@@ -188,8 +188,8 @@ class MockKeyringService: BraveWalletKeyringService {
     }
     return address
   }
-
-  func importAccount(_ accountName: String, privateKey: String, completion: @escaping (Bool, String) -> Void) {
+  
+  func importAccount(_ accountName: String, privateKey: String, coin: BraveWallet.CoinType, completion: @escaping (BraveWallet.AccountInfo?) -> Void) {
     let address = nextImportedAddress()
     let info = BraveWallet.AccountInfo(
       accountId: .init(
@@ -208,15 +208,21 @@ class MockKeyringService: BraveWalletKeyringService {
     observers.allObjects.forEach {
       $0.accountsChanged()
     }
-    completion(true, info.address)
+    completion(info)
   }
 
-  func importFilecoinAccount(_ accountName: String, privateKey: String, network: String, completion: @escaping (Bool, String) -> Void) {
-    completion(false, "")
+//  func importFilecoinAccount(_ accountName: String, privateKey: String, network: String, completion: @escaping (Bool, String) -> Void) {
+//    completion(false, "")
+//  }
+  func importFilecoinAccount(_ accountName: String, privateKey: String, network: String, completion: @escaping (BraveWallet.AccountInfo?) -> Void) {
+    completion(nil)
   }
 
-  func importAccount(fromJson accountName: String, password: String, json: String, completion: @escaping (Bool, String) -> Void) {
-    completion(false, "")
+//  func importAccount(fromJson accountName: String, password: String, json: String, completion: @escaping (Bool, String) -> Void) {
+//    completion(false, "")
+//  }
+  func importAccount(fromJson accountName: String, password: String, json: String, completion: @escaping (BraveWallet.AccountInfo?) -> Void) {
+    completion(nil)
   }
 
   func importAccount(_ accountName: String, privateKey: String, coin: BraveWallet.CoinType, completion: @escaping (Bool, String) -> Void) {

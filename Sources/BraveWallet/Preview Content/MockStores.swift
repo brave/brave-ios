@@ -256,8 +256,7 @@ extension BraveWallet.TestSolanaTxManagerProxy {
 extension BraveWallet.TestBraveWalletService {
   static var previewWalletService: BraveWallet.TestBraveWalletService {
     let walletService = BraveWallet.TestBraveWalletService()
-    walletService._selectedCoin = { $0(.eth) }
-    
+//    walletService._selectedCoin = { $0(.eth) }
     return walletService
   }
 }

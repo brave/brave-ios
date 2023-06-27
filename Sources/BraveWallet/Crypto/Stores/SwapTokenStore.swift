@@ -244,66 +244,67 @@ public class SwapTokenStore: ObservableObject {
   }
   
   @MainActor private func createEthSwapTransaction() async -> Bool {
-    self.isMakingTx = true
-    defer { self.isMakingTx = false }
-    let coin = await walletService.selectedCoin()
-    let network = await rpcService.network(coin, origin: nil)
-    guard
-      let accountInfo = self.accountInfo,
-      let swapParams = self.swapParameters(for: .perSellAsset, in: network)
-    else {
-      self.state = .error(Strings.Wallet.unknownError)
-      self.clearAllAmount()
-      return false
-    }
-    let (swapResponse, _, _) = await swapService.transactionPayload(swapParams)
-    guard let swapResponse = swapResponse else {
-      self.state = .error(Strings.Wallet.unknownError)
-      self.clearAllAmount()
-      return false
-    }
-    let weiFormatter = WeiFormatter(decimalFormatStyle: .decimals(precision: 18))
-    let gasPrice = "0x\(weiFormatter.weiString(from: swapResponse.gasPrice, radix: .hex, decimals: 0) ?? "0")"  // already in wei
-    let gasLimit = "0x\(weiFormatter.weiString(from: swapResponse.estimatedGas, radix: .hex, decimals: 0) ?? "0")"  // already in wei
-    let value = "0x\(weiFormatter.weiString(from: swapResponse.value, radix: .hex, decimals: 0) ?? "0")"  // already in wei
-    let data: [NSNumber] = .init(hexString: swapResponse.data) ?? .init()
-    
-    if network.isEip1559 {
-      let baseData: BraveWallet.TxData = .init(
-        nonce: "",
-        gasPrice: "",  // no gas price in eip1559
-        gasLimit: gasLimit,
-        to: swapResponse.to,
-        value: value,
-        data: data,
-        signOnly: false,
-        signedTransaction: nil
-      )
-      let success = await self.makeEIP1559Tx(chainId: network.chainId, baseData: baseData, from: accountInfo)
-      if !success {
-        self.state = .error(Strings.Wallet.unknownError)
-        self.clearAllAmount()
-      }
-      return success
-    } else {
-      let baseData: BraveWallet.TxData = .init(
-        nonce: "",
-        gasPrice: gasPrice,
-        gasLimit: gasLimit,
-        to: swapResponse.to,
-        value: value,
-        data: data,
-        signOnly: false,
-        signedTransaction: nil
-      )
-      let txDataUnion = BraveWallet.TxDataUnion(ethTxData: baseData)
-      let (success, _, _) = await txService.addUnapprovedTransaction(txDataUnion, from: accountInfo.address, origin: nil, groupId: nil)
-      if !success {
-        self.state = .error(Strings.Wallet.unknownError)
-        self.clearAllAmount()
-      }
-      return success
-    }
+//    self.isMakingTx = true
+//    defer { self.isMakingTx = false }
+//    let coin = await walletService.selectedCoin()
+//    let network = await rpcService.network(coin, origin: nil)
+//    guard
+//      let accountInfo = self.accountInfo,
+//      let swapParams = self.swapParameters(for: .perSellAsset, in: network)
+//    else {
+//      self.state = .error(Strings.Wallet.unknownError)
+//      self.clearAllAmount()
+//      return false
+//    }
+//    let (swapResponse, _, _) = await swapService.transactionPayload(swapParams)
+//    guard let swapResponse = swapResponse else {
+//      self.state = .error(Strings.Wallet.unknownError)
+//      self.clearAllAmount()
+//      return false
+//    }
+//    let weiFormatter = WeiFormatter(decimalFormatStyle: .decimals(precision: 18))
+//    let gasPrice = "0x\(weiFormatter.weiString(from: swapResponse.gasPrice, radix: .hex, decimals: 0) ?? "0")"  // already in wei
+//    let gasLimit = "0x\(weiFormatter.weiString(from: swapResponse.estimatedGas, radix: .hex, decimals: 0) ?? "0")"  // already in wei
+//    let value = "0x\(weiFormatter.weiString(from: swapResponse.value, radix: .hex, decimals: 0) ?? "0")"  // already in wei
+//    let data: [NSNumber] = .init(hexString: swapResponse.data) ?? .init()
+//
+//    if network.isEip1559 {
+//      let baseData: BraveWallet.TxData = .init(
+//        nonce: "",
+//        gasPrice: "",  // no gas price in eip1559
+//        gasLimit: gasLimit,
+//        to: swapResponse.to,
+//        value: value,
+//        data: data,
+//        signOnly: false,
+//        signedTransaction: nil
+//      )
+//      let success = await self.makeEIP1559Tx(chainId: network.chainId, baseData: baseData, from: accountInfo)
+//      if !success {
+//        self.state = .error(Strings.Wallet.unknownError)
+//        self.clearAllAmount()
+//      }
+//      return success
+//    } else {
+//      let baseData: BraveWallet.TxData = .init(
+//        nonce: "",
+//        gasPrice: gasPrice,
+//        gasLimit: gasLimit,
+//        to: swapResponse.to,
+//        value: value,
+//        data: data,
+//        signOnly: false,
+//        signedTransaction: nil
+//      )
+//      let txDataUnion = BraveWallet.TxDataUnion(ethTxData: baseData)
+//      let (success, _, _) = await txService.addUnapprovedTransaction(txDataUnion, from: accountInfo.address, origin: nil, groupId: nil)
+//      if !success {
+//        self.state = .error(Strings.Wallet.unknownError)
+//        self.clearAllAmount()
+//      }
+//      return success
+//    }
+    return false
   }
 
   private func clearAllAmount() {
@@ -354,59 +355,60 @@ public class SwapTokenStore: ObservableObject {
   @MainActor private func createERC20ApprovalTransaction(
       _ spenderAddress: String
   ) async -> Bool {
-    guard
-      let fromToken = selectedFromToken,
-      let accountInfo = accountInfo
-    else {
-      return false
-    }
-    
-    // IMPORTANT SECURITY NOTICE
-    //
-    // The token allowance suggested by Swap is always unlimited,
-    // i.e., max(uint256). While unlimited approvals are not safe from a
-    // security standpoint, and this puts the entire token balance at risk
-    // if 0x contracts are ever exploited, we still opted for this to give
-    // users a frictionless UX and save on gas fees.
-    //
-    // The transaction confirmation screen for ERC20 approve() shows a loud
-    // security notice, and still allows users to edit the default approval
-    // amount.
-    let allowance = WalletConstants.MAX_UINT256
-    self.isMakingTx = true
-    defer { self.isMakingTx = false }
-    let coin = await walletService.selectedCoin()
-    let network = await rpcService.network(coin, origin: nil)
-    let (success, data) = await ethTxManagerProxy.makeErc20ApproveData(spenderAddress, amount: allowance)
-    guard success else {
-      return false
-    }
-    let baseData = BraveWallet.TxData(
-      nonce: "",
-      gasPrice: "",
-      gasLimit: "",
-      to: fromToken.contractAddress(in: network),
-      value: "0x0",
-      data: data,
-      signOnly: false,
-      signedTransaction: nil
-    )
-    if network.isEip1559 {
-      let success = await self.makeEIP1559Tx(chainId: network.chainId, baseData: baseData, from: accountInfo)
-      if !success {
-        self.state = .error(Strings.Wallet.unknownError)
-        self.clearAllAmount()
-      }
-      return success
-    } else {
-      let txDataUnion = BraveWallet.TxDataUnion(ethTxData: baseData)
-      let (success, _, _) = await txService.addUnapprovedTransaction(txDataUnion, from: accountInfo.address, origin: nil, groupId: nil)
-      if !success {
-        self.state = .error(Strings.Wallet.unknownError)
-        self.clearAllAmount()
-      }
-      return success
-    }
+//    guard
+//      let fromToken = selectedFromToken,
+//      let accountInfo = accountInfo
+//    else {
+//      return false
+//    }
+//
+//    // IMPORTANT SECURITY NOTICE
+//    //
+//    // The token allowance suggested by Swap is always unlimited,
+//    // i.e., max(uint256). While unlimited approvals are not safe from a
+//    // security standpoint, and this puts the entire token balance at risk
+//    // if 0x contracts are ever exploited, we still opted for this to give
+//    // users a frictionless UX and save on gas fees.
+//    //
+//    // The transaction confirmation screen for ERC20 approve() shows a loud
+//    // security notice, and still allows users to edit the default approval
+//    // amount.
+//    let allowance = WalletConstants.MAX_UINT256
+//    self.isMakingTx = true
+//    defer { self.isMakingTx = false }
+//    let coin = await walletService.selectedCoin()
+//    let network = await rpcService.network(coin, origin: nil)
+//    let (success, data) = await ethTxManagerProxy.makeErc20ApproveData(spenderAddress, amount: allowance)
+//    guard success else {
+//      return false
+//    }
+//    let baseData = BraveWallet.TxData(
+//      nonce: "",
+//      gasPrice: "",
+//      gasLimit: "",
+//      to: fromToken.contractAddress(in: network),
+//      value: "0x0",
+//      data: data,
+//      signOnly: false,
+//      signedTransaction: nil
+//    )
+//    if network.isEip1559 {
+//      let success = await self.makeEIP1559Tx(chainId: network.chainId, baseData: baseData, from: accountInfo)
+//      if !success {
+//        self.state = .error(Strings.Wallet.unknownError)
+//        self.clearAllAmount()
+//      }
+//      return success
+//    } else {
+//      let txDataUnion = BraveWallet.TxDataUnion(ethTxData: baseData)
+//      let (success, _, _) = await txService.addUnapprovedTransaction(txDataUnion, from: accountInfo.address, origin: nil, groupId: nil)
+//      if !success {
+//        self.state = .error(Strings.Wallet.unknownError)
+//        self.clearAllAmount()
+//      }
+//      return success
+//    }
+    return false
   }
   
   @MainActor private func makeEIP1559Tx(
@@ -445,55 +447,55 @@ public class SwapTokenStore: ObservableObject {
   }
 
   @MainActor private func checkBalanceShowError(swapResponse: BraveWallet.SwapResponse) async {
-    guard
-      let accountInfo = accountInfo,
-      let sellAmountValue = BDouble(sellAmount.normalizedDecimals),
-      let gasLimit = BDouble(swapResponse.estimatedGas),
-      let gasPrice = BDouble(swapResponse.gasPrice, over: "1000000000000000000"),
-      let fromToken = selectedFromToken,
-      let fromTokenBalance = selectedFromTokenBalance
-    else { return }
-
-    // Check if balance is insufficient
-    guard sellAmountValue <= fromTokenBalance else {
-      state = .error(Strings.Wallet.insufficientBalance)
-      return
-    }
-
-    // Get ETH balance for this account because gas can only be paid in ETH
-    let coin = await walletService.selectedCoin()
-    let network = await rpcService.network(coin, origin: nil)
-    let (balance, status, _) = await rpcService.balance(accountInfo.address, coin: network.coin, chainId: network.chainId)
-    if status == BraveWallet.ProviderError.success {
-      let fee = gasLimit * gasPrice
-      let balanceFormatter = WeiFormatter(decimalFormatStyle: .balance)
-      let currentBalance = BDouble(balanceFormatter.decimalString(for: balance.removingHexPrefix, radix: .hex, decimals: 18) ?? "") ?? 0
-      if fromToken.symbol == network.symbol {
-        if currentBalance < fee + sellAmountValue {
-          self.state = .error(Strings.Wallet.insufficientFundsForGas)
-          return
-        }
-      } else {
-        if currentBalance < fee {
-          self.state = .error(Strings.Wallet.insufficientFundsForGas)
-          return
-        }
-      }
-      self.state = .swap
-      // check for ERC20 token allowance
-      if fromToken.isErc20 {
-        await self.checkAllowance(
-          network: network,
-          ownerAddress: accountInfo.address,
-          spenderAddress: swapResponse.allowanceTarget,
-          amountToSend: sellAmountValue,
-          fromToken: fromToken
-        )
-      }
-    } else {
-      self.state = .error(Strings.Wallet.unknownError)
-      self.clearAllAmount()
-    }
+//    guard
+//      let accountInfo = accountInfo,
+//      let sellAmountValue = BDouble(sellAmount.normalizedDecimals),
+//      let gasLimit = BDouble(swapResponse.estimatedGas),
+//      let gasPrice = BDouble(swapResponse.gasPrice, over: "1000000000000000000"),
+//      let fromToken = selectedFromToken,
+//      let fromTokenBalance = selectedFromTokenBalance
+//    else { return }
+//
+//    // Check if balance is insufficient
+//    guard sellAmountValue <= fromTokenBalance else {
+//      state = .error(Strings.Wallet.insufficientBalance)
+//      return
+//    }
+//
+//    // Get ETH balance for this account because gas can only be paid in ETH
+//    let coin = await walletService.selectedCoin()
+//    let network = await rpcService.network(coin, origin: nil)
+//    let (balance, status, _) = await rpcService.balance(accountInfo.address, coin: network.coin, chainId: network.chainId)
+//    if status == BraveWallet.ProviderError.success {
+//      let fee = gasLimit * gasPrice
+//      let balanceFormatter = WeiFormatter(decimalFormatStyle: .balance)
+//      let currentBalance = BDouble(balanceFormatter.decimalString(for: balance.removingHexPrefix, radix: .hex, decimals: 18) ?? "") ?? 0
+//      if fromToken.symbol == network.symbol {
+//        if currentBalance < fee + sellAmountValue {
+//          self.state = .error(Strings.Wallet.insufficientFundsForGas)
+//          return
+//        }
+//      } else {
+//        if currentBalance < fee {
+//          self.state = .error(Strings.Wallet.insufficientFundsForGas)
+//          return
+//        }
+//      }
+//      self.state = .swap
+//      // check for ERC20 token allowance
+//      if fromToken.isErc20 {
+//        await self.checkAllowance(
+//          network: network,
+//          ownerAddress: accountInfo.address,
+//          spenderAddress: swapResponse.allowanceTarget,
+//          amountToSend: sellAmountValue,
+//          fromToken: fromToken
+//        )
+//      }
+//    } else {
+//      self.state = .error(Strings.Wallet.unknownError)
+//      self.clearAllAmount()
+//    }
   }
 
   @MainActor private func checkAllowance(
@@ -674,44 +676,45 @@ public class SwapTokenStore: ObservableObject {
   }
 
   @MainActor func createSwapTransaction() async -> Bool {
-    switch state {
-    case .error, .idle:
-      // will never come here
-      return false
-    case let .lowAllowance(spenderAddress):
-      return await createERC20ApprovalTransaction(spenderAddress)
-    case .swap:
-      let coin = await walletService.selectedCoin()
-      switch coin {
-      case .eth:
-        return await createEthSwapTransaction()
-      case .sol:
-        return await createSolSwapTransaction()
-      default:
-        return false
-      }
-    }
+//    switch state {
+//    case .error, .idle:
+//      // will never come here
+//      return false
+//    case let .lowAllowance(spenderAddress):
+//      return await createERC20ApprovalTransaction(spenderAddress)
+//    case .swap:
+//      let coin = await walletService.selectedCoin()
+//      switch coin {
+//      case .eth:
+//        return await createEthSwapTransaction()
+//      case .sol:
+//        return await createSolSwapTransaction()
+//      default:
+//        return false
+//      }
+//    }
+    return false
   }
 
   func fetchPriceQuote(base: SwapParamsBase) {
-    Task { @MainActor in
-      // reset jupiter quote before fetching new quote
-      self.jupiterQuote = nil
-      let coin = await walletService.selectedCoin()
-      let network = await rpcService.network(coin, origin: nil)
-      guard let swapParams = self.swapParameters(for: base, in: network) else {
-        self.state = .idle
-        return
-      }
-      switch coin {
-      case .eth:
-        await fetchEthPriceQuote(base: base, swapParams: swapParams, network: network)
-      case .sol:
-        await fetchSolPriceQuote(base: base, swapParams: swapParams, network: network)
-      default:
-        break
-      }
-    }
+//    Task { @MainActor in
+//      // reset jupiter quote before fetching new quote
+//      self.jupiterQuote = nil
+//      let coin = await walletService.selectedCoin()
+//      let network = await rpcService.network(coin, origin: nil)
+//      guard let swapParams = self.swapParameters(for: base, in: network) else {
+//        self.state = .idle
+//        return
+//      }
+//      switch coin {
+//      case .eth:
+//        await fetchEthPriceQuote(base: base, swapParams: swapParams, network: network)
+//      case .sol:
+//        await fetchSolPriceQuote(base: base, swapParams: swapParams, network: network)
+//      default:
+//        break
+//      }
+//    }
   }
   
   @MainActor private func fetchEthPriceQuote(
@@ -786,66 +789,66 @@ public class SwapTokenStore: ObservableObject {
       }
     }
 
-    // All tokens from token registry
-    walletService.selectedCoin { [weak self] coinType in
-      guard let self = self else { return }
-      self.rpcService.network(coinType, origin: nil) { network in
-        // Closure run after validating the prefilledToken (if applicable)
-        let continueClosure: (BraveWallet.NetworkInfo) -> Void = { [weak self] network in
-          guard let self = self else { return }
-          self.blockchainRegistry.allTokens(network.chainId, coin: network.coin) { tokens in
-            // Native token on the current selected network
-            let nativeAsset = network.nativeToken
-            // Custom tokens added by users
-            let userAssets = self.assetManager.getAllUserAssetsInNetworkAssets(networks: [network]).flatMap { $0.tokens }
-            let customTokens = userAssets.filter { asset in
-              !tokens.contains(where: { $0.contractAddress(in: network).caseInsensitiveCompare(asset.contractAddress) == .orderedSame })
-            }
-            let sortedCustomTokens = customTokens.sorted {
-              if $0.contractAddress(in: network).caseInsensitiveCompare(nativeAsset.contractAddress) == .orderedSame {
-                return true
-              } else {
-                return $0.symbol < $1.symbol
-              }
-            }
-            self.allTokens = (sortedCustomTokens + tokens.sorted(by: { $0.symbol < $1.symbol })).filter { !$0.isNft }
-            // Seems like user assets always include the selected network's native asset
-            // But let's make sure all token list includes the native asset
-            if !self.allTokens.contains(where: { $0.symbol.lowercased() == nativeAsset.symbol.lowercased() }) {
-              self.allTokens.insert(nativeAsset, at: 0)
-            }
-            updateSelectedTokens(in: network)
-          }
-        }
-        
-        // validate the `prefilledToken`
-        if let prefilledToken = self.prefilledToken {
-          if prefilledToken.coin == network.coin && prefilledToken.chainId == network.chainId {
-            self.selectedFromToken = prefilledToken
-            continueClosure(network)
-          } else {
-            self.rpcService.allNetworks(prefilledToken.coin) { allNetworksForTokenCoin in
-              guard let networkForToken = allNetworksForTokenCoin.first(where: { $0.chainId == prefilledToken.chainId }) else {
-                // don't set prefilled token if it belongs to a network we don't know
-                continueClosure(network)
-                return
-              }
-              self.rpcService.setNetwork(networkForToken.chainId, coin: networkForToken.coin, origin: nil) { success in
-                if success {
-                  self.selectedFromToken = prefilledToken
-                  continueClosure(networkForToken) // network changed
-                } else {
-                  continueClosure(network)
-                }
-              }
-            }
-          }
-          self.prefilledToken = nil
-        } else { // `prefilledToken` is nil
-          continueClosure(network)
-        }
-      }
-    }
+//    // All tokens from token registry
+//    walletService.selectedCoin { [weak self] coinType in
+//      guard let self = self else { return }
+//      self.rpcService.network(coinType, origin: nil) { network in
+//        // Closure run after validating the prefilledToken (if applicable)
+//        let continueClosure: (BraveWallet.NetworkInfo) -> Void = { [weak self] network in
+//          guard let self = self else { return }
+//          self.blockchainRegistry.allTokens(network.chainId, coin: network.coin) { tokens in
+//            // Native token on the current selected network
+//            let nativeAsset = network.nativeToken
+//            // Custom tokens added by users
+//            let userAssets = self.assetManager.getAllUserAssetsInNetworkAssets(networks: [network]).flatMap { $0.tokens }
+//            let customTokens = userAssets.filter { asset in
+//              !tokens.contains(where: { $0.contractAddress(in: network).caseInsensitiveCompare(asset.contractAddress) == .orderedSame })
+//            }
+//            let sortedCustomTokens = customTokens.sorted {
+//              if $0.contractAddress(in: network).caseInsensitiveCompare(nativeAsset.contractAddress) == .orderedSame {
+//                return true
+//              } else {
+//                return $0.symbol < $1.symbol
+//              }
+//            }
+//            self.allTokens = (sortedCustomTokens + tokens.sorted(by: { $0.symbol < $1.symbol })).filter { !$0.isNft }
+//            // Seems like user assets always include the selected network's native asset
+//            // But let's make sure all token list includes the native asset
+//            if !self.allTokens.contains(where: { $0.symbol.lowercased() == nativeAsset.symbol.lowercased() }) {
+//              self.allTokens.insert(nativeAsset, at: 0)
+//            }
+//            updateSelectedTokens(in: network)
+//          }
+//        }
+//
+//        // validate the `prefilledToken`
+//        if let prefilledToken = self.prefilledToken {
+//          if prefilledToken.coin == network.coin && prefilledToken.chainId == network.chainId {
+//            self.selectedFromToken = prefilledToken
+//            continueClosure(network)
+//          } else {
+//            self.rpcService.allNetworks(prefilledToken.coin) { allNetworksForTokenCoin in
+//              guard let networkForToken = allNetworksForTokenCoin.first(where: { $0.chainId == prefilledToken.chainId }) else {
+//                // don't set prefilled token if it belongs to a network we don't know
+//                continueClosure(network)
+//                return
+//              }
+//              self.rpcService.setNetwork(networkForToken.chainId, coin: networkForToken.coin, origin: nil) { success in
+//                if success {
+//                  self.selectedFromToken = prefilledToken
+//                  continueClosure(networkForToken) // network changed
+//                } else {
+//                  continueClosure(network)
+//                }
+//              }
+//            }
+//          }
+//          self.prefilledToken = nil
+//        } else { // `prefilledToken` is nil
+//          continueClosure(network)
+//        }
+//      }
+//    }
   }
   
   func suggestedAmountTapped(_ amount: ShortcutAmountGrid.Amount) {
@@ -914,21 +917,26 @@ extension SwapTokenStore: BraveWalletKeyringServiceObserver {
   public func autoLockMinutesChanged() {
   }
 
-  public func selectedAccountChanged(_ coinType: BraveWallet.CoinType) {
-    Task { @MainActor in
-      let network = await rpcService.network(coinType, origin: nil)
-      let isSwapSupported = await swapService.isSwapSupported(network.chainId)
-      guard isSwapSupported else { return }
-      
-      let keyringInfo = await keyringService.keyringInfo(coinType.keyringId)
-      if !keyringInfo.accountInfos.isEmpty {
-        let accountAddress = await keyringService.selectedAccount(coinType)
-        let selectedAccountInfo = keyringInfo.accountInfos.first(where: { $0.address == accountAddress }) ?? keyringInfo.accountInfos.first!
-        prepare(with: selectedAccountInfo) { [self] in
-          fetchPriceQuote(base: .perSellAsset)
-        }
-      }
-    }
+//  public func selectedAccountChanged(_ coinType: BraveWallet.CoinType) {
+//    Task { @MainActor in
+//      let network = await rpcService.network(coinType, origin: nil)
+//      let isSwapSupported = await swapService.isSwapSupported(network.chainId)
+//      guard isSwapSupported else { return }
+//
+//      let keyringInfo = await keyringService.keyringInfo(coinType.keyringId)
+//      if !keyringInfo.accountInfos.isEmpty {
+//        let accountAddress = await keyringService.selectedAccount(coinType)
+//        let selectedAccountInfo = keyringInfo.accountInfos.first(where: { $0.address == accountAddress }) ?? keyringInfo.accountInfos.first!
+//        prepare(with: selectedAccountInfo) { [self] in
+//          fetchPriceQuote(base: .perSellAsset)
+//        }
+//      }
+//    }
+//  }
+  public func selectedWalletAccountChanged(_ account: BraveWallet.AccountInfo) {
+  }
+  
+  public func selectedDappAccountChanged(_ coin: BraveWallet.CoinType, account: BraveWallet.AccountInfo?) {
   }
   
   public func accountsAdded(_ addedAccounts: [BraveWallet.AccountInfo]) {

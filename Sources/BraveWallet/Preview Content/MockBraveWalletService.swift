@@ -250,5 +250,17 @@ class MockBraveWalletService: BraveWalletBraveWalletService {
   func simpleHashSpamNfTs(_ walletAddress: String, chainIds: [String], coin: BraveWallet.CoinType, cursor: String?, completion: @escaping ([BraveWallet.BlockchainToken], String?) -> Void) {
     completion([], nil)
   }
+  
+  func ensureSelectedAccount(forChain coin: BraveWallet.CoinType, chainId: String, completion: @escaping (BraveWallet.AccountId?) -> Void) {
+    completion(nil)
+  }
+  
+  func networkForSelectedAccount(onActiveOrigin completion: @escaping (BraveWallet.NetworkInfo?) -> Void) {
+    completion(nil)
+  }
+  
+  func setNetworkForSelectedAccountOnActiveOrigin(_ chainId: String, completion: @escaping (Bool) -> Void) {
+    completion(false)
+  }
 }
 #endif

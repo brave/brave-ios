@@ -41,13 +41,13 @@ extension BraveWalletKeyringService {
     return await withTaskGroup(
       of: BraveWallet.AccountInfo?.self,
       body: { @MainActor group in
-        for coin in coins {
-          group.addTask { @MainActor in
-            let accounts = await self.keyringInfo(coin.keyringId).accountInfos
-            let selectedAccountAddress = await self.selectedAccount(coin)
-            return accounts.first(where: { $0.address.caseInsensitiveCompare(selectedAccountAddress ?? "") == .orderedSame })
-          }
-        }
+//        for coin in coins {
+//          group.addTask { @MainActor in
+//            let accounts = await self.keyringInfo(coin.keyringId).accountInfos
+//            let selectedAccountAddress = await self.selectedAccount(coin)
+//            return accounts.first(where: { $0.address.caseInsensitiveCompare(selectedAccountAddress ?? "") == .orderedSame })
+//          }
+//        }
         var defaultAccounts: [BraveWallet.AccountInfo] = []
         for await account in group {
           if let account = account {

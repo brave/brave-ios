@@ -190,22 +190,22 @@ public class SendTokenStore: ObservableObject {
   }
   
   func didSelect(account: BraveWallet.AccountInfo, token: BraveWallet.BlockchainToken) {
-    Task { @MainActor in
-      let selectedCoin = await walletService.selectedCoin()
-      
-      let selectedAccount = await self.keyringService.selectedAccount(selectedCoin)
-      if selectedAccount != account.address {
-        _ = await self.keyringService.setSelectedAccount(account.accountId)
-      }
-      
-      let selectedChain = await rpcService.network(selectedCoin, origin: nil)
-      if self.selectedSendToken != token || selectedChain.chainId != token.chainId {
-        _ = await self.rpcService.setNetwork(token.chainId, coin: token.coin, origin: nil)
-        self.prefilledToken = token
-      }
-      
-      self.update()
-    }
+//    Task { @MainActor in
+//      let selectedCoin = await walletService.selectedCoin()
+//
+//      let selectedAccount = await self.keyringService.selectedAccount(selectedCoin)
+//      if selectedAccount != account.address {
+//        _ = await self.keyringService.setSelectedAccount(account.accountId)
+//      }
+//
+//      let selectedChain = await rpcService.network(selectedCoin, origin: nil)
+//      if self.selectedSendToken != token || selectedChain.chainId != token.chainId {
+//        _ = await self.rpcService.setNetwork(token.chainId, coin: token.coin, origin: nil)
+//        self.prefilledToken = token
+//      }
+//
+//      self.update()
+//    }
   }
   
   @MainActor private func validatePrefilledToken(on network: inout BraveWallet.NetworkInfo) async {
@@ -234,45 +234,45 @@ public class SendTokenStore: ObservableObject {
   private var updateTask: Task<(), Never>?
   /// Updates the `userAssets`, `allTokens`, and `selectedSendTokenBalance`
   func update() {
-    self.updateTask?.cancel()
-    self.updateTask = Task { @MainActor in
-      self.isLoading = true
-      defer { self.isLoading = false }
-      var coin = await self.walletService.selectedCoin()
-      var network = await self.rpcService.network(coin, origin: nil)
-      await validatePrefilledToken(on: &network) // network may change
-      coin = network.coin // in case network changed
-      // fetch user assets
-      let userAssets = assetManager.getAllUserAssetsInNetworkAssets(networks: [network]).flatMap { $0.tokens }
-      let allTokens = await self.blockchainRegistry.allTokens(network.chainId, coin: network.coin)
-      guard !Task.isCancelled else { return }
-      if selectedSendToken == nil {
-        self.selectedSendToken = userAssets.first
-      }
-      self.userAssets = userAssets
-      self.allTokens = allTokens
-      self.validateSendAddress() // `sendAddress` may match a token contract address
-      // fetch balance for `selectedSendToken`
-      guard let selectedAccount = await self.keyringService.selectedAccount(coin),
-            let selectedSendToken = self.selectedSendToken else {
-        self.selectedSendTokenBalance = nil // no selected account, or send token is nil
-        return
-      }
-      let balance = await self.rpcService.balance(
-        for: selectedSendToken,
-        in: selectedAccount,
-        network: network,
-        decimalFormatStyle: .decimals(precision: Int(selectedSendToken.decimals))
-      )
-  
-      if (selectedSendToken.isErc721 || selectedSendToken.isNft), metadataCache[selectedSendToken.id] == nil {
-        metadataCache[selectedSendToken.id] = await rpcService.fetchNFTMetadata(for: selectedSendToken, ipfsApi: self.ipfsApi)
-      }
-      guard !Task.isCancelled else { return }
-      self.selectedSendTokenBalance = balance
-      self.selectedSendNFTMetadata = metadataCache[selectedSendToken.id]
-      self.validateBalance()
-    }
+//    self.updateTask?.cancel()
+//    self.updateTask = Task { @MainActor in
+//      self.isLoading = true
+//      defer { self.isLoading = false }
+//      var coin = await self.walletService.selectedCoin()
+//      var network = await self.rpcService.network(coin, origin: nil)
+//      await validatePrefilledToken(on: &network) // network may change
+//      coin = network.coin // in case network changed
+//      // fetch user assets
+//      let userAssets = assetManager.getAllUserAssetsInNetworkAssets(networks: [network]).flatMap { $0.tokens }
+//      let allTokens = await self.blockchainRegistry.allTokens(network.chainId, coin: network.coin)
+//      guard !Task.isCancelled else { return }
+//      if selectedSendToken == nil {
+//        self.selectedSendToken = userAssets.first
+//      }
+//      self.userAssets = userAssets
+//      self.allTokens = allTokens
+//      self.validateSendAddress() // `sendAddress` may match a token contract address
+//      // fetch balance for `selectedSendToken`
+//      guard let selectedAccount = await self.keyringService.selectedAccount(coin),
+//            let selectedSendToken = self.selectedSendToken else {
+//        self.selectedSendTokenBalance = nil // no selected account, or send token is nil
+//        return
+//      }
+//      let balance = await self.rpcService.balance(
+//        for: selectedSendToken,
+//        in: selectedAccount,
+//        network: network,
+//        decimalFormatStyle: .decimals(precision: Int(selectedSendToken.decimals))
+//      )
+//
+//      if (selectedSendToken.isErc721 || selectedSendToken.isNft), metadataCache[selectedSendToken.id] == nil {
+//        metadataCache[selectedSendToken.id] = await rpcService.fetchNFTMetadata(for: selectedSendToken, ipfsApi: self.ipfsApi)
+//      }
+//      guard !Task.isCancelled else { return }
+//      self.selectedSendTokenBalance = balance
+//      self.selectedSendNFTMetadata = metadataCache[selectedSendToken.id]
+//      self.validateBalance()
+//    }
   }
 
   private func makeEIP1559Tx(
@@ -290,25 +290,25 @@ public class SendTokenStore: ObservableObject {
   
   private var validateSendAddressTask: Task<Void, Never>?
   private func validateSendAddress() {
-    validateSendAddressTask?.cancel()
-    validateSendAddressTask = Task { @MainActor in
-      guard !sendAddress.isEmpty,
-            case let coin = await self.walletService.selectedCoin(),
-            let sendFromAddress = await self.keyringService.selectedAccount(coin),
-            !Task.isCancelled else {
-        return
-      }
-      switch coin {
-      case .eth:
-        await validateEthereumSendAddress(fromAddress: sendFromAddress)
-      case .sol:
-        await validateSolanaSendAddress(fromAddress: sendFromAddress)
-      case .fil, .btc:
-        break
-      @unknown default:
-        break
-      }
-    }
+//    validateSendAddressTask?.cancel()
+//    validateSendAddressTask = Task { @MainActor in
+//      guard !sendAddress.isEmpty,
+//            case let coin = await self.walletService.selectedCoin(),
+//            let sendFromAddress = await self.keyringService.selectedAccount(coin),
+//            !Task.isCancelled else {
+//        return
+//      }
+//      switch coin {
+//      case .eth:
+//        await validateEthereumSendAddress(fromAddress: sendFromAddress)
+//      case .sol:
+//        await validateSolanaSendAddress(fromAddress: sendFromAddress)
+//      case .fil, .btc:
+//        break
+//      @unknown default:
+//        break
+//      }
+//    }
   }
   
   @MainActor private func validateEthereumSendAddress(fromAddress: String) async {
@@ -469,24 +469,24 @@ public class SendTokenStore: ObservableObject {
       completion(false, "An Internal Error")
       return
     }
-    let amount = (token.isErc721 || token.isNft) ? "1" : amount
-    walletService.selectedCoin { [weak self] coin in
-      guard let self = self else { return }
-      self.keyringService.selectedAccount(coin) { selectedAccount in
-        guard let selectedAccount = selectedAccount else {
-          completion(false, "An Internal Error")
-          return
-        }
-        switch coin {
-        case .eth:
-          self.sendTokenOnEth(amount: amount, token: token, fromAddress: selectedAccount, completion: completion)
-        case .sol:
-          self.sendTokenOnSol(amount: amount, token: token, fromAddress: selectedAccount, completion: completion)
-        default:
-          break
-        }
-      }
-    }
+//    let amount = (token.isErc721 || token.isNft) ? "1" : amount
+//    walletService.selectedCoin { [weak self] coin in
+//      guard let self = self else { return }
+//      self.keyringService.selectedAccount(coin) { selectedAccount in
+//        guard let selectedAccount = selectedAccount else {
+//          completion(false, "An Internal Error")
+//          return
+//        }
+//        switch coin {
+//        case .eth:
+//          self.sendTokenOnEth(amount: amount, token: token, fromAddress: selectedAccount, completion: completion)
+//        case .sol:
+//          self.sendTokenOnSol(amount: amount, token: token, fromAddress: selectedAccount, completion: completion)
+//        default:
+//          break
+//        }
+//      }
+//    }
   }
 
   func sendTokenOnEth(
@@ -638,11 +638,16 @@ extension SendTokenStore: BraveWalletKeyringServiceObserver {
   public func autoLockMinutesChanged() {
   }
 
-  public func selectedAccountChanged(_ coinType: BraveWallet.CoinType) {
-    selectedSendTokenBalance = nil
-    addressError = nil
-    update() // `selectedSendTokenBalance` needs updated for new account
-    validateSendAddress() // `sendAddress` may equal selected account address
+//  public func selectedAccountChanged(_ coinType: BraveWallet.CoinType) {
+//    selectedSendTokenBalance = nil
+//    addressError = nil
+//    update() // `selectedSendTokenBalance` needs updated for new account
+//    validateSendAddress() // `sendAddress` may equal selected account address
+//  }
+  public func selectedWalletAccountChanged(_ account: BraveWallet.AccountInfo) {
+  }
+  
+  public func selectedDappAccountChanged(_ coin: BraveWallet.CoinType, account: BraveWallet.AccountInfo?) {
   }
   
   public func accountsAdded(_ addedAccounts: [BraveWallet.AccountInfo]) {
