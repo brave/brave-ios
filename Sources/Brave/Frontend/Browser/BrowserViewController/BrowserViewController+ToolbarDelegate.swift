@@ -914,71 +914,63 @@ extension BrowserViewController: ToolbarDelegate {
 
 extension BrowserViewController: UIContextMenuInteractionDelegate {
   public func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
-    
-    func createURLBarContextMenuConfiguration(priorityEnabled: Bool) -> UIContextMenuConfiguration {
-      let configuration =  UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [unowned self] _ in
-        var actionMenu: [UIMenu] = []
-        var pasteMenuChildren: [UIAction] = []
-        
-        let pasteGoAction = UIAction(
-          identifier: .pasteAndGo,
-          handler: UIAction.deferredActionHandler { _ in
-            if let pasteboardContents = UIPasteboard.general.string {
-              self.topToolbar(self.topToolbar, didSubmitText: pasteboardContents)
-            }
-          })
-        
-        let pasteAction = UIAction(
-          identifier: .paste,
-          handler: UIAction.deferredActionHandler { _ in
-            if let pasteboardContents = UIPasteboard.general.string {
-              // Enter overlay mode and make the search controller appear.
-              self.topToolbar.enterOverlayMode(pasteboardContents, pasted: true, search: true)
-            }
-          })
-        
-        pasteMenuChildren = [pasteGoAction, pasteAction]
-        
-        if isUsingBottomBar, !priorityEnabled {
-          pasteMenuChildren.reverse()
-        }
-        
-        let copyAction = UIAction(
-          title: Strings.copyAddressTitle,
-          image: UIImage(systemName: "doc.on.doc"),
-          handler: UIAction.deferredActionHandler { _ in
-            if let url = self.topToolbar.currentURL {
-              UIPasteboard.general.url = url as URL
-            }
-          })
-        
-        let copyMenu = UIMenu(title: "", options: .displayInline, children: [copyAction])
-        
-        if UIPasteboard.general.hasStrings || UIPasteboard.general.hasURLs {
-          let pasteMenu = UIMenu(title: "", options: .displayInline, children: pasteMenuChildren)
-          
-          actionMenu = [pasteMenu, copyMenu]
-          
-          if isUsingBottomBar, !priorityEnabled {
-            actionMenu.reverse()
+    let configuration =  UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [unowned self] _ in
+      var actionMenu: [UIMenu] = []
+      var pasteMenuChildren: [UIAction] = []
+      
+      let pasteGoAction = UIAction(
+        identifier: .pasteAndGo,
+        handler: UIAction.deferredActionHandler { _ in
+          if let pasteboardContents = UIPasteboard.general.string {
+            self.topToolbar(self.topToolbar, didSubmitText: pasteboardContents)
           }
-        } else {
-          actionMenu = [copyMenu]
-        }
-        
-        return UIMenu(title: "", identifier: nil, children: actionMenu)
+        })
+
+      let pasteAction = UIAction(
+        identifier: .paste,
+        handler: UIAction.deferredActionHandler { _ in
+          if let pasteboardContents = UIPasteboard.general.string {
+            // Enter overlay mode and make the search controller appear.
+            self.topToolbar.enterOverlayMode(pasteboardContents, pasted: true, search: true)
+          }
+        })
+
+      pasteMenuChildren = [pasteGoAction, pasteAction]
+      
+      if #unavailable(iOS 16.0), isUsingBottomBar {
+        pasteMenuChildren.reverse()
       }
       
-      return configuration
-    }
-    
-    if #available(iOS 16.0, *) {
-      let configuration = createURLBarContextMenuConfiguration(priorityEnabled: true)
-      configuration.preferredMenuElementOrder = .priority
+      let copyAction = UIAction(
+        title: Strings.copyAddressTitle,
+        image: UIImage(systemName: "doc.on.doc"),
+        handler: UIAction.deferredActionHandler { _ in
+          if let url = self.topToolbar.currentURL {
+            UIPasteboard.general.url = url as URL
+          }
+        })
+
+      let copyMenu = UIMenu(title: "", options: .displayInline, children: [copyAction])
       
-      return configuration
+      if UIPasteboard.general.hasStrings || UIPasteboard.general.hasURLs {
+        let pasteMenu = UIMenu(title: "", options: .displayInline, children: pasteMenuChildren)
+        
+        actionMenu = [pasteMenu, copyMenu]
+        
+        if #unavailable(iOS 16.0), isUsingBottomBar {
+          actionMenu.reverse()
+        }
+      } else {
+        actionMenu = [copyMenu]
+      }
+
+      return UIMenu(title: "", identifier: nil, children: actionMenu)
+    }
+      
+    if #available(iOS 16.0, *) {
+      configuration.preferredMenuElementOrder = .priority
     }
     
-    return createURLBarContextMenuConfiguration(priorityEnabled: false)
+    return configuration
   }
 }
