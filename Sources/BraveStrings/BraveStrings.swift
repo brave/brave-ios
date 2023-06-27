@@ -1902,6 +1902,16 @@ extension Strings {
       NSLocalizedString("playlist.deleteForOfflineButtonTitle", tableName: "BraveShared", bundle: .module,
         value: "Delete Offline Cache",
         comment: "The title of the button indicating that the user delete the offline data. (deletes the data that allows them to play offline)")
+    
+    public static let playlistAlreadyShowingTitle =
+      NSLocalizedString("playlist.playlistAlreadyShowingTitle", tableName: "BraveShared", bundle: .module,
+        value: "Sorry",
+        comment: "Playlist alert title when playlist is already showing on a different window")
+    
+    public static let playlistAlreadyShowingBody =
+      NSLocalizedString("playlist.playlistAlreadyShowingBody", tableName: "BraveShared", bundle: .module,
+        value: "Playlist is already active on another window",
+        comment: "Playlist alert message when playlist is already showing on a different window")
   }
 
   public struct PlaylistFolders {

@@ -201,11 +201,23 @@ extension BrowserViewController {
   }
 
   private func presentPlaylistController() {
+    if PlaylistCarplayManager.shared.isPlaylistControllerPresented {
+      let alert = UIAlertController(title: Strings.PlayList.playlistAlreadyShowingTitle,
+                                    message: Strings.PlayList.playlistAlreadyShowingBody,
+                                    preferredStyle: .alert)
+      alert.addAction(UIAlertAction(title: Strings.OKString, style: .default))
+      dismiss(animated: true) {
+        self.present(alert, animated: true)
+      }
+      return
+    }
+    
     // Present existing playlist controller
     if let playlistController = PlaylistCarplayManager.shared.playlistController {
       PlaylistP3A.recordUsage()
       
       dismiss(animated: true) {
+        PlaylistCarplayManager.shared.isPlaylistControllerPresented = true
         self.present(playlistController, animated: true)
       }
     } else {
@@ -218,6 +230,7 @@ extension BrowserViewController {
         PlaylistP3A.recordUsage()
         
         self.dismiss(animated: true) {
+          PlaylistCarplayManager.shared.isPlaylistControllerPresented = true
           self.present(playlistController, animated: true)
         }
       }

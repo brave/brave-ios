@@ -93,6 +93,8 @@ class PlaylistViewController: UIViewController {
   }
 
   deinit {
+    PlaylistCarplayManager.shared.isPlaylistControllerPresented = false
+    
     // Store the last played item's time-offset
     if let item = PlaylistCarplayManager.shared.currentPlaylistItem {
       updateLastPlayedItem(item: item)

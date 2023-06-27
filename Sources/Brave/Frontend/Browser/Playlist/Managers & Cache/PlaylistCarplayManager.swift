@@ -28,6 +28,7 @@ public class PlaylistCarplayManager: NSObject {
 
   var currentlyPlayingItemIndex = -1
   var currentPlaylistItem: PlaylistInfo?
+  var isPlaylistControllerPresented = false
 
   // When Picture-In-Picture is enabled, we need to store a reference to the controller to keep it alive, otherwise if it deallocates, the system automatically kills Picture-In-Picture.
   var playlistController: PlaylistViewController? {
