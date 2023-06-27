@@ -1188,7 +1188,7 @@ public class BrowserViewController: UIViewController {
           activeKeyboardHeight = keyboardHeight
         }
         
-        if let presentedNavigationController = presentedViewController as? ModalSettingsNavigationController ,
+        if let presentedNavigationController = presentedViewController as? ModalSettingsNavigationController,
            let presentedRootController = presentedNavigationController.viewControllers.first,
            presentedRootController is SearchSettingsTableViewController {
           searchEngineSettingsDismissed = true
