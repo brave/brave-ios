@@ -6,8 +6,14 @@
 import Foundation
 import SwiftUI
 
-struct PlaylistItemHeaderView: View {
+struct PlaylistItemHeaderView<TitleAccessory: View>: View {
   var folder: Folder
+  var titleAccessory: TitleAccessory
+  
+  init(folder: Folder, @ViewBuilder titleAccessory: () -> TitleAccessory) {
+    self.folder = folder
+    self.titleAccessory = titleAccessory()
+  }
   
   @ViewBuilder var totalDuration: some View {
     let total = folder.items.reduce(0, { $0 + $1.duration })
@@ -22,8 +28,11 @@ struct PlaylistItemHeaderView: View {
     VStack(spacing: 0) {
       HStack {
         VStack(alignment: .leading) {
-          Text(folder.title)
-            .font(.body.weight(.medium))
+          HStack {
+            Text(folder.title)
+              .font(.body.weight(.medium))
+            titleAccessory
+          }
           HStack {
             Text("\(folder.items.count) items")
             if !folder.items.isEmpty {

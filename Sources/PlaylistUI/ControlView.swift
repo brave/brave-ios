@@ -34,6 +34,8 @@ struct ControlView: View {
   @State private var isPlaybackStopInfoPresented: Bool = false
   @State private var resumePlayingAfterScrub: Bool = false
   
+  @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+  
   private var timeFormatter: DateComponentsFormatter {
     let formatter = DateComponentsFormatter()
     formatter.allowedUnits = [.minute, .second]
@@ -50,12 +52,33 @@ struct ControlView: View {
           .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
         Text(title)
           .font(.body.weight(.semibold))
+        Spacer()
+        Button { } label: {
+          Image(braveSystemName: "leo.airplay")
+        }
+        .buttonStyle(.spring(backgroundStyle: Color.white))
       }
       .frame(maxWidth: .infinity, alignment: .leading)
       MediaScrubber(currentTime: $currentTime, totalDuration: totalDuration, isScrubbing: $isScrubbing)
       VStack(spacing: 24) {
-        PlaybackControls(isPlaying: $isPlaying)
-        ExtraControls(isShuffleEnabled: $isShuffleEnabled, contentSpeed: $contentSpeed, stopPlaybackDate: $stopPlaybackDate, isPlaybackStopInfoPresented: $isPlaybackStopInfoPresented)
+        if horizontalSizeClass == .compact {
+          HStack {
+            PlaybackControls(isPlaying: $isPlaying)
+          }
+          HStack {
+            LeadingExtraControls(isShuffleEnabled: $isShuffleEnabled, contentSpeed: $contentSpeed)
+            Spacer()
+            TrailingExtraControls(stopPlaybackDate: $stopPlaybackDate, isPlaybackStopInfoPresented: $isPlaybackStopInfoPresented)
+          }
+        } else {
+          HStack {
+            LeadingExtraControls(isShuffleEnabled: $isShuffleEnabled, contentSpeed: $contentSpeed)
+            Spacer()
+            PlaybackControls(isPlaying: $isPlaying)
+            Spacer()
+            TrailingExtraControls(stopPlaybackDate: $stopPlaybackDate, isPlaybackStopInfoPresented: $isPlaybackStopInfoPresented)
+          }
+        }
       }
       .foregroundStyle(Color.white.opacity(0.75))
       .dynamicTypeSize(...DynamicTypeSize.accessibility3)
@@ -142,7 +165,7 @@ struct PlaybackControls: View {
   }
   
   var body: some View {
-    HStack {
+    Group {
       Button { } label: {
         Image(braveSystemName: "leo.start.outline")
       }
@@ -186,16 +209,12 @@ struct PlaybackControls: View {
   }
 }
 
-struct ExtraControls: View {
+struct LeadingExtraControls: View {
   @Binding var isShuffleEnabled: Bool
   @Binding var contentSpeed: ContentSpeed
-  @Binding var stopPlaybackDate: Date?
-  @Binding var isPlaybackStopInfoPresented: Bool
-  
-  @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   
   var body: some View {
-    HStack {
+    Group {
       Toggle(isOn: $isShuffleEnabled) {
         ZStack {
           Image(braveSystemName: "leo.shuffle.toggle-on")
@@ -230,13 +249,17 @@ struct ExtraControls: View {
             .transition(.opacity.animation(.linear(duration: 0.1)))
         }
       }
-      Spacer()
-      if horizontalSizeClass == .compact {
-        Button { } label: {
-          Image(braveSystemName: "leo.picture.in-picture")
-        }
-        Spacer()
-      }
+    }
+    .buttonStyle(.spring(scale: 0.85, backgroundStyle: Color.white))
+  }
+}
+
+struct TrailingExtraControls: View {
+  @Binding var stopPlaybackDate: Date?
+  @Binding var isPlaybackStopInfoPresented: Bool
+  
+  var body: some View {
+    Group {
       if let _ = stopPlaybackDate {
         Button {
           isPlaybackStopInfoPresented = true

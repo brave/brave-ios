@@ -133,7 +133,9 @@ public struct PlaylistContainerView: View {
                       NavigationLink(isActive: $sidebarFolderItemsPresented) {
                         if let selectedFolder {
                           VStack(spacing: 0) {
-                            PlaylistItemHeaderView(folder: selectedFolder)
+                            PlaylistItemHeaderView(folder: selectedFolder) {
+                              editFolderMenu
+                            }
                             PlaylistItemListView(folder: selectedFolder, selectedItemId: selectedItemID)
                               .background(Color(.braveBackground))
                           }
@@ -192,9 +194,6 @@ public struct PlaylistContainerView: View {
               Button { } label: {
                 Image(braveSystemName: "leo.picture.in-picture")
               }
-              if selectedFolderID != nil {
-                editFolderMenu
-              }
               closeButton
             }
           }
@@ -227,7 +226,9 @@ public struct PlaylistContainerView: View {
                 .navigationTitle(selectedFolder?.title ?? "Playlist")
                 .toolbar {
                   HStack {
-                    editFolderMenu
+                    Button { } label: {
+                      Image(braveSystemName: "leo.picture.in-picture")
+                    }
                     closeButton
                   }
                   .tint(Color.white)
@@ -237,6 +238,7 @@ public struct PlaylistContainerView: View {
                     content
                       .toolbarColorScheme(.dark, for: .navigationBar)
                       .toolbarBackground(.visible, for: .navigationBar)
+                      .toolbar(orientation.isLandscape ? .hidden : .visible, for: .navigationBar)
                   } else {
                     content
                       .introspectViewController { controller in
@@ -349,14 +351,25 @@ public struct PlayerView: View {
             .contentShape(Rectangle())
             .background {
               if orientation.isLandscape {
-                PartialRoundedRectangle(cornerRadius: 10, corners: [.topLeft, .topRight])
-                  .fill(Material.bar)
-                  .colorScheme(.dark)
-                  .ignoresSafeArea()
-                  .transition(.opacity.animation(.default))
+                LinearGradient(
+                  stops: [
+                    .init(color: .black.opacity(0.8), location: 0),
+                    .init(color: .black.opacity(0.1), location: 0.7),
+                    .init(color: .black.opacity(0), location: 1)
+                  ],
+                  startPoint: .bottom,
+                  endPoint: .top
+                )
+                .ignoresSafeArea()
+//                PartialRoundedRectangle(cornerRadius: 10, corners: [.topLeft, .topRight])
+//                  .fill(Material.bar)
+//                  .colorScheme(.dark)
+//                  .ignoresSafeArea()
+//                  .transition(.opacity.animation(.default))
               }
             }
-            .transition(.move(edge: .bottom).combined(with: .opacity))
+            .transition(.opacity)
+            .zIndex(1)
         }
       }
     } else {
@@ -447,10 +460,30 @@ public struct PlaylistView: View {
       }
   }
   
+  // FIXME: pass this in from above
+  private var editFolderMenu: some View {
+    Menu {
+      Button { } label: {
+        Label("Edit", braveSystemImage: "leo.folder.exchange")
+      }
+      Button { } label: {
+        Label("Rename", braveSystemImage: "leo.edit.box")
+      }
+      Button { } label: {
+        Label("Remove Offline Data", braveSystemImage: "leo.cloud.off")
+      }
+      Button(role: .destructive) { } label: {
+        Label("Delete", braveSystemImage: "leo.trash")
+      }
+    } label: {
+      Image(braveSystemName: "leo.more.horizontal")
+    }
+  }
+  
   public var body: some View {
     VStack(spacing: 0) {
       PlayerView(orientation: orientation)
-      if orientation == .portrait {
+      if orientation.isPortrait {
         Color.clear
           .frame(minHeight: 100)
           .background {
@@ -477,7 +510,9 @@ public struct PlaylistView: View {
                     .opacity(0.3)
                     .frame(width: 32, height: 4)
                     .padding(.top, 6)
-                  PlaylistItemHeaderView(folder: folder)
+                  PlaylistItemHeaderView(folder: folder) {
+                    editFolderMenu
+                  }
                 }
                 .frame(maxWidth: .infinity)
                 .background(Color(.braveBackground))
