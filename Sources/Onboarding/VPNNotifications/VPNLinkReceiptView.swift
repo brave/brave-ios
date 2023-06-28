@@ -64,7 +64,7 @@ public struct VPNLinkReceiptView: View {
 }
 
 #if DEBUG
-struct OnboardingLinkReceiptView_Previews: PreviewProvider {
+struct VPNLinkReceiptView_Previews: PreviewProvider {
   static var previews: some View {
     VPNLinkReceiptView()
       .previewLayout(.sizeThatFits)
