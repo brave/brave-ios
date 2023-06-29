@@ -55,8 +55,8 @@ class FiltersDisplaySettingsStore: ObservableObject {
   @Published var groupBy: GroupBy = .none
   /// Ascending order is smallest fiat to largest fiat. Default is descending order.
   @Published var sortOrder: SortOrder = .descending
-  /// If we are hiding small balances (less than $1 value). Default is true.
-  @Published var isHidingSmallBalances: Bool = true
+  /// If we are hiding small balances (less than $1 value). Default is false.
+  @Published var isHidingSmallBalances: Bool = false
   
   /// All accounts and if they are currently selected. Default is all accounts selected.
   @Published var accounts: [Selectable<BraveWallet.AccountInfo>] = []
@@ -97,8 +97,8 @@ class FiltersDisplaySettingsStore: ObservableObject {
     self.groupBy = .none
     // Descending order (largest fiat to smallest) by default
     self.sortOrder = .descending
-    // Small balances hidden by default
-    self.isHidingSmallBalances = true
+    // Small balances shown by default
+    self.isHidingSmallBalances = false
     
     // All accounts selected by default
     self.accounts = self.accounts.map {

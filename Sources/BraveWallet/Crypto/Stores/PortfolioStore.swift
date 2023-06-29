@@ -21,9 +21,12 @@ public struct AssetViewModel: Identifiable, Equatable {
   }
   
   /// Sort by the fiat/value of the asset (price x balance), otherwise by balance when price is unavailable.
-  static func sortedByValue(lhs: AssetViewModel, rhs: AssetViewModel) -> Bool {
+  static func sortedByValue(lhs: AssetViewModel, rhs: AssetViewModel, sortOrder: SortOrder = .descending) -> Bool {
     if let lhsPrice = Double(lhs.price),
        let rhsPrice = Double(rhs.price) {
+      if sortOrder == .ascending {
+        return (lhsPrice * lhs.decimalBalance) < (rhsPrice * rhs.decimalBalance)
+      }
       return (lhsPrice * lhs.decimalBalance) > (rhsPrice * rhs.decimalBalance)
     } else if let lhsPrice = Double(lhs.price), (lhsPrice * lhs.decimalBalance) > 0 {
       // lhs has a non-zero value
@@ -33,6 +36,9 @@ public struct AssetViewModel: Identifiable, Equatable {
       return false
     }
     // price unavailable, sort by balance
+    if sortOrder == .ascending {
+      return lhs.decimalBalance < rhs.decimalBalance
+    }
     return lhs.decimalBalance > rhs.decimalBalance
   }
 }
@@ -80,7 +86,7 @@ public class PortfolioStore: ObservableObject {
   @Published var filters: Filters = .init(
     groupBy: .none,
     sortOrder: .descending,
-    isHidingSmallBalances: true,
+    isHidingSmallBalances: false,
     accounts: [],
     networks: []
   )
@@ -172,8 +178,10 @@ public class PortfolioStore: ObservableObject {
       var updatedUserVisibleAssets = buildAssetViewModels(allVisibleUserAssets: allVisibleUserAssets)
       // update userVisibleAssets on display immediately with empty values. Issue #5567
       self.userVisibleAssets = updatedUserVisibleAssets
-        .sorted(by: AssetViewModel.sortedByValue(lhs:rhs:))
-      let keyrings = await self.keyringService.keyrings(for: WalletConstants.supportedCoinTypes)
+        .sorted(by: { lhs, rhs in
+          AssetViewModel.sortedByValue(lhs: lhs, rhs: rhs, sortOrder: filters.sortOrder)
+        })
+      let accounts = self.filters.accounts.filter(\.isSelected).map(\.model)
       guard !Task.isCancelled else { return }
       typealias TokenNetworkAccounts = (token: BraveWallet.BlockchainToken, network: BraveWallet.NetworkInfo, accounts: [BraveWallet.AccountInfo])
       let allTokenNetworkAccounts = allVisibleUserAssets.flatMap { networkAssets in
@@ -181,7 +189,7 @@ public class PortfolioStore: ObservableObject {
           TokenNetworkAccounts(
             token: token,
             network: networkAssets.network,
-            accounts: keyrings.first(where: { $0.coin == token.coin })?.accountInfos ?? []
+            accounts: accounts.filter { $0.coin == token.coin }
           )
         }
       }
@@ -230,7 +238,16 @@ public class PortfolioStore: ObservableObject {
       guard !Task.isCancelled else { return }
       updatedUserVisibleAssets = buildAssetViewModels(allVisibleUserAssets: allVisibleUserAssets)
       self.userVisibleAssets = updatedUserVisibleAssets
-        .sorted(by: AssetViewModel.sortedByValue(lhs:rhs:))
+        .optionallyFilter(
+          shouldFilter: filters.isHidingSmallBalances,
+          isIncluded: { assetViewModel in
+            let value = (Double(assetViewModel.price) ?? 0) * assetViewModel.decimalBalance
+            return value >= 1
+          }
+        )
+        .sorted(by: { lhs, rhs in
+          AssetViewModel.sortedByValue(lhs: lhs, rhs: rhs, sortOrder: filters.sortOrder)
+        })
       
       // Compute balance based on current prices
       let currentBalance = userVisibleAssets
@@ -420,5 +437,13 @@ extension PortfolioStore: BraveWalletBraveWalletServiceObserver {
   }
   
   public func onResetWallet() {
+  }
+}
+
+extension Array {
+  /// `filter` helper that skips iterating through the entire array when not applying any filtering.
+  @inlinable public func optionallyFilter(shouldFilter: Bool, isIncluded: (Element) throws -> Bool) rethrows -> [Element] {
+    guard shouldFilter else { return self }
+    return try filter(isIncluded)
   }
 }
