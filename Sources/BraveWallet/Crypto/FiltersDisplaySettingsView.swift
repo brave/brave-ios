@@ -247,6 +247,7 @@ struct FiltersDisplaySettingsView: View {
         networks: store.networks,
         networkStore: networkStore,
         showsCancelButton: false,
+        requiresSave: false,
         saveAction: { selectedNetworks in
           store.networks = selectedNetworks
         }

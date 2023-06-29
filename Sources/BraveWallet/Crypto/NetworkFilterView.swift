@@ -20,6 +20,7 @@ struct NetworkFilterView: View {
   @State var networks: [Selectable<BraveWallet.NetworkInfo>]
   @ObservedObject var networkStore: NetworkStore
   let showsCancelButton: Bool
+  let requiresSave: Bool
   let saveAction: ([Selectable<BraveWallet.NetworkInfo>]) -> Void
   
   @Environment(\.presentationMode) @Binding private var presentationMode
@@ -28,11 +29,13 @@ struct NetworkFilterView: View {
     networks: [Selectable<BraveWallet.NetworkInfo>],
     networkStore: NetworkStore,
     showsCancelButton: Bool = true,
+    requiresSave: Bool = true,
     saveAction: @escaping ([Selectable<BraveWallet.NetworkInfo>]) -> Void
   ) {
     self._networks = .init(initialValue: networks)
     self.networkStore = networkStore
     self.showsCancelButton = showsCancelButton
+    self.requiresSave = requiresSave
     self.saveAction = saveAction
   }
   
@@ -53,26 +56,26 @@ struct NetworkFilterView: View {
       selectedNetworks: networks.filter(\.isSelected).map(\.model),
       allNetworks: networks.map(\.model),
       showsCancelButton: showsCancelButton,
+      showsSelectAllButton: true,
       selectNetwork: selectNetwork
     )
     .toolbar {
       ToolbarItem(placement: .confirmationAction) {
-        Button(action: {
-          saveAction(networks)
-          presentationMode.dismiss()
-        }) {
-          Text(Strings.Wallet.saveButtonTitle)
-            .foregroundColor(Color(.braveBlurpleTint))
+        if requiresSave {
+          Button(action: {
+            saveAction(networks)
+            presentationMode.dismiss()
+          }) {
+            Text(Strings.Wallet.saveButtonTitle)
+              .foregroundColor(Color(.braveBlurpleTint))
+          }
         }
       }
     }
-    .toolbar {
-      ToolbarItemGroup(placement: .bottomBar) {
-        Spacer()
-        Button(action: selectAll) {
-          Text(allSelected ? Strings.Wallet.deselectAllButtonTitle : Strings.Wallet.selectAllButtonTitle)
-            .foregroundColor(Color(.braveBlurpleTint))
-        }
+    .onChange(of: networks) { networks in
+      if !requiresSave {
+        // No save button, so call saveAction when updating selections
+        saveAction(networks)
       }
     }
   }
@@ -101,3 +104,26 @@ struct NetworkFilterView: View {
     }
   }
 }
+
+#if DEBUG
+struct NetworkFilterView_Previews: PreviewProvider {
+  static var previews: some View {
+    NavigationView {
+      NetworkFilterView(
+        networks: [
+          .init(isSelected: true, model: .mockMainnet),
+          .init(isSelected: true, model: .mockSolana),
+          .init(isSelected: true, model: .mockPolygon),
+          .init(isSelected: true, model: .mockGoerli),
+          .init(isSelected: true, model: .mockSolanaTestnet)
+        ],
+        networkStore: .previewStore,
+        requiresSave: false,
+        saveAction: { _ in
+          
+        }
+      )
+    }
+  }
+}
+#endif
