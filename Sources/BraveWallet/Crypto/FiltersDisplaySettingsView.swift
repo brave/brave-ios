@@ -223,10 +223,7 @@ struct FiltersDisplaySettingsView: View {
   private var accountFilters: some View {
     NavigationLink(destination: {
       AccountFilterView(
-        accounts: store.accounts,
-        saveAction: { selectedAccounts in
-          store.accounts = selectedAccounts
-        }
+        accounts: $store.accounts
       )
     }, label: {
       FilterDetailRowView(

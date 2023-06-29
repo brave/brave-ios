@@ -13,26 +13,77 @@ struct AccountSelectionRootView: View {
   let navigationTitle: String
   let allAccounts: [BraveWallet.AccountInfo]
   let selectedAccounts: [BraveWallet.AccountInfo]
-  let selectAccount: (BraveWallet.AccountInfo) -> Void
+  var showsSelectAllButton: Bool
+  var selectAccount: (BraveWallet.AccountInfo) -> Void
+  
+  init(
+    navigationTitle: String,
+    allAccounts: [BraveWallet.AccountInfo],
+    selectedAccounts: [BraveWallet.AccountInfo],
+    showsSelectAllButton: Bool,
+    selectAccount: @escaping (BraveWallet.AccountInfo) -> Void
+  ) {
+    self.navigationTitle = navigationTitle
+    self.allAccounts = allAccounts
+    self.selectedAccounts = selectedAccounts
+    self.showsSelectAllButton = showsSelectAllButton
+    self.selectAccount = selectAccount
+  }
+  
+  private var allSelected: Bool {
+    allAccounts.allSatisfy({ account in
+      selectedAccounts.contains(where: { $0.id == account.id && $0.coin == account.coin })
+    })
+  }
+  
+  private func selectAllButtonTitle(_ allSelected: Bool) -> String {
+    if allSelected {
+      return Strings.Wallet.deselectAllButtonTitle
+    }
+    return Strings.Wallet.selectAllButtonTitle
+  }
   
   var body: some View {
-    List {
-      Section(
-        header: WalletListHeaderView(title: Text(Strings.Wallet.accountsPageTitle))
-      ) {
-        ForEach(allAccounts) { account in
-          AccountListRowView(
-            account: account,
-            selectedAccounts: selectedAccounts
-          ) {
-            selectAccount(account)
+    ScrollView {
+      LazyVStack(spacing: 0) {
+        HStack {
+          Text(Strings.Wallet.accountsPageTitle)
+            .font(.body.weight(.semibold))
+            .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
+          Spacer()
+          if showsSelectAllButton {
+            Button(action: {
+              if allSelected { // deselect all
+                allAccounts.forEach(selectAccount)
+              } else { // select all
+                let unselectedAccounts = allAccounts
+                  .filter { account in
+                    !selectedAccounts.contains(
+                      where: { $0.id == account.id && $0.coin == account.coin }
+                    )
+                  }
+                unselectedAccounts.forEach(selectAccount)
+              }
+            }) {
+              Text(selectAllButtonTitle(allSelected))
+                .font(.callout.weight(.semibold))
+                .foregroundColor(Color(uiColor: WalletV2Design.textInteractive))
+            }
           }
         }
-        .listRowBackground(Color(.secondaryBraveGroupedBackground))
+        .padding(.horizontal)
+        .padding(.vertical, 12)
+      }
+      ForEach(allAccounts) { account in
+        AccountListRowView(
+          account: account,
+          selectedAccounts: selectedAccounts
+        ) {
+          selectAccount(account)
+        }
       }
     }
-    .listStyle(.insetGrouped)
-    .listBackgroundColor(Color(UIColor.braveGroupedBackground))
+    .listBackgroundColor(Color(uiColor: WalletV2Design.containerBackground))
     .navigationTitle(navigationTitle)
     .navigationBarTitleDisplayMode(.inline)
   }
@@ -76,5 +127,9 @@ private struct AccountListRowView: View {
         }
       }
     }
+    .accessibilityElement(children: .combine)
+    .accessibilityAddTraits(isSelected ? [.isSelected] : [])
+    .padding(.horizontal)
+    .contentShape(Rectangle())
   }
 }

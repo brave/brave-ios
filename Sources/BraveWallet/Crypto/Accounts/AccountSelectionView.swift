@@ -21,6 +21,7 @@ struct AccountSelectionView: View {
       navigationTitle: Strings.Wallet.selectAccountTitle,
       allAccounts: keyringStore.allAccounts,
       selectedAccounts: [keyringStore.selectedAccount],
+      showsSelectAllButton: false,
       selectAccount: { selectedAccount in
         keyringStore.selectedAccount = selectedAccount
         onDismiss()
