@@ -63,14 +63,16 @@ struct PlaylistItemHeaderView<TitleAccessory: View>: View {
 
 struct PlaylistItemListView: View {
   var folder: Folder
-  var selectedItemId: Item.ID?
+  @Binding var selectedItem: Item?
   
   var body: some View {
     ScrollView(.vertical) {
       LazyVStack(spacing: 0) {
         Section {
           ForEach(folder.items) { item in
-            Button { } label: {
+            Button {
+              selectedItem = item
+            } label: {
               PlaylistItemView(
                 title: item.name,
                 isItemPlaying: false,
@@ -78,7 +80,7 @@ struct PlaylistItemListView: View {
                 downloadState: nil
               )
             }
-            .background(selectedItemId == item.id ? Color(red: 0.941, green: 0.944, blue: 0.957) : Color(.braveBackground))
+            .background(selectedItem?.id == item.id ? Color(red: 0.941, green: 0.944, blue: 0.957) : Color(.braveBackground))
             .buttonStyle(.spring)
             .contextMenu {
               Section {
@@ -116,16 +118,16 @@ struct PlaylistItemListView: View {
 }
 
 #if DEBUG
-struct PlaylistItemListView_PreviewProvider: PreviewProvider {
-  static var previews: some View {
-    PlaylistItemListView(
-      folder: .init(id: UUID().uuidString, title: "Play Later", items: [
-        .init(id: "1", dateAdded: .now, duration: 1204, source: URL(string: "https://brave.com")!, name: "I’m Dumb and Spent $7,000 on the New Mac Pro", pageSource: URL(string: "https://brave.com")!),
-        .init(id: "2", dateAdded: .now, duration: 1204, source: URL(string: "https://brave.com")!, name: "I’m Dumb and Spent $7,000 on the New Mac Pro", pageSource: URL(string: "https://brave.com")!),
-        .init(id: "3", dateAdded: .now, duration: 1204, source: URL(string: "https://brave.com")!, name: "I’m Dumb and Spent $7,000 on the New Mac Pro", pageSource: URL(string: "https://brave.com")!)
-      ]),
-      selectedItemId: "2"
-    )
-  }
-}
+//struct PlaylistItemListView_PreviewProvider: PreviewProvider {
+//  static var previews: some View {
+//    PlaylistItemListView(
+//      folder: .init(id: UUID().uuidString, title: "Play Later", items: [
+//        .init(id: "1", dateAdded: .now, duration: 1204, source: URL(string: "https://brave.com")!, name: "I’m Dumb and Spent $7,000 on the New Mac Pro", pageSource: URL(string: "https://brave.com")!),
+//        .init(id: "2", dateAdded: .now, duration: 1204, source: URL(string: "https://brave.com")!, name: "I’m Dumb and Spent $7,000 on the New Mac Pro", pageSource: URL(string: "https://brave.com")!),
+//        .init(id: "3", dateAdded: .now, duration: 1204, source: URL(string: "https://brave.com")!, name: "I’m Dumb and Spent $7,000 on the New Mac Pro", pageSource: URL(string: "https://brave.com")!)
+//      ]),
+//      selectedItemId: "2"
+//    )
+//  }
+//}
 #endif

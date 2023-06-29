@@ -8,6 +8,9 @@ import SwiftUI
 import BraveUI
 import Introspect
 import Data
+import AVKit
+
+// Note for morning: Pass in the drawer contents from the container view to share everything properly
 
 public struct PlaylistCoreDataContainerView: View {
   struct ViewWithContext: View {
@@ -36,12 +39,10 @@ public struct PlaylistCoreDataContainerView: View {
 ///   - The player & folder contents exist in one screen pushed onto the stack.
 ///     - The folder contents lives as a drawer that is draggable up and down
 ///     - Dragging this drawer up and down can change the player & player controls based on stopping points
-///   - The PiP button will sit in the player controls between the speed and sleep timer
 ///   - Create playlist button is in the navigation bar
 ///
 /// On a regular-width layout we have the following structure:
 ///   - The list of playlist folders will exist in a sidebar whos visibility can be toggled
-///   - The PiP button will sit in the navigation bar
 ///   - Create playlist button is at the bottom of the folders list
 ///   - If the width exceeds some threshold (i.e. in landscape orientation), then:
 ///     - When selecting a folder, the contents list which would usually live in the drawer in compact-width
@@ -74,6 +75,18 @@ public struct PlaylistContainerView: View {
   
   private var selectedFolder: Folder? {
     folders.first(where: { $0.id == self.selectedFolderID })
+  }
+  
+  private var selectedItem: Item? {
+    selectedFolder?.items.first(where: { $0.id == self.selectedItemID })
+  }
+  
+  private var selectedItemBinding: Binding<Item?> {
+    .init(get: {
+      selectedFolder?.items.first(where: { $0.id == self.selectedItemID })
+    }, set: {
+      selectedItemID = $0?.id
+    })
   }
   
   private var closeButton: some View {
@@ -136,7 +149,7 @@ public struct PlaylistContainerView: View {
                             PlaylistItemHeaderView(folder: selectedFolder) {
                               editFolderMenu
                             }
-                            PlaylistItemListView(folder: selectedFolder, selectedItemId: selectedItemID)
+                            PlaylistItemListView(folder: selectedFolder, selectedItem: selectedItemBinding)
                               .background(Color(.braveBackground))
                           }
                           .osAvailabilityModifiers { content in
@@ -165,7 +178,7 @@ public struct PlaylistContainerView: View {
                 .ignoresSafeArea()
             }
           }
-          PlaylistView(folder: selectedFolder, orientation: orientation)
+          PlaylistView(folder: selectedFolder, item: selectedItemBinding, orientation: orientation)
         }
         .animation(.default, value: orientation.isLandscape || isSidebarVisible)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -221,7 +234,7 @@ public struct PlaylistContainerView: View {
         PlaylistFolderListView(folders: folders, sharedFolders: [], selectedFolderID: $selectedFolderID)
           .background {
             NavigationLink(isActive: Binding(get: { selectedFolderID != nil }, set: { if !$0 { selectedFolderID = nil } })) {
-              PlaylistView(folder: selectedFolder, orientation: orientation)
+              PlaylistView(folder: selectedFolder, item: selectedItemBinding, orientation: orientation)
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationTitle(selectedFolder?.title ?? "Playlist")
                 .toolbar {
@@ -325,6 +338,7 @@ class OrientationWatcherViewController: UIViewController {
 }
 
 public struct PlayerView: View {
+  public var item: Item?
   public var orientation: UIInterfaceOrientation
   
   @State private var isControlsVisible: Bool = true
@@ -332,12 +346,17 @@ public struct PlayerView: View {
   public var body: some View {
     if #available(iOS 16.0, *) {
       (orientation.isPortrait ? AnyLayout(VStackLayout()) : AnyLayout(ZStackLayout(alignment: .bottom))) {
-        Color.clear
+        // FIXME: Replace with a proper AVPlayer/UIViewRepresentable
+        VideoPlayer(player: item.map { .init(url: $0.source) })
+          .disabled(true)
           .aspectRatio(16/9, contentMode: .fit)
-          .overlay {
-            LinearGradient(braveGradient: .gradient03) // Video player?
-          }
-          .clipped()
+          .background(Color.black.ignoresSafeArea(.container, edges: [.leading, .trailing, .bottom]))
+//        Color.clear
+//          .aspectRatio(16/9, contentMode: .fit)
+//          .overlay {
+//            LinearGradient(braveGradient: .gradient03) // Video player?
+//          }
+//          .clipped()
           .fixedSize(horizontal: false, vertical: true)
           .frame(maxHeight: .infinity)
           .onTapGesture {
@@ -400,11 +419,9 @@ public struct PlayerBackgroundView: View {
 
 public struct PlaylistView: View {
   public var folder: Folder?
+  @Binding public var item: Item?
   var orientation: UIInterfaceOrientation
   
-  @State private var selectedFolderID: Folder.ID?
-  @State private var selectedItemID: Item.ID?
-  @State private var offset: CGFloat = 0
   @State private var drawerHeight: CGFloat = 0
   @State private var screenHeight: CGFloat = 0
   @State private var listHeight: CGFloat = 0
@@ -412,10 +429,6 @@ public struct PlaylistView: View {
   @State private var startHeight: CGFloat?
   
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-  
-//  private var selectedFolder: Folder? {
-//    folders.first(where: { $0.id == self.selectedFolderID })
-//  }
   
 //  public init(folders: [Folder], initiallySelectedFolder: Folder.ID? = nil) {
 //    self.folders = folders
@@ -520,7 +533,7 @@ public struct PlaylistView: View {
                 .contentShape(PartialRoundedRectangle(cornerRadius: drawerHeight == screenHeight ? 0 : 10, corners: [.topLeft, .topRight]))
                 .simultaneousGesture(dragGesture)
                 
-                PlaylistItemListView(folder: folder, selectedItemId: selectedItemID)
+                PlaylistItemListView(folder: folder, selectedItem: $item)
                   .background(Color(.braveBackground))
               }
               .frame(height: drawerHeight)
