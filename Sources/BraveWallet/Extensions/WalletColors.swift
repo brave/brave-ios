@@ -145,12 +145,7 @@ enum WalletV2Design {
   // Dark/Container/Background rgba(25, 27, 34, 1)
   static let containerBackground = UIColor(dynamicProvider: { traits in
     if traits.userInterfaceStyle == .light {
-      return UIColor(
-        red: 255 / 255,
-        green: 255 / 255,
-        blue: 255 / 255,
-        alpha: 1
-      )
+      return UIColor.white
     } else {
       return UIColor(
         red: 25 / 255,
