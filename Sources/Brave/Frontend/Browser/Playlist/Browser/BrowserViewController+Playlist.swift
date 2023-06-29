@@ -255,22 +255,12 @@ extension BrowserViewController: PlaylistScriptHandlerDelegate, PlaylistFolderSh
   }
   
   private func openPlaylist(tab: Tab?, item: PlaylistInfo?, playbackOffset: Double, folderSharingPageUrl: String? = nil) {
-    let playlistController = PlaylistCarplayManager.shared.getPlaylistController(tab: tab,
-                                                                                 initialItem: item,
-                                                                                 initialItemPlaybackOffset: playbackOffset)
-    playlistController.modalPresentationStyle = .fullScreen
-    if let folderSharingPageUrl = folderSharingPageUrl {
-      playlistController.setFolderSharingUrl(folderSharingPageUrl)
-    }
-
-    // Donate Open Playlist Activity for suggestions
-    let openPlaylist = ActivityShortcutManager.shared.createShortcutActivity(type: .openPlayList)
-    self.userActivity = openPlaylist
-    openPlaylist.becomeCurrent()
-
-    present(playlistController, animated: true) {
-      if let folderSharingPageUrl = folderSharingPageUrl {
-        playlistController.setFolderSharingUrl(folderSharingPageUrl)
+    let alert = UIAlertController(title: "Playlist Disabled", message: "Playlist is disabled", preferredStyle: .alert)
+    alert.addAction(UIAlertAction(title: "Okay", style: .default))
+    
+    self.dismiss(animated: true) {
+      DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+        self.present(alert, animated: true)
       }
     }
   }
@@ -292,59 +282,7 @@ extension BrowserViewController: PlaylistScriptHandlerDelegate, PlaylistFolderSh
   }
 
   func addToPlaylist(item: PlaylistInfo, folderUUID: String? = nil, completion: ((_ didAddItem: Bool) -> Void)? = nil) {
-    if PlaylistManager.shared.isDiskSpaceEncumbered() {
-      let style: UIAlertController.Style = UIDevice.current.userInterfaceIdiom == .pad ? .alert : .actionSheet
-      let alert = UIAlertController(
-        title: Strings.PlayList.playlistDiskSpaceWarningTitle, message: Strings.PlayList.playlistDiskSpaceWarningMessage, preferredStyle: style)
-
-      alert.addAction(
-        UIAlertAction(
-          title: Strings.OKString, style: .default,
-          handler: { [weak self] _ in
-            guard let self = self else { return }
-            self.openInPlaylistActivityItem = (enabled: true, item: item)
-            self.addToPlayListActivityItem = nil
-
-            AppReviewManager.shared.processSubCriteria(for: .numberOfPlaylistItems)
-            PlaylistItem.addItem(item, folderUUID: folderUUID, cachedData: nil) { [weak self] in
-              guard let self = self else { return }
-              PlaylistManager.shared.autoDownload(item: item)
-
-              self.updatePlaylistURLBar(
-                tab: self.tabManager.selectedTab,
-                state: .existingItem,
-                item: item)
-
-              completion?(true)
-            }
-          }))
-
-      alert.addAction(
-        UIAlertAction(
-          title: Strings.cancelButtonTitle, style: .cancel,
-          handler: { _ in
-            completion?(false)
-          }))
-
-      // Sometimes the MENU controller is being displayed and cannot present the alert
-      // So we need to ask it to present the alert
-      (presentedViewController ?? self).present(alert, animated: true, completion: nil)
-    } else {
-      openInPlaylistActivityItem = (enabled: true, item: item)
-      addToPlayListActivityItem = nil
-
-      AppReviewManager.shared.processSubCriteria(for: .numberOfPlaylistItems)
-      PlaylistItem.addItem(item, folderUUID: folderUUID, cachedData: nil) { [weak self] in
-        guard let self = self else { return }
-        PlaylistManager.shared.autoDownload(item: item)
-
-        self.updatePlaylistURLBar(
-          tab: self.tabManager.selectedTab,
-          state: .existingItem,
-          item: item)
-        completion?(true)
-      }
-    }
+    completion?(false)
   }
   
   // MARK: - PlaylistFolderSharingHelperDelegate

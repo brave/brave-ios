@@ -179,11 +179,9 @@ public class ActivityShortcutManager: NSObject {
     case .openPlayList:
       bvc.popToBVC()
       
-      let tab = bvc.tabManager.selectedTab
-      PlaylistCarplayManager.shared.getPlaylistController(tab: tab) { playlistController in
-        playlistController.modalPresentationStyle = .fullScreen
-        bvc.present(playlistController, animated: true)
-      }
+      let alert = UIAlertController(title: "Playlist Disabled", message: "Playlist is disabled", preferredStyle: .alert)
+      alert.addAction(UIAlertAction(title: "Okay", style: .default))
+      bvc.present(alert, animated: true)
     }
   }
 

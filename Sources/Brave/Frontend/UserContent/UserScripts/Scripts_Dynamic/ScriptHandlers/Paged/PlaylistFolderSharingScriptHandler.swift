@@ -41,21 +41,6 @@ class PlaylistFolderSharingScriptHandler: NSObject, TabContentScript {
 
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
     defer { replyHandler(nil, nil) }
-
-    if !verifyMessage(message: message) {
-      assertionFailure("Missing required security token.")
-      return
-    }
-    
-    if let sharingInfo = PlaylistFolderSharingInfo.from(message: message) {
-      // This shared playlist folder already exists
-      var sharedFolderPageUrl = sharingInfo.pageUrl
-      if sharedFolderPageUrl.last != "/" {
-        sharedFolderPageUrl += "/"
-      }
-      
-      delegate?.openPlaylistSharingFolder(with: sharedFolderPageUrl)
-    }
   }
 }
 

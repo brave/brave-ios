@@ -200,22 +200,12 @@ extension BrowserViewController {
   }
 
   private func presentPlaylistController() {
-    // Present existing playlist controller
-    if let playlistController = PlaylistCarplayManager.shared.playlistController {
-      dismiss(animated: true) {
-        self.present(playlistController, animated: true)
-      }
-    } else {
-      // Retrieve the item and offset-time from the current tab's webview.
-      let tab = self.tabManager.selectedTab
-      PlaylistCarplayManager.shared.getPlaylistController(tab: tab) { [weak self] playlistController in
-        guard let self = self else { return }
-
-        playlistController.modalPresentationStyle = .fullScreen
-
-        self.dismiss(animated: true) {
-          self.present(playlistController, animated: true)
-        }
+    let alert = UIAlertController(title: "Playlist Disabled", message: "Playlist is disabled", preferredStyle: .alert)
+    alert.addAction(UIAlertAction(title: "Okay", style: .default))
+    
+    self.dismiss(animated: true) {
+      DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+        self.present(alert, animated: true)
       }
     }
   }
