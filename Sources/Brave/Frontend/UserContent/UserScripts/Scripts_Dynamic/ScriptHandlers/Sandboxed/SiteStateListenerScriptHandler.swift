@@ -67,16 +67,16 @@ class SiteStateListenerScriptHandler: TabContentScript {
           let domain = pageData.domain(persistent: !tab.isPrivate)
           if domain.areAllShieldsOff { return }
           
-          let models = await AdBlockStats.shared.cosmeticFilterModels(forFrameURL: frameURL, domain: domain)
-          let setup = try self.makeSetup(from: models, isAggressive: ShieldPreferences.blockAdsAndTrackingLevel.isAggressive)
-          let script = try ScriptFactory.shared.makeScript(for: .selectorsPoller(setup))
-          
-          try await webView.evaluateSafeJavaScriptThrowing(
-            functionName: script.source,
-            frame: message.frameInfo,
-            contentWorld: CosmeticFiltersScriptHandler.scriptSandbox,
-            asFunction: false
-          )
+//          let models = await AdBlockStats.shared.cosmeticFilterModels(forFrameURL: frameURL, domain: domain)
+//          let setup = try self.makeSetup(from: models, isAggressive: ShieldPreferences.blockAdsAndTrackingLevel.isAggressive)
+//          let script = try ScriptFactory.shared.makeScript(for: .selectorsPoller(setup))
+//          
+//          try await webView.evaluateSafeJavaScriptThrowing(
+//            functionName: script.source,
+//            frame: message.frameInfo,
+//            contentWorld: CosmeticFiltersScriptHandler.scriptSandbox,
+//            asFunction: false
+//          )
         }
       }
     } catch {

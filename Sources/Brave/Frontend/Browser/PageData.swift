@@ -71,7 +71,7 @@ struct PageData {
   
   /// Return all the user script types for this page. The number of script types grows as more frames are loaded.
   @MainActor func makeUserScriptTypes(domain: Domain) async -> Set<UserScriptType> {
-    var userScriptTypes: Set<UserScriptType> = [.siteStateListener]
+    var userScriptTypes: Set<UserScriptType> = []
 
     // Handle dynamic domain level scripts on the main document.
     // These are scripts that change depending on the domain and the main document
