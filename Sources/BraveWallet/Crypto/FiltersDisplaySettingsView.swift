@@ -6,6 +6,7 @@
 import SwiftUI
 import BraveCore
 import DesignSystem
+import Preferences
 
 enum GroupBy: Equatable, CaseIterable, Identifiable {
   case none
@@ -61,6 +62,23 @@ class FiltersDisplaySettingsStore: ObservableObject {
   @Published var accounts: [Selectable<BraveWallet.AccountInfo>] = []
   /// All networks and if they are currently selected. Default is all selected except known test networks.
   @Published var networks: [Selectable<BraveWallet.NetworkInfo>] = []
+  
+  /// Returns true if all accounts are selected
+  var allAccountsSelected: Bool {
+    accounts.allSatisfy(\.isSelected)
+  }
+  
+  /// Returns true if all visible networks are selected
+  var allNetworksSelected: Bool {
+    networks
+      .filter {
+        if !Preferences.Wallet.showTestNetworks.value {
+          return !WalletConstants.supportedTestNetworkChainIds.contains($0.model.chainId)
+        }
+        return true
+      }
+      .allSatisfy(\.isSelected)
+  }
   
   let saveAction: (Filters) -> Void
   
@@ -233,7 +251,15 @@ struct FiltersDisplaySettingsView: View {
           braveSystemName: "leo.user.accounts",
           iconContainerSize: iconContainerSize
         ),
-        numberSelected: store.accounts.filter(\.isSelected).count
+        selectionView: {
+          if store.allAccountsSelected {
+            AllSelectedView(title: "All accounts")
+          } else if store.accounts.contains(where: { $0.isSelected }) { // at least 1 selected
+            MultipleAccountBlockiesView(
+              accountAddresses: store.accounts.filter(\.isSelected).map(\.model.address)
+            )
+          }
+        }
       )
     })
   }
@@ -257,29 +283,47 @@ struct FiltersDisplaySettingsView: View {
           braveSystemName: "leo.internet",
           iconContainerSize: iconContainerSize
         ),
-        numberSelected: store.networks.filter(\.isSelected).count
+        selectionView: {
+          if store.allNetworksSelected {
+            AllSelectedView(title: "All networks")
+          } else if store.networks.contains(where: { $0.isSelected }) { // at least 1 selected
+            MultipleNetworkIconsView(
+              networks: store.networks.filter(\.isSelected).map(\.model)
+            )
+          }
+        }
       )
     }
   }
   
   private var saveChangesContainer: some View {
-    Button(action: {
-      let filters = Filters(
-        groupBy: store.groupBy,
-        sortOrder: store.sortOrder,
-        isHidingSmallBalances: store.isHidingSmallBalances,
-        accounts: store.accounts,
-        networks: store.networks
-      )
-      store.saveAction(filters)
-      dismiss()
-    }) {
-      Text("Save Changes")
-        .fontWeight(.semibold)
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 4)
+    VStack {
+      Button(action: {
+        let filters = Filters(
+          groupBy: store.groupBy,
+          sortOrder: store.sortOrder,
+          isHidingSmallBalances: store.isHidingSmallBalances,
+          accounts: store.accounts,
+          networks: store.networks
+        )
+        store.saveAction(filters)
+        dismiss()
+      }) {
+        Text("Save Changes")
+          .fontWeight(.semibold)
+          .frame(maxWidth: .infinity)
+          .padding(.vertical, 4)
+      }
+      .buttonStyle(BraveFilledButtonStyle(size: .large))
+      
+      Button(action: { dismiss() }) {
+        Text("Cancel")
+          .fontWeight(.semibold)
+          .foregroundColor(Color(uiColor: WalletV2Design.textInteractive))
+          .frame(maxWidth: .infinity)
+          .padding(.vertical, 4)
+      }
     }
-    .buttonStyle(BraveFilledButtonStyle(size: .large))
     .padding(.horizontal)
     .padding(.vertical, 14)
     .background(
@@ -326,6 +370,20 @@ extension FiltersDisplaySettingsStore {
 }
 #endif
 
+private struct AllSelectedView: View {
+  let title: String
+  
+  var body: some View {
+    Text(title)
+      .foregroundColor(Color(uiColor: WalletV2Design.extendedGray50))
+      .font(.footnote.weight(.semibold))
+      .padding(.horizontal, 2)
+      .padding(4)
+      .background(Color(uiColor: WalletV2Design.extendedGray20))
+      .clipShape(RoundedRectangle(cornerRadius: 6))
+  }
+}
+
 struct FilterIconInfo {
   let braveSystemName: String
   let iconContainerSize: CGFloat
@@ -365,12 +423,12 @@ private struct FilterLabelView: View {
 }
 
 // `FilterLabelView` with a detail disclosure.
-private struct FilterDetailRowView: View {
+private struct FilterDetailRowView<SelectionView: View>: View {
 
   let title: String
   let description: String
   let icon: FilterIconInfo?
-  let numberSelected: Int?
+  @ViewBuilder let selectionView: () -> SelectionView
 
   var body: some View {
     HStack {
@@ -380,14 +438,7 @@ private struct FilterDetailRowView: View {
         icon: icon
       )
       Spacer()
-      if let numberSelected {
-        Text("\(numberSelected)")
-          .padding(8)
-          .background(Color(uiColor: WalletV2Design.containerHighlight))
-          .clipShape(Circle())
-          .foregroundColor(Color(uiColor: WalletV2Design.iconDefault))
-          .font(.callout)
-      }
+      selectionView()
       Image(systemName: "chevron.right")
         .font(.body.weight(.semibold))
         .foregroundColor(Color(.separator))
