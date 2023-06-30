@@ -15,7 +15,7 @@
       "scale" : "1x"
     },
     {
-      "filename" : "link_receipt_image_2x.png",
+      "filename" : "update_billing_expired@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
@@ -26,12 +26,12 @@
           "value" : "dark"
         }
       ],
-      "filename" : "link_receipt_dark@2x.png",
+      "filename" : "update_billing_expired@2x 1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "link_receipt_image_3x.png",
+      "filename" : "update_billing_expired@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     },
@@ -42,7 +42,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "link_receipt_dark@3x.png",
+      "filename" : "update_billing_expired@3x 1.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

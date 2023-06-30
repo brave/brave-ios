@@ -32,34 +32,62 @@ public enum VPNChurnPromoType {
   var title: String {
     switch self {
     case .autoRenewSoonExpire:
-      return "Oh no! Your Brave VPN subscription is about to expire."
+      return Strings.VPN.autoRenewSoonExpirePopOverTitle
     case .autoRenewDiscount:
-      return "Auto-renew your Brave VPN Subscription now and get 20% off for 3 months!"
+      return Strings.VPN.autoRenewDiscountPopOverTitle
     case .autoRenewFreeMonth:
-      return "Auto-renew your Brave VPN Subscription now and get 1 month free!"
+      return Strings.VPN.autoRenewFreeMonthPopOverTitle
     case .updateBillingSoonExpire:
-      return "There's a billing issue with your account, which means your Brave VPN subscription is about to expire."
+      return Strings.VPN.updateBillingSoonExpirePopOverTitle
     case .updateBillingExpired:
-      return "Update your payment info to stay protected with Brave VPN."
+      return Strings.VPN.updateBillingExpiredPopOverTitle
+    }
+  }
+  
+  var description: String? {
+    switch self {
+    case .autoRenewSoonExpire:
+      return Strings.VPN.autoRenewSoonExpirePopOverDescription
+    case .updateBillingSoonExpire:
+      return Strings.VPN.updateBillingSoonExpirePopOverDescription
+    case .updateBillingExpired:
+      return Strings.VPN.updateBillingExpiredPopOverDescription
+    default:
+      return nil
+    }
+  }
+  
+  var subDescription: String? {
+    switch self {
+    case .autoRenewSoonExpire:
+      return Strings.VPN.autoReneSoonExpirePopOverSubDescription
+    default:
+      return nil
     }
   }
   
   var buttonTitle: String {
     switch self {
     case .autoRenewSoonExpire, .autoRenewDiscount, .autoRenewFreeMonth:
-      return "Enable Auto-Renew"
+      return Strings.VPN.autoRenewActionButtonTitle
     case .updateBillingSoonExpire, .updateBillingExpired:
-      return "Update Payment"
+      return Strings.VPN.updatePaymentActionButtonTitle
     }
   }
 }
 
 public struct VPNChurnPromoView: View {
   @Environment(\.presentationMode) @Binding private var presentationMode
+  @State private var height: CGFloat?
   
   public var renewAction: (() -> Void)?
   
   public var churnPromoType: VPNChurnPromoType
+  
+  private let descriptionItems = [Strings.VPN.checkboxBlockAdsAlternate,
+                          Strings.VPN.popupCheckmarkSecureConnections,
+                          Strings.VPN.checkboxFastAlternate,
+                          Strings.VPN.popupCheckmark247Support]
   
   public init(churnPromoType: VPNChurnPromoType) {
     self.churnPromoType = churnPromoType
@@ -70,13 +98,22 @@ public struct VPNChurnPromoView: View {
       VStack(spacing: 24) {
         headerView
         detailView
+          .padding(.bottom, 8)
         footerView
       }
+      .background {
+        GeometryReader { proxy in
+          Color.clear
+            .onAppear { height = proxy.size.height }
+            .onChange(of: proxy.size.height) { newValue in
+              height = newValue
+            }
+        }
+      }
       .padding(.horizontal, 32)
-      .padding(.vertical, 16)
     }
     .background(Color(.braveBackground))
-    .frame(maxWidth: BraveUX.baseDimensionValue, maxHeight: 650)
+    .frame(maxWidth: BraveUX.baseDimensionValue, maxHeight: height)
     .overlay {
       Button {
         presentationMode.dismiss()
@@ -86,7 +123,26 @@ public struct VPNChurnPromoView: View {
           .foregroundColor(Color(.bravePrimary))
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
-      .padding([.top, .trailing], 20)
+      .padding([.top, .trailing], 10)
+    }
+    .padding(.vertical, 16)
+    .osAvailabilityModifiers { content in
+      #if compiler(>=5.8)
+      if #available(iOS 16.4, *) {
+        content
+          .scrollBounceBehavior(.basedOnSize)
+      } else {
+        content
+          .introspectScrollView { scrollView in
+            scrollView.alwaysBounceVertical = false
+          }
+      }
+      #else
+      content
+        .introspectScrollView { scrollView in
+          scrollView.alwaysBounceVertical = false
+        }
+      #endif
     }
   }
 
@@ -100,10 +156,43 @@ public struct VPNChurnPromoView: View {
     }
   }
   
+  @ViewBuilder
   private var detailView: some View {
-    Text("Long long long long long long long description of all times")
-      .font(.subheadline)
-      .multilineTextAlignment(.center)
+    switch churnPromoType {
+    case .autoRenewSoonExpire:
+      let description = churnPromoType.description ?? ""
+      let subDescription = churnPromoType.subDescription ?? ""
+      
+      VStack(spacing: 24) {
+        Text(description)
+          .font(.title3)
+          .multilineTextAlignment(.center)
+        Text(subDescription)
+          .font(.callout)
+          .multilineTextAlignment(.center)
+      }
+    case .autoRenewDiscount, .autoRenewFreeMonth:
+      VStack(alignment: .leading, spacing: 8) {
+        ForEach(descriptionItems, id: \.self) { itemDescription in
+          HStack(spacing: 8) {
+            Image(sharedName: "vpn_checkmark_popup")
+              .renderingMode(.template)
+              .foregroundColor(Color(.red))
+              .frame(alignment: .leading)
+            Text(itemDescription)
+              .multilineTextAlignment(.leading)
+              .foregroundColor(Color(.bravePrimary))
+              .fixedSize(horizontal: false, vertical: true)
+          }
+        }
+      }
+    case .updateBillingExpired, .updateBillingSoonExpire:
+      let description = churnPromoType.description ?? ""
+      
+      Text(description)
+        .font(.title3)
+        .multilineTextAlignment(.center)
+    }
   }
 
   private var footerView: some View {
@@ -113,18 +202,21 @@ public struct VPNChurnPromoView: View {
         presentationMode.dismiss()
       }) {
         Text(churnPromoType.buttonTitle)
+          .padding(.vertical, 4)
+          .frame(maxWidth: .infinity)
       }
       .buttonStyle(BraveFilledButtonStyle(size: .large))
       
       HStack(spacing: 8) {
         Text(Strings.VPN.poweredBy)
           .font(.footnote)
-          .foregroundColor(Color(.bravePrimary))
+          .foregroundColor(Color(.secondaryBraveLabel))
           .multilineTextAlignment(.center)
         Image(sharedName: "vpn_brand")
           .renderingMode(.template)
-          .foregroundColor(Color(.bravePrimary))
+          .foregroundColor(Color(.secondaryBraveLabel))
       }
+      .padding(.bottom, 16)
     }
   }
 }

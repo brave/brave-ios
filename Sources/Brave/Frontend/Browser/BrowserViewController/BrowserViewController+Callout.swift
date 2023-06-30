@@ -20,20 +20,7 @@ extension BrowserViewController {
   
   // Priority: P3A - Bottom Bar - VPN - Default Browser - Rewards - Cookie Notification - Link Receipt
   func presentFullScreenCallouts() {
-//    for type in FullScreenCalloutType.allCases {
-//      presentScreenCallout(for: type)
-//    }
-        
-//    presentScreenCallout(for: .bottomBar, skipSafeGuards: true)
-    
-//    presentScreenCallout(for: .vpnPromotion, skipSafeGuards: true)
-    
-//    presentScreenCallout(for: .vpnLinkReceipt, skipSafeGuards: true)
-    
-    
     presentVPNChurnPromoCallout(for: .autoRenewSoonExpire)
-    
-    
   }
   
   private func presentScreenCallout(for type: FullScreenCalloutType, skipSafeGuards: Bool = false) {
@@ -67,7 +54,7 @@ extension BrowserViewController {
       $0.isModalInPresentation = true
       $0.modalPresentationStyle = .overFullScreen
     }
-    
+
     let state = WelcomeViewCalloutState.p3a(
       info: WelcomeViewCalloutState.WelcomeViewDefaultBrowserDetails(
         title: Strings.Callout.p3aCalloutTitle,
