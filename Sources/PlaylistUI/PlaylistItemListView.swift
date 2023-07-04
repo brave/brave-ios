@@ -28,7 +28,7 @@ struct PlaylistItemHeaderView<TitleAccessory: View>: View {
     VStack(spacing: 0) {
       HStack {
         VStack(alignment: .leading) {
-          HStack {
+          HStack(spacing: 0) {
             Text(folder.title)
               .font(.body.weight(.medium))
             titleAccessory
@@ -79,6 +79,7 @@ struct PlaylistItemListView: View {
                 duration: Int(item.duration),
                 downloadState: nil
               )
+              .contentShape(Rectangle())
             }
             .background(selectedItem?.id == item.id ? Color(red: 0.941, green: 0.944, blue: 0.957) : Color(.braveBackground))
             .buttonStyle(.spring)

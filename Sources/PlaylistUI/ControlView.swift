@@ -6,6 +6,7 @@
 import Foundation
 import SwiftUI
 import DesignSystem
+import Favicon
 
 enum ContentSpeed: Double {
   case normal = 1.0
@@ -23,6 +24,7 @@ enum ContentSpeed: Double {
 
 struct ControlView: View {
   var title: String
+  var publisherSource: URL?
   
   @State private var currentTime: Int = 68
   @State private var totalDuration: Int = 1008
@@ -35,6 +37,7 @@ struct ControlView: View {
   @State private var resumePlayingAfterScrub: Bool = false
   
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+  @Environment(\.interfaceOrientation) private var orientation
   
   private var timeFormatter: DateComponentsFormatter {
     let formatter = DateComponentsFormatter()
@@ -49,9 +52,14 @@ struct ControlView: View {
         Color.white
           .opacity(0.1)
           .frame(width: 20, height: 20)
+          .overlay {
+            FaviconImage(url: publisherSource)
+          }
           .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
-        Text(title)
+        Text(title.isEmpty ? "No Item Selected" : title)
           .font(.body.weight(.semibold))
+          .opacity(title.isEmpty ? 0 : 1)
+          .lineLimit(1)
         Spacer()
         Button { } label: {
           Image(braveSystemName: "leo.airplay")
@@ -61,7 +69,7 @@ struct ControlView: View {
       .frame(maxWidth: .infinity, alignment: .leading)
       MediaScrubber(currentTime: $currentTime, totalDuration: totalDuration, isScrubbing: $isScrubbing)
       VStack(spacing: 24) {
-        if horizontalSizeClass == .compact {
+        if (UIDevice.isPhone && orientation.isPortrait) || (UIDevice.isIpad && horizontalSizeClass == .compact) {
           HStack {
             PlaybackControls(isPlaying: $isPlaying)
           }
@@ -167,11 +175,11 @@ struct PlaybackControls: View {
   var body: some View {
     Group {
       Button { } label: {
-        Image(braveSystemName: "leo.start.outline")
+        Label("Previous Item", braveSystemImage: "leo.start.outline")
       }
       Spacer()
       Button { } label: {
-        Image(braveSystemName: "leo.rewind.15")
+        Label("Step Back", braveSystemImage: "leo.rewind.15")
       }
       Spacer()
       Toggle(isOn: $isPlaying, label: {
@@ -184,10 +192,12 @@ struct PlaybackControls: View {
         .hidden()
         .overlay {
           if isPlaying {
-            Image(braveSystemName: "leo.pause.filled")
+            Label("Pause", braveSystemImage: "leo.pause.filled")
+              .labelStyle(.iconOnly)
               .transition(playButtonTransition)
           } else {
-            Image(braveSystemName: "leo.play.filled")
+            Label("Play", braveSystemImage: "leo.play.filled")
+              .labelStyle(.iconOnly)
               .transition(playButtonTransition)
           }
         }
@@ -197,15 +207,16 @@ struct PlaybackControls: View {
       .font(.title)
       Spacer()
       Button { } label: {
-        Image(braveSystemName: "leo.forward.15")
+        Label("Step Forward", braveSystemImage: "leo.forward.15")
       }
       Spacer()
       Button { } label: {
-        Image(braveSystemName: "leo.end.outline")
+        Label("Next Item", braveSystemImage: "leo.end.outline")
       }
     }
     .buttonStyle(.spring(scale: 0.85, backgroundStyle: Color.white))
     .imageScale(.large)
+    .labelStyle(.iconOnly)
   }
 }
 
@@ -251,6 +262,7 @@ struct LeadingExtraControls: View {
       }
     }
     .buttonStyle(.spring(scale: 0.85, backgroundStyle: Color.white))
+    .labelStyle(.iconOnly)
   }
 }
 
@@ -264,7 +276,7 @@ struct TrailingExtraControls: View {
         Button {
           isPlaybackStopInfoPresented = true
         } label: {
-          Image(braveSystemName: "leo.sleep.timer")
+          Label("Sleep Timer", braveSystemImage: "leo.sleep.timer")
         }
         .anchorPreference(key: SleepTimerBoundsPrefKey.self, value: .bounds, transform: { [$0] })
       } else {
@@ -294,15 +306,16 @@ struct TrailingExtraControls: View {
             Text("Stop Playback In…")
           }
         } label: {
-          Image(braveSystemName: "leo.sleep.timer")
+          Label("Sleep Timer", braveSystemImage: "leo.sleep.timer")
         }
       }
       Spacer()
       Button { } label: {
-        Image(braveSystemName: "leo.fullscreen.on")
+        Label("Fullscreen", braveSystemImage: "leo.fullscreen.on")
       }
     }
     .buttonStyle(.spring(scale: 0.85, backgroundStyle: Color.white))
+    .labelStyle(.iconOnly)
   }
 }
 
@@ -430,9 +443,33 @@ struct MediaScrubber: View {
 #if DEBUG
 struct VideoControls_PreviewProvider: PreviewProvider {
   static var previews: some View {
-    ControlView(title: "Top 10 things to do with Brave")
+    ControlView(title: "Top 10 things to do with Brave", publisherSource: URL(string: "https://youtube.com")!)
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(Color(white: 0.1))
   }
 }
 #endif
+
+private struct FaviconImage: View {
+  let url: URL?
+  @State private var image: UIImage?
+  
+  init(url: URL?) {
+    self.url = url
+  }
+  
+  var body: some View {
+    Image(uiImage: image ?? UIImage())
+      .resizable()
+      .aspectRatio(contentMode: .fit)
+      .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+      .task {
+        do {
+          if let url {
+            image = try await FaviconFetcher.loadIcon(url: url, persistent: true).image
+          }
+        } catch {}
+      }
+      .id(url)
+  }
+}
