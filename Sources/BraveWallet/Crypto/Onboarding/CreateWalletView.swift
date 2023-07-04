@@ -44,12 +44,36 @@ private struct CreateWalletView: View {
       }
     }
   }
+  
+  private enum LocalValidation {
+    case weak
+    case medium // more than 12
+    case strong // more than 16
+    
+    var description: String {
+      switch self {
+      case .weak:
+        return "Weak"
+      case .medium:
+        return "Medium"
+      case .strong:
+        return "Strong"
+      }
+    }
+  }
+  
+  private var autoLockIntervals: [AutoLockInterval] {
+    let all = AutoLockInterval.allOptions
+    return all.sorted(by: { $0.value < $1.value })
+  }
 
   @State private var password: String = ""
   @State private var repeatedPassword: String = ""
   @State private var validationError: ValidationError?
   @State private var isShowingBiometricsPrompt: Bool = false
   @State private var isSkippingBiometricsPrompt: Bool = false
+  @State private var passwordStatus: LocalValidation?
+  @State private var isInputsMatch: Bool = false
 
   private func createWallet() {
     validate { success in
@@ -90,6 +114,15 @@ private struct CreateWalletView: View {
       // Reset validation on user changing
       validationError = nil
     }
+    if password.count >= 16 {
+      passwordStatus = .strong
+    } else if password.count >= 12 {
+      passwordStatus = .medium
+    } else if password.isEmpty {
+      passwordStatus = nil
+    } else {
+      passwordStatus = .weak
+    }
   }
 
   private func handleRepeatedPasswordChanged(_ value: String) {
@@ -97,104 +130,119 @@ private struct CreateWalletView: View {
       // Reset validation on user changing
       validationError = nil
     }
+    isInputsMatch = password == repeatedPassword
+  }
+  
+  @ViewBuilder func passwordStatusView(value: Float, tintColor: Color, label: String) -> some View {
+    HStack {
+      ProgressView(value: value)
+        .tint(tintColor)
+      Text(label)
+        .foregroundColor(tintColor)
+        .font(.footnote)
+        .padding(.leading, 20)
+    }
   }
 
   var body: some View {
-    VStack(spacing: 0) {
-      VStack(spacing: 46) {
-        Image("graphic-lock", bundle: .module)
+    VStack(spacing: 16) {
+      VStack {
+        Text(Strings.Wallet.createWalletTitle)
+          .font(.title)
           .padding(.bottom)
-        VStack {
-          Text(Strings.Wallet.createWalletTitle)
-            .font(.headline)
-            .padding(.bottom)
-            .multilineTextAlignment(.center)
-            .fixedSize(horizontal: false, vertical: true)
-          VStack {
+          .multilineTextAlignment(.center)
+          .foregroundColor(.primary)
+        Text(Strings.Wallet.createWalletSubTitle)
+          .font(.subheadline)
+          .padding(.bottom)
+          .multilineTextAlignment(.center)
+          .foregroundColor(Color(.secondaryBraveLabel))
+      }
+      VStack(alignment: .leading, spacing: 20) {
+        VStack(spacing: 30) {
+          VStack(alignment: .leading, spacing: 5) {
+            Text(Strings.Wallet.passwordPlaceholder)
+              .foregroundColor(Color(.braveLabel))
             SecureField(Strings.Wallet.passwordPlaceholder, text: $password)
               .textContentType(.newPassword)
               .textFieldStyle(BraveValidatedTextFieldStyle(error: validationError, when: .requirementsNotMet))
+            if let passwordStatus {
+              switch passwordStatus {
+              case .weak:
+                passwordStatusView(value: 0.33, tintColor: Color(.braveErrorLabel), label: LocalValidation.weak.description)
+              case .medium:
+                passwordStatusView(value: 0.66, tintColor: Color(.braveWarningLabel), label: LocalValidation.medium.description)
+              case .strong:
+                passwordStatusView(value: 1, tintColor: Color(.braveSuccessLabel), label: LocalValidation.strong.description)
+              }
+            }
+          }
+          VStack(alignment: .leading, spacing: 5) {
+            Text(Strings.Wallet.repeatedPasswordPlaceholder)
+              .foregroundColor(Color(.braveLabel))
             SecureField(Strings.Wallet.repeatedPasswordPlaceholder, text: $repeatedPassword, onCommit: createWallet)
               .textContentType(.newPassword)
               .textFieldStyle(BraveValidatedTextFieldStyle(error: validationError, when: .inputsDontMatch))
-          }
-          .font(.subheadline)
-          .padding(.horizontal, 48)
-        }
-        Button(action: createWallet) {
-          Text(Strings.Wallet.continueButtonTitle)
-        }
-        .buttonStyle(BraveFilledButtonStyle(size: .normal))
-        .background(
-          WalletPromptView(
-            isPresented: $isShowingBiometricsPrompt,
-            primaryButton: .init(
-              title: Strings.Wallet.biometricsSetupEnableButtonTitle,
-              action: { navController in
-                // Store password in keychain
-                if case let status = keyringStore.storePasswordInKeychain(password),
-                   status != errSecSuccess {
-                  let isPublic = AppConstants.buildChannel.isPublic
-                  let alert = UIAlertController(
-                    title: Strings.Wallet.biometricsSetupErrorTitle,
-                    message: Strings.Wallet.biometricsSetupErrorMessage + (isPublic ? "" : " (\(status))"),
-                    preferredStyle: .alert
-                  )
-                  alert.addAction(.init(title: Strings.OKString, style: .default, handler: nil))
-                  navController?.presentedViewController?.present(alert, animated: true)
-                }
-                
-                let controller = UIHostingController(
-                  rootView: BackupWalletView(
-                    password: password,
-                    keyringStore: keyringStore
-                  )
-                )
-                navController?.pushViewController(controller, animated: true)
-                isShowingBiometricsPrompt = false
+            if isInputsMatch {
+              HStack {
+                Spacer()
+                Text(Image(braveSystemName: "leo.check.normal")) + Text(" Match!")
               }
-            ),
-            dismissAction: { navController in
-              let controller = UIHostingController(
-                rootView: BackupWalletView(
-                  password: password,
-                  keyringStore: keyringStore
-                )
-              )
-              navController?.pushViewController(controller, animated: true)
-              isShowingBiometricsPrompt = false
-            },
-            content: {
-              VStack {
-                Image(sharedName: "pin-migration-graphic")
-                  .resizable()
-                  .aspectRatio(contentMode: .fit)
-                  .frame(maxWidth: 250)
-                  .padding()
-                Text(Strings.Wallet.biometricsSetupTitle)
-                  .font(.headline)
-                  .fixedSize(horizontal: false, vertical: true)
-                  .multilineTextAlignment(.center)
-                  .padding(.bottom)
-              }
+              .frame(maxWidth: .infinity)
+              .multilineTextAlignment(.trailing)
+              .font(.footnote)
+              .foregroundColor(Color(.braveBlurpleTint))
             }
-          )
-        )
-      }
-      .frame(maxHeight: .infinity, alignment: .top)
-      .padding()
-      .padding(.vertical)
-      .background(
-        NavigationLink(
-          destination: BackupWalletView(password: password, keyringStore: keyringStore),
-          isActive: $isSkippingBiometricsPrompt
-        ) {
-          EmptyView()
+          }
         }
-      )
-      .onChange(of: password, perform: handlePasswordChanged)
-      .onChange(of: repeatedPassword, perform: handleRepeatedPasswordChanged)
+        .font(.subheadline)
+        HStack {
+          Image(braveSystemName: "leo.lock")
+            .renderingMode(.template)
+            .foregroundColor(Color(.braveBlurpleTint).opacity(0.5))
+            .font(.caption)
+            .frame(width: 24, height: 24)
+            .background(Color(.braveDisabled).opacity(0.5))
+            .clipShape(Circle())
+          Text("Brave Wallet will auto-lock after")
+            .font(.footnote)
+            .foregroundColor(Color(.braveLabel))
+          Spacer()
+          Picker("time interval", selection: $keyringStore.autoLockInterval) {
+            ForEach(autoLockIntervals) { interval in
+              Text(interval.label)
+                .foregroundColor(Color(.secondaryBraveLabel))
+                .tag(interval)
+            }
+          }
+          .tint(Color(.braveBlurpleTint))
+        }
+      }
+      Spacer()
+      Button(action: createWallet) {
+        Text(Strings.Wallet.continueButtonTitle)
+          .frame(maxWidth: .infinity)
+      }
+      .buttonStyle(BraveFilledButtonStyle(size: .large))
+      .disabled(!isInputsMatch || password.isEmpty || repeatedPassword.isEmpty)
+      Spacer()
     }
+    .padding(20)
+    .background(.white)
+    .cornerRadius(8)
+    .background(
+      NavigationLink(
+        destination: BackupRecoveryPhraseView(
+          password: password,
+          keyringStore: keyringStore
+        ),
+        isActive: $isSkippingBiometricsPrompt
+      ) {
+        EmptyView()
+      }
+    )
+    .onChange(of: password, perform: handlePasswordChanged)
+    .onChange(of: repeatedPassword, perform: handleRepeatedPasswordChanged)
   }
 }
 

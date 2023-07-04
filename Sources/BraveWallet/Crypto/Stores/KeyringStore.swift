@@ -44,7 +44,7 @@ struct AutoLockInterval: Identifiable, Hashable {
   private static let formatter = MeasurementFormatter().then {
     $0.locale = Locale.current
     $0.unitOptions = .providedUnit
-    $0.unitStyle = .long
+    $0.unitStyle = .medium
   }
 }
 
@@ -66,6 +66,12 @@ struct RecoveryWord: Hashable, Identifiable {
 ///
 /// This wraps a KeyringService that you would obtain through BraveCore and makes it observable
 public class KeyringStore: ObservableObject {
+  /// The number of minutes to wait until the Brave Wallet is automatically locked
+  @Published var autoLockInterval: AutoLockInterval = .minute {
+    didSet {
+      keyringService.setAutoLockMinutes(autoLockInterval.value) { _ in }
+    }
+  }
   /// The defualt keyring information. By default this is an empty keyring which has no accounts.
   @Published private(set) var defaultKeyring: BraveWallet.KeyringInfo = .init(
     id: .default,

@@ -13,32 +13,89 @@ struct SetupCryptoView: View {
   @ObservedObject var keyringStore: KeyringStore
 
   var body: some View {
-    VStack(spacing: 46) {
-      Image("setup-welcome", bundle: .module)
-      VStack(spacing: 14) {
-        Text(Strings.Wallet.setupCryptoTitle)
-          .foregroundColor(.primary)
-          .font(.headline)
-        Text(Strings.Wallet.setupCryptoSubtitle)
-          .foregroundColor(.secondary)
-          .font(.subheadline)
-      }
-      .fixedSize(horizontal: false, vertical: true)
-      .multilineTextAlignment(.center)
-      VStack(spacing: 26) {
-        NavigationLink(destination: CreateWalletContainerView(keyringStore: keyringStore)) {
-          Text(Strings.Wallet.setupCryptoButtonTitle)
+    ScrollView {
+      VStack(spacing: 32) {
+        HStack {
+          Image("wallet-brave-logo", bundle: .module)
+          Divider()
+            .frame(height: 14)
+          Text("Wallet")
+            .font(.title3.weight(.medium))
+            .foregroundColor(.primary)
         }
-        .buttonStyle(BraveFilledButtonStyle(size: .normal))
-        NavigationLink(destination: RestoreWalletContainerView(keyringStore: keyringStore)) {
-          Text(Strings.Wallet.restoreWalletButtonTitle)
-            .font(.subheadline.weight(.medium))
-            .foregroundColor(Color(.braveLabel))
+        VStack(spacing: 14) {
+          Text(Strings.Wallet.setupCryptoTitle)
+            .foregroundColor(.primary)
+            .font(.largeTitle)
+          Text(Strings.Wallet.setupCryptoSubtitle)
+            .foregroundColor(.secondary)
+            .font(.headline)
+        }
+        .fixedSize(horizontal: false, vertical: true)
+        .multilineTextAlignment(.center)
+        VStack(spacing: 24) {
+          NavigationLink(destination: CreateWalletContainerView(keyringStore: keyringStore)) {
+            HStack(alignment: .top, spacing: 16) {
+              Image("wallet-add", bundle: .module)
+                .frame(width: 24, height: 24)
+                .background(Color(.braveDisabled).opacity(0.5))
+                .clipShape(Circle())
+              VStack(alignment: .leading, spacing: 12) {
+                Text("Need a new wallet?")
+                  .font(.title3.weight(.medium))
+                  .foregroundColor(.primary)
+                Text("Get started with Brave Wallet within minutes")
+                  .font(.headline)
+                  .foregroundColor(.secondary)
+              }
+              Spacer()
+            }
+            .padding(28)
+            .background(Color.white)
+            .cornerRadius(16)
+            .frame(maxWidth: .infinity)
+          }
+          NavigationLink(destination: RestoreWalletContainerView(keyringStore: keyringStore)) {
+            HStack(alignment: .top, spacing: 16) {
+              Image("wallet-import", bundle: .module)
+                .frame(width: 24, height: 24)
+                .background(Color(.braveDisabled).opacity(0.5))
+                .clipShape(Circle())
+              VStack(alignment: .leading, spacing: 12) {
+                Text("Already have a wallet?")
+                  .font(.title3.weight(.medium))
+                  .foregroundColor(.primary)
+                Text("Import your existing wallet")
+                  .font(.headline)
+                  .foregroundColor(.secondary)
+                HStack(spacing: 14) {
+                  Group {
+                    Image(braveSystemName: "leo.social.brave-favicon")
+                      .renderingMode(.template)
+                      .foregroundColor(Color(.braveOrange))
+                    Image("wallet-phantom", bundle: .module)
+                    Image("wallet-metamask", bundle: .module)
+                    Image("wallet-coinbase", bundle: .module)
+                  }
+                  .frame(width: 20, height: 20)
+                }
+              }
+              Spacer()
+            }
+            .padding(28)
+            .background(Color.white)
+            .cornerRadius(16)
+          }
         }
       }
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
+      .padding(24)
     }
-    .padding()
-    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .padding(.top, 80)
+    .background(
+      Image("wallet-background", bundle: .module)
+    )
+    .edgesIgnoringSafeArea(.all)
     .accessibilityEmbedInScrollView()
     .navigationTitle(Strings.Wallet.cryptoTitle)
     .navigationBarTitleDisplayMode(.inline)
@@ -46,7 +103,6 @@ struct SetupCryptoView: View {
       vc.navigationItem.backButtonTitle = Strings.Wallet.setupCryptoButtonBackButtonTitle
       vc.navigationItem.backButtonDisplayMode = .minimal
     }
-    .background(Color(.braveBackground).edgesIgnoringSafeArea(.all))
   }
 }
 
