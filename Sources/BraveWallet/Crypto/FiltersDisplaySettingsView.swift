@@ -15,9 +15,9 @@ public enum GroupBy: Int, CaseIterable, Identifiable, UserDefaultsEncodable {
   
   var title: String {
     switch self {
-    case .none: return "None"
-    case .accounts: return "Accounts"
-    case .networks: return "Networks"
+    case .none: return Strings.Wallet.groupByNoneOptionTitle
+    case .accounts: return Strings.Wallet.groupByAccountsOptionTitle
+    case .networks: return Strings.Wallet.groupByNetworksOptionTitle
     }
   }
   public var id: String { title }
@@ -29,8 +29,8 @@ public enum SortOrder: Int, CaseIterable, Identifiable, UserDefaultsEncodable {
   
   var title: String {
     switch self {
-    case .ascending: return "Low to High"
-    case .descending: return "High to Low"
+    case .ascending: return Strings.Wallet.lowToHighSortOption
+    case .descending: return Strings.Wallet.highToLowSortOption
     }
   }
   public var id: String { title }
@@ -137,12 +137,12 @@ struct FiltersDisplaySettingsView: View {
       .safeAreaInset(edge: .bottom, content: {
         saveChangesContainer
       })
-      .navigationTitle("Filters and Display Settings")
+      .navigationTitle(Strings.Wallet.filtersAndDisplaySettings)
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         ToolbarItem(placement: .navigationBarTrailing) {
           Button(action: restoreToDefaults) {
-            Text("Reset")
+            Text(Strings.Wallet.settingsResetTransactionAlertButtonTitle)
               .fontWeight(.semibold)
               .foregroundColor(Color(uiColor: WalletV2Design.textInteractive))
           }
@@ -153,8 +153,8 @@ struct FiltersDisplaySettingsView: View {
   
   private var groupByRow: some View {
     FilterPickerRowView(
-      title: "Group By",
-      description: "Group assets by",
+      title: Strings.Wallet.groupByTitle,
+      description: Strings.Wallet.groupByDescription,
       icon: .init(
         braveSystemName: "leo.list.bullet-default",
         iconContainerSize: min(iconContainerSize, maxIconContainerSize)
@@ -168,8 +168,8 @@ struct FiltersDisplaySettingsView: View {
   
   private var sortAssets: some View {
     FilterPickerRowView(
-      title: "Sort Assets",
-      description: "Sort by fiat amount",
+      title: Strings.Wallet.sortAssetsTitle,
+      description: Strings.Wallet.sortAssetsDescription,
       icon: .init(
         braveSystemName: "leo.arrow.down",
         iconContainerSize: min(iconContainerSize, maxIconContainerSize)
@@ -184,8 +184,8 @@ struct FiltersDisplaySettingsView: View {
   private var hideSmallBalances: some View {
     Toggle(isOn: $isHidingSmallBalances) {
       FilterLabelView(
-        title: "Hide Small Balances",
-        description: "Assets with value less than $1",
+        title: Strings.Wallet.hideSmallBalancesTitle,
+        description: Strings.Wallet.hideSmallBalancesDescription,
         icon: .init(
           braveSystemName: "leo.eye.on",
           iconContainerSize: min(iconContainerSize, maxIconContainerSize)
@@ -202,15 +202,15 @@ struct FiltersDisplaySettingsView: View {
       )
     }, label: {
       FilterDetailRowView(
-        title: "Select Accounts",
-        description: "Select accounts to filter by",
+        title: Strings.Wallet.selectAccountsTitle,
+        description: Strings.Wallet.selectAccountsDescription,
         icon: .init(
           braveSystemName: "leo.user.accounts",
           iconContainerSize: iconContainerSize
         ),
         selectionView: {
           if allAccountsSelected {
-            AllSelectedView(title: "All accounts")
+            AllSelectedView(title: Strings.Wallet.allAccountsLabel)
           } else if accounts.contains(where: { $0.isSelected }) { // at least 1 selected
             MultipleAccountBlockiesView(
               accountAddresses: accounts.filter(\.isSelected).map(\.model.address)
@@ -234,15 +234,15 @@ struct FiltersDisplaySettingsView: View {
       )
     }) {
       FilterDetailRowView(
-        title: "Select Networks",
-        description: "Select networks to filter by",
+        title: Strings.Wallet.selectNetworksTitle,
+        description: Strings.Wallet.selectNetworksDescription,
         icon: .init(
           braveSystemName: "leo.internet",
           iconContainerSize: iconContainerSize
         ),
         selectionView: {
           if allNetworksSelected {
-            AllSelectedView(title: "All networks")
+            AllSelectedView(title: Strings.Wallet.allNetworksLabel)
           } else if networks.contains(where: { $0.isSelected }) { // at least 1 selected
             MultipleNetworkIconsView(
               networks: networks.filter(\.isSelected).map(\.model)
@@ -266,7 +266,7 @@ struct FiltersDisplaySettingsView: View {
         save(filters)
         dismiss()
       }) {
-        Text("Save Changes")
+        Text(Strings.Wallet.saveChangesButtonTitle)
           .fontWeight(.semibold)
           .frame(maxWidth: .infinity)
           .padding(.vertical, 4)
@@ -274,7 +274,7 @@ struct FiltersDisplaySettingsView: View {
       .buttonStyle(BraveFilledButtonStyle(size: .large))
       
       Button(action: { dismiss() }) {
-        Text("Cancel")
+        Text(Strings.CancelString)
           .fontWeight(.semibold)
           .foregroundColor(Color(uiColor: WalletV2Design.textInteractive))
           .frame(maxWidth: .infinity)
