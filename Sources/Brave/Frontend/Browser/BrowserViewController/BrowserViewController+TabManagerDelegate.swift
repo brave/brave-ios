@@ -242,10 +242,6 @@ extension BrowserViewController: TabManagerDelegate {
       newTabMenuChildren.append(openNewTab)
     }
     addTabMenuChildren.append(openNewTab)
-    
-    addTabMenuChildren.append(UIAction(title: "New Window", image: UIImage(systemName: "window.horizontal.closed"), handler: UIAction.deferredActionHandler { [unowned self] _ in
-      self.tabsBarDidSelectAddNewWindow(privateBrowsingManager.isPrivateBrowsing)
-    }))
 
     var bookmarkMenuChildren: [UIAction] = []
     

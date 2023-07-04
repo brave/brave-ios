@@ -117,7 +117,7 @@ public class PlaylistCarplayManager: NSObject {
         mediaPlayer: mediaPlayer,
         initialItem: initialItem,
         initialItemPlaybackOffset: initialItemPlaybackOffset,
-        privateBrowsingManager: browserController?.privateBrowsingManager)
+        isPrivateBrowsing: browserController?.privateBrowsingManager.isPrivateBrowsing == true)
     self.mediaPlayer = mediaPlayer
     return playlistController
   }

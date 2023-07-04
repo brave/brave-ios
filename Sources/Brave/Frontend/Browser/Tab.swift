@@ -74,7 +74,6 @@ class Tab: NSObject {
   
   private(set) var type: TabType = .regular
   
-  
   var redirectURLs = [URL]()
 
   var isPrivate: Bool {

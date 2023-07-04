@@ -6,6 +6,7 @@
 import Foundation
 import UIKit
 import BraveCore
+import Brave
 import Data
 import RuntimeWarnings
 import Shared
@@ -15,17 +16,21 @@ import Storage
 import BraveNews
 import os.log
 
+private let adsRewardsLog = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "ads-rewards")
+
 /// Class that does startup initialization
 /// Everything in this class can only be execute ONCE
 /// IE: BraveCore initialization, BuildChannel, Migrations, etc.
 public class AppState {
+  private let log = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "app-state")
+  
   public static let shared = AppState()
 
   public let braveCore: BraveCoreMain
   public let dau: DAU
   public let migration: Migration
   public let profile: Profile
-  public let rewards: BraveRewards
+  public let rewards: Brave.BraveRewards
   public let newsFeedDataSource: FeedDataSource
   private var didBecomeActive = false
   
@@ -63,7 +68,7 @@ public class AppState {
         namespace: "TabManagerScreenshots",
         quality: UIConstants.screenshotQuality)
     } catch {
-      Logger.module.error("Failed to create an image store for files: \(self.profile.files.rootPath) and namespace: \"TabManagerScreenshots\": \(error.localizedDescription)")
+      log.error("Failed to create an image store for files: \(self.profile.files.rootPath) and namespace: \"TabManagerScreenshots\": \(error.localizedDescription)")
     }
     return nil
   }()
@@ -193,14 +198,14 @@ public class AppState {
     }
   }
   
-  private static func migrateAdsConfirmations(for configruation: BraveRewards.Configuration) {
+  private static func migrateAdsConfirmations(for configuruation: Brave.BraveRewards.Configuration) {
     // To ensure after a user launches 1.21 that their ads confirmations, viewed count and
     // estimated payout remain correct.
     //
     // This hack is unfortunately neccessary due to a missed migration path when moving
     // confirmations from ledger to ads, we must extract `confirmations.json` out of ledger's
     // state file and save it as a new file under the ads directory.
-    let base = configruation.storageURL
+    let base = configuruation.storageURL
     let ledgerStateContainer = base.appendingPathComponent("ledger/random_state.plist")
     let adsConfirmations = base.appendingPathComponent("ads/confirmations.json")
     let fm = FileManager.default

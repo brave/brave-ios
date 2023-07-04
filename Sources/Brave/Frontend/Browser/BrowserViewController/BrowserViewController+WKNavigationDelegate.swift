@@ -1002,7 +1002,6 @@ extension BrowserViewController: WKUIDelegate {
           }
 
           openNewTabAction.accessibilityLabel = "linkContextMenu.openInNewTab"
-
           actions.append(openNewTabAction)
         }
 
@@ -1013,8 +1012,31 @@ extension BrowserViewController: WKUIDelegate {
           self.addTab(url: url, inPrivateMode: true, currentTab: currentTab)
         }
         openNewPrivateTabAction.accessibilityLabel = "linkContextMenu.openInNewPrivateTab"
-
         actions.append(openNewPrivateTabAction)
+        
+        if UIApplication.shared.supportsMultipleScenes {
+          if !tabType.isPrivate {
+            let openNewWindowAction = UIAction(
+              title: Strings.openInNewWindowTitle,
+              image: UIImage(braveSystemNamed: "leo.window")
+            ) { _ in
+              self.openInNewWindow(url: url, isPrivate: false)
+            }
+            
+            openNewWindowAction.accessibilityLabel = "linkContextMenu.openInNewWindow"
+            actions.append(openNewWindowAction)
+          }
+          
+          let openNewPrivateWindowAction = UIAction(
+            title: Strings.openInNewPrivateWindowTitle,
+            image: UIImage(braveSystemNamed: "leo.window.tab-private")
+          ) { _ in
+            self.openInNewWindow(url: url, isPrivate: true)
+          }
+          
+          openNewPrivateWindowAction.accessibilityLabel = "linkContextMenu.openInNewPrivateWindow"
+          actions.append(openNewPrivateWindowAction)
+        }
 
         let copyAction = UIAction(
           title: Strings.copyLinkActionTitle,

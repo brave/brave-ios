@@ -26,8 +26,6 @@ class SearchEnginesTests: XCTestCase {
     Preferences.Search.defaultEngineName.reset()
     Preferences.Search.defaultPrivateEngineName.reset()
     Preferences.Search.yahooEngineMigrationCompleted.reset()
-
-    PrivateBrowsingManager.shared.isPrivateBrowsing = false
   }
 
   func testIncludesExpectedEngines() {

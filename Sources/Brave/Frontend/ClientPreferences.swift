@@ -126,7 +126,9 @@ extension Preferences {
     /// Forces all private tabs
     public static let privateBrowsingOnly = Option<Bool>(key: "privacy.private-only", default: false)
     /// Whether or not private browsing tabs can be session restored (persistent private browsing)
-    public static let persistentPrivateBrowsing = Option<Bool>(key: "privacy.private-browsing-persistence", default: false)
+    public static let persistentPrivateBrowsing = Option<Bool>(key: "privacy.private-browsing-persistence", default: true)
+    /// Whether or not a persistent private browsing alert was shown to existing users
+    public static let shouldShowPersistentPrivateBrowsingAlert = Option<Bool>(key: "privacy.private-browsing-persistence-alert", default: false)
     /// Blocks all cookies and access to local storage
     static let blockAllCookies = Option<Bool>(key: "privacy.block-all-cookies", default: false)
     /// The toggles states for clear private data screen

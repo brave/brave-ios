@@ -49,12 +49,12 @@ class PlaylistViewController: UIViewController {
   private let player: MediaPlayer
   private let playerView = VideoView()
   private let mediaStreamer: PlaylistMediaStreamer
-  private let privateBrowsingManager: PrivateBrowsingManager?
+  private let isPrivateBrowsing: Bool
 
   private let splitController = UISplitViewController()
   private let folderController = PlaylistFolderController()
-  private lazy var listController = PlaylistListViewController(playerView: playerView, privateBrowsingManager: privateBrowsingManager)
-  private lazy var detailController = PlaylistDetailViewController(isPrivateBrowsing: privateBrowsingManager?.isPrivateBrowsing == true)
+  private lazy var listController = PlaylistListViewController(playerView: playerView, isPrivateBrowsing: isPrivateBrowsing)
+  private lazy var detailController = PlaylistDetailViewController(isPrivateBrowsing: isPrivateBrowsing)
 
   private var folderObserver: AnyCancellable?
   private var playerStateObservers = Set<AnyCancellable>()
@@ -70,14 +70,14 @@ class PlaylistViewController: UIViewController {
     mediaPlayer: MediaPlayer,
     initialItem: PlaylistInfo?,
     initialItemPlaybackOffset: Double,
-    privateBrowsingManager: PrivateBrowsingManager?
+    isPrivateBrowsing: Bool
   ) {
 
     self.openInNewTab = openInNewTab
     self.openPlaylistSettingsMenu = openPlaylistSettingsMenu
     self.player = mediaPlayer
     self.mediaStreamer = PlaylistMediaStreamer(playerView: playerView)
-    self.privateBrowsingManager = privateBrowsingManager
+    self.isPrivateBrowsing = isPrivateBrowsing
     self.folderSharingUrl = nil
     
     super.init(nibName: nil, bundle: nil)
@@ -315,7 +315,7 @@ class PlaylistViewController: UIViewController {
     }
 
     if let item = PlaylistCarplayManager.shared.currentPlaylistItem {
-      playerView.setVideoInfo(videoDomain: item.pageSrc, videoTitle: item.pageTitle, isPrivateBrowsing: privateBrowsingManager?.isPrivateBrowsing == true)
+      playerView.setVideoInfo(videoDomain: item.pageSrc, videoTitle: item.pageTitle, isPrivateBrowsing: isPrivateBrowsing)
     } else {
       playerView.resetVideoInfo()
     }
@@ -333,7 +333,7 @@ class PlaylistViewController: UIViewController {
         self.playerView.setVideoInfo(
           videoDomain: item.pageSrc,
           videoTitle: item.pageTitle,
-          isPrivateBrowsing: self.privateBrowsingManager?.isPrivateBrowsing == true)
+          isPrivateBrowsing: self.isPrivateBrowsing)
       }
       
       self.listController.highlightActiveItem()
@@ -916,7 +916,7 @@ extension PlaylistViewController: VideoViewDelegate {
           self.playerView.setVideoInfo(
             videoDomain: item.pageSrc,
             videoTitle: item.pageTitle,
-            isPrivateBrowsing: self.privateBrowsingManager?.isPrivateBrowsing == true)
+            isPrivateBrowsing: self.isPrivateBrowsing)
           PlaylistMediaStreamer.setNowPlayingInfo(item, withPlayer: self.player)
         } catch {
           PlaylistMediaStreamer.clearNowPlayingInfo()
@@ -964,7 +964,7 @@ extension PlaylistViewController: VideoViewDelegate {
     playerView.setVideoInfo(
       videoDomain: item.pageSrc,
       videoTitle: item.pageTitle,
-      isPrivateBrowsing: privateBrowsingManager?.isPrivateBrowsing == true)
+      isPrivateBrowsing: isPrivateBrowsing)
     
     PlaylistMediaStreamer.setNowPlayingInfo(item, withPlayer: self.player)
     return item

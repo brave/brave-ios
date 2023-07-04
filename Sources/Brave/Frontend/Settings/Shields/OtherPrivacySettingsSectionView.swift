@@ -58,15 +58,17 @@ struct OtherPrivacySettingsSectionView: View {
         OptionToggleView(title: Strings.persistentPrivateBrowsing,
                          subtitle: nil,
                          option: Preferences.Privacy.persistentPrivateBrowsing) { newValue in
-          Task { @MainActor in
-            if newValue {
-              settings.tabManager.saveAllTabs()
-            } else {
-              let tabs = settings.tabManager.allTabs.filter({ $0.isPrivate })
-              SessionTab.deleteAll(tabIds: tabs.map({ $0.id }))
-              
-              if !settings.tabManager.privateBrowsingManager.isPrivateBrowsing {
-                settings.tabManager.willSwitchTabMode(leavingPBM: true)
+          if !Preferences.Privacy.shouldShowPersistentPrivateBrowsingAlert.value {
+            Task { @MainActor in
+              if newValue {
+                settings.tabManager.saveAllTabs()
+              } else {
+                let tabs = settings.tabManager.allTabs.filter({ $0.isPrivate })
+                SessionTab.deleteAll(tabIds: tabs.map({ $0.id }))
+                
+                if !settings.tabManager.privateBrowsingManager.isPrivateBrowsing {
+                  settings.tabManager.willSwitchTabMode(leavingPBM: true)
+                }
               }
             }
           }

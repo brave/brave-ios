@@ -107,18 +107,19 @@ open class MockTabManagerDelegate: TabManagerDelegate {
   let didAdd = MethodSpy(functionName: "tabManager(_:didAddTab:)")
 
   var manager: TabManager!
+  private let privateBrowsingManager = PrivateBrowsingManager()
 
   override func setUp() {
     super.setUp()
 
     DataController.shared.initializeOnce()
     let profile = MockProfile()
-    manager = TabManager(prefs: profile.prefs, rewards: nil, tabGeneratorAPI: nil)
-    PrivateBrowsingManager.shared.isPrivateBrowsing = false
+    manager = TabManager(windowId: UUID(), prefs: profile.prefs, rewards: nil, tabGeneratorAPI: nil, privateBrowsingManager: privateBrowsingManager)
+    privateBrowsingManager.isPrivateBrowsing = false
   }
 
   override func tearDown() {
-    PrivateBrowsingManager.shared.isPrivateBrowsing = false
+    privateBrowsingManager.isPrivateBrowsing = false
     super.tearDown()
   }
 
