@@ -12,7 +12,7 @@ import AVKit
 
 // Note for morning: Pass in the drawer contents from the container view to share everything properly
 
-public struct PlaylistCoreDataContainerView: View {
+public struct PlaylistContainerView: View {
   struct ViewWithContext: View {
     @FetchRequest(entity: PlaylistFolder.entity(), sortDescriptors: [
       NSSortDescriptor(keyPath: \PlaylistFolder.order, ascending: true),
@@ -20,15 +20,34 @@ public struct PlaylistCoreDataContainerView: View {
     ]) var folders: FetchedResults<PlaylistFolder>
     
     var body: some View {
-      PlaylistContainerView(folders: folders.map(Folder.from))
+      PlaylistSplitView(folders: folders.map(Folder.from))
     }
   }
   
   public init() {}
   
+#if DEBUG
+  // For previews
+  var folders: [Folder]?
+  fileprivate init(folders: [Folder]) {
+    self.folders = folders
+  }
+#endif
+  
   public var body: some View {
+    Group {
+#if DEBUG
+      if let folders {
+        PlaylistSplitView(folders: folders)
+      } else {
+        ViewWithContext()
+      }
+#else
     ViewWithContext()
-      .environment(\.managedObjectContext, DataController.swiftUIContext)
+#endif
+    }
+    .environment(\.managedObjectContext, DataController.swiftUIContext)
+    .observingOrientation()
   }
 }
 
@@ -55,12 +74,12 @@ public struct PlaylistCoreDataContainerView: View {
 ///
 ///  When transitioning between the two states we have to reset the selected folders since they don't
 ///  maintain the same navigation stack.
-public struct PlaylistContainerView: View {
+public struct PlaylistSplitView: View {
   public var folders: [Folder]
   
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   @Environment(\.dismiss) private var dismiss
-  @State private var orientation: UIInterfaceOrientation = .unknown
+  @Environment(\.interfaceOrientation) private var orientation
   
   @State private var isSidebarVisible: Bool = false
   
@@ -178,7 +197,7 @@ public struct PlaylistContainerView: View {
                 .ignoresSafeArea()
             }
           }
-          PlaylistView(folder: selectedFolder, item: selectedItemBinding, orientation: orientation)
+          PlaylistView(folder: selectedFolder, item: selectedItemBinding)
         }
         .animation(.default, value: orientation.isLandscape || isSidebarVisible)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -234,7 +253,7 @@ public struct PlaylistContainerView: View {
         PlaylistFolderListView(folders: folders, sharedFolders: [], selectedFolderID: $selectedFolderID)
           .background {
             NavigationLink(isActive: Binding(get: { selectedFolderID != nil }, set: { if !$0 { selectedFolderID = nil } })) {
-              PlaylistView(folder: selectedFolder, item: selectedItemBinding, orientation: orientation)
+              PlaylistView(folder: selectedFolder, item: selectedItemBinding)
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationTitle(selectedFolder?.title ?? "Playlist")
                 .toolbar {
@@ -251,7 +270,7 @@ public struct PlaylistContainerView: View {
                     content
                       .toolbarColorScheme(.dark, for: .navigationBar)
                       .toolbarBackground(.visible, for: .navigationBar)
-                      .toolbar(orientation.isLandscape ? .hidden : .visible, for: .navigationBar)
+                      .toolbar(orientation.isLandscape && UIDevice.current.userInterfaceIdiom == .phone ? .hidden : .visible, for: .navigationBar)
                   } else {
                     content
                       .introspectViewController { controller in
@@ -282,10 +301,6 @@ public struct PlaylistContainerView: View {
       }
     }
     .navigationViewStyle(.stack)
-    .background {
-      OrientationWatcher(orientation: $orientation)
-        .accessibilityHidden(true)
-    }
     .onChange(of: horizontalSizeClass) { [oldValue=horizontalSizeClass] newValue in
       if oldValue == .compact, newValue == .regular, selectedFolderID == nil {
         // Reset the selected folder ID when moving from compact folder list to regular which always displays
@@ -293,6 +308,35 @@ public struct PlaylistContainerView: View {
         selectedFolderID = folders.first?.id
       }
     }
+  }
+}
+
+private struct OrientationEnvironmentKey: EnvironmentKey {
+  static var defaultValue: UIInterfaceOrientation = .unknown
+}
+
+extension EnvironmentValues {
+  fileprivate var interfaceOrientation: UIInterfaceOrientation {
+    get { self[OrientationEnvironmentKey.self] }
+    set { self[OrientationEnvironmentKey.self] = newValue }
+  }
+}
+
+private struct OrientationWatcherViewModifier: ViewModifier {
+  @State private var orientation: UIInterfaceOrientation = .unknown
+  func body(content: Content) -> some View {
+    content
+      .environment(\.interfaceOrientation, orientation)
+      .background {
+        OrientationWatcher(orientation: $orientation)
+          .accessibilityHidden(true)
+      }
+  }
+}
+
+extension View {
+  func observingOrientation() -> some View {
+    modifier(OrientationWatcherViewModifier())
   }
 }
 
@@ -339,7 +383,8 @@ class OrientationWatcherViewController: UIViewController {
 
 public struct PlayerView: View {
   public var item: Item?
-  public var orientation: UIInterfaceOrientation
+  
+  @Environment(\.interfaceOrientation) private var orientation
   
   @State private var isControlsVisible: Bool = true
   
@@ -420,7 +465,6 @@ public struct PlayerBackgroundView: View {
 public struct PlaylistView: View {
   public var folder: Folder?
   @Binding public var item: Item?
-  var orientation: UIInterfaceOrientation
   
   @State private var drawerHeight: CGFloat = 0
   @State private var screenHeight: CGFloat = 0
@@ -429,6 +473,7 @@ public struct PlaylistView: View {
   @State private var startHeight: CGFloat?
   
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+  @Environment(\.interfaceOrientation) private var orientation
   
 //  public init(folders: [Folder], initiallySelectedFolder: Folder.ID? = nil) {
 //    self.folders = folders
@@ -495,7 +540,7 @@ public struct PlaylistView: View {
   
   public var body: some View {
     VStack(spacing: 0) {
-      PlayerView(orientation: orientation)
+      PlayerView()
       if orientation.isPortrait {
         Color.clear
           .frame(minHeight: 100)
