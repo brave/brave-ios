@@ -34,6 +34,11 @@ import Growth
 import BraveShields
 import CertificateUtilities
 
+#if DEBUG
+// FIXME: Remove later
+import PlaylistUI
+#endif
+
 private let KVOs: [KVOConstants] = [
   .estimatedProgress,
   .loading,
@@ -913,6 +918,13 @@ public class BrowserViewController: UIViewController {
     
     syncPlaylistFolders()
     checkCrashRestorationOrSetupTabs()
+    
+#if DEBUG
+    // FIXME: Remove later
+    let vc = UIHostingController(rootView: PlaylistContainerView())
+    vc.modalPresentationStyle = .fullScreen
+    self.present(vc, animated: true)
+#endif
   }
 
   public static let defaultBrowserNotificationId = "defaultBrowserNotification"

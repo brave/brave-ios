@@ -132,6 +132,7 @@ public struct PlaylistSplitView: View {
       }
     } label: {
       Image(braveSystemName: "leo.more.horizontal")
+        .padding(6)
     }
   }
   
@@ -316,7 +317,7 @@ private struct OrientationEnvironmentKey: EnvironmentKey {
 }
 
 extension EnvironmentValues {
-  fileprivate var interfaceOrientation: UIInterfaceOrientation {
+  var interfaceOrientation: UIInterfaceOrientation {
     get { self[OrientationEnvironmentKey.self] }
     set { self[OrientationEnvironmentKey.self] = newValue }
   }
@@ -388,20 +389,37 @@ public struct PlayerView: View {
   
   @State private var isControlsVisible: Bool = true
   
+  private var controlView: some View {
+    ControlView(title: item?.name ?? "", publisherSource: item?.pageSource)
+      .padding(.vertical, 24)
+      .contentShape(Rectangle())
+      .background {
+        if orientation.isLandscape {
+          LinearGradient(
+            stops: [
+              .init(color: .black.opacity(0.8), location: 0),
+              .init(color: .black.opacity(0.1), location: 0.7),
+              .init(color: .black.opacity(0), location: 1)
+            ],
+            startPoint: .bottom,
+            endPoint: .top
+          )
+          .ignoresSafeArea()
+        }
+      }
+      .transition(.opacity)
+      .zIndex(1)
+  }
+  
   public var body: some View {
-    if #available(iOS 16.0, *) {
-      (orientation.isPortrait ? AnyLayout(VStackLayout()) : AnyLayout(ZStackLayout(alignment: .bottom))) {
+    ZStack(alignment: .bottom) {
+      // FIXME: Not sure what to do about this nonsense controls layout... Its expected that the video to be centered in the available space (excluding the controls) but somehow also take up the full amount of space and make the controls appear above them when the video is portrait which we don't know until we load the video
+      VStack {
         // FIXME: Replace with a proper AVPlayer/UIViewRepresentable
         VideoPlayer(player: item.map { .init(url: $0.source) })
           .disabled(true)
           .aspectRatio(16/9, contentMode: .fit)
           .background(Color.black.ignoresSafeArea(.container, edges: [.leading, .trailing, .bottom]))
-//        Color.clear
-//          .aspectRatio(16/9, contentMode: .fit)
-//          .overlay {
-//            LinearGradient(braveGradient: .gradient03) // Video player?
-//          }
-//          .clipped()
           .fixedSize(horizontal: false, vertical: true)
           .frame(maxHeight: .infinity)
           .onTapGesture {
@@ -409,44 +427,13 @@ public struct PlayerView: View {
               isControlsVisible.toggle()
             }
           }
-        if orientation.isPortrait || orientation.isLandscape && isControlsVisible {
-          ControlView(title: "")
-            .padding(.vertical, 24)
-            .contentShape(Rectangle())
-            .background {
-              if orientation.isLandscape {
-                LinearGradient(
-                  stops: [
-                    .init(color: .black.opacity(0.8), location: 0),
-                    .init(color: .black.opacity(0.1), location: 0.7),
-                    .init(color: .black.opacity(0), location: 1)
-                  ],
-                  startPoint: .bottom,
-                  endPoint: .top
-                )
-                .ignoresSafeArea()
-//                PartialRoundedRectangle(cornerRadius: 10, corners: [.topLeft, .topRight])
-//                  .fill(Material.bar)
-//                  .colorScheme(.dark)
-//                  .ignoresSafeArea()
-//                  .transition(.opacity.animation(.default))
-              }
-            }
-            .transition(.opacity)
-            .zIndex(1)
+        if orientation.isPortrait {
+          controlView.hidden()
         }
       }
-    } else {
-      Color.clear
-        .overlay {
-          LinearGradient(braveGradient: .gradient03) // Video player?
-        }
-        .clipped()
-        .aspectRatio(16/9, contentMode: .fit)
-        .fixedSize(horizontal: false, vertical: true)
-      ControlView(title: "")
-        .padding(.vertical, 24)
-        .contentShape(Rectangle())
+      if orientation.isPortrait || orientation.isLandscape && isControlsVisible {
+        controlView
+      }
     }
   }
 }
@@ -535,12 +522,15 @@ public struct PlaylistView: View {
       }
     } label: {
       Image(braveSystemName: "leo.more.horizontal")
+        .padding(6)
     }
   }
   
   public var body: some View {
     VStack(spacing: 0) {
-      PlayerView()
+      PlayerView(item: item)
+        .frame(maxHeight: 800)
+        .layoutPriority(1)
       if orientation.isPortrait {
         Color.clear
           .frame(minHeight: 100)
@@ -580,6 +570,13 @@ public struct PlaylistView: View {
                 
                 PlaylistItemListView(folder: folder, selectedItem: $item)
                   .background(Color(.braveBackground))
+                  .onChange(of: item) { newItem in
+                    if newItem != nil {
+                      withAnimation(.spring(response: 0.15, dampingFraction: 0.9)) {
+                        drawerHeight = listHeight
+                      }
+                    }
+                  }
               }
               .frame(height: drawerHeight)
             }

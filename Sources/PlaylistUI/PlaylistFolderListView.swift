@@ -11,7 +11,7 @@ import BraveUI
 import BraveStrings
 import DesignSystem
 
-public struct Folder: Identifiable {
+public struct Folder: Identifiable, Equatable {
   public var id: String
   public var title: String
   public var items: [Item]
@@ -25,7 +25,7 @@ extension String {
   static let defaultPlaylistID: Folder.ID = PlaylistFolder.savedFolderUUID
 }
 
-public struct Item: Identifiable {
+public struct Item: Identifiable, Equatable {
   public var id: String
   public var dateAdded: Date
   public var duration: TimeInterval
