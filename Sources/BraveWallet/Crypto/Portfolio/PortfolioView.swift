@@ -12,6 +12,7 @@ import Strings
 import DesignSystem
 import BraveUI
 import Shared
+import Preferences
 
 struct PortfolioView: View {
   var cryptoStore: CryptoStore
@@ -104,9 +105,11 @@ struct PortfolioView: View {
     }
     .sheet(isPresented: $isPresentingNetworkFilter) {
       FiltersDisplaySettingsView(
-        store: portfolioStore.filtersDisplaySettingsStore(),
-        keyringStore: keyringStore,
-        networkStore: networkStore
+        filters: portfolioStore.filters,
+        networkStore: networkStore,
+        save: { filters in
+          portfolioStore.saveFilters(filters)
+        }
       )
       .osAvailabilityModifiers({ view in
         if #available(iOS 16, *) {
@@ -119,9 +122,6 @@ struct PortfolioView: View {
           view
         }
       })
-      .onDisappear {
-        portfolioStore.closeFiltersDisplaySettingsStore()
-      }
     }
   }
 

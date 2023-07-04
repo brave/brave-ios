@@ -8,6 +8,7 @@ import BraveCore
 import SwiftUI
 import Combine
 import Data
+import Preferences
 
 public struct AssetViewModel: Identifiable, Equatable {
   var token: BraveWallet.BlockchainToken
@@ -82,14 +83,34 @@ public class PortfolioStore: ObservableObject {
   
   @Published private(set) var isLoadingDiscoverAssets: Bool = false
   
-  // Filters
-  @Published var filters: Filters = .init(
-    groupBy: .none,
-    sortOrder: .descending,
-    isHidingSmallBalances: false,
-    accounts: [],
-    networks: []
-  )
+  /// All User Accounts
+  var allAccounts: [BraveWallet.AccountInfo] = []
+  /// All available networks
+  var allNetworks: [BraveWallet.NetworkInfo] = []
+  var filters: Filters {
+    let nonSelectedAccountAddresses = Preferences.Wallet.nonSelectedAccountsFilter.value
+    let nonSelectedNetworkChainIds = Preferences.Wallet.nonSelectedNetworksFilter.value
+    return Filters(
+      groupBy: .none,
+      sortOrder: SortOrder(rawValue: Preferences.Wallet.sortOrderFilter.value) ?? .descending,
+      isHidingSmallBalances: Preferences.Wallet.isHidingSmallBalancesFilter.value,
+      accounts: allAccounts.map { account in
+          .init(
+            isSelected: !nonSelectedAccountAddresses.contains(where: { $0 == account.address }),
+            model: account
+          )
+      },
+      networks: allNetworks.map { network in
+          .init(
+            isSelected: !nonSelectedNetworkChainIds.contains(where: { $0 == network.chainId }),
+            model: network
+          )
+      }
+    )
+  }
+  /// Flag indicating when we are saving filters. Since we are observing multiple `Preference.Option`s,
+  /// we should avoid calling `update()` in `preferencesDidChange()` unless another view changed.
+  private var isSavingFilters: Bool = false
 
   public private(set) lazy var userAssetsStore: UserAssetsStore = .init(
     blockchainRegistry: self.blockchainRegistry,
@@ -148,40 +169,39 @@ public class PortfolioStore: ObservableObject {
     walletService.defaultBaseCurrency { [self] currencyCode in
       self.currencyCode = currencyCode
     }
+    Preferences.Wallet.showTestNetworks.observe(from: self)
+    Preferences.Wallet.sortOrderFilter.observe(from: self)
+    Preferences.Wallet.isHidingSmallBalancesFilter.observe(from: self)
+    Preferences.Wallet.nonSelectedAccountsFilter.observe(from: self)
+    Preferences.Wallet.nonSelectedNetworksFilter.observe(from: self)
   }
   
   func update() {
     self.updateTask?.cancel()
     self.updateTask = Task { @MainActor in
       self.isLoadingBalances = true
-      // setup filters if empty
-      if filters.accounts.isEmpty && filters.networks.isEmpty {
-        let allAccounts = await self.keyringService.allAccounts()
-        self.filters.accounts = allAccounts.accounts.map { account in
-          .init(isSelected: true, model: account)
+      self.allAccounts = await keyringService.allAccounts().accounts
+      self.allNetworks = await rpcService.allNetworksForSupportedCoins().filter { network in
+        if !Preferences.Wallet.showTestNetworks.value { // filter out test networks
+          return !WalletConstants.supportedTestNetworkChainIds.contains(where: { $0 == network.chainId })
         }
-        let allNetworks = await self.rpcService.allNetworksForSupportedCoins()
-        self.filters.networks = allNetworks.map { network in
-          .init(
-            isSelected: !WalletConstants.supportedTestNetworkChainIds.contains(network.chainId),
-            model: network
-          )
-        }
+        return true
       }
-      let networks: [BraveWallet.NetworkInfo] = self.filters.networks.filter(\.isSelected).map(\.model)
+      let filters = self.filters
+      let selectedAcounts = filters.accounts.filter(\.isSelected).map(\.model)
+      let selectedNetworks = filters.networks.filter(\.isSelected).map(\.model)
       struct NetworkAssets: Equatable {
         let network: BraveWallet.NetworkInfo
         let tokens: [BraveWallet.BlockchainToken]
         let sortOrder: Int
       }
-      let allVisibleUserAssets = assetManager.getAllVisibleAssetsInNetworkAssets(networks: networks)
+      let allVisibleUserAssets = assetManager.getAllVisibleAssetsInNetworkAssets(networks: selectedNetworks)
       var updatedUserVisibleAssets = buildAssetViewModels(allVisibleUserAssets: allVisibleUserAssets)
       // update userVisibleAssets on display immediately with empty values. Issue #5567
       self.userVisibleAssets = updatedUserVisibleAssets
         .sorted(by: { lhs, rhs in
           AssetViewModel.sortedByValue(lhs: lhs, rhs: rhs, sortOrder: filters.sortOrder)
         })
-      let accounts = self.filters.accounts.filter(\.isSelected).map(\.model)
       guard !Task.isCancelled else { return }
       typealias TokenNetworkAccounts = (token: BraveWallet.BlockchainToken, network: BraveWallet.NetworkInfo, accounts: [BraveWallet.AccountInfo])
       let allTokenNetworkAccounts = allVisibleUserAssets.flatMap { networkAssets in
@@ -189,7 +209,7 @@ public class PortfolioStore: ObservableObject {
           TokenNetworkAccounts(
             token: token,
             network: networkAssets.network,
-            accounts: accounts.filter { $0.coin == token.coin }
+            accounts: selectedAcounts.filter { $0.coin == token.coin }
           )
         }
       }
@@ -320,26 +340,6 @@ public class PortfolioStore: ObservableObject {
     }
     return priceHistories
   }
-  
-  private var _filtersDisplaySettingsStore: FiltersDisplaySettingsStore?
-  func filtersDisplaySettingsStore() -> FiltersDisplaySettingsStore {
-    if let filtersDisplaySettingsStore = _filtersDisplaySettingsStore {
-      return filtersDisplaySettingsStore
-    }
-    let store = FiltersDisplaySettingsStore(
-      filters: filters,
-      saveAction: { [weak self] filters in
-        guard let self = self else { return }
-        self.filters = filters
-        self.update()
-      }
-    )
-    self._filtersDisplaySettingsStore = store
-    return store
-  }
-  func closeFiltersDisplaySettingsStore() {
-    _filtersDisplaySettingsStore = nil
-  }
 }
 
 extension PortfolioStore: BraveWalletJsonRpcServiceObserver {
@@ -360,12 +360,7 @@ extension PortfolioStore: BraveWalletKeyringServiceObserver {
 
   public func accountsChanged() {
     Task { @MainActor in
-      // An account was added or removed, update our account filters for the change.
-      let allAccounts = await self.keyringService.allAccounts()
-      filters.accounts = allAccounts.accounts.map { account in
-        let existingSelectionValue = self.filters.accounts.first(where: { $0.model.id == account.id })?.isSelected
-        return .init(isSelected: existingSelectionValue ?? true, model: account)
-      }
+      // An account was added or removed, `update()` will update `allAccounts`.
       update()
     }
   }
@@ -410,13 +405,7 @@ extension PortfolioStore: BraveWalletBraveWalletServiceObserver {
 
   public func onNetworkListChanged() {
     Task { @MainActor in
-      // A network was added or removed, update our network filters for the change.
-      let updatedNetworkFilters = await self.rpcService.allNetworksForSupportedCoins().map { network in
-        let defaultValue = !WalletConstants.supportedTestNetworkChainIds.contains(network.chainId)
-        let existingSelectionValue = self.filters.networks.first(where: { $0.model.chainId == network.chainId})?.isSelected
-        return Selectable(isSelected: existingSelectionValue ?? defaultValue, model: network)
-      }
-      filters.networks = updatedNetworkFilters
+      // A network was added or removed, `update()` will update `allNetworks`.
       update()
     }
   }
@@ -437,6 +426,28 @@ extension PortfolioStore: BraveWalletBraveWalletServiceObserver {
   }
   
   public func onResetWallet() {
+  }
+}
+
+extension PortfolioStore: PreferencesObserver {
+  func saveFilters(_ filters: Filters) {
+    isSavingFilters = true
+    defer {
+      isSavingFilters = false
+      update()
+    }
+    Preferences.Wallet.sortOrderFilter.value = filters.sortOrder.rawValue
+    Preferences.Wallet.isHidingSmallBalancesFilter.value = filters.isHidingSmallBalances
+    Preferences.Wallet.nonSelectedAccountsFilter.value = filters.accounts
+      .filter({ !$0.isSelected })
+      .map(\.model.address)
+    Preferences.Wallet.nonSelectedNetworksFilter.value = filters.networks
+      .filter({ !$0.isSelected })
+      .map(\.model.chainId)
+  }
+  public func preferencesDidChange(for key: String) {
+    guard !isSavingFilters else { return }
+    update()
   }
 }
 

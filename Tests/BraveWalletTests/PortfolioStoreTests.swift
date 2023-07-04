@@ -6,11 +6,25 @@
 import Combine
 import XCTest
 import BraveCore
+import Preferences
 @testable import BraveWallet
 
 class PortfolioStoreTests: XCTestCase {
 
   private var cancellables: Set<AnyCancellable> = .init()
+  
+  override func setUp() {
+    resetFilters()
+  }
+  override func tearDown() {
+    resetFilters()
+  }
+  private func resetFilters() {
+    Preferences.Wallet.sortOrderFilter.reset()
+    Preferences.Wallet.isHidingSmallBalancesFilter.reset()
+    Preferences.Wallet.nonSelectedAccountsFilter.reset()
+    Preferences.Wallet.nonSelectedNetworksFilter.reset()
+  }
   
   /// Test `update()` will fetch all visible user assets from all networks and display them sorted by their balance.
   func testUpdate() async {
@@ -335,14 +349,13 @@ class PortfolioStoreTests: XCTestCase {
       }.store(in: &cancellables)
     
     // change sort to ascending
-    store.filters = .init(
+    store.saveFilters(.init(
       groupBy: store.filters.groupBy,
       sortOrder: .ascending,
       isHidingSmallBalances: store.filters.isHidingSmallBalances,
       accounts: store.filters.accounts,
       networks: store.filters.networks
-    )
-    store.update()
+    ))
     await fulfillment(of: [sortExpectation], timeout: 1)
     cancellables.removeAll()
     
@@ -381,14 +394,13 @@ class PortfolioStoreTests: XCTestCase {
         // USDC (value 0.75), hidden
         XCTAssertNil(lastUpdatedVisibleAssets[safe: 2])
       }.store(in: &cancellables)
-    store.filters = .init(
+    store.saveFilters(.init(
       groupBy: store.filters.groupBy,
       sortOrder: .descending,
       isHidingSmallBalances: true,
       accounts: store.filters.accounts,
       networks: store.filters.networks
-    )
-    store.update()
+    ))
     await fulfillment(of: [hideSmallBalancesExpectation], timeout: 1)
     cancellables.removeAll()
     
@@ -404,7 +416,7 @@ class PortfolioStoreTests: XCTestCase {
           XCTFail("Unexpected test result")
           return
         }
-        // ETH on Ethereum mainnet, SOL on Solana mainnet
+        // ETH on Ethereum mainnet, SOL on Solana mainnet, USDC on Ethereum mainnet
         XCTAssertEqual(lastUpdatedVisibleAssets.count, 3)
         // ETH (value ~= 2741.7510399999996)
         XCTAssertEqual(lastUpdatedVisibleAssets[safe: 0]?.token.symbol,
@@ -434,7 +446,7 @@ class PortfolioStoreTests: XCTestCase {
         XCTAssertEqual(lastUpdatedVisibleAssets[safe: 2]?.decimalBalance,
                        mockUSDCBalanceAccount1) // verify account 2 hidden
       }.store(in: &cancellables)
-    store.filters = .init(
+    store.saveFilters(.init(
       groupBy: store.filters.groupBy,
       sortOrder: .descending,
       isHidingSmallBalances: false,
@@ -442,8 +454,7 @@ class PortfolioStoreTests: XCTestCase {
         .init(isSelected: $0.model.address != ethAccount2.address, model: $0.model)
       },
       networks: store.filters.networks
-    )
-    store.update()
+    ))
     await fulfillment(of: [accountsExpectation], timeout: 1)
     cancellables.removeAll()
     
@@ -459,7 +470,7 @@ class PortfolioStoreTests: XCTestCase {
           XCTFail("Unexpected test result")
           return
         }
-        // ETH on Ethereum mainnet, SOL on Solana mainnet
+        // ETH on Ethereum mainnet, USDC on Ethereum mainnet
         XCTAssertEqual(lastUpdatedVisibleAssets.count, 2)
         // ETH (value ~= 2741.7510399999996)
         XCTAssertEqual(lastUpdatedVisibleAssets[safe: 0]?.token.symbol,
@@ -482,7 +493,7 @@ class PortfolioStoreTests: XCTestCase {
         // SOL (value = 0, SOL networks hidden)
         XCTAssertNil(lastUpdatedVisibleAssets[safe: 2])
       }.store(in: &cancellables)
-    store.filters = .init(
+    store.saveFilters(.init(
       groupBy: store.filters.groupBy,
       sortOrder: .descending,
       isHidingSmallBalances: false,
@@ -492,8 +503,7 @@ class PortfolioStoreTests: XCTestCase {
       networks: store.filters.networks.map { // only select Ethereum networks
         .init(isSelected: $0.model.coin == .eth, model: $0.model)
       }
-    )
-    store.update()
+    ))
     await fulfillment(of: [networksExpectation], timeout: 1)
   }
 }

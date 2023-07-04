@@ -8,7 +8,7 @@ import BraveCore
 import DesignSystem
 import Preferences
 
-enum GroupBy: Equatable, CaseIterable, Identifiable {
+public enum GroupBy: Int, CaseIterable, Identifiable, UserDefaultsEncodable {
   case none
   case accounts
   case networks
@@ -20,10 +20,10 @@ enum GroupBy: Equatable, CaseIterable, Identifiable {
     case .networks: return "Networks"
     }
   }
-  var id: String { title }
+  public var id: String { title }
 }
 
-enum SortOrder: Equatable, CaseIterable, Identifiable {
+public enum SortOrder: Int, CaseIterable, Identifiable, UserDefaultsEncodable {
   case ascending
   case descending
   
@@ -33,7 +33,7 @@ enum SortOrder: Equatable, CaseIterable, Identifiable {
     case .descending: return "High to Low"
     }
   }
-  var id: String { title }
+  public var id: String { title }
 }
 
 struct Filters {
@@ -43,25 +43,28 @@ struct Filters {
   let sortOrder: SortOrder
   /// If we are hiding small balances (less than $1 value). Default is true.
   let isHidingSmallBalances: Bool
-  
   /// All accounts and if they are currently selected. Default is all accounts selected.
   var accounts: [Selectable<BraveWallet.AccountInfo>]
   /// All networks and if they are currently selected. Default is all selected except known test networks.
   var networks: [Selectable<BraveWallet.NetworkInfo>]
 }
 
-class FiltersDisplaySettingsStore: ObservableObject {
+struct FiltersDisplaySettingsView: View {
   
-  @Published var groupBy: GroupBy = .none
+  /// How the assets are grouped. Unavailable until Portfolio supports grouping.
+  @State var groupBy: GroupBy
   /// Ascending order is smallest fiat to largest fiat. Default is descending order.
-  @Published var sortOrder: SortOrder = .descending
+  @State var sortOrder: SortOrder
   /// If we are hiding small balances (less than $1 value). Default is false.
-  @Published var isHidingSmallBalances: Bool = false
+  @State var isHidingSmallBalances: Bool
   
   /// All accounts and if they are currently selected. Default is all accounts selected.
-  @Published var accounts: [Selectable<BraveWallet.AccountInfo>] = []
+  @State var accounts: [Selectable<BraveWallet.AccountInfo>]
   /// All networks and if they are currently selected. Default is all selected except known test networks.
-  @Published var networks: [Selectable<BraveWallet.NetworkInfo>] = []
+  @State var networks: [Selectable<BraveWallet.NetworkInfo>]
+  
+  var networkStore: NetworkStore
+  let save: (Filters) -> Void
   
   /// Returns true if all accounts are selected
   var allAccountsSelected: Bool {
@@ -80,17 +83,211 @@ class FiltersDisplaySettingsStore: ObservableObject {
       .allSatisfy(\.isSelected)
   }
   
-  let saveAction: (Filters) -> Void
+  @State private var isShowingNetworksDetail: Bool = false
+  @Environment(\.dismiss) private var dismiss
+  
+  /// Size of the circle containing the icon for each filter.
+  /// The `relativeTo: .headline` should match icon's `TextStyle` in `FilterLabelView`.
+  @ScaledMetric(relativeTo: .headline) private var iconContainerSize: CGFloat = 40
+  private var maxIconContainerSize: CGFloat = 80
+  private let rowPadding: CGFloat = 16
   
   init(
     filters: Filters,
-    saveAction: @escaping (Filters) -> Void
+    networkStore: NetworkStore,
+    save: @escaping (Filters) -> Void
   ) {
-    self.sortOrder = filters.sortOrder
-    self.isHidingSmallBalances = filters.isHidingSmallBalances
-    self.accounts = filters.accounts
-    self.networks = filters.networks
-    self.saveAction = saveAction
+    self._groupBy = State(initialValue: filters.groupBy)
+    self._sortOrder = State(initialValue: filters.sortOrder)
+    self._isHidingSmallBalances = State(initialValue: filters.isHidingSmallBalances)
+    self._accounts = State(initialValue: filters.accounts)
+    self._networks = State(initialValue: filters.networks)
+    self.networkStore = networkStore
+    self.save = save
+  }
+  
+  var body: some View {
+    NavigationView {
+      ScrollView {
+        LazyVStack(spacing: 0) {
+          /*
+           Unavailable until Portfolio supports grouping.
+           groupByRow
+            .padding(.vertical, rowPadding)
+           */
+
+          sortAssets
+            .padding(.vertical, rowPadding)
+
+          hideSmallBalances
+            .padding(.vertical, rowPadding)
+
+          DividerLine()
+
+          accountFilters
+            .padding(.vertical, rowPadding)
+
+          networkFilters
+            .padding(.vertical, rowPadding)
+
+        }
+        .padding(.horizontal)
+      }
+      .background(Color(uiColor: WalletV2Design.containerBackground))
+      .safeAreaInset(edge: .bottom, content: {
+        saveChangesContainer
+      })
+      .navigationTitle("Filters and Display Settings")
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        ToolbarItem(placement: .navigationBarTrailing) {
+          Button(action: restoreToDefaults) {
+            Text("Reset")
+              .fontWeight(.semibold)
+              .foregroundColor(Color(uiColor: WalletV2Design.textInteractive))
+          }
+        }
+      }
+    }
+  }
+  
+  private var groupByRow: some View {
+    FilterPickerRowView(
+      title: "Group By",
+      description: "Group assets by",
+      icon: .init(
+        braveSystemName: "leo.list.bullet-default",
+        iconContainerSize: min(iconContainerSize, maxIconContainerSize)
+      ),
+      allOptions: GroupBy.allCases,
+      selection: $groupBy
+    ) { groupBy in
+      Text(groupBy.title)
+    }
+  }
+  
+  private var sortAssets: some View {
+    FilterPickerRowView(
+      title: "Sort Assets",
+      description: "Sort by fiat amount",
+      icon: .init(
+        braveSystemName: "leo.arrow.down",
+        iconContainerSize: min(iconContainerSize, maxIconContainerSize)
+      ),
+      allOptions: SortOrder.allCases,
+      selection: $sortOrder
+    ) { sortOrder in
+      Text(sortOrder.title)
+    }
+  }
+  
+  private var hideSmallBalances: some View {
+    Toggle(isOn: $isHidingSmallBalances) {
+      FilterLabelView(
+        title: "Hide Small Balances",
+        description: "Assets with value less than $1",
+        icon: .init(
+          braveSystemName: "leo.eye.on",
+          iconContainerSize: min(iconContainerSize, maxIconContainerSize)
+        )
+      )
+    }
+    .tint(Color(.braveBlurpleTint))
+  }
+  
+  private var accountFilters: some View {
+    NavigationLink(destination: {
+      AccountFilterView(
+        accounts: $accounts
+      )
+    }, label: {
+      FilterDetailRowView(
+        title: "Select Accounts",
+        description: "Select accounts to filter by",
+        icon: .init(
+          braveSystemName: "leo.user.accounts",
+          iconContainerSize: iconContainerSize
+        ),
+        selectionView: {
+          if allAccountsSelected {
+            AllSelectedView(title: "All accounts")
+          } else if accounts.contains(where: { $0.isSelected }) { // at least 1 selected
+            MultipleAccountBlockiesView(
+              accountAddresses: accounts.filter(\.isSelected).map(\.model.address)
+            )
+          }
+        }
+      )
+    })
+  }
+  
+  private var networkFilters: some View {
+    NavigationLink(destination: {
+      NetworkFilterView(
+        networks: networks,
+        networkStore: networkStore,
+        showsCancelButton: false,
+        requiresSave: false,
+        saveAction: { selectedNetworks in
+          networks = selectedNetworks
+        }
+      )
+    }) {
+      FilterDetailRowView(
+        title: "Select Networks",
+        description: "Select networks to filter by",
+        icon: .init(
+          braveSystemName: "leo.internet",
+          iconContainerSize: iconContainerSize
+        ),
+        selectionView: {
+          if allNetworksSelected {
+            AllSelectedView(title: "All networks")
+          } else if networks.contains(where: { $0.isSelected }) { // at least 1 selected
+            MultipleNetworkIconsView(
+              networks: networks.filter(\.isSelected).map(\.model)
+            )
+          }
+        }
+      )
+    }
+  }
+  
+  private var saveChangesContainer: some View {
+    VStack {
+      Button(action: {
+        let filters = Filters(
+          groupBy: groupBy,
+          sortOrder: sortOrder,
+          isHidingSmallBalances: isHidingSmallBalances,
+          accounts: accounts,
+          networks: networks
+        )
+        save(filters)
+        dismiss()
+      }) {
+        Text("Save Changes")
+          .fontWeight(.semibold)
+          .frame(maxWidth: .infinity)
+          .padding(.vertical, 4)
+      }
+      .buttonStyle(BraveFilledButtonStyle(size: .large))
+      
+      Button(action: { dismiss() }) {
+        Text("Cancel")
+          .fontWeight(.semibold)
+          .foregroundColor(Color(uiColor: WalletV2Design.textInteractive))
+          .frame(maxWidth: .infinity)
+          .padding(.vertical, 4)
+      }
+    }
+    .padding(.horizontal)
+    .padding(.vertical, 14)
+    .background(
+      Color(uiColor: WalletV2Design.containerBackground)
+        .ignoresSafeArea()
+    )
+    .shadow(color: Color.black.opacity(0.04), radius: 16, x: 0, y: -8)
   }
   
   func restoreToDefaults() {
@@ -124,234 +321,14 @@ class FiltersDisplaySettingsStore: ObservableObject {
   }
 }
 
-struct FiltersDisplaySettingsView: View {
-  
-  @ObservedObject var store: FiltersDisplaySettingsStore
-  var keyringStore: KeyringStore
-  var networkStore: NetworkStore
-  
-  @State private var isShowingNetworksDetail: Bool = false
-  @Environment(\.dismiss) private var dismiss
-  
-  /// Size of the circle containing the icon for each filter.
-  /// The `relativeTo: .headline` should match icon's `TextStyle` in `FilterLabelView`.
-  @ScaledMetric(relativeTo: .headline) private var iconContainerSize: CGFloat = 40
-  private var maxIconContainerSize: CGFloat = 80
-  private let rowPadding: CGFloat = 16
-  
-  init(
-    store: FiltersDisplaySettingsStore,
-    keyringStore: KeyringStore,
-    networkStore: NetworkStore
-  ) {
-    self.store = store
-    self.keyringStore = keyringStore
-    self.networkStore = networkStore
-  }
-  
-  var body: some View {
-    NavigationView {
-      ScrollView {
-        LazyVStack(spacing: 0) {
-          /*
-           Disabled until Portfolio supports grouping
-          groupBy
-            .padding(.vertical, rowPadding)
-           */
-
-          sortAssets
-            .padding(.vertical, rowPadding)
-
-          hideSmallBalances
-            .padding(.vertical, rowPadding)
-
-          DividerLine()
-
-          accountFilters
-            .padding(.vertical, rowPadding)
-
-          networkFilters
-            .padding(.vertical, rowPadding)
-
-        }
-        .padding(.horizontal)
-      }
-      .background(Color(uiColor: WalletV2Design.containerBackground))
-      .safeAreaInset(edge: .bottom, content: {
-        saveChangesContainer
-      })
-      .navigationTitle("Filters and Display Settings")
-      .navigationBarTitleDisplayMode(.inline)
-      .toolbar {
-        ToolbarItem(placement: .navigationBarTrailing) {
-          Button(action: { store.restoreToDefaults() }) {
-            Text("Reset")
-              .fontWeight(.semibold)
-              .foregroundColor(Color(uiColor: WalletV2Design.textInteractive))
-          }
-        }
-      }
-    }
-  }
-  
-  private var groupBy: some View {
-    FilterPickerRowView(
-      title: "Group By",
-      description: "Group assets by",
-      icon: .init(
-        braveSystemName: "leo.list.bullet-default",
-        iconContainerSize: min(iconContainerSize, maxIconContainerSize)
-      ),
-      allOptions: GroupBy.allCases,
-      selection: $store.groupBy
-    ) { groupBy in
-      Text(groupBy.title)
-    }
-  }
-  
-  private var sortAssets: some View {
-    FilterPickerRowView(
-      title: "Sort Assets",
-      description: "Sort by fiat amount",
-      icon: .init(
-        braveSystemName: "leo.arrow.down",
-        iconContainerSize: min(iconContainerSize, maxIconContainerSize)
-      ),
-      allOptions: SortOrder.allCases,
-      selection: $store.sortOrder
-    ) { sortOrder in
-      Text(sortOrder.title)
-    }
-  }
-  
-  private var hideSmallBalances: some View {
-    Toggle(isOn: $store.isHidingSmallBalances) {
-      FilterLabelView(
-        title: "Hide Small Balances",
-        description: "Assets with value less than $1",
-        icon: .init(
-          braveSystemName: "leo.eye.on",
-          iconContainerSize: min(iconContainerSize, maxIconContainerSize)
-        )
-      )
-    }
-    .tint(Color(.braveBlurpleTint))
-  }
-  
-  private var accountFilters: some View {
-    NavigationLink(destination: {
-      AccountFilterView(
-        accounts: $store.accounts
-      )
-    }, label: {
-      FilterDetailRowView(
-        title: "Select Accounts",
-        description: "Select accounts to filter by",
-        icon: .init(
-          braveSystemName: "leo.user.accounts",
-          iconContainerSize: iconContainerSize
-        ),
-        selectionView: {
-          if store.allAccountsSelected {
-            AllSelectedView(title: "All accounts")
-          } else if store.accounts.contains(where: { $0.isSelected }) { // at least 1 selected
-            MultipleAccountBlockiesView(
-              accountAddresses: store.accounts.filter(\.isSelected).map(\.model.address)
-            )
-          }
-        }
-      )
-    })
-  }
-  
-  private var networkFilters: some View {
-    NavigationLink(destination: {
-      NetworkFilterView(
-        networks: store.networks,
-        networkStore: networkStore,
-        showsCancelButton: false,
-        requiresSave: false,
-        saveAction: { selectedNetworks in
-          store.networks = selectedNetworks
-        }
-      )
-    }) {
-      FilterDetailRowView(
-        title: "Select Networks",
-        description: "Select networks to filter by",
-        icon: .init(
-          braveSystemName: "leo.internet",
-          iconContainerSize: iconContainerSize
-        ),
-        selectionView: {
-          if store.allNetworksSelected {
-            AllSelectedView(title: "All networks")
-          } else if store.networks.contains(where: { $0.isSelected }) { // at least 1 selected
-            MultipleNetworkIconsView(
-              networks: store.networks.filter(\.isSelected).map(\.model)
-            )
-          }
-        }
-      )
-    }
-  }
-  
-  private var saveChangesContainer: some View {
-    VStack {
-      Button(action: {
-        let filters = Filters(
-          groupBy: store.groupBy,
-          sortOrder: store.sortOrder,
-          isHidingSmallBalances: store.isHidingSmallBalances,
-          accounts: store.accounts,
-          networks: store.networks
-        )
-        store.saveAction(filters)
-        dismiss()
-      }) {
-        Text("Save Changes")
-          .fontWeight(.semibold)
-          .frame(maxWidth: .infinity)
-          .padding(.vertical, 4)
-      }
-      .buttonStyle(BraveFilledButtonStyle(size: .large))
-      
-      Button(action: { dismiss() }) {
-        Text("Cancel")
-          .fontWeight(.semibold)
-          .foregroundColor(Color(uiColor: WalletV2Design.textInteractive))
-          .frame(maxWidth: .infinity)
-          .padding(.vertical, 4)
-      }
-    }
-    .padding(.horizontal)
-    .padding(.vertical, 14)
-    .background(
-      Color(uiColor: WalletV2Design.containerBackground)
-        .ignoresSafeArea()
-    )
-    .shadow(color: Color.black.opacity(0.04), radius: 16, x: 0, y: -8)
-  }
-}
-
 #if DEBUG
 struct FiltersDisplaySettingsView_Previews: PreviewProvider {
   static var previews: some View {
     FiltersDisplaySettingsView(
-      store: .previewStore,
-      keyringStore: .previewStore,
-      networkStore: .previewStore
-    )
-  }
-}
-
-extension FiltersDisplaySettingsStore {
-  static var previewStore: FiltersDisplaySettingsStore {
-    FiltersDisplaySettingsStore(
-      filters: .init(
+      filters: Filters(
         groupBy: .none,
         sortOrder: .descending,
-        isHidingSmallBalances: true,
+        isHidingSmallBalances: false,
         accounts: [
           .init(isSelected: true, model: .mockEthAccount),
           .init(isSelected: true, model: .mockSolAccount)
@@ -364,7 +341,8 @@ extension FiltersDisplaySettingsStore {
           .init(isSelected: false, model: .mockGoerli)
         ]
       ),
-      saveAction: { _ in }
+      networkStore: .previewStore,
+      save: { _ in }
     )
   }
 }
