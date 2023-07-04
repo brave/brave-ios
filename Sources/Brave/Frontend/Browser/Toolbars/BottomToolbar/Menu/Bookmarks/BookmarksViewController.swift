@@ -443,16 +443,26 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     let fontSize: CGFloat = 14.0
     cell.textLabel?.text = item.title ?? item.url
     cell.textLabel?.lineBreakMode = .byTruncatingTail
+    cell.detailTextLabel?.lineBreakMode = .byTruncatingTail
 
     if !item.isFolder {
       configCell()
       cell.textLabel?.font = UIFont.systemFont(ofSize: fontSize)
       cell.accessoryType = .none
+      cell.detailTextLabel?.text = nil
     } else {
       configCell(image: UIImage(braveSystemNamed: "leo.folder"))
       cell.textLabel?.font = UIFont.boldSystemFont(ofSize: fontSize)
       cell.accessoryType = .disclosureIndicator
       cell.setRightBadge(nil)
+      
+      // 0 bookmarks
+      // 1 bookmark
+      // 2 bookmarks
+      // ...
+      cell.detailTextLabel?.text = String(format: item.bookmarkNode.childCount == 1 ? Strings.bookmarkSingleCount :
+                                            Strings.bookmarkMultipleCount, item.children?.count ?? 0)
+      cell.detailTextLabel?.font = UIFont.systemFont(ofSize: fontSize)
     }
   }
 
