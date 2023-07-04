@@ -698,7 +698,7 @@ class SettingsViewController: TableViewController {
     return Static.Section(
       rows: [
         Row(text: "Show Playlist Prototype", selection: { [unowned self] in
-          let vc = UIHostingController(rootView: PlaylistCoreDataContainerView())
+          let vc = UIHostingController(rootView: PlaylistContainerView())
           vc.modalPresentationStyle = .fullScreen
           self.present(vc, animated: true)
         }),
