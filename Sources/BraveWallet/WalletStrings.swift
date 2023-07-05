@@ -4142,6 +4142,20 @@ extension Strings {
       value: "High to Low",
       comment: "The title of the sort option that sorts highest value to lowest value. Used in Portfolio/NFT filters and display settings."
     )
+    public static let aToZSortOption = NSLocalizedString(
+      "wallet.aToZSortOption",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "A to Z",
+      comment: "The title of the sort option that sorts alphabetically from A to Z. Used in Portfolio/NFT filters and display settings."
+    )
+    public static let zToASortOption = NSLocalizedString(
+      "wallet.highToLowSortOption",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Z to A",
+      comment: "The title of the sort option that sorts alphabetically from Z to A. Used in Portfolio/NFT filters and display settings."
+    )
     public static let sortAssetsTitle = NSLocalizedString(
       "wallet.sortAssetsTitle",
       tableName: "BraveWallet",
@@ -4153,7 +4167,7 @@ extension Strings {
       "wallet.sortAssetsDescription",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Sort by fiat amount",
+      value: "Sort by fiat value or name",
       comment: "The description label of the sort option that sorts assets by their fiat value, shown below the title. Used in Portfolio/NFT filters and display settings."
     )
     public static let hideSmallBalancesTitle = NSLocalizedString(

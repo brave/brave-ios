@@ -22,25 +22,32 @@ public struct AssetViewModel: Identifiable, Equatable {
   }
   
   /// Sort by the fiat/value of the asset (price x balance), otherwise by balance when price is unavailable.
-  static func sortedByValue(lhs: AssetViewModel, rhs: AssetViewModel, sortOrder: SortOrder = .descending) -> Bool {
-    if let lhsPrice = Double(lhs.price),
-       let rhsPrice = Double(rhs.price) {
-      if sortOrder == .ascending {
-        return (lhsPrice * lhs.decimalBalance) < (rhsPrice * rhs.decimalBalance)
+  static func sorted(by sortOrder: SortOrder = .valueDesc, lhs: AssetViewModel, rhs: AssetViewModel) -> Bool {
+    switch sortOrder {
+    case .valueAsc, .valueDesc:
+      if let lhsPrice = Double(lhs.price),
+         let rhsPrice = Double(rhs.price) {
+        if sortOrder == .valueAsc {
+          return (lhsPrice * lhs.decimalBalance) < (rhsPrice * rhs.decimalBalance)
+        }
+        return (lhsPrice * lhs.decimalBalance) > (rhsPrice * rhs.decimalBalance)
+      } else if let lhsPrice = Double(lhs.price), (lhsPrice * lhs.decimalBalance) > 0 {
+        // lhs has a non-zero value
+        return true
+      } else if let rhsPrice = Double(rhs.price), (rhsPrice * rhs.decimalBalance) > 0 {
+        // rhs has a non-zero value
+        return false
       }
-      return (lhsPrice * lhs.decimalBalance) > (rhsPrice * rhs.decimalBalance)
-    } else if let lhsPrice = Double(lhs.price), (lhsPrice * lhs.decimalBalance) > 0 {
-      // lhs has a non-zero value
-      return true
-    } else if let rhsPrice = Double(rhs.price), (rhsPrice * rhs.decimalBalance) > 0 {
-      // rhs has a non-zero value
-      return false
+      // price unavailable, sort by balance
+      if sortOrder == .valueAsc {
+        return lhs.decimalBalance < rhs.decimalBalance
+      }
+      return lhs.decimalBalance > rhs.decimalBalance
+    case .alphaAsc:
+      return lhs.token.name.localizedStandardCompare(rhs.token.name) == .orderedAscending
+    case .alphaDesc:
+      return lhs.token.name.localizedStandardCompare(rhs.token.name) == .orderedDescending
     }
-    // price unavailable, sort by balance
-    if sortOrder == .ascending {
-      return lhs.decimalBalance < rhs.decimalBalance
-    }
-    return lhs.decimalBalance > rhs.decimalBalance
   }
 }
 
@@ -92,7 +99,7 @@ public class PortfolioStore: ObservableObject {
     let nonSelectedNetworkChainIds = Preferences.Wallet.nonSelectedNetworksFilter.value
     return Filters(
       groupBy: .none,
-      sortOrder: SortOrder(rawValue: Preferences.Wallet.sortOrderFilter.value) ?? .descending,
+      sortOrder: SortOrder(rawValue: Preferences.Wallet.sortOrderFilter.value) ?? .valueDesc,
       isHidingSmallBalances: Preferences.Wallet.isHidingSmallBalancesFilter.value,
       accounts: allAccounts.map { account in
           .init(
@@ -200,7 +207,7 @@ public class PortfolioStore: ObservableObject {
       // update userVisibleAssets on display immediately with empty values. Issue #5567
       self.userVisibleAssets = updatedUserVisibleAssets
         .sorted(by: { lhs, rhs in
-          AssetViewModel.sortedByValue(lhs: lhs, rhs: rhs, sortOrder: filters.sortOrder)
+          AssetViewModel.sorted(by: filters.sortOrder, lhs: lhs, rhs: rhs)
         })
       guard !Task.isCancelled else { return }
       typealias TokenNetworkAccounts = (token: BraveWallet.BlockchainToken, network: BraveWallet.NetworkInfo, accounts: [BraveWallet.AccountInfo])
@@ -266,7 +273,7 @@ public class PortfolioStore: ObservableObject {
           }
         )
         .sorted(by: { lhs, rhs in
-          AssetViewModel.sortedByValue(lhs: lhs, rhs: rhs, sortOrder: filters.sortOrder)
+          AssetViewModel.sorted(by: filters.sortOrder, lhs: lhs, rhs: rhs)
         })
       
       // Compute balance based on current prices

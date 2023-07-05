@@ -351,7 +351,7 @@ class PortfolioStoreTests: XCTestCase {
     // change sort to ascending
     store.saveFilters(.init(
       groupBy: store.filters.groupBy,
-      sortOrder: .ascending,
+      sortOrder: .valueAsc,
       isHidingSmallBalances: store.filters.isHidingSmallBalances,
       accounts: store.filters.accounts,
       networks: store.filters.networks
@@ -396,7 +396,7 @@ class PortfolioStoreTests: XCTestCase {
       }.store(in: &cancellables)
     store.saveFilters(.init(
       groupBy: store.filters.groupBy,
-      sortOrder: .descending,
+      sortOrder: .valueDesc,
       isHidingSmallBalances: true,
       accounts: store.filters.accounts,
       networks: store.filters.networks
@@ -448,7 +448,7 @@ class PortfolioStoreTests: XCTestCase {
       }.store(in: &cancellables)
     store.saveFilters(.init(
       groupBy: store.filters.groupBy,
-      sortOrder: .descending,
+      sortOrder: .valueDesc,
       isHidingSmallBalances: false,
       accounts: store.filters.accounts.map { // deselect ethAccount2
         .init(isSelected: $0.model.address != ethAccount2.address, model: $0.model)
@@ -495,7 +495,7 @@ class PortfolioStoreTests: XCTestCase {
       }.store(in: &cancellables)
     store.saveFilters(.init(
       groupBy: store.filters.groupBy,
-      sortOrder: .descending,
+      sortOrder: .valueDesc,
       isHidingSmallBalances: false,
       accounts: store.filters.accounts.map { // re-select all accounts
         .init(isSelected: true, model: $0.model)

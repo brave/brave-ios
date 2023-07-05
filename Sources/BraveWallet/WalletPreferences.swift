@@ -48,7 +48,7 @@ extension Preferences {
     public static let showAuroraPopup = Option<Bool>(key: "wallet.show-aurora-popup", default: true)
     
     // MARK: Portfolio & NFT filters
-    public static let sortOrderFilter = Option<Int>(key: "wallet.sortOrderFilter", default: SortOrder.descending.rawValue)
+    public static let sortOrderFilter = Option<Int>(key: "wallet.sortOrderFilter", default: SortOrder.valueDesc.rawValue)
     public static let isHidingSmallBalancesFilter = Option<Bool>(key: "wallet.isHidingSmallBalancesFilter", default: false)
     public static let nonSelectedAccountsFilter = Option<[String]>(key: "wallet.nonSelectedAccountsFilter", default: [])
     public static let nonSelectedNetworksFilter = Option<[String]>(

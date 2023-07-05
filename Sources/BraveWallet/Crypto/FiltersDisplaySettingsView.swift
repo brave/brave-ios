@@ -24,13 +24,21 @@ public enum GroupBy: Int, CaseIterable, Identifiable, UserDefaultsEncodable {
 }
 
 public enum SortOrder: Int, CaseIterable, Identifiable, UserDefaultsEncodable {
-  case ascending
-  case descending
+  /// Fiat value lowest to highest
+  case valueAsc
+  /// Fiat value highest to lowest
+  case valueDesc
+  /// A-Z
+  case alphaAsc
+  /// Z-A
+  case alphaDesc
   
   var title: String {
     switch self {
-    case .ascending: return Strings.Wallet.lowToHighSortOption
-    case .descending: return Strings.Wallet.highToLowSortOption
+    case .valueAsc: return Strings.Wallet.lowToHighSortOption
+    case .valueDesc: return Strings.Wallet.highToLowSortOption
+    case .alphaAsc: return Strings.Wallet.aToZSortOption
+    case .alphaDesc: return Strings.Wallet.zToASortOption
     }
   }
   public var id: String { title }
@@ -292,8 +300,8 @@ struct FiltersDisplaySettingsView: View {
   
   func restoreToDefaults() {
     self.groupBy = .none
-    // Descending order (largest fiat to smallest) by default
-    self.sortOrder = .descending
+    // Fiat value in descending order (largest fiat to smallest) by default
+    self.sortOrder = .valueDesc
     // Small balances shown by default
     self.isHidingSmallBalances = false
     
@@ -327,7 +335,7 @@ struct FiltersDisplaySettingsView_Previews: PreviewProvider {
     FiltersDisplaySettingsView(
       filters: Filters(
         groupBy: .none,
-        sortOrder: .descending,
+        sortOrder: .valueDesc,
         isHidingSmallBalances: false,
         accounts: [
           .init(isSelected: true, model: .mockEthAccount),
