@@ -460,8 +460,8 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
       // 1 bookmark
       // 2 bookmarks
       // ...
-      cell.detailTextLabel?.text = String(format: item.bookmarkNode.childCount == 1 ? Strings.bookmarkSingleCount :
-                                            Strings.bookmarkMultipleCount, item.children?.count ?? 0)
+      let bookmarksCount = item.children?.filter({ !$0.isFolder }).count ?? 0
+      cell.detailTextLabel?.text = String(format: bookmarksCount == 1 ? Strings.bookmarkSingleCount : Strings.bookmarkMultipleCount, bookmarksCount)
       cell.detailTextLabel?.font = UIFont.systemFont(ofSize: fontSize)
     }
   }
