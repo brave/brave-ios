@@ -1,4 +1,4 @@
-// Copyright 2022 The Brave Authors. All rights reserved.
+// Copyright 2023 The Brave Authors. All rights reserved.
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -21,7 +21,7 @@ struct AccountFilterView: View {
   
   var body: some View {
     AccountSelectionRootView(
-      navigationTitle: "Select Accounts",
+      navigationTitle: Strings.Wallet.selectAccountsTitle,
       allAccounts: accounts.map(\.model),
       selectedAccounts: accounts.filter(\.isSelected).map(\.model),
       showsSelectAllButton: true,

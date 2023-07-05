@@ -33,81 +33,21 @@ struct NetworkSelectionRootView: View {
     self.selectNetwork = selectNetwork
   }
   
-  /// If all primary networks are selected
-  private var allPrimarySelected: Bool {
-    allNetworks.primaryNetworks.allSatisfy({ primaryNetwork in
-      selectedNetworks.contains(where: { $0.chainId == primaryNetwork.chainId })
-    })
-  }
-  
-  /// If all secondary networks are selected
-  private var allSecondarySelected: Bool {
-    allNetworks.secondaryNetworks.allSatisfy({ secondaryNetwork in
-      selectedNetworks.contains(where: { $0.chainId == secondaryNetwork.chainId })
-    })
-  }
-  
-  /// If all test networks are selected
-  private var allTestnetSelected: Bool {
-    allNetworks.testNetworks.allSatisfy({ testNetwork in
-      selectedNetworks.contains(where: { $0.chainId == testNetwork.chainId })
-    })
-  }
-  
-  private func selectAllButtonTitle(_ allSelected: Bool) -> String {
-    if allSelected {
-      return Strings.Wallet.deselectAllButtonTitle
-    }
-    return Strings.Wallet.selectAllButtonTitle
-  }
-  
-  @ViewBuilder private func headerView(
-    title: String,
-    allSelected: Bool,
-    selectAllAction: @escaping () -> Void
-  ) -> some View {
-    HStack {
-      Text(title)
-        .font(.body.weight(.semibold))
-        .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
-      Spacer()
-      if showsSelectAllButton {
-        Button(action: selectAllAction) {
-          Text(selectAllButtonTitle(allSelected))
-            .font(.callout.weight(.semibold))
-            .foregroundColor(Color(uiColor: WalletV2Design.textInteractive))
-        }
-      }
-    }
-    .padding(.horizontal)
-    .padding(.vertical, 12)
-  }
-  
   var body: some View {
     ScrollView {
       LazyVStack(spacing: 0) {
-        headerView(
+        SelectAllHeaderView(
           title: Strings.Wallet.networkSelectionPrimaryNetworks,
-          allSelected: allPrimarySelected,
-          selectAllAction: {
-            if allPrimarySelected { // deselect all
-              allNetworks.primaryNetworks.forEach(selectNetwork)
-            } else { // select all
-              let unselectedNetworks = allNetworks.primaryNetworks
-                .filter { primaryNetwork in
-                  !selectedNetworks.contains(
-                    where: { $0.chainId == primaryNetwork.chainId && $0.coin == primaryNetwork.coin }
-                  )
-                }
-              unselectedNetworks.forEach(selectNetwork)
-            }
-          }
+          showsSelectAllButton: showsSelectAllButton,
+          allModels: allNetworks.primaryNetworks,
+          selectedModels: selectedNetworks,
+          select: selectNetwork
         )
         ForEach(allNetworks.primaryNetworks) { network in
           Button(action: { selectNetwork(network) }) {
             NetworkRowView(
               network: network,
-              selectedNetworks: selectedNetworks
+              isSelected: selectedNetworks.contains(network)
             )
           }
         }
@@ -115,28 +55,18 @@ struct NetworkSelectionRootView: View {
         DividerLine()
           .padding(.top, 12)
         
-        headerView(
+        SelectAllHeaderView(
           title: Strings.Wallet.networkSelectionSecondaryNetworks,
-          allSelected: allSecondarySelected,
-          selectAllAction: {
-            if allSecondarySelected { // deselect all
-              allNetworks.secondaryNetworks.forEach(selectNetwork)
-            } else { // select all
-              let unselectedNetworks = allNetworks.secondaryNetworks
-                .filter { secondaryNetwork in
-                  !selectedNetworks.contains(
-                    where: { $0.chainId == secondaryNetwork.chainId && $0.coin == secondaryNetwork.coin }
-                  )
-                }
-              unselectedNetworks.forEach(selectNetwork)
-            }
-          }
+          showsSelectAllButton: showsSelectAllButton,
+          allModels: allNetworks.secondaryNetworks,
+          selectedModels: selectedNetworks,
+          select: selectNetwork
         )
         ForEach(allNetworks.secondaryNetworks) { network in
           Button(action: { selectNetwork(network) }) {
             NetworkRowView(
               network: network,
-              selectedNetworks: selectedNetworks
+              isSelected: selectedNetworks.contains(network)
             )
           }
         }
@@ -145,28 +75,18 @@ struct NetworkSelectionRootView: View {
           DividerLine()
             .padding(.top, 12)
           
-          headerView(
+          SelectAllHeaderView(
             title: Strings.Wallet.networkSelectionTestNetworks,
-            allSelected: allTestnetSelected,
-            selectAllAction: {
-              if allTestnetSelected { // deselect all
-                allNetworks.testNetworks.forEach(selectNetwork)
-              } else { // select all
-                let unselectedNetworks = allNetworks.testNetworks
-                  .filter { testNetwork in
-                    !selectedNetworks.contains(
-                      where: { $0.chainId == testNetwork.chainId && $0.coin == testNetwork.coin }
-                    )
-                  }
-                unselectedNetworks.forEach(selectNetwork)
-              }
-            }
+            showsSelectAllButton: showsSelectAllButton,
+            allModels: allNetworks.testNetworks,
+            selectedModels: selectedNetworks,
+            select: selectNetwork
           )
           ForEach(allNetworks.testNetworks) { network in
             Button(action: { selectNetwork(network) }) {
               NetworkRowView(
                 network: network,
-                selectedNetworks: selectedNetworks
+                isSelected: selectedNetworks.contains(network)
               )
             }
           }
@@ -194,7 +114,7 @@ struct NetworkSelectionRootView_Previews: PreviewProvider {
   static var previews: some View {
     NavigationView {
       NetworkSelectionRootView(
-        navigationTitle: "Select Networks",
+        navigationTitle: Strings.Wallet.selectNetworksTitle,
         selectedNetworks: [.mockMainnet, .mockSolana, .mockPolygon],
         allNetworks: [
           .mockMainnet, .mockSolana,
@@ -213,20 +133,16 @@ struct NetworkSelectionRootView_Previews: PreviewProvider {
 private struct NetworkRowView: View {
 
   var network: BraveWallet.NetworkInfo
-  var selectedNetworks: [BraveWallet.NetworkInfo]
+  var isSelected: Bool
 
   @ScaledMetric private var length: CGFloat = 30
   
   init(
     network: BraveWallet.NetworkInfo,
-    selectedNetworks: [BraveWallet.NetworkInfo]
+    isSelected: Bool
   ) {
     self.network = network
-    self.selectedNetworks = selectedNetworks
-  }
-  
-  private var isSelected: Bool {
-    selectedNetworks.contains(where: { $0.chainId == network.chainId })
+    self.isSelected = isSelected
   }
 
   private var checkmark: some View {
@@ -236,6 +152,8 @@ private struct NetworkRowView: View {
       .hidden(isHidden: !isSelected)
       .foregroundColor(Color(.braveBlurpleTint))
       .frame(width: 14, height: 14)
+      .transition(.identity)
+      .animation(nil, value: isSelected)
   }
 
   var body: some View {
@@ -264,15 +182,15 @@ struct NetworkRowView_Previews: PreviewProvider {
     Group {
       NetworkRowView(
         network: .mockSolana,
-        selectedNetworks: [.mockSolana]
+        isSelected: true
       )
       NetworkRowView(
         network: .mockMainnet,
-        selectedNetworks: [.mockMainnet]
+        isSelected: true
       )
       NetworkRowView(
         network: .mockPolygon,
-        selectedNetworks: [.mockMainnet]
+        isSelected: false
       )
     }
     .previewLayout(.sizeThatFits)

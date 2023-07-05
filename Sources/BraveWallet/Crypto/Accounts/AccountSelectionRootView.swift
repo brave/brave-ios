@@ -1,4 +1,4 @@
-// Copyright 2022 The Brave Authors. All rights reserved.
+// Copyright 2023 The Brave Authors. All rights reserved.
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -30,56 +30,23 @@ struct AccountSelectionRootView: View {
     self.selectAccount = selectAccount
   }
   
-  private var allSelected: Bool {
-    allAccounts.allSatisfy({ account in
-      selectedAccounts.contains(where: { $0.id == account.id && $0.coin == account.coin })
-    })
-  }
-  
-  private func selectAllButtonTitle(_ allSelected: Bool) -> String {
-    if allSelected {
-      return Strings.Wallet.deselectAllButtonTitle
-    }
-    return Strings.Wallet.selectAllButtonTitle
-  }
-  
   var body: some View {
     ScrollView {
       LazyVStack(spacing: 0) {
-        HStack {
-          Text(Strings.Wallet.accountsPageTitle)
-            .font(.body.weight(.semibold))
-            .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
-          Spacer()
-          if showsSelectAllButton {
-            Button(action: {
-              if allSelected { // deselect all
-                allAccounts.forEach(selectAccount)
-              } else { // select all
-                let unselectedAccounts = allAccounts
-                  .filter { account in
-                    !selectedAccounts.contains(
-                      where: { $0.id == account.id && $0.coin == account.coin }
-                    )
-                  }
-                unselectedAccounts.forEach(selectAccount)
-              }
-            }) {
-              Text(selectAllButtonTitle(allSelected))
-                .font(.callout.weight(.semibold))
-                .foregroundColor(Color(uiColor: WalletV2Design.textInteractive))
-            }
+        SelectAllHeaderView(
+          title: Strings.Wallet.accountsPageTitle,
+          showsSelectAllButton: showsSelectAllButton,
+          allModels: allAccounts,
+          selectedModels: selectedAccounts,
+          select: selectAccount
+        )
+        ForEach(allAccounts) { account in
+          AccountListRowView(
+            account: account,
+            isSelected: selectedAccounts.contains(account)
+          ) {
+            selectAccount(account)
           }
-        }
-        .padding(.horizontal)
-        .padding(.vertical, 12)
-      }
-      ForEach(allAccounts) { account in
-        AccountListRowView(
-          account: account,
-          selectedAccounts: selectedAccounts
-        ) {
-          selectAccount(account)
         }
       }
     }
@@ -92,21 +59,17 @@ struct AccountSelectionRootView: View {
 private struct AccountListRowView: View {
   
   var account: BraveWallet.AccountInfo
-  var selectedAccounts: [BraveWallet.AccountInfo]
+  var isSelected: Bool
   let didSelect: () -> Void
   
   init(
     account: BraveWallet.AccountInfo,
-    selectedAccounts: [BraveWallet.AccountInfo],
+    isSelected: Bool,
     didSelect: @escaping () -> Void
   ) {
     self.account = account
-    self.selectedAccounts = selectedAccounts
+    self.isSelected = isSelected
     self.didSelect = didSelect
-  }
-  
-  private var isSelected: Bool {
-    selectedAccounts.contains(where: { $0.id == account.id && $0.coin == account.coin })
   }
   
   private var checkmark: some View {
@@ -116,6 +79,8 @@ private struct AccountListRowView: View {
       .hidden(isHidden: !isSelected)
       .foregroundColor(Color(.braveBlurpleTint))
       .frame(width: 14, height: 14)
+      .transition(.identity)
+      .animation(nil, value: isSelected)
   }
   
   var body: some View {
