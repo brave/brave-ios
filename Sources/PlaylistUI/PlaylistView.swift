@@ -225,7 +225,7 @@ public struct PlaylistSplitView: View {
           ToolbarItem(placement: .navigationBarTrailing) {
             HStack {
               Button { } label: {
-                Image(braveSystemName: "leo.picture.in-picture")
+                Label("Enter Picture-in-Picture", braveSystemImage: "leo.picture.in-picture")
               }
               closeButton
             }
@@ -419,7 +419,7 @@ public struct PlayerView: View {
         VideoPlayer(player: item.map { .init(url: $0.source) })
           .disabled(true)
           .aspectRatio(16/9, contentMode: .fit)
-          .background(Color.black.ignoresSafeArea(.container, edges: [.leading, .trailing, .bottom]))
+          .background(Color.black)
           .fixedSize(horizontal: false, vertical: true)
           .frame(maxHeight: .infinity)
           .onTapGesture {
@@ -442,7 +442,8 @@ public struct PlayerBackgroundView: View {
   public var body: some View {
     ZStack {
       // Thumbnail or some representation of the video
-      LinearGradient(braveGradient: .gradient03)
+//      LinearGradient(braveGradient: .gradient03)
+      Color(.braveBlurple)
       VisualEffectView(effect: UIBlurEffect(style: .systemThickMaterialDark))
     }
     .ignoresSafeArea()

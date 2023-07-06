@@ -61,8 +61,16 @@ struct ControlView: View {
           .opacity(title.isEmpty ? 0 : 1)
           .lineLimit(1)
         Spacer()
-        Button { } label: {
-          Image(braveSystemName: "leo.airplay")
+        HStack(spacing: 24) {
+          if UIDevice.isPhone && orientation.isLandscape {
+            Button { } label: {
+              Label("Enter Picture-in-Picture", braveSystemImage: "leo.picture.in-picture")
+                .labelStyle(.iconOnly)
+            }
+          }
+          Button { } label: {
+            Image(braveSystemName: "leo.airplay.video")
+          }
         }
         .buttonStyle(.spring(backgroundStyle: Color.white))
       }
@@ -72,6 +80,7 @@ struct ControlView: View {
         if (UIDevice.isPhone && orientation.isPortrait) || (UIDevice.isIpad && horizontalSizeClass == .compact) {
           HStack {
             PlaybackControls(isPlaying: $isPlaying)
+              .imageScale(.large)
           }
           HStack {
             LeadingExtraControls(isShuffleEnabled: $isShuffleEnabled, contentSpeed: $contentSpeed)
@@ -215,7 +224,6 @@ struct PlaybackControls: View {
       }
     }
     .buttonStyle(.spring(scale: 0.85, backgroundStyle: Color.white))
-    .imageScale(.large)
     .labelStyle(.iconOnly)
   }
 }
@@ -443,9 +451,10 @@ struct MediaScrubber: View {
 #if DEBUG
 struct VideoControls_PreviewProvider: PreviewProvider {
   static var previews: some View {
-    ControlView(title: "Top 10 things to do with Brave", publisherSource: URL(string: "https://youtube.com")!)
+    ControlView(title: "Blah Bleh a Bluh Blah Blue", publisherSource: nil)
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(Color(white: 0.1))
+      .observingOrientation()
   }
 }
 #endif
