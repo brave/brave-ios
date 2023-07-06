@@ -50,6 +50,7 @@ struct NetworkSelectionRootView: View {
               isSelected: selectedNetworks.contains(network)
             )
           }
+          .buttonStyle(FadeButtonStyle())
         }
         
         DividerLine()
@@ -69,6 +70,7 @@ struct NetworkSelectionRootView: View {
               isSelected: selectedNetworks.contains(network)
             )
           }
+          .buttonStyle(FadeButtonStyle())
         }
         
         if Preferences.Wallet.showTestNetworks.value && !allNetworks.testNetworks.isEmpty {
@@ -89,6 +91,7 @@ struct NetworkSelectionRootView: View {
                 isSelected: selectedNetworks.contains(network)
               )
             }
+            .buttonStyle(FadeButtonStyle())
           }
         }
       }

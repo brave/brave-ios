@@ -227,6 +227,7 @@ struct FiltersDisplaySettingsView: View {
         }
       )
     })
+    .buttonStyle(FadeButtonStyle())
   }
   
   private var networkFilters: some View {
@@ -259,6 +260,7 @@ struct FiltersDisplaySettingsView: View {
         }
       )
     }
+    .buttonStyle(FadeButtonStyle())
   }
   
   private var saveChangesContainer: some View {
@@ -478,5 +480,15 @@ struct DividerLine: View {
   var body: some View {
     Color(uiColor: WalletV2Design.dividerSubtle)
       .frame(height: 1)
+  }
+}
+
+struct FadeButtonStyle: ButtonStyle {
+  @Environment(\.isEnabled) private var isEnabled
+
+  func makeBody(configuration: Configuration) -> some View {
+    configuration.label
+      .opacity(configuration.isPressed ? 0.7 : 1.0)
+      .clipShape(Rectangle())
   }
 }

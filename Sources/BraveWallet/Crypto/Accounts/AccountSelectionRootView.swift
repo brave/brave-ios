@@ -91,6 +91,7 @@ private struct AccountListRowView: View {
           checkmark
         }
       }
+      .buttonStyle(FadeButtonStyle())
     }
     .accessibilityElement(children: .combine)
     .accessibilityAddTraits(isSelected ? [.isSelected] : [])
