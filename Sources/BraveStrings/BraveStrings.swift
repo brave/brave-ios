@@ -2457,7 +2457,7 @@ extension Strings {
         comment: "The button text that starts the trial action")
     
     public static let activateSubscriptionAction =
-      NSLocalizedString("vpn.freeTrialPeriodAction", tableName: "BraveShared", bundle: .module,
+      NSLocalizedString("vpn.activateSubscriptionAction", tableName: "BraveShared", bundle: .module,
         value: "activate",
         comment: "The button text that starts the subscription action")
     

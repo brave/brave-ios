@@ -44,10 +44,10 @@ class BuyVPNViewController: VPNSetupLoadingController {
       target: self, action: #selector(restorePurchasesAction))
     
     let actionTitle = Preferences.VPN.freeTrialUsed.value
-      ? Strings.VPN.activateSubscriptionAction.uppercased()
-      : Strings.VPN.freeTrialPeriodAction.uppercased()
+      ? Strings.VPN.activateSubscriptionAction.capitalized
+      : Strings.VPN.freeTrialPeriodAction.capitalized
     
-    let actionButton = BraveGradientButton(gradient: .lightGradient01).then {
+    let actionButton = BraveGradientButton(gradient: .backgroundGradient1).then {
       $0.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
       $0.titleLabel?.textAlignment = .center
        
@@ -58,7 +58,7 @@ class BuyVPNViewController: VPNSetupLoadingController {
       }
       
       $0.layer.do {
-        $0.cornerRadius = 12
+        $0.cornerRadius = 24
         $0.cornerCurve = .continuous
         $0.masksToBounds = true
       }
@@ -240,5 +240,19 @@ class VPNSetupLoadingController: UIViewController {
 
       overlayView = overlay
     }
+  }
+}
+
+extension BraveGradient {
+  
+  public static var backgroundGradient1: BraveGradient {
+    .init(
+      stops: [
+        .init(color: UIColor(rgb: 0x8b10c6), position: 0.22),
+        .init(color: UIColor(rgb: 0xd02480), position: 0.7),
+        .init(color: UIColor(rgb: 0xe95e3c), position: 0.96),
+      ],
+      angle: .figmaDegrees(138)
+    )
   }
 }

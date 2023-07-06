@@ -371,7 +371,7 @@ class SubscriptionButton: UIControl {
   private struct UX {
     static let secondaryTextColor = primaryTextColor.withAlphaComponent(0.7)
     static let discountTextColor = primaryTextColor.withAlphaComponent(0.6)
-    static let borderColor = #colorLiteral(red: 0.07058823529, green: 0.6392156863, blue: 0.4705882353, alpha: 1)
+    static let borderColor = #colorLiteral(red: 0.3725490196, green: 0.3607843137, blue: 0.9450980392, alpha: 1)
     static let primaryTextColor = #colorLiteral(red: 1, green: 1, blue: 0.9411764706, alpha: 1)
   }
 
@@ -387,9 +387,6 @@ class SubscriptionButton: UIControl {
     didSet {
       layer.borderWidth = isTypeSelected ? 2 : 0
       backgroundColor = isTypeSelected ? #colorLiteral(red: 0.31, green: 0.192, blue: 0.663, alpha: 1) : #colorLiteral(red: 0.231, green: 0.165, blue: 0.427, alpha: 1)
-      
-//      setNeedsLayout()
-//      layoutIfNeeded()
     }
   }
 
