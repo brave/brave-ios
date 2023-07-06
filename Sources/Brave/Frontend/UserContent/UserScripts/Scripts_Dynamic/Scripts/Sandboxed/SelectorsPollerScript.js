@@ -59,6 +59,10 @@ window.__firefox__.execute(function($) {
   const scoreCalcIntervalMs = 1000
   // The begin of the time frame to calc |currentMutationScore|.
   let currentMutationStartTime = performance.now()
+  // Elements that are not yet queried for selectors
+  const notYetQueriedElements = []
+  // The query to perform when extracting classes and ids
+  const classIdWithoutHtmlOrBody = '[id]:not(html):not(body),[class]:not(html):not(body)'
 
   const CC = {
     allSelectors: new Set(),
@@ -110,9 +114,15 @@ window.__firefox__.execute(function($) {
 
   /**
    * Send any pending id and class selectors to iOS so we can determine hide selectors.
-   * @returns A promise containing new selectors that need to be hidden
    */
   const sendPendingSelectorsIfNeeded = async () => {
+    for (const elements of notYetQueriedElements) {
+      for (const element of elements) {
+        extractNewSelectors(element)
+      }
+    }
+    notYetQueriedElements.length = 0
+    
     if (CC.pendingSelectors.ids.size === 0 && CC.pendingSelectors.classes.size === 0) {
       return false
     }
@@ -137,7 +147,34 @@ window.__firefox__.execute(function($) {
       }
     }
 
-    return hasChanges
+    if (hasChanges) {
+      setRulesOnStylesheetThrottled()
+
+      if (!args.hideFirstPartyContent) {
+        pumpCosmeticFilterQueuesOnIdle()
+      }
+    }
+  }
+  
+  let sendPendingSelectorsTimerId
+
+  /**
+   * Send any pending id and class selectors to iOS so we can determine hide selectors.
+   * Do this throttled so we don't send selectors too often.
+   */
+  const sendPendingSelectorsThrottled = () => {
+    if (!args.fetchNewClassIdRulesThrottlingMs) {
+      sendPendingSelectorsIfNeeded()
+      return
+    }
+    
+    // Ensure we are not already waiting on a timer
+    if (sendPendingSelectorsTimerId) { return }
+    
+    sendPendingSelectorsTimerId = window.setTimeout(() => {
+      sendPendingSelectorsIfNeeded()
+      delete sendPendingSelectorsTimerId
+    }, args.fetchNewClassIdRulesThrottlingMs)
   }
 
   /**
@@ -252,18 +289,16 @@ window.__firefox__.execute(function($) {
     return ('innerText' in node)
   }
 
+  /**
+   * Handle mutations by extracting selectors from the elements
+   * @param {*} mutations The mutations to cancel
+   * @param {*} observer The observer for the given mutations
+   */
   const onMutations = async (mutations, observer) => {
     const mutationScore = queueSelectorsFromMutations(mutations)
 
     if (mutationScore > 0) {
-      const changes = await sendPendingOriginsIfNeeded()
-      if (changes) {
-        setRulesOnStylesheet()
-        
-        if (!args.hideFirstPartyContent) {
-          pumpCosmeticFilterQueuesOnIdle()
-        }
-      }
+      sendPendingSelectorsThrottled()
     }
 
     // Check the conditions to switch to the alternative strategy
@@ -282,6 +317,9 @@ window.__firefox__.execute(function($) {
     }
   }
 
+  /**
+   * Switch to a mutation observer and cancel the poller
+   */
   const useMutationObserver = () => {
     if (selectorsPollingIntervalId) {
       clearInterval(selectorsPollingIntervalId)
@@ -299,21 +337,29 @@ window.__firefox__.execute(function($) {
     observer.observe(document.documentElement, observerConfig)
   }
 
+  /**
+   * Switch to polling temporarily to get new classes and ids from the document
+   * Cancels the given mutation observer
+   * @param {MutationObserver} observer The mutation observer to cancel
+   */
   const usePolling = (observer) => {
+    // Don't start polling if we're already polling
+    if (selectorsPollingIntervalId !== undefined) { return }
+    
     if (observer) {
-      const mutations = observer.takeRecords()
       observer.disconnect()
-
-      if (mutations) {
-        queueSelectorsFromMutations(mutations)
-      }
+      notYetQueriedElements.length = 0
     }
 
     const futureTimeMs = window.Date.now() + returnToMutationObserverIntervalMs
-    const queryAttrsFromDocumentBound = querySelectorsFromElement.bind(undefined, document, futureTimeMs)
+    const queryAttrsFromDocumentBound = querySelectorsFromDocument.bind(undefined, futureTimeMs)
     selectorsPollingIntervalId = window.setInterval(queryAttrsFromDocumentBound, selectorsPollingIntervalMs)
   }
 
+  /**
+   * Extract the selectors from the mutation
+   * @param {[MutationRecord]} mutations 
+   */
   const queueSelectorsFromMutations = (mutations) => {
     let mutationScore = 0
     for (const mutation of mutations) {
@@ -335,12 +381,14 @@ window.__firefox__.execute(function($) {
           }
           break
         case 'childList':
-          if (mutation.addedNodes.length > 0) {
-            mutationScore += mutation.addedNodes.length
-
-            for (const node of mutation.addedNodes) {
-              if (!isElement(node)) { continue }
-              querySelectorsFromElement(node)
+          for (const node of mutation.addedNodes) {
+            if (!isElement(node)) { continue }
+            notYetQueriedElements.push([node])
+            mutationScore += 1
+            if (node.firstElementChild !== null) {
+              const nodeList = node.querySelectorAll(classIdWithoutHtmlOrBody)
+              notYetQueriedElements.push(nodeList)
+              mutationScore += nodeList.length
             }
           }
       }
@@ -670,7 +718,7 @@ window.__firefox__.execute(function($) {
     queueIsSleeping = true
 
     await sendPendingOriginsIfNeeded()
-    setRulesOnStylesheet()
+    setRulesOnStylesheetThrottled()
 
     window.setTimeout(() => {
       // Set this to false now even though there's a gap in time between now and
@@ -680,31 +728,32 @@ window.__firefox__.execute(function($) {
       pumpCosmeticFilterQueuesOnIdle()
     }, pumpIntervalMinMs)
   }, pumpIntervalMaxMs)
-
+  
   /**
    * Extract any selectors from the document
-   * @param {*} switchToMutationObserverAtTime A timestamp that identifies when we should switch to the mutation observer
+   * @param {number} switchToMutationObserverAtTime A timestamp that identifies when we should switch to the mutation observer
    */
-  const querySelectorsFromElement = async (element, switchToMutationObserverAtTime) => {
+  const querySelectorsFromDocument = async (switchToMutationObserverAtTime) => {
+    querySelectorsFromElement(document)
+
+    if (window.Date.now() >= switchToMutationObserverAtTime) {
+      useMutationObserver()
+    }
+  }
+
+  /**
+   * Extract any selectors from the given element
+   * @param {object} element The element to extract the selectors from
+   */
+  const querySelectorsFromElement = async (element) => {
     extractNewSelectors(element)
-    const elmWithClassOrId = element.querySelectorAll('[class],[id]')
+    const elmWithClassOrId = element.querySelectorAll(classIdWithoutHtmlOrBody)
 
     elmWithClassOrId.forEach((node) => {
       extractNewSelectors(node)
     })
 
-    if (switchToMutationObserverAtTime !== undefined &&
-      window.Date.now() >= switchToMutationObserverAtTime) {
-      useMutationObserver()
-    }
-
-    const changes = await sendPendingSelectorsIfNeeded()
-    if (!changes) { return }
-    setRulesOnStylesheet()
-
-    if (!args.hideFirstPartyContent) {
-      pumpCosmeticFilterQueuesOnIdle()
-    }
+    sendPendingSelectorsThrottled()
   }
 
   /**
@@ -851,7 +900,7 @@ window.__firefox__.execute(function($) {
 
     // If we have some new values, we want to unhide any new selectors
     unhideSelectorsMatchingElementIf1P(elementsWithURLs)
-    setRulesOnStylesheet()
+    setRulesOnStylesheetThrottled()
   }
 
   /**
@@ -937,6 +986,24 @@ window.__firefox__.execute(function($) {
     targetElm.appendChild(styleElm)
   }
 
+  let moveStyleTimerId
+
+  /**
+   * Move the stylesheet to the bottom of the page
+   * Do this throttled so we don't move the stylesheet too often.
+   */
+  const moveStyleThrottled = async () => {
+    if (moveStyleTimerId) {
+      // Each time this is called cancell the timer and allow a new one to start
+      window.clearInterval(moveStyleTimerId)
+    }
+    
+    moveStyleTimerId = window.setTimeout(() => {
+      moveStyle()
+      delete moveStyleTimerId
+    }, 100)
+  }
+
   /**
    * Create a stylesheet and append it to the bottom of the body element.
    * The stylesheet is stored on `cosmeticStyleSheet` for future reference.
@@ -953,8 +1020,27 @@ window.__firefox__.execute(function($) {
       if (styleElm.nextElementSibling === null || styleElm.parentElement === targetElm) {
         return
       }
-      moveStyle()
+      moveStyleThrottled()
     }, 1000)
+  }
+  
+  let setRulesTimerId
+  
+  /**
+   * This method only allows a single setRulesOnStylesheet to be applied.
+   * This is an optimaization so we don't constantly re-apply rules
+   * for each small change that may happen simultaneously.
+   */
+  const setRulesOnStylesheetThrottled = () => {
+    if (setRulesTimerId) {
+      // Each time this is called cancell the timer and allow a new one to start
+      window.clearInterval(setRulesTimerId)
+    }
+    
+    setRulesTimerId = window.setTimeout(() => {
+      setRulesOnStylesheet()
+      delete setRulesTimerId
+    }, 100)
   }
 
   /**
@@ -1001,7 +1087,7 @@ window.__firefox__.execute(function($) {
     // 4. Set the rules on the stylesheet. So far we don't have any rules set
     // We could do this earlier but it causes elements to hide and unhide
     // It's best to wait to this period so we have
-    setRulesOnStylesheet()
+    setRulesOnStylesheetThrottled()
     // 5. Start our queue pump if we need to
     scheduleQueuePump(args.hideFirstPartyContent, args.genericHide)
 
