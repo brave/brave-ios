@@ -127,6 +127,11 @@ extension SessionTab {
     deleteAll(context: .new(inMemory: false))
   }
   
+  public static func deleteAll(tabIds: [UUID]) {
+    let predicate = NSPredicate(format: "\(#keyPath(SessionTab.tabId)) IN %@", tabIds)
+    deleteAll(predicate: predicate, context: .new(inMemory: false))
+  }
+  
   public static func deleteAll(olderThan timeInterval: TimeInterval) {
     let lastUpdatedKeyPath = #keyPath(SessionTab.lastUpdated)
     let date = Date().advanced(by: -timeInterval) as NSDate
@@ -207,17 +212,17 @@ extension SessionTab {
     }
   }
   
-  public static func createIfNeeded(tabId: UUID, title: String, tabURL: URL) {
+  public static func createIfNeeded(windowId: UUID, tabId: UUID, title: String, tabURL: URL, isPrivate: Bool) {
     DataController.perform { context in
       guard !SessionTab.exists(tabId: tabId, in: context),
-            let window = SessionWindow.getActiveWindow(context: context) else { return }
+            let window = SessionWindow.from(windowId: windowId, in: context) else { return }
       
       _ = SessionTab(context: context,
                      sessionWindow: window,
                      sessionTabGroup: nil,
                      index: Int32(window.sessionTabs?.count ?? 0),
                      interactionState: Data(),
-                     isPrivate: false,
+                     isPrivate: isPrivate,
                      isSelected: false,
                      lastUpdated: .now,
                      screenshotData: Data(),

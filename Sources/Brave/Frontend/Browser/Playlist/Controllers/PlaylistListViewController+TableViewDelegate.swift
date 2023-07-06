@@ -149,7 +149,7 @@ extension PlaylistListViewController: UITableViewDelegate {
       handler: { [weak self] (action, view, completionHandler) in
         guard let self = self else { return }
 
-        let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
+        let isPrivateBrowsing = self.privateBrowsingManager?.isPrivateBrowsing == true
         let style: UIAlertController.Style = UIDevice.current.userInterfaceIdiom == .pad ? .alert : .actionSheet
 
         let alert = UIAlertController(
@@ -244,7 +244,7 @@ extension PlaylistListViewController: UITableViewDelegate {
 
             // In Private-Browsing, we do not show "Open in New Tab",
             // we only show "Open in Private Tab"
-            let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
+            let isPrivateBrowsing = self.privateBrowsingManager?.isPrivateBrowsing == true
             if !isPrivateBrowsing {
               actions.append(
                 UIAction(

@@ -433,7 +433,7 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
         openInNewTab,
         // Brave News is only available in normal tabs, so this isn't technically required
         // but good to be on the safe side
-        !PrivateBrowsingManager.shared.isPrivateBrowsing ? openInNewPrivateTab : nil,
+        openInNewPrivateTab,
       ].compactMap { $0 }
       let children: [UIMenu] = [
         UIMenu(title: "", options: [.displayInline], children: openActions)
@@ -490,7 +490,7 @@ class BraveNewsSectionProvider: NSObject, NTPObservableSectionProvider {
         openInNewTab,
         // Brave News is only available in normal tabs, so this isn't technically required
         // but good to be on the safe side
-        !PrivateBrowsingManager.shared.isPrivateBrowsing ? openInNewPrivateTab : nil,
+        openInNewPrivateTab,
       ].compactMap({ $0 })
 
       let manageActions = [

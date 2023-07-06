@@ -52,6 +52,8 @@ enum NTPWallpaper {
 }
 
 public class NTPDataSource {
+  
+  var privateBrowsingManager: PrivateBrowsingManager
 
   var initializeFavorites: ((_ sites: [NTPSponsoredImageTopSite]?) -> Void)?
 
@@ -131,7 +133,7 @@ public class NTPDataSource {
         let attemptSponsored =
           Preferences.NewTabPage.backgroundSponsoredImages.value
           && backgroundRotationCounter == NTPDataSource.sponsorshipShowValue
-          && !PrivateBrowsingManager.shared.isPrivateBrowsing
+          && !privateBrowsingManager.isPrivateBrowsing
 
         if attemptSponsored {
           // Pick the campaign randomly

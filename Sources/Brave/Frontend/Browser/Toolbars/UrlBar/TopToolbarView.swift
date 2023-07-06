@@ -293,7 +293,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     // Make sure we hide any views that shouldn't be showing in non-overlay mode.
     updateViewsForOverlayModeAndToolbarChanges()
 
-    privateModeCancellable = PrivateBrowsingManager.shared
+    privateModeCancellable = privateBrowsingManager
       .$isPrivateBrowsing
       .removeDuplicates()
       .sink(receiveValue: { [weak self] isPrivateBrowsing in
@@ -303,7 +303,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     Preferences.General.nightModeEnabled.objectWillChange
       .receive(on: RunLoop.main)
       .sink { [weak self] _ in
-        self?.updateColors(PrivateBrowsingManager.shared.isPrivateBrowsing)
+        self?.updateColors(privateBrowsingManager.isPrivateBrowsing)
       }
       .store(in: &cancellables)
     

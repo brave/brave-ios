@@ -241,7 +241,7 @@ extension BrowserViewController: WKNavigationDelegate {
       }
     }
 
-    let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
+    let isPrivateBrowsing = privateBrowsingManager.isPrivateBrowsing
     
     // Website redirection logic
     if url.isWebPage(includeDataURIs: false),
@@ -446,7 +446,7 @@ extension BrowserViewController: WKNavigationDelegate {
 
   @MainActor
   public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy {
-    let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
+    let isPrivateBrowsing = privateBrowsingManager.isPrivateBrowsing
     let response = navigationResponse.response
     let responseURL = response.url
     let tab = tab(for: webView)
@@ -693,7 +693,7 @@ extension BrowserViewController: WKNavigationDelegate {
           tab: tab,
           url: url,
           isSelected: tabManager.selectedTab == tab,
-          isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing
+          isPrivate: privateBrowsingManager.isPrivateBrowsing
         )
       }
       
@@ -1091,7 +1091,7 @@ extension BrowserViewController: WKUIDelegate {
 
   fileprivate func addTab(url: URL, inPrivateMode: Bool, currentTab: Tab) {
     let tab = self.tabManager.addTab(URLRequest(url: url), afterTab: currentTab, isPrivate: inPrivateMode)
-    if inPrivateMode && !PrivateBrowsingManager.shared.isPrivateBrowsing {
+    if inPrivateMode && !privateBrowsingManager.isPrivateBrowsing {
       self.tabManager.selectTab(tab)
     } else {
       // We're not showing the top tabs; show a toast to quick switch to the fresh new tab.
