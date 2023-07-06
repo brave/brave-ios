@@ -18,7 +18,7 @@ class SyncViewController: UIViewController {
 
   init(windowProtection: WindowProtection? = nil,
        requiresAuthentication: Bool = false,
-       isAuthenticationCancallable: Bool = true,
+       isAuthenticationCancellable: Bool = true,
        isModallyPresented: Bool = false) {
     self.windowProtection = windowProtection
     self.requiresAuthentication = requiresAuthentication
@@ -26,7 +26,7 @@ class SyncViewController: UIViewController {
 
     super.init(nibName: nil, bundle: nil)
     
-    windowProtection?.isCancallable = isAuthenticationCancallable
+    windowProtection?.isCancellable = isAuthenticationCancellable
     
     windowProtection?.cancelPressed
       .sink { [weak self] _ in

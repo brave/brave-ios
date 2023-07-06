@@ -50,7 +50,7 @@ public class WindowProtection {
       }
       unlockButton.snp.makeConstraints {
         $0.leading.greaterThanOrEqualToSuperview().offset(20)
-        $0.trailing.lessThanOrEqualToSuperview().offset(20)
+        $0.trailing.lessThanOrEqualToSuperview().offset(-20)
         $0.centerX.equalToSuperview()
         $0.height.greaterThanOrEqualTo(44)
         $0.width.greaterThanOrEqualTo(230)
@@ -58,7 +58,7 @@ public class WindowProtection {
       }
       cancelButton.snp.makeConstraints {
         $0.leading.greaterThanOrEqualToSuperview().offset(20)
-        $0.trailing.lessThanOrEqualToSuperview().offset(20)
+        $0.trailing.lessThanOrEqualToSuperview().offset(-20)
         $0.centerX.equalToSuperview()
         $0.height.greaterThanOrEqualTo(44)
         $0.width.greaterThanOrEqualTo(230)
@@ -95,10 +95,10 @@ public class WindowProtection {
     return true
   }
 
-  var isCancallable: Bool = false {
+  var isCancellable: Bool = false {
     didSet {
-      if oldValue != isCancallable {
-        lockedViewController.cancelButton.isHidden = !isCancallable
+      if oldValue != isCancellable {
+        lockedViewController.cancelButton.isHidden = !isCancellable
       }
     }
   }
