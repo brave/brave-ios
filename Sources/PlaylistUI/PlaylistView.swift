@@ -84,7 +84,7 @@ public struct PlaylistSplitView: View {
   @State private var isSidebarVisible: Bool = false
   
   @State private var selectedFolderID: Folder.ID?
-  @State private var sidebarFolderItemsPresented: Bool = false
+  @State private var sidebarFolderItemsPresented: Bool = true
   @State private var selectedItemID: Item.ID?
   
   public init(folders: [Folder]) {
@@ -199,6 +199,13 @@ public struct PlaylistSplitView: View {
             }
           }
           PlaylistView(folder: selectedFolder, item: selectedItemBinding)
+            .overlay {
+              if orientation.isLandscape && (selectedFolder?.items.isEmpty == true || selectedFolder == nil) {
+                Color(.braveBackground)
+                  .ignoresSafeArea()
+                  .transition(.opacity.animation(.linear(duration: 0.1)))
+              }
+            }
         }
         .animation(.default, value: orientation.isLandscape || isSidebarVisible)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -224,8 +231,10 @@ public struct PlaylistSplitView: View {
           }
           ToolbarItem(placement: .navigationBarTrailing) {
             HStack {
-              Button { } label: {
-                Label("Enter Picture-in-Picture", braveSystemImage: "leo.picture.in-picture")
+              if let folder = selectedFolder, !folder.items.isEmpty {
+                Button { } label: {
+                  Label("Enter Picture-in-Picture", braveSystemImage: "leo.picture.in-picture")
+                }
               }
               closeButton
             }
@@ -259,8 +268,10 @@ public struct PlaylistSplitView: View {
                 .navigationTitle(selectedFolder?.title ?? "Playlist")
                 .toolbar {
                   HStack {
-                    Button { } label: {
-                      Image(braveSystemName: "leo.picture.in-picture")
+                    if let folder = selectedFolder, !folder.items.isEmpty {
+                      Button { } label: {
+                        Image(braveSystemName: "leo.picture.in-picture")
+                      }
                     }
                     closeButton
                   }
@@ -423,7 +434,7 @@ public struct PlayerView: View {
           .fixedSize(horizontal: false, vertical: true)
           .frame(maxHeight: .infinity)
           .onTapGesture {
-            withAnimation(.interactiveSpring) {
+            withAnimation(.linear(duration: 0.1)) {
               isControlsVisible.toggle()
             }
           }
@@ -554,20 +565,22 @@ public struct PlaylistView: View {
             if let folder, orientation.isPortrait {
               VStack(spacing: 0) {
                 VStack(spacing: 0) {
-                  // Grabber
-                  Capsule()
-                    .opacity(0.3)
-                    .frame(width: 32, height: 4)
-                    .padding(.top, 6)
+                  if !folder.items.isEmpty {
+                    // Grabber
+                    Capsule()
+                      .opacity(0.3)
+                      .frame(width: 32, height: 4)
+                      .padding(.top, 6)
+                  }
                   PlaylistItemHeaderView(folder: folder) {
                     editFolderMenu
                   }
                 }
                 .frame(maxWidth: .infinity)
                 .background(Color(.braveBackground))
-                .clipShape(PartialRoundedRectangle(cornerRadius: drawerHeight == screenHeight ? 0 : 10, corners: [.topLeft, .topRight]))
+                .clipShape(PartialRoundedRectangle(cornerRadius: drawerHeight == screenHeight || folder.items.isEmpty ? 0 : 10, corners: [.topLeft, .topRight]))
                 .contentShape(PartialRoundedRectangle(cornerRadius: drawerHeight == screenHeight ? 0 : 10, corners: [.topLeft, .topRight]))
-                .simultaneousGesture(dragGesture)
+                .simultaneousGesture(dragGesture, including: folder.items.isEmpty ? .subviews : .all)
                 
                 PlaylistItemListView(folder: folder, selectedItem: $item)
                   .background(Color(.braveBackground))
@@ -579,7 +592,8 @@ public struct PlaylistView: View {
                     }
                   }
               }
-              .frame(height: drawerHeight)
+              .frame(height: folder.items.isEmpty ? screenHeight : drawerHeight)
+//              .frame(maxHeight: folder.items.isEmpty ? .infinity : nil)
             }
           }
       }
@@ -662,7 +676,7 @@ struct PlaylistView_PreviewProvider: PreviewProvider {
   static var previews: some View {
     PlaylistContainerView(folders: [.init(id: PlaylistFolder.savedFolderUUID, title: "Play Later", items: (0..<10).map { i in
         .init(id: "\(i)", dateAdded: .now, duration: 1204, source: URL(string: "https://brave.com")!, name: "I’m Dumb and Spent $7,000 on the New Mac Pro", pageSource: URL(string: "https://brave.com")!)
-    })])
+    }), .init(id: "new", title: "New Playlist", items: [])])
 //    Color.black.fullScreenCover(isPresented: .constant(true)) {
 //      NavigationView {
 //        PlaylistView(folders: [.init(id: "1", title: "Play Later", items: (0..<10).map { i in

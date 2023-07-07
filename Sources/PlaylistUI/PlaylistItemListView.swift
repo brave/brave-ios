@@ -115,6 +115,19 @@ struct PlaylistItemListView: View {
         }
       }
     }
+    .overlay {
+      if folder.items.isEmpty {
+        VStack(spacing: 24) {
+          Image("empty-playlist", bundle: .module)
+            .renderingMode(.original)
+          Text("Fun starts when you have media to play. Go find your favorite media and add them to this playlist.")
+            .multilineTextAlignment(.center)
+            .font(.callout)
+            .foregroundColor(Color(.secondaryBraveLabel))
+        }
+        .padding(40)
+      }
+    }
   }
 }
 
