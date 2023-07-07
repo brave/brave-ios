@@ -118,6 +118,14 @@ class MockJsonRpcService: BraveWalletJsonRpcService {
     completion("", .success, "")
   }
   
+  func addHiddenNetwork(_ coin: BraveWallet.CoinType, chainId: String, completion: @escaping (Bool) -> Void) {
+    completion(false)
+  }
+  
+  func removeHiddenNetwork(_ coin: BraveWallet.CoinType, chainId: String, completion: @escaping (Bool) -> Void) {
+    completion(false)
+  }
+  
   func addEthereumChain(forOrigin chain: BraveWallet.NetworkInfo, origin: URLOrigin, completion: @escaping (String, BraveWallet.ProviderError, String) -> Void) {
     completion("", .chainDisconnected, "Error Message")
   }
