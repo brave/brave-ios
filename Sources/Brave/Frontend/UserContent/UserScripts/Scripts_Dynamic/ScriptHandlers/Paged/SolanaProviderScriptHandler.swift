@@ -108,7 +108,6 @@ class SolanaProviderScriptHandler: TabContentScript {
         }
       case .disconnect:
         provider.disconnect()
-        tab.emitSolanaEvent(.disconnect)
         replyHandler("{:}", nil)
       case .signAndSendTransaction:
         let (result, error) = await signAndSendTransaction(args: body.args)
