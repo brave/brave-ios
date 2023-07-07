@@ -64,6 +64,7 @@ extension BraveWallet.NetworkInfo: Identifiable {
       isErc721: false,
       isErc1155: false,
       isNft: false,
+      isSpam: false,
       symbol: symbol,
       decimals: decimals,
       visible: false,
