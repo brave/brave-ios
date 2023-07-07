@@ -221,15 +221,18 @@ class MockBraveWalletService: BraveWalletBraveWalletService {
   }
   
   func nftDiscoveryEnabled(_ completion: @escaping (Bool) -> Void) {
+    completion(false)
   }
   
   func setNftDiscoveryEnabled(_ enabled: Bool) {
   }
   
   func chainId(forActiveOrigin coin: BraveWallet.CoinType, completion: @escaping (String) -> Void) {
+    completion(BraveWallet.MainnetChainId)
   }
   
   func setChainIdForActiveOrigin(_ coin: BraveWallet.CoinType, chainId: String, completion: @escaping (Bool) -> Void) {
+    completion(false)
   }
   
   func balanceScannerSupportedChains(_ completion: @escaping ([String]) -> Void) {
@@ -238,6 +241,14 @@ class MockBraveWalletService: BraveWalletBraveWalletService {
 
   func discoverEthAllowances(_ completion: @escaping ([BraveWallet.AllowanceInfo]) -> Void) {
     completion([])
+  }
+  
+  func setAssetSpamStatus(_ token: BraveWallet.BlockchainToken, status: Bool, completion: @escaping (Bool) -> Void) {
+    completion(false)
+  }
+  
+  func simpleHashSpamNfTs(_ walletAddress: String, chainIds: [String], coin: BraveWallet.CoinType, cursor: String?, completion: @escaping ([BraveWallet.BlockchainToken], String?) -> Void) {
+    completion([], nil)
   }
   
   func convertFevm(toFvmAddress isMainnet: Bool, fevmAddresses: [String], completion: @escaping ([String: String]) -> Void) {

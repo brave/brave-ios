@@ -1239,7 +1239,7 @@ extension TabManager: NSFetchedResultsControllerDelegate {
       let tabsForDomain = self.allTabs.filter { $0.url?.domainURL.absoluteString.caseInsensitiveCompare(domainURL) == .orderedSame }
       tabsForDomain.forEach { tab in
         Task { @MainActor in
-          let privateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
+          let privateMode = privateBrowsingManager.isPrivateBrowsing
           // iOS does not have `HostContentSettingsMap`, so we must
           // implement `SolanaProviderImpl::OnContentSettingChanged`
           if let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: privateMode),
