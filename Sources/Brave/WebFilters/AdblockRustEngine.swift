@@ -36,10 +36,8 @@ extension AdblockEngine {
     let isThirdParty = requestHost != sourceHost
     
     if !isAggressive {
-      // Normally we should check the etld+1.
-      // However for network filtering we use content blockers
-      // which unfortunately uses a host comparison.
-      // So this is what we simulate here
+      // If we have standard mode for this engine,
+      // we don't block first party ads
       guard isThirdParty else {
         return false
       }
