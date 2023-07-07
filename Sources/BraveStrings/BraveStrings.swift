@@ -2447,7 +2447,7 @@ extension Strings {
         comment: "Used in context: All plans include a 'free 7-day trial'! where variable part will be indicating what kind of trial it will include")
     
     public static let freeTrialPeriod =
-      NSLocalizedString("vpn.freeTrialDisclaimer", tableName: "BraveShared", bundle: .module,
+      NSLocalizedString("vpn.freeTrialPeriod", tableName: "BraveShared", bundle: .module,
         value: "free 7-day trial",
         comment: "Used in context: All plans include a 'free 7-day trial'! - this will be the disclamier for the trial showing it is free and 7 days long")
 
@@ -2836,11 +2836,6 @@ extension Strings {
       NSLocalizedString("vpn.contactFormTitle", tableName: "BraveShared", bundle: .module,
         value: "Brave Firewall + VPN Issue",
         comment: "Title for contact form email.")
-
-    public static let freeTrialDisclaimer =
-      NSLocalizedString("vpn.freeTrialDisclaimer", tableName: "BraveShared", bundle: .module,
-        value: "Try free for 7 days. After 7 days, you will be charged the plan price. ",
-        comment: "Disclaimer about free trial")
 
     public static let iapDisclaimer =
       NSLocalizedString("vpn.iapDisclaimer", tableName: "BraveShared", bundle: .module,
