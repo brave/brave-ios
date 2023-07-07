@@ -983,6 +983,7 @@ extension BrowserViewController: WKUIDelegate {
           }
         }
         openNewPrivateTabAction.accessibilityLabel = "linkContextMenu.openInNewPrivateTab"
+        
         actions.append(openNewPrivateTabAction)
         
         if UIApplication.shared.supportsMultipleScenes {
@@ -1017,15 +1018,13 @@ extension BrowserViewController: WKUIDelegate {
           actions.append(openNewPrivateWindowAction)
         }
 
-        let copyAction = UIAction(
-          title: Strings.copyLinkActionTitle,
-          image: UIImage(systemName: "doc.on.doc")
-        ) { _ in
-          UIPasteboard.general.url = url
-        }
+        let copyAction = UIAction.makeCopyAction(for: url)
         copyAction.accessibilityLabel = "linkContextMenu.copyLink"
-
         actions.append(copyAction)
+        
+        let copyCleanLinkAction = UIAction.makeCleanCopyAction(for: url, isPrivateMode: currentTab.isPrivate)
+        copyCleanLinkAction.accessibilityLabel = "linkContextMenu.copyCleanLink"
+        actions.append(copyCleanLinkAction)
 
         if let braveWebView = webView as? BraveWebView {
           let shareAction = UIAction(

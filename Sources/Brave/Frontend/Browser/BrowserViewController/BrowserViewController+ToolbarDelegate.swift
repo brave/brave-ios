@@ -913,13 +913,12 @@ extension BrowserViewController: ToolbarDelegate {
 
 extension BrowserViewController: UIContextMenuInteractionDelegate {
   public func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
-    
-    let configuration = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [unowned self] _ in
-      var actionMenus: [UIMenu?] = []
-      var pasteMenuChildren: [UIAction] = []
-      
+    let configuration =  UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [unowned self] _ in
       let tab = tabManager.selectedTab
-      var reloadMenu: UIMenu?
+      var actionMenus: [UIMenu?] = [
+        makePasteMenu(),
+        makeCopyMenu(isPrivateMode: tab?.isPrivate ?? true)
+      ]
       
       if let url = tab?.url, url.isWebPage() {
         let reloadTitle = tab?.isDesktopSite == true ? Strings.appMenuViewMobileSiteTitleString : Strings.appMenuViewDesktopSiteTitleString
@@ -931,52 +930,11 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
             tab?.switchUserAgent()
           })
         
-        reloadMenu = UIMenu(options: .displayInline, children: [reloadAction])
+        let reloadMenu = UIMenu(options: .displayInline, children: [reloadAction])
+        actionMenus.append(reloadMenu)
       }
       
-      let pasteGoAction = UIAction(
-        identifier: .pasteAndGo,
-        handler: UIAction.deferredActionHandler { _ in
-          if let pasteboardContents = UIPasteboard.general.string {
-            self.topToolbar(self.topToolbar, didSubmitText: pasteboardContents)
-          }
-        })
-
-      let pasteAction = UIAction(
-        identifier: .paste,
-        handler: UIAction.deferredActionHandler { _ in
-          if let pasteboardContents = UIPasteboard.general.string {
-            self.topToolbar.enterOverlayMode(pasteboardContents, pasted: true, search: true)
-          }
-        })
-
-      pasteMenuChildren = [pasteGoAction, pasteAction]
-      
-      if #unavailable(iOS 16.0), isUsingBottomBar {
-        pasteMenuChildren.reverse()
-      }
-      
-      let copyAction = UIAction(
-        title: Strings.copyAddressTitle,
-        image: UIImage(systemName: "doc.on.doc"),
-        handler: UIAction.deferredActionHandler { _ in
-          if let url = self.topToolbar.currentURL {
-            UIPasteboard.general.url = url as URL
-          }
-        })
-
-      let copyMenu = UIMenu(options: .displayInline, children: [copyAction])
-      
-      if UIPasteboard.general.hasStrings || UIPasteboard.general.hasURLs {
-        let pasteMenu = UIMenu(options: .displayInline, children: pasteMenuChildren)
-        actionMenus.append(contentsOf: [pasteMenu, copyMenu])
-      } else {
-        actionMenus.append(copyMenu)
-      }
-      
-      actionMenus.append(reloadMenu)
-      
-      return UIMenu(children: actionMenus.compactMap { $0 })
+      return UIMenu(children: actionMenus.compactMap({ $0 }))
     }
     
     if #available(iOS 16.0, *) {
@@ -984,5 +942,39 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
     }
     
     return configuration
+  }
+  
+  private func makePasteMenu() -> UIMenu? {
+    guard UIPasteboard.general.hasStrings || UIPasteboard.general.hasURLs else { return nil }
+    
+    var children: [UIAction] = [
+      UIAction.makePasteAndGoAction(pasteCallback: { pasteboardContents in
+        self.topToolbar(self.topToolbar, didSubmitText: pasteboardContents)
+      }),
+      UIAction.makePasteAction(pasteCallback: { pasteboardContents in
+        self.topToolbar.enterOverlayMode(pasteboardContents, pasted: true, search: true)
+      })
+    ]
+    
+    if #unavailable(iOS 16.0), isUsingBottomBar {
+      children.reverse()
+    }
+    
+    return UIMenu(options: .displayInline, children: children)
+  }
+  
+  private func makeCopyMenu(isPrivateMode: Bool) -> UIMenu? {
+    guard let url = self.topToolbar.currentURL else { return nil }
+    
+    var children: [UIAction] = [
+      UIAction.makeCopyAction(for: url),
+      UIAction.makeCleanCopyAction(for: url, isPrivateMode: isPrivateMode)
+    ]
+    
+    if #unavailable(iOS 16.0), isUsingBottomBar {
+      children.reverse()
+    }
+    
+    return UIMenu(options: .displayInline, children: children)
   }
 }
