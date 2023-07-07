@@ -535,6 +535,10 @@ extension Tab: BraveWalletSolanaEventsListener {
       await updateSolanaProperties()
     }
   }
+  
+  func disconnectEvent() {
+    emitSolanaEvent(.disconnect)
+  }
 
   func emitSolanaEvent(_ event: Web3ProviderEvent) {
     guard Preferences.Wallet.defaultSolWallet.value == Preferences.Wallet.WalletType.brave.rawValue,
