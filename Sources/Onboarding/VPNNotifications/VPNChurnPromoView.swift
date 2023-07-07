@@ -15,7 +15,10 @@ public enum VPNChurnPromoType {
   case autoRenewFreeMonth
   case updateBillingSoonExpire
   case updateBillingExpired
-  
+  case subscribeDiscount
+  case subscribeVPNProtection
+  case subscribeAllDevices
+
   var promoImage: String {
     switch self {
     case .autoRenewSoonExpire:
@@ -26,6 +29,12 @@ public enum VPNChurnPromoType {
       return "auto_renew _free_image"
     case .updateBillingSoonExpire, .updateBillingExpired:
       return "update_billing_expired"
+    case .subscribeDiscount:
+      return "auto_renew _soon_image"
+    case .subscribeVPNProtection:
+      return "subscribe_protection_image"
+    case .subscribeAllDevices:
+      return "subscribe_all-devices_image"
     }
   }
   
@@ -41,6 +50,12 @@ public enum VPNChurnPromoType {
       return Strings.VPN.updateBillingSoonExpirePopOverTitle
     case .updateBillingExpired:
       return Strings.VPN.updateBillingExpiredPopOverTitle
+    case .subscribeDiscount:
+      return Strings.VPN.subscribeVPNDiscountPopOverTitle
+    case .subscribeVPNProtection:
+      return Strings.VPN.subscribeVPNProtectionPopOverTitle
+    case .subscribeAllDevices:
+      return Strings.VPN.subscribeVPNAllDevicesPopOverTitle
     }
   }
   
@@ -52,6 +67,10 @@ public enum VPNChurnPromoType {
       return Strings.VPN.updateBillingSoonExpirePopOverDescription
     case .updateBillingExpired:
       return Strings.VPN.updateBillingExpiredPopOverDescription
+    case .subscribeVPNProtection:
+      return Strings.VPN.subscribeVPNProtectionPopOverDescription
+    case .subscribeAllDevices:
+      return Strings.VPN.subscribeVPNAllDevicesPopOverDescription
     default:
       return nil
     }
@@ -61,6 +80,8 @@ public enum VPNChurnPromoType {
     switch self {
     case .autoRenewSoonExpire:
       return Strings.VPN.autoReneSoonExpirePopOverSubDescription
+    case .subscribeVPNProtection, .subscribeAllDevices:
+      return Strings.VPN.subscribeVPNPopOverSubDescription
     default:
       return nil
     }
@@ -72,6 +93,8 @@ public enum VPNChurnPromoType {
       return Strings.VPN.autoRenewActionButtonTitle
     case .updateBillingSoonExpire, .updateBillingExpired:
       return Strings.VPN.updatePaymentActionButtonTitle
+    case .subscribeDiscount, .subscribeVPNProtection, .subscribeAllDevices:
+      return Strings.VPN.subscribeVPNActionButtonTitle
     }
   }
 }
@@ -159,7 +182,7 @@ public struct VPNChurnPromoView: View {
   @ViewBuilder
   private var detailView: some View {
     switch churnPromoType {
-    case .autoRenewSoonExpire:
+    case .autoRenewSoonExpire, .subscribeVPNProtection, .subscribeAllDevices:
       let description = churnPromoType.description ?? ""
       let subDescription = churnPromoType.subDescription ?? ""
       
@@ -171,7 +194,7 @@ public struct VPNChurnPromoView: View {
           .font(.callout)
           .multilineTextAlignment(.center)
       }
-    case .autoRenewDiscount, .autoRenewFreeMonth:
+    case .autoRenewDiscount, .autoRenewFreeMonth, .subscribeDiscount:
       VStack(alignment: .leading, spacing: 8) {
         ForEach(descriptionItems, id: \.self) { itemDescription in
           HStack(spacing: 8) {

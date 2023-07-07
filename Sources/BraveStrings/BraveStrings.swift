@@ -2968,8 +2968,7 @@ extension Strings {
       NSLocalizedString("vpn.vpnRegionSelectorButtonSubTitle", tableName: "BraveShared", bundle: .module,
         value: "Current Setting: %@",
         comment: "Button subtitle for VPN region selection in menu. %@ will be replaced with country name or automatic ex: Current Setting: Automatic")
-    
-    
+
     public static let autoRenewSoonExpirePopOverTitle =
       NSLocalizedString("vpn.autoRenewSoonExpireTitle", tableName: "BraveShared", bundle: .module,
         value: "Oh no! Your Brave VPN subscription is about to expire.",
@@ -3024,6 +3023,41 @@ extension Strings {
       NSLocalizedString("vpn.updatePaymentActionButtonTitle", tableName: "BraveShared", bundle: .module,
         value: "Update Payment",
         comment: "Action button title that updates method payment")
+    
+    public static let subscribeVPNActionButtonTitle =
+      NSLocalizedString("vpn.subscribeVPNActionButtonTitle", tableName: "BraveShared", bundle: .module,
+        value: "Subscribe Now",
+        comment: "Action button title that subscribe action for VPN purchase")
+    
+    public static let subscribeVPNDiscountPopOverTitle =
+      NSLocalizedString("vpn.subscribeVPNDiscountPopOverTitle", tableName: "BraveShared", bundle: .module,
+        value: "Give Brave VPN another try and get 20% off for 3 months!",
+        comment: "Pop up title for subscribing VPN with discount")
+    
+    public static let subscribeVPNProtectionPopOverTitle =
+      NSLocalizedString("vpn.subscribeVPNProtectionPopOverTitle", tableName: "BraveShared", bundle: .module,
+        value: "Did you know that Brave VPN protects you outside of Brave Browser?",
+        comment: "Pop up title for subscribing VPN explaning VPN protects user outside the Brave")
+    
+    public static let subscribeVPNAllDevicesPopOverTitle =
+      NSLocalizedString("vpn.subscribeVPNAllDevicesPopOverTitle", tableName: "BraveShared", bundle: .module,
+        value: "Now, use Brave VPN on all your devices for the same price!",
+        comment: "Pop up title the subscription for VPN can be used for all platforms")
+    
+    public static let subscribeVPNProtectionPopOverDescription =
+      NSLocalizedString("vpn.subscribeVPNProtectionPopOverDescription", tableName: "BraveShared", bundle: .module,
+        value: "Brave VPN has always blocked trackers on every app, even outside the Brave browser. Now you can see who tried to track you, with the Brave Privacy Hub.",
+        comment: "Pop up description for subscribing VPN explaning VPN protects user outside the Brave")
+    
+    public static let subscribeVPNAllDevicesPopOverDescription =
+      NSLocalizedString("vpn.subscribeVPNAllDevicesPopOverDescription", tableName: "BraveShared", bundle: .module,
+        value: "That’s right. Your Brave VPN subscription is now good on up to 5 devices. So you can subscribe on iOS and use it on your Mac, Windows and Android devices for free.",
+        comment: "Pop up description the subscription for VPN can be used for all platforms")
+    
+    public static let subscribeVPNPopOverSubDescription =
+      NSLocalizedString("vpn.subscribeVPNPopOverSubDescription", tableName: "BraveShared", bundle: .module,
+        value: "Ready to safeguard every app on your phone? Come back to Brave VPN and get 20% off for the next 3 months.",
+        comment: "Pop up sub description the subscription for VPN can be used for all platforms")
   }
   
 }

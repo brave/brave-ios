@@ -20,7 +20,9 @@ extension BrowserViewController {
   
   // Priority: P3A - Bottom Bar - VPN - Default Browser - Rewards - Cookie Notification - Link Receipt
   func presentFullScreenCallouts() {
-    presentVPNChurnPromoCallout(for: .autoRenewSoonExpire)
+    for type in FullScreenCalloutType.allCases {
+      presentScreenCallout(for: type)
+    }
   }
   
   private func presentScreenCallout(for type: FullScreenCalloutType, skipSafeGuards: Bool = false) {
