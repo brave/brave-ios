@@ -205,7 +205,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     $0.setImage(UIImage(braveSystemNamed: "leo.qr.code", compatibleWith: nil), for: .normal)
     $0.tintColor = .braveLabel
     $0.contentEdgeInsets = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
-    $0.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 1000), for: .horizontal)
+    $0.setContentCompressionResistancePriority(.required, for: .horizontal)
     $0.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
     $0.setContentHuggingPriority(.defaultHigh, for: .horizontal)
     $0.setContentHuggingPriority(.defaultHigh, for: .vertical)
@@ -218,7 +218,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     $0.setImage(UIImage(braveSystemNamed: "leo.microphone", compatibleWith: nil), for: .normal)
     $0.tintColor = .braveLabel
     $0.contentEdgeInsets = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
-    $0.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 1000), for: .horizontal)
+    $0.setContentCompressionResistancePriority(.required, for: .horizontal)
     $0.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
     $0.setContentHuggingPriority(.defaultHigh, for: .horizontal)
     $0.setContentHuggingPriority(.defaultHigh, for: .vertical)
