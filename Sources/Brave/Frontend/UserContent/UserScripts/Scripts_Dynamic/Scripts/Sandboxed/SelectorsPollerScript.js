@@ -310,7 +310,7 @@ window.__firefox__.execute(function($) {
     }
 
     const futureTimeMs = window.Date.now() + returnToMutationObserverIntervalMs
-    const queryAttrsFromDocumentBound = querySelectorsFromElement.bind(undefined, document, futureTimeMs)
+    const queryAttrsFromDocumentBound = querySelectorsFromElement.bind(document, undefined, futureTimeMs)
     selectorsPollingIntervalId = window.setInterval(queryAttrsFromDocumentBound, selectorsPollingIntervalMs)
   }
 
@@ -686,7 +686,6 @@ window.__firefox__.execute(function($) {
    * @param {*} switchToMutationObserverAtTime A timestamp that identifies when we should switch to the mutation observer
    */
   const querySelectorsFromElement = async (element, switchToMutationObserverAtTime) => {
-    extractNewSelectors(element)
     const elmWithClassOrId = element.querySelectorAll('[class],[id]')
 
     elmWithClassOrId.forEach((node) => {
