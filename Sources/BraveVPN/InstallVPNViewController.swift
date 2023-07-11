@@ -53,7 +53,7 @@ class InstallVPNViewController: VPNSetupLoadingController {
     isLoading = true
     
     installProfileAndConnectVPNFirstTime { [weak self] status in
-      guard let self else { return }
+      guard let self = self else { return }
       
       if status {
         self.dismiss(animated: true) {
@@ -63,7 +63,7 @@ class InstallVPNViewController: VPNSetupLoadingController {
         // Retry installing profile twice if it fails
         // Error generated is WireGuard capabilities are not yet enabled on this node
         if self.installVPNProfileRetryCount < 2 {
-          installVPNAction()
+          self.installVPNAction()
         } else {
           presentErrorVPNInstallProfile()
         }

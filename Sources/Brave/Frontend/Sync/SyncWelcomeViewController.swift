@@ -256,7 +256,7 @@ class SyncWelcomeViewController: SyncViewController {
     askForAuthentication() { [weak self] status in
       guard let self = self, status else { return }
       
-      let pairCamera = SyncPairCameraViewController(syncAPI: syncAPI)
+      let pairCamera = SyncPairCameraViewController(syncAPI: self.syncAPI)
       pairCamera.delegate = self
       self.navigationController?.pushViewController(pairCamera, animated: true)
     }
@@ -267,11 +267,11 @@ class SyncWelcomeViewController: SyncViewController {
     askForAuthentication() { [weak self] status in
       guard let self = self, status else { return }
       
-      let syncInternalsController = syncAPI.createSyncInternalsController().then {
+      let syncInternalsController = self.syncAPI.createSyncInternalsController().then {
         $0.title = Strings.braveSyncInternalsTitle
       }
       
-      navigationController?.pushViewController(syncInternalsController, animated: true)
+      self.navigationController?.pushViewController(syncInternalsController, animated: true)
     }
   }
 
