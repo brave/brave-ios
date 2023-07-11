@@ -168,8 +168,10 @@ window.__firefox__.execute(function($) {
       return
     }
     
-    // Ensure we are not already waiting on a timer
-    if (sendPendingSelectorsTimerId) { return }
+    if (sendPendingSelectorsTimerId) {
+      // Each time this is called cancell the timer and allow a new one to start
+      window.clearInterval(sendPendingSelectorsTimerId)
+    }
     
     sendPendingSelectorsTimerId = window.setTimeout(() => {
       sendPendingSelectorsIfNeeded()
