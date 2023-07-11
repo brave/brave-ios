@@ -184,6 +184,12 @@ extension BrowserViewController {
 
   private func addSearchEngine(_ engine: OpenSearchEngine) {
     var customEngineAlert: UIAlertController
+
+    if let existingEngine = profile.searchEngines.orderedEngines.first(where: { $0.shortName == engine.shortName }) {
+      customEngineAlert = ThirdPartySearchAlerts.engineAlreadyExists(existingEngine)
+      present(customEngineAlert, animated: true)
+      return
+    }
     
     if let searchTemplateURL = URL(string: engine.searchTemplate), !searchTemplateURL.isSecureWebPage() {
       customEngineAlert = ThirdPartySearchAlerts.insecureSearchTemplateURL(engine)

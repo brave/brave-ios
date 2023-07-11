@@ -68,6 +68,16 @@ class ThirdPartySearchAlerts: UIAlertController {
       message: alertMessage)
   }
   
+  static func engineAlreadyExists(_ engine: OpenSearchEngine) -> UIAlertController {
+    let alertMessage = """
+      \n\(engine.displayName)
+      \nA search engine with the same name already exists.
+      """
+    return searchAlertWithOK(
+      title: "Error Adding Custom Search Engine",
+      message: alertMessage)
+  }
+  
   static func insecureSuggestionTemplateURL(_ engine: OpenSearchEngine) -> UIAlertController {
     let alertMessage = """
       \nInsecure Custom Suggestion Template for
