@@ -177,7 +177,7 @@ class Tab: NSObject {
     willSet {
       url = newValue
       previousComittedURL = committedURL
-      screenTimeViewController.url = isPrivate ? nil : url
+      screenTimeViewController.url = url
     }
   }
 
