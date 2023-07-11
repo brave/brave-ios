@@ -27,7 +27,7 @@ window.__firefox__.execute(function($) {
   
   /**
    * Send new urls found on the page and return their partiness
-   * @param {Array} urls The urls found on this page
+   * @param {Array<string>} urls The urls found on this page
    * @returns A Promise resolving to a dictionary base urls and their first party status
    */
   const getPartiness = $((urls) => {
@@ -623,7 +623,7 @@ window.__firefox__.execute(function($) {
    * Unhide the given selectors.
    * (i.e. Remove them from CC.hiddenSelectors and move them to CC.unhiddenSelectors)
    * This will not recreate the stylesheet
-   * @param {Set} selectors The selectors to unhide
+   * @param {Set<string>} selectors The selectors to unhide
    */
   const unhideSelectors = (selectors) => {
     if (selectors.size === 0) { return }
@@ -842,7 +842,7 @@ window.__firefox__.execute(function($) {
   /**
    * This method will unhide the node an all parent nodes if they are needed.
    * This will move up each parent for the each node until it reaches the document body
-   * @param {Array} nodes Array of WeakRef nodes
+   * @param {Array<object>} nodes Array of WeakRef nodes
    * @returns A list of unhidden selectors
    */
   const unhideSelectorsMatchingElementsAndTheirParents = (nodes) => {
@@ -867,7 +867,7 @@ window.__firefox__.execute(function($) {
    * 1. Extract any urls from the mutations and add them to pendingURLs
    * 2. Send them to iOS for 1st party analysis
    * 3. Unhide any elements (or their parents) that are 1st party
-   * @param {*} mutations
+   * @param {[MutationRecord]} mutations
    * @param {MutationObserver} observer
    */
   const onURLMutations = async (mutations, observer) => {
@@ -944,7 +944,7 @@ window.__firefox__.execute(function($) {
 
   /**
    * Adds given selectors to hiddenSelectors unless they are in the unhiddenSelectors set
-   * @param {*} selectors The selectors to add
+   * @param {Array<string>} selectors The selectors to add
    */
   const processHideSelectors = (selectors, canUnhide1PElements) => {
     let hasChanges = false
@@ -969,7 +969,7 @@ window.__firefox__.execute(function($) {
 
   /**
    * Adds given style selectors to allStyleRules
-   * @param {*} styleSelectors The style selectors to add
+   * @param {Array<string>} styleSelectors The style selectors to add
    */
   const processStyleSelectors = (styleSelectors) => {
     styleSelectors.forEach(entry => {
