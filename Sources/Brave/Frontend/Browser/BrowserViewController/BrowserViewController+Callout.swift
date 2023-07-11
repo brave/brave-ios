@@ -245,13 +245,13 @@ extension BrowserViewController {
   }
   
   private func presentVPNChurnPromoCallout(for type: VPNChurnPromoType) {
-    var vpnChrunPromoView = VPNChurnPromoView(churnPromoType: type)
+    var vpnChurnPromoView = VPNChurnPromoView(churnPromoType: type)
    
-    vpnChrunPromoView.renewAction = {
+    vpnChurnPromoView.renewAction = {
       // TODO: Action
     }
     
-    let popup = PopupViewController(rootView: vpnChrunPromoView, isDismissable: true)
+    let popup = PopupViewController(rootView: vpnChurnPromoView, isDismissable: true)
 
     isOnboardingOrFullScreenCalloutPresented = true
     present(popup, animated: false)
