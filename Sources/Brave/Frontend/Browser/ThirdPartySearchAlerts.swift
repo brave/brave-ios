@@ -16,19 +16,20 @@ class ThirdPartySearchAlerts: UIAlertController {
   }
 
   /**
-     Builds the Alert view that asks if the users wants to add a third party search engine.
+   Builds the Alert view that asks if the users wants to add a third party search engine.
 
-     - parameter engine: To add engine details to alert
-
-     - parameter completion: Okay option handler.
-
-     - returns: UIAlertController for asking the user to add a search engine
-     **/
+   - parameter engine: To add engine details to alert
+   - parameter completion: Okay option handler.
+   - returns: UIAlertController for asking the user to add a search engine
+  **/
 
   static func addThirdPartySearchEngine(_ engine: OpenSearchEngine, completion: @escaping (UIAlertAction) -> Void) -> UIAlertController {
     let alertMessage = """
       \n\(engine.displayName)
+      \nSearch Template:
       \(engine.searchTemplate)
+      \nSuggestion Template:
+      \(engine.suggestTemplate ?? "N/A")
       \n\(Strings.CustomSearchEngine.thirdPartySearchEngineAddAlertDescription)
       """
     let alert = ThirdPartySearchAlerts(
@@ -54,12 +55,35 @@ class ThirdPartySearchAlerts: UIAlertController {
 
     return alert
   }
+  
+  static func insecureSearchTemplateURL(_ engine: OpenSearchEngine) -> UIAlertController {
+    let alertMessage = """
+      \nInsecure Custom Search Template for
+      \(engine.displayName)
+      \nSearch Template:
+      \(engine.searchTemplate)
+      """
+    return searchAlertWithOK(
+      title: "Error Adding Custom Search Engine",
+      message: alertMessage)
+  }
+  
+  static func insecureSuggestionTemplateURL(_ engine: OpenSearchEngine) -> UIAlertController {
+    let alertMessage = """
+      \nInsecure Custom Suggestion Template for
+      \(engine.displayName)
+      \nSuggestion Template:
+      \(engine.suggestTemplate ?? "")
+      """
+    return searchAlertWithOK(
+      title: "Error Adding Custom Search Engine",
+      message: alertMessage)
+  }
 
   /**
-     Builds the Alert view that shows the user an error in case a search engine could not be added.
-
-     - returns: UIAlertController with an error dialog
-     **/
+   Builds the Alert view that shows the user an error in case a search engine could not be added.
+   - returns: UIAlertController with an error dialog
+  **/
 
   static func failedToAddThirdPartySearch() -> UIAlertController {
     return searchAlertWithOK(
@@ -90,7 +114,7 @@ class ThirdPartySearchAlerts: UIAlertController {
       title: Strings.CustomSearchEngine.thirdPartySearchEngineAddErrorTitle,
       message: Strings.CustomSearchEngine.thirdPartySearchEngineInsecureURLErrorDescription)
   }
-
+  
   private static func searchAlertWithOK(title: String, message: String) -> UIAlertController {
     let alert = ThirdPartySearchAlerts(
       title: title,

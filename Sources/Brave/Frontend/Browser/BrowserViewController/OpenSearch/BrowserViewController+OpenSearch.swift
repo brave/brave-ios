@@ -183,7 +183,21 @@ extension BrowserViewController {
   }
 
   private func addSearchEngine(_ engine: OpenSearchEngine) {
-    let alert = ThirdPartySearchAlerts.addThirdPartySearchEngine(engine) { alertAction in
+    var customEngineAlert: UIAlertController
+    
+    if let searchTemplateURL = URL(string: engine.searchTemplate), !searchTemplateURL.isSecureWebPage() {
+      customEngineAlert = ThirdPartySearchAlerts.insecureSearchTemplateURL(engine)
+      present(customEngineAlert, animated: true)
+      return
+    }
+    
+    if let suggestTemplate = engine.suggestTemplate, let suggestTemplateURL = URL(string: suggestTemplate), !suggestTemplateURL.isSecureWebPage() {
+      customEngineAlert = ThirdPartySearchAlerts.insecureSearchTemplateURL(engine)
+      present(customEngineAlert, animated: true)
+      return
+    }
+    
+    customEngineAlert = ThirdPartySearchAlerts.addThirdPartySearchEngine(engine) { alertAction in
       if alertAction.style == .cancel {
         return
       }
@@ -203,7 +217,6 @@ extension BrowserViewController {
         }
       }
     }
-
-    self.present(alert, animated: true, completion: {})
+    present(customEngineAlert, animated: true)
   }
 }
