@@ -58,35 +58,35 @@ class ThirdPartySearchAlerts: UIAlertController {
   
   static func insecureSearchTemplateURL(_ engine: OpenSearchEngine) -> UIAlertController {
     let alertMessage = """
-      \nInsecure Custom Search Template for
+      \n\(Strings.CustomSearchEngine.insecureSearchTemplateURLErrorDescription)"
       \(engine.displayName)
-      \nSearch Template:
+      \n\(Strings.CustomSearchEngine.searchTemplateTitle)
       \(engine.searchTemplate)
       """
     return searchAlertWithOK(
-      title: "Error Adding Custom Search Engine",
+      title: Strings.CustomSearchEngine.customSearchEngineAddErrorTitle,
       message: alertMessage)
   }
   
   static func engineAlreadyExists(_ engine: OpenSearchEngine) -> UIAlertController {
     let alertMessage = """
       \n\(engine.displayName)
-      \nA search engine with the same name already exists.
+      \n\(Strings.CustomSearchEngine.engineExistsAlertDescription)
       """
     return searchAlertWithOK(
-      title: "Error Adding Custom Search Engine",
+      title: Strings.CustomSearchEngine.customSearchEngineAddErrorTitle,
       message: alertMessage)
   }
   
   static func insecureSuggestionTemplateURL(_ engine: OpenSearchEngine) -> UIAlertController {
     let alertMessage = """
-      \nInsecure Custom Suggestion Template for
+      \n\(Strings.CustomSearchEngine.insecureSuggestionTemplateURLErrorDescription)
       \(engine.displayName)
-      \nSuggestion Template:
+      \n\(Strings.CustomSearchEngine.suggestionTemplateTitle)
       \(engine.suggestTemplate ?? "")
       """
     return searchAlertWithOK(
-      title: "Error Adding Custom Search Engine",
+      title: Strings.CustomSearchEngine.customSearchEngineAddErrorTitle,
       message: alertMessage)
   }
 
@@ -124,7 +124,7 @@ class ThirdPartySearchAlerts: UIAlertController {
       title: Strings.CustomSearchEngine.thirdPartySearchEngineAddErrorTitle,
       message: Strings.CustomSearchEngine.thirdPartySearchEngineInsecureURLErrorDescription)
   }
-  
+
   private static func searchAlertWithOK(title: String, message: String) -> UIAlertController {
     let alert = ThirdPartySearchAlerts(
       title: title,
