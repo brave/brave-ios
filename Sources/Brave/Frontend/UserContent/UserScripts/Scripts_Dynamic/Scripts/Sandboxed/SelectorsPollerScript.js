@@ -291,8 +291,8 @@ window.__firefox__.execute(function($) {
 
   /**
    * Handle mutations by extracting selectors from the elements
-   * @param {*} mutations The mutations to cancel
-   * @param {*} observer The observer for the given mutations
+   * @param {[MutationRecord]} mutations The mutations to cancel
+   * @param {MutationObserver} observer The observer for the given mutations
    */
   const onMutations = async (mutations, observer) => {
     const mutationScore = queueSelectorsFromMutations(mutations)
@@ -733,8 +733,9 @@ window.__firefox__.execute(function($) {
    * Extract any selectors from the document
    * @param {number} switchToMutationObserverAtTime A timestamp that identifies when we should switch to the mutation observer
    */
-  const querySelectorsFromDocument = async (switchToMutationObserverAtTime) => {
+  const querySelectorsFromDocument = (switchToMutationObserverAtTime) => {
     querySelectorsFromElement(document)
+    sendPendingSelectorsThrottled()
 
     if (window.Date.now() >= switchToMutationObserverAtTime) {
       useMutationObserver()
@@ -745,15 +746,13 @@ window.__firefox__.execute(function($) {
    * Extract any selectors from the given element
    * @param {object} element The element to extract the selectors from
    */
-  const querySelectorsFromElement = async (element) => {
+  const querySelectorsFromElement = (element) => {
     extractNewSelectors(element)
     const elmWithClassOrId = element.querySelectorAll(classIdWithoutHtmlOrBody)
 
     elmWithClassOrId.forEach((node) => {
       extractNewSelectors(node)
     })
-
-    sendPendingSelectorsThrottled()
   }
 
   /**
@@ -763,7 +762,8 @@ window.__firefox__.execute(function($) {
   const startPollingSelectors = async () => {
     // First queue up any classes and ids that exist before the mutation observer
     // starts running.
-    await querySelectorsFromElement(document)
+    querySelectorsFromElement(document)
+    await sendPendingSelectorsIfNeeded()
 
     // Second, set up a mutation observer to handle any new ids or classes
     // that are added to the document.
