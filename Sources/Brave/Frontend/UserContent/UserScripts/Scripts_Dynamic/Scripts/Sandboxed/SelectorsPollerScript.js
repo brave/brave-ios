@@ -170,7 +170,7 @@ window.__firefox__.execute(function($) {
     
     if (sendPendingSelectorsTimerId) {
       // Each time this is called cancell the timer and allow a new one to start
-      window.clearInterval(sendPendingSelectorsTimerId)
+      window.clearTimeout(sendPendingSelectorsTimerId)
     }
     
     sendPendingSelectorsTimerId = window.setTimeout(() => {
@@ -997,7 +997,7 @@ window.__firefox__.execute(function($) {
   const moveStyleThrottled = async () => {
     if (moveStyleTimerId) {
       // Each time this is called cancell the timer and allow a new one to start
-      window.clearInterval(moveStyleTimerId)
+      window.clearTimeout(moveStyleTimerId)
     }
     
     moveStyleTimerId = window.setTimeout(() => {
@@ -1036,7 +1036,7 @@ window.__firefox__.execute(function($) {
   const setRulesOnStylesheetThrottled = () => {
     if (setRulesTimerId) {
       // Each time this is called cancell the timer and allow a new one to start
-      window.clearInterval(setRulesTimerId)
+      window.clearTimeout(setRulesTimerId)
     }
     
     setRulesTimerId = window.setTimeout(() => {
