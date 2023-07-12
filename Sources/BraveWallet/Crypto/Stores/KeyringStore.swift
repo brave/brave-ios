@@ -361,12 +361,16 @@ public class KeyringStore: ObservableObject {
     keyringService.notifyUserInteraction()
   }
   
-  @MainActor func selectedAccount(for coin: BraveWallet.CoinType) async -> BraveWallet.AccountInfo? {
-    let selectedAccount = await keyringService.allAccounts().selectedAccount
-    if selectedAccount?.coin != coin {
-      assertionFailure("Should not occur.")
+  @MainActor func selectedDappAccount(for coin: BraveWallet.CoinType) async -> BraveWallet.AccountInfo? {
+    let allAccounts = await keyringService.allAccounts()
+    switch coin {
+    case .eth:
+      return allAccounts.ethDappSelectedAccount
+    case .sol:
+      return allAccounts.solDappSelectedAccount
+    default:
+      return nil
     }
-    return selectedAccount
   }
 
   // MARK: - Keychain

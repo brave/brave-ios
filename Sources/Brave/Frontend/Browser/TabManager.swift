@@ -1200,26 +1200,31 @@ extension TabManager: PreferencesObserver {
 
 extension TabManager: NSFetchedResultsControllerDelegate {
   func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChange anObject: Any, at indexPath: IndexPath?, for type: NSFetchedResultsChangeType, newIndexPath: IndexPath?) {
-//    if let domain = anObject as? Domain, let domainURL = domain.url {
-//      // if `wallet_permittedAccounts` changes on a `Domain` from
-//      // wallet settings / manage web3 site connections, we need to
-//      // fire `accountsChanged` event on open tabs for this `Domain`
-//      let tabsForDomain = self.allTabs.filter { $0.url?.domainURL.absoluteString.caseInsensitiveCompare(domainURL) == .orderedSame }
-//      tabsForDomain.forEach { tab in
-//        Task { @MainActor in
-//          let privateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
-//          // iOS does not have `HostContentSettingsMap`, so we must
-//          // implement `SolanaProviderImpl::OnContentSettingChanged`
-//          if let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: privateMode),
-//             let selectedSolAccount = await keyringService.selectedAccount(.sol),
-//             tab.isSolanaAccountConnected(selectedSolAccount), // currently connected
-//             !tab.isAccountAllowed(.sol, account: selectedSolAccount) { // user revoked access
-//            tab.walletSolProvider?.disconnect()
-//          }
-//          let accounts = await tab.allowedAccountsForCurrentCoin()
-//          tab.accountsChangedEvent(Array(accounts))
-//        }
-//      }
-//    }
+    if let domain = anObject as? Domain, let domainURL = domain.url {
+      // if `wallet_permittedAccounts` changes on a `Domain` from
+      // wallet settings / manage web3 site connections, we need to
+      // fire `accountsChanged` event on open tabs for this `Domain`
+      let tabsForDomain = self.allTabs.filter { $0.url?.domainURL.absoluteString.caseInsensitiveCompare(domainURL) == .orderedSame }
+      tabsForDomain.forEach { tab in
+        Task { @MainActor in
+          let privateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
+          guard let keyringService = BraveWallet.KeyringServiceFactory.get(privateMode: privateMode) else {
+            return
+          }
+          let allAccounts = await keyringService.allAccounts()
+          // iOS does not have `HostContentSettingsMap`, so we must
+          // implement `SolanaProviderImpl::OnContentSettingChanged`
+          if let selectedSolAccount = allAccounts.solDappSelectedAccount,
+             tab.isSolanaAccountConnected(selectedSolAccount.address), // currently connected
+             !tab.isAccountAllowed(.sol, account: selectedSolAccount.address) { // user revoked access
+            tab.walletSolProvider?.disconnect()
+          }
+          
+          let ethAccountAddressess = allAccounts.accounts.filter { $0.coin == .eth }.map(\.address)
+          let allowedEthAccountAddresses = tab.getAllowedAccounts(.eth, accounts: ethAccountAddressess) ?? []
+          tab.accountsChangedEvent(Array(allowedEthAccountAddresses))
+        }
+      }
+    }
   }
 }
