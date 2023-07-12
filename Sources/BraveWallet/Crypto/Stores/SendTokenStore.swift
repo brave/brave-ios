@@ -299,7 +299,7 @@ public class SendTokenStore: ObservableObject {
     validateSendAddressTask?.cancel()
     validateSendAddressTask = Task { @MainActor in
       guard !sendAddress.isEmpty,
-              let selectedAccount = await keyringService.allAccounts().selectedAccount,
+            let selectedAccount = await keyringService.allAccounts().selectedAccount,
             !Task.isCancelled else {
         return
       }

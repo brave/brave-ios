@@ -121,6 +121,15 @@ public class NetworkStore: ObservableObject {
         self.defaultSelectedChainId = network.chainId
       }
       
+      let currentlySelectedCoin = await keyringService.allAccounts().selectedAccount?.coin ?? .eth
+      let rpcServiceNetwork = await rpcService.network(currentlySelectedCoin, origin: isForOrigin ? origin : nil)
+      guard rpcServiceNetwork.chainId != network.chainId else {
+        if !isForOrigin { // `isSwapSupported` is for the `defaultSelectedChain`
+          self.isSwapSupported = await swapService.isSwapSupported(network.chainId)
+        }
+        return .chainAlreadySelected
+      }
+      
       let success = await rpcService.setNetwork(network.chainId, coin: network.coin, origin: isForOrigin ? origin : nil)
       if success {
         let account = await walletService.ensureSelectedAccount(forChain: network.coin, chainId: network.chainId)

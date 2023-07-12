@@ -863,13 +863,14 @@ public class SwapTokenStore: ObservableObject {
 
   #if DEBUG
   func setUpTest(
+    fromAccount: BraveWallet.AccountInfo = .mockEthAccount,
     selectedFromToken: BraveWallet.BlockchainToken = .previewToken,
     selectedToToken: BraveWallet.BlockchainToken = .previewDaiToken,
     sellAmount: String? = "0.01",
     buyAmount: String? = nil,
     jupiterQuote: BraveWallet.JupiterQuote? = nil
   ) {
-    accountInfo = .init()
+    accountInfo = fromAccount
     self.selectedFromToken = selectedFromToken
     self.selectedToToken = selectedToToken
     if let sellAmount {

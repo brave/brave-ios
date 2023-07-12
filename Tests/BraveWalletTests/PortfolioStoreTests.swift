@@ -161,7 +161,6 @@ class PortfolioStoreTests: XCTestCase {
     let walletService = BraveWallet.TestBraveWalletService()
     walletService._addObserver = { _ in }
     walletService._defaultBaseCurrency = { $0(CurrencyCode.usd.code) }
-    walletService._selectedCoin = { $0(BraveWallet.CoinType.eth) }
     let assetRatioService = BraveWallet.TestAssetRatioService()
     assetRatioService._price = { priceIds, _, _, completion in
       completion(true, [mockETHAssetPrice, mockUSDCAssetPrice, mockSOLAssetPrice])
