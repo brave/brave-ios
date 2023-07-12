@@ -65,6 +65,10 @@ struct BackupRecoveryPhraseView: View {
         .padding(.top, 20)
         .padding(.horizontal)
         .blur(radius: isViewRecoveryPermitted ? 0 : 4)
+        .overlay(
+          RoundedRectangle(cornerRadius: 4)
+            .stroke(Color(.braveDisabled), lineWidth: isViewRecoveryPermitted ? 0 : 1)
+        )
         if isViewRecoveryPermitted {
           Button(action: copyRecoveryPhrase) {
             if hasCopied {
@@ -72,7 +76,7 @@ struct BackupRecoveryPhraseView: View {
                 .font(.subheadline.bold())
                 .foregroundColor(Color(.braveSuccessLabel))
             } else {
-              Text("\(Strings.Wallet.copyToPasteboard) \(Image(braveSystemName: "leo.copy.plain-text"))")
+              Text(Strings.Wallet.copyToPasteboard)
                 .font(.subheadline.bold())
                 .foregroundColor(Color(.braveBlurpleTint))
             }
@@ -81,7 +85,8 @@ struct BackupRecoveryPhraseView: View {
           NavigationLink(
             destination: VerifyRecoveryPhraseView(
               recoveryWords: recoveryWords,
-              keyringStore: keyringStore
+              keyringStore: keyringStore,
+              password: password
             )
           ) {
             Text(Strings.Wallet.continueButtonTitle)
@@ -115,8 +120,6 @@ struct BackupRecoveryPhraseView: View {
       }
       .padding()
     }
-    .navigationTitle(Strings.Wallet.cryptoTitle)
-    .navigationBarTitleDisplayMode(.inline)
     .introspectViewController { vc in
       vc.navigationItem.backButtonTitle = Strings.Wallet.backupRecoveryPhraseBackButtonTitle
       vc.navigationItem.backButtonDisplayMode = .minimal

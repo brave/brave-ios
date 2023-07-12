@@ -7,6 +7,7 @@ import Foundation
 import SwiftUI
 import DesignSystem
 import Strings
+import LocalAuthentication
 
 struct VerifyRecoveryPhraseView: View {
   @ObservedObject var keyringStore: KeyringStore
@@ -16,18 +17,22 @@ struct VerifyRecoveryPhraseView: View {
   @State private var selectedWords: [RecoveryWord] = []
   @State private var input: String = ""
   @State private var isShowingError = false
-  @State private var activeCheckIndex = 0
+  @State private var activeCheckIndex: Int = 0
+  @State private var isShowingBiometricsPrompt: Bool = false
+  @State private var isShowingSkipWarning: Bool = false
+  @State private var isShowingCompleteState: Bool = false
 
   @Environment(\.modalPresentationMode) @Binding private var modalPresentationMode
   
   @FocusState private var isTextFieldFocused: Bool
   
-  private let randomizedIndex: Int = 0
   private let targetedRecoveryWordIndexes: [Int]
+  private let password: String
   
   init(
     recoveryWords: [RecoveryWord],
-    keyringStore: KeyringStore
+    keyringStore: KeyringStore,
+    password: String
   ) {
     self.recoveryWords = recoveryWords
     self.randomizedWords = recoveryWords.shuffled()
@@ -42,6 +47,7 @@ struct VerifyRecoveryPhraseView: View {
       }
     }
     self.targetedRecoveryWordIndexes = indexes
+    self.password = password
   }
 
   private var wordsSelectedInCorrectOrder: Bool {
@@ -64,19 +70,21 @@ struct VerifyRecoveryPhraseView: View {
     }
   }
   
+  private var isBiometricsAvailable: Bool {
+    LAContext().canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
+  }
+  
   var body: some View {
     ScrollView {
       VStack {
-        HStack(spacing: 10) {
+        HStack(spacing: 16) {
           Text(Strings.Wallet.verifyRecoveryPhraseTitle)
             .font(.title.weight(.medium))
             .foregroundColor(.primary)
             .fixedSize(horizontal: false, vertical: true)
           RecoveryPhrasePager(activeIndex: $activeCheckIndex)
         }
-        Group {
-          Text(String.localizedStringWithFormat(Strings.Wallet.verifyRecoveryPhraseSubTitle, targetedRecoveryWordIndexes[activeCheckIndex] + 1))
-        }
+        Text(LocalizedStringKey(String.localizedStringWithFormat(Strings.Wallet.verifyRecoveryPhraseSubTitle, targetedRecoveryWordIndexes[activeCheckIndex] + 1)))
         .fixedSize(horizontal: false, vertical: true)
         .padding(.bottom, 40)
         VStack(alignment: .leading) {
@@ -86,16 +94,32 @@ struct VerifyRecoveryPhraseView: View {
             .autocapitalization(.none)
           Divider()
         }
+        if isShowingError {
+          HStack(spacing: 12) {
+            Image(braveSystemName: "leo.warning.circle-filled")
+              .renderingMode(.template)
+              .foregroundColor(Color(.braveLighterOrange))
+            Text("Recovery phrase doesn't match.")
+              .multilineTextAlignment(.leading)
+              .font(.callout)
+            Spacer()
+          }
+          .padding(12)
+          .background(
+            Color(.braveErrorBackground)
+              .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+          )
+        }
         Button {
           let targetIndex = targetedRecoveryWordIndexes[activeCheckIndex]
           if input == recoveryWords[targetIndex].value {
             isShowingError = false
             if activeCheckIndex == targetedRecoveryWordIndexes.count - 1 { // finished all checks
-              keyringStore.notifyWalletBackupComplete()
-              if keyringStore.isOnboardingVisible {
-                keyringStore.markOnboardingCompleted()
+              // check if biometric is available
+              if isBiometricsAvailable {
+                isShowingBiometricsPrompt = true
               } else {
-                modalPresentationMode = false
+                isShowingCompleteState = true
               }
             } else {
               // next check
@@ -112,17 +136,65 @@ struct VerifyRecoveryPhraseView: View {
         .buttonStyle(BraveFilledButtonStyle(size: .large))
         .padding(.top, 86)
         Button(action: {
+          isShowingSkipWarning = true
         }) {
           Text(Strings.Wallet.skipButtonTitle)
             .font(Font.subheadline.weight(.medium))
             .foregroundColor(Color(.braveLabel))
         }
+        .padding(.top, 16)
       }
     }
     .padding()
     .background(Color(.braveBackground).edgesIgnoringSafeArea(.all))
-    .navigationTitle(Strings.Wallet.braveWallet)
-    .navigationBarTitleDisplayMode(.inline)
+    .background(
+      WalletPromptView(
+        isPresented: $isShowingSkipWarning,
+        primaryButton: WalletPromptButton(title: Strings.Wallet.editTransactionErrorCTA, action: { _ in
+          isShowingSkipWarning = false
+        }),
+        secondaryButton: WalletPromptButton(title: Strings.Wallet.backupSkipButtonTitle, action: { _ in
+          isShowingSkipWarning = false
+          keyringStore.markOnboardingCompleted()
+        }),
+        showCloseButton: false,
+        content: {
+          VStack(alignment: .leading, spacing: 20) {
+            Text(Strings.Wallet.backupSkipPromptTitle)
+              .font(.subheadline.weight(.medium))
+              .foregroundColor(.primary)
+            Text(Strings.Wallet.backupSkipPromptSubTitle)
+              .font(.subheadline)
+              .foregroundColor(.secondary)
+          }
+          .multilineTextAlignment(.leading)
+          .padding(.vertical, 20)
+        })
+    )
+    .sheet(isPresented: $isShowingBiometricsPrompt, content: {
+      BiometricView(
+        keyringStore: keyringStore,
+        password: password,
+        onSkip: {
+          keyringStore.notifyWalletBackupComplete()
+          if keyringStore.isOnboardingVisible {
+            keyringStore.markOnboardingCompleted()
+          } else {
+            modalPresentationMode = false
+          }
+        }
+      )
+    })
+    .sheet(isPresented: $isShowingCompleteState) {
+      OnBoardingCompletedView() {
+        keyringStore.notifyWalletBackupComplete()
+        if keyringStore.isOnboardingVisible {
+          keyringStore.markOnboardingCompleted()
+        } else {
+          modalPresentationMode = false
+        }
+      }
+    }
   }
 }
 
@@ -136,7 +208,8 @@ struct VerifyRecoveryPhraseView_Previews: PreviewProvider {
           .init(value: "Second", index: 1),
           .init(value: "Third", index: 2)
         ],
-        keyringStore: .previewStore
+        keyringStore: .previewStore,
+        password: ""
       )
     }
     .previewLayout(.sizeThatFits)

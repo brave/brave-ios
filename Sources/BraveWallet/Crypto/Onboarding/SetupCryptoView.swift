@@ -11,25 +11,19 @@ import Strings
 
 struct SetupCryptoView: View {
   @ObservedObject var keyringStore: KeyringStore
+  
+  @Environment(\.colorScheme) private var colorScheme: ColorScheme
 
   var body: some View {
     ScrollView {
       VStack(spacing: 32) {
-        HStack {
-          Image("wallet-brave-logo", bundle: .module)
-          Divider()
-            .frame(height: 14)
-          Text("Wallet")
-            .font(.title3.weight(.medium))
-            .foregroundColor(.primary)
-        }
         VStack(spacing: 14) {
           Text(Strings.Wallet.setupCryptoTitle)
             .foregroundColor(.primary)
             .font(.largeTitle)
           Text(Strings.Wallet.setupCryptoSubtitle)
             .foregroundColor(.secondary)
-            .font(.headline)
+            .font(.subheadline)
         }
         .fixedSize(horizontal: false, vertical: true)
         .multilineTextAlignment(.center)
@@ -37,17 +31,18 @@ struct SetupCryptoView: View {
           NavigationLink(destination: CreateWalletContainerView(keyringStore: keyringStore)) {
             HStack(alignment: .top, spacing: 16) {
               Image("wallet-add", bundle: .module)
-                .frame(width: 24, height: 24)
+                .frame(width: 32, height: 32)
                 .background(Color(.braveDisabled).opacity(0.5))
                 .clipShape(Circle())
               VStack(alignment: .leading, spacing: 12) {
-                Text("Need a new wallet?")
+                Text(Strings.Wallet.setupCryptoCreateNewTitle)
                   .font(.title3.weight(.medium))
                   .foregroundColor(.primary)
-                Text("Get started with Brave Wallet within minutes")
-                  .font(.headline)
+                Text(Strings.Wallet.setupCryptoCreateNewSubTitle)
+                  .font(.subheadline)
                   .foregroundColor(.secondary)
               }
+              .multilineTextAlignment(.leading)
               Spacer()
             }
             .padding(28)
@@ -58,19 +53,22 @@ struct SetupCryptoView: View {
           NavigationLink(destination: RestoreWalletContainerView(keyringStore: keyringStore)) {
             HStack(alignment: .top, spacing: 16) {
               Image("wallet-import", bundle: .module)
-                .frame(width: 24, height: 24)
+                .frame(width: 32, height: 32)
                 .background(Color(.braveDisabled).opacity(0.5))
                 .clipShape(Circle())
               VStack(alignment: .leading, spacing: 12) {
-                Text("Already have a wallet?")
-                  .font(.title3.weight(.medium))
-                  .foregroundColor(.primary)
-                Text("Import your existing wallet")
-                  .font(.headline)
-                  .foregroundColor(.secondary)
+                Group {
+                  Text(Strings.Wallet.setupCryptoRestoreTitle)
+                    .font(.title3.weight(.medium))
+                    .foregroundColor(.primary)
+                  Text(Strings.Wallet.setupCryptoRestoreSubTitle)
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                }
+                .multilineTextAlignment(.leading)
                 HStack(spacing: 14) {
                   Group {
-                    Image(braveSystemName: "leo.social.brave-favicon")
+                    Image(braveSystemName: "leo.social.brave-favicon-fullheight")
                       .renderingMode(.template)
                       .foregroundColor(Color(.braveOrange))
                     Image("wallet-phantom", bundle: .module)
@@ -94,10 +92,11 @@ struct SetupCryptoView: View {
     .padding(.top, 80)
     .background(
       Image("wallet-background", bundle: .module)
+        .resizable()
+        .aspectRatio(contentMode: .fill)
     )
     .edgesIgnoringSafeArea(.all)
     .accessibilityEmbedInScrollView()
-    .navigationTitle(Strings.Wallet.cryptoTitle)
     .navigationBarTitleDisplayMode(.inline)
     .introspectViewController { vc in
       vc.navigationItem.backButtonTitle = Strings.Wallet.setupCryptoButtonBackButtonTitle

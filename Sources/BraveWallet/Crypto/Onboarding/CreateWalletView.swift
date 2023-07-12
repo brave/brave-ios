@@ -5,7 +5,6 @@
 
 import Foundation
 import SwiftUI
-import LocalAuthentication
 import DesignSystem
 import Strings
 import struct Shared.AppConstants
@@ -28,84 +27,58 @@ struct CreateWalletContainerView: View {
   }
 }
 
+private enum ValidationError: LocalizedError, Equatable {
+  case requirementsNotMet
+  case inputsDontMatch
+  
+  var errorDescription: String? {
+    switch self {
+    case .requirementsNotMet:
+      return Strings.Wallet.passwordDoesNotMeetRequirementsError
+    case .inputsDontMatch:
+      return Strings.Wallet.passwordsDontMatchError
+    }
+  }
+}
+
 private struct CreateWalletView: View {
   @ObservedObject var keyringStore: KeyringStore
-
-  private enum ValidationError: LocalizedError, Equatable {
-    case requirementsNotMet
-    case inputsDontMatch
-
-    var errorDescription: String? {
-      switch self {
-      case .requirementsNotMet:
-        return Strings.Wallet.passwordDoesNotMeetRequirementsError
-      case .inputsDontMatch:
-        return Strings.Wallet.passwordsDontMatchError
-      }
-    }
-  }
-  
-  private enum LocalValidation {
-    case weak
-    case medium // more than 12
-    case strong // more than 16
-    
-    var description: String {
-      switch self {
-      case .weak:
-        return "Weak"
-      case .medium:
-        return "Medium"
-      case .strong:
-        return "Strong"
-      }
-    }
-  }
-  
-  private var autoLockIntervals: [AutoLockInterval] {
-    let all = AutoLockInterval.allOptions
-    return all.sorted(by: { $0.value < $1.value })
-  }
 
   @State private var password: String = ""
   @State private var repeatedPassword: String = ""
   @State private var validationError: ValidationError?
-  @State private var isShowingBiometricsPrompt: Bool = false
-  @State private var isSkippingBiometricsPrompt: Bool = false
-  @State private var passwordStatus: LocalValidation?
+  @State private var hasCreatedNewWallet: Bool = false
+  @State private var passwordStatus: PasswordStatus = .none
   @State private var isInputsMatch: Bool = false
 
   private func createWallet() {
-    validate { success in
-      if !success {
-        return
-      }
-      keyringStore.createWallet(password: password) { mnemonic in
-        if !mnemonic.isEmpty {
-          if isBiometricsAvailable {
-            isShowingBiometricsPrompt = true
-          } else {
-            isSkippingBiometricsPrompt = true
-          }
-        }
+    keyringStore.createWallet(password: password) { mnemonic in
+      if !mnemonic.isEmpty {
+        hasCreatedNewWallet = true
       }
     }
   }
 
-  private var isBiometricsAvailable: Bool {
-    LAContext().canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
-  }
-
-  private func validate(_ completion: @escaping (Bool) -> Void) {
-    keyringStore.isStrongPassword(password) { isValidPassword in
-      if !isValidPassword {
-        validationError = .requirementsNotMet
-      } else if password != repeatedPassword {
-        validationError = .inputsDontMatch
-      } else {
+  private func validatePassword() {
+    keyringStore.isStrongPassword(password) { status in
+      passwordStatus = status
+      if status == .none {
         validationError = nil
+      } else if status == .invalid {
+        validationError = .requirementsNotMet
+      } else {
+        if !password.isEmpty && !repeatedPassword.isEmpty {
+          if password == repeatedPassword {
+            isInputsMatch = true
+            validationError = nil
+          } else {
+            isInputsMatch = false
+            validationError = .inputsDontMatch
+          }
+        } else {
+          validationError = nil
+        }
       }
-      completion(validationError == nil)
     }
   }
 
@@ -114,15 +87,7 @@ private struct CreateWalletView: View {
       // Reset validation on user changing
       validationError = nil
     }
-    if password.count >= 16 {
-      passwordStatus = .strong
-    } else if password.count >= 12 {
-      passwordStatus = .medium
-    } else if password.isEmpty {
-      passwordStatus = nil
-    } else {
-      passwordStatus = .weak
-    }
+    validatePassword()
   }
 
   private func handleRepeatedPasswordChanged(_ value: String) {
@@ -130,18 +95,43 @@ private struct CreateWalletView: View {
       // Reset validation on user changing
       validationError = nil
     }
-    isInputsMatch = password == repeatedPassword
+    validatePassword()
   }
   
-  @ViewBuilder func passwordStatusView(value: Float, tintColor: Color, label: String) -> some View {
-    HStack {
-      ProgressView(value: value)
-        .tint(tintColor)
-      Text(label)
-        .foregroundColor(tintColor)
+  private func handleInputChange(_ value: String) {
+    validationError = nil
+    isInputsMatch = false
+    validatePassword()
+  }
+  
+  @ViewBuilder func passwordStatusView(_ status: PasswordStatus) -> some View {
+    HStack(spacing: 4) {
+      ProgressView(value: status.percentage)
+        .tint(status.tintColor)
+        .background(status.tintColor.opacity(0.1))
+        .frame(width: 52, height: 4)
+      Text(status.description)
+        .foregroundColor(status.tintColor)
         .font(.footnote)
         .padding(.leading, 20)
     }
+  }
+  
+  func errorLabel(_ error: ValidationError) -> some View {
+    HStack(spacing: 12) {
+      Image(braveSystemName: "leo.warning.circle-filled")
+        .renderingMode(.template)
+        .foregroundColor(Color(.braveLighterOrange))
+      Text(error.errorDescription ?? "")
+        .multilineTextAlignment(.leading)
+        .font(.callout)
+      Spacer()
+    }
+    .padding(12)
+    .background(
+      Color(.braveErrorBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+    )
   }
 
   var body: some View {
@@ -156,76 +146,52 @@ private struct CreateWalletView: View {
           .font(.subheadline)
           .padding(.bottom)
           .multilineTextAlignment(.center)
-          .foregroundColor(Color(.secondaryBraveLabel))
+          .foregroundColor(.secondary)
       }
       VStack(alignment: .leading, spacing: 20) {
         VStack(spacing: 30) {
-          VStack(alignment: .leading, spacing: 5) {
+          VStack(alignment: .leading, spacing: 10) {
             Text(Strings.Wallet.passwordPlaceholder)
-              .foregroundColor(Color(.braveLabel))
-            SecureField(Strings.Wallet.passwordPlaceholder, text: $password)
-              .textContentType(.newPassword)
-              .textFieldStyle(BraveValidatedTextFieldStyle(error: validationError, when: .requirementsNotMet))
-            if let passwordStatus {
-              switch passwordStatus {
-              case .weak:
-                passwordStatusView(value: 0.33, tintColor: Color(.braveErrorLabel), label: LocalValidation.weak.description)
-              case .medium:
-                passwordStatusView(value: 0.66, tintColor: Color(.braveWarningLabel), label: LocalValidation.medium.description)
-              case .strong:
-                passwordStatusView(value: 1, tintColor: Color(.braveSuccessLabel), label: LocalValidation.strong.description)
+              .foregroundColor(.primary)
+            HStack(spacing: 8) {
+              SecureField(Strings.Wallet.passwordPlaceholder, text: $password)
+                .textContentType(.newPassword)
+              Spacer()
+              if passwordStatus != .none {
+                passwordStatusView(passwordStatus)
               }
             }
+            Divider()
           }
-          VStack(alignment: .leading, spacing: 5) {
+          VStack(alignment: .leading, spacing: 12) {
             Text(Strings.Wallet.repeatedPasswordPlaceholder)
-              .foregroundColor(Color(.braveLabel))
-            SecureField(Strings.Wallet.repeatedPasswordPlaceholder, text: $repeatedPassword, onCommit: createWallet)
-              .textContentType(.newPassword)
-              .textFieldStyle(BraveValidatedTextFieldStyle(error: validationError, when: .inputsDontMatch))
-            if isInputsMatch {
-              HStack {
-                Spacer()
-                Text(Image(braveSystemName: "leo.check.normal")) + Text(" Match!")
+              .foregroundColor(.primary)
+            HStack(spacing: 8) {
+              SecureField(Strings.Wallet.repeatedPasswordPlaceholder, text: $repeatedPassword, onCommit: createWallet)
+                .textContentType(.newPassword)
+              Spacer()
+              if isInputsMatch {
+                Text("\(Image(braveSystemName: "leo.check.normal")) \(Strings.Wallet.repeatedPasswordMatch)")
+                  .multilineTextAlignment(.trailing)
+                  .font(.footnote)
+                  .foregroundColor(.secondary)
               }
-              .frame(maxWidth: .infinity)
-              .multilineTextAlignment(.trailing)
-              .font(.footnote)
-              .foregroundColor(Color(.braveBlurpleTint))
             }
+            Divider()
           }
         }
         .font(.subheadline)
-        HStack {
-          Image(braveSystemName: "leo.lock")
-            .renderingMode(.template)
-            .foregroundColor(Color(.braveBlurpleTint).opacity(0.5))
-            .font(.caption)
-            .frame(width: 24, height: 24)
-            .background(Color(.braveDisabled).opacity(0.5))
-            .clipShape(Circle())
-          Text("Brave Wallet will auto-lock after")
-            .font(.footnote)
-            .foregroundColor(Color(.braveLabel))
-          Spacer()
-          Picker("time interval", selection: $keyringStore.autoLockInterval) {
-            ForEach(autoLockIntervals) { interval in
-              Text(interval.label)
-                .foregroundColor(Color(.secondaryBraveLabel))
-                .tag(interval)
-            }
-          }
-          .tint(Color(.braveBlurpleTint))
+        if let validationError {
+          errorLabel(validationError)
         }
       }
-      Spacer()
       Button(action: createWallet) {
         Text(Strings.Wallet.continueButtonTitle)
           .frame(maxWidth: .infinity)
       }
       .buttonStyle(BraveFilledButtonStyle(size: .large))
-      .disabled(!isInputsMatch || password.isEmpty || repeatedPassword.isEmpty)
-      Spacer()
+      .disabled(validationError != nil || password.isEmpty || repeatedPassword.isEmpty)
+      .padding(.top, 80)
     }
     .padding(20)
     .background(.white)
@@ -236,13 +202,13 @@ private struct CreateWalletView: View {
           password: password,
           keyringStore: keyringStore
         ),
-        isActive: $isSkippingBiometricsPrompt
+        isActive: $hasCreatedNewWallet
       ) {
         EmptyView()
       }
     )
-    .onChange(of: password, perform: handlePasswordChanged)
-    .onChange(of: repeatedPassword, perform: handleRepeatedPasswordChanged)
+    .onChange(of: password, perform: handleInputChange)
+    .onChange(of: repeatedPassword, perform: handleInputChange)
   }
 }
 

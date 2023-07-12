@@ -62,16 +62,58 @@ struct RecoveryWord: Hashable, Identifiable {
   }
 }
 
+/// Validate if password is weak/medium/strong
+enum PasswordStatus {
+  case none // empty
+  case invalid // less than 8
+  case weak // between 8 to 12
+  case medium // more than 12
+  case strong // more than 16
+  
+  var description: String {
+    switch self {
+    case .none:
+      return ""
+    case .invalid, .weak:
+      return Strings.Wallet.passwordStatusWeak
+    case .medium:
+      return Strings.Wallet.passwordStatusMedium
+    case .strong:
+      return Strings.Wallet.passwordStatusStrong
+    }
+  }
+  
+  var tintColor: Color {
+    switch self {
+    case .none:
+      return Color.clear
+    case .invalid, .weak:
+      return Color(.braveErrorLabel)
+    case .medium:
+      return Color(.braveWarningLabel)
+    case .strong:
+      return Color(.braveSuccessLabel)
+    }
+  }
+  
+  var percentage: CGFloat {
+    switch self {
+    case .none:
+      return 0
+    case .invalid, .weak:
+      return 1 / 3
+    case .medium:
+      return 2 / 3
+    case .strong:
+      return 1
+    }
+  }
+}
+
 /// An interface that helps you interact with a users keyring
 ///
 /// This wraps a KeyringService that you would obtain through BraveCore and makes it observable
 public class KeyringStore: ObservableObject {
-  /// The number of minutes to wait until the Brave Wallet is automatically locked
-  @Published var autoLockInterval: AutoLockInterval = .minute {
-    didSet {
-      keyringService.setAutoLockMinutes(autoLockInterval.value) { _ in }
-    }
-  }
   /// The defualt keyring information. By default this is an empty keyring which has no accounts.
   @Published private(set) var defaultKeyring: BraveWallet.KeyringInfo = .init(
     id: .default,
@@ -279,11 +321,21 @@ public class KeyringStore: ObservableObject {
     keyringService.validatePassword(password, completion: completion)
   }
 
-  func isStrongPassword(_ password: String, completion: @escaping (Bool) -> Void) {
-    completion(password.count >= 8)
+  func isStrongPassword(_ password: String, completion: @escaping (PasswordStatus) -> Void) {
+    if password.count >= 16 {
+      completion(.strong)
+    } else if password.count >= 12 {
+      completion(.medium)
+    } else if password.isEmpty {
+      completion(.none)
+    } else if password.count >= 8 {
+      completion(.weak)
+    } else {
+      completion(.invalid)
+    }
   }
   
-  @MainActor func isStrongPassword(_ password: String) async -> Bool {
+  @MainActor func isStrongPassword(_ password: String) async -> PasswordStatus {
     await withCheckedContinuation { continuation in
       isStrongPassword(password) { isStrong in
         continuation.resume(returning: isStrong)

@@ -7,6 +7,7 @@
 import SwiftUI
 import DesignSystem
 import struct Shared.AppConstants
+import LocalAuthentication
 
 struct BiometricView: View {
   var keyringStore: KeyringStore
@@ -15,24 +16,72 @@ struct BiometricView: View {
   
   @State private var biometricError: OSStatus?
   
+  private var biometricsIcon: Image? {
+    let context = LAContext()
+    if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil) {
+      switch context.biometryType {
+      case .faceID:
+        return Image(braveSystemName: "leo.face.id")
+      case .touchID:
+        return Image(braveSystemName: "leo.biometric.login")
+      case .none:
+        return nil
+      @unknown default:
+        return nil
+      }
+    }
+    return nil
+  }
+  
+  private var biometricName: String {
+    let context = LAContext()
+    if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil) {
+      switch context.biometryType {
+      case .faceID:
+        return "Face ID"
+      case .touchID:
+        return "Touch ID"
+      default:
+        return ""
+      }
+    }
+    return ""
+  }
+
   var body: some View {
     VStack {
-      Image(sharedName: "pin-migration-graphic")
-        .resizable()
-        .aspectRatio(contentMode: .fit)
-        .frame(maxWidth: 250)
-        .padding()
+      ZStack {
+        Circle()
+          .strokeBorder(Color(.braveInfoBorder).opacity(0.3))
+          .background(
+            Circle()
+              .foregroundColor(Color(.braveInfoBackground).opacity(0.5))
+          )
+          .frame(width: 240, height: 240)
+        Rectangle()
+          .frame(width: 96, height: 96)
+          .foregroundColor(Color(.white))
+          .cornerRadius(20)
+        if let biometricsIcon {
+          biometricsIcon
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .frame(width: 52, height: 52)
+            .foregroundColor(Color(.braveInfoLabel))
+        }
+      }
       Group {
-        Text(Strings.Wallet.biometricsSetupTitle)
-          .font(.title3)
-          .foregroundColor(Color(.braveLabel))
-          .padding(.bottom, 20)
-        Text(Strings.Wallet.biometricsSetupSubTitle)
+        Text(String.localizedStringWithFormat(Strings.Wallet.biometricsSetupTitle, biometricName))
+          .font(.title)
+          .foregroundColor(.primary)
+          .padding(.bottom, 10)
+        Text(String.localizedStringWithFormat(Strings.Wallet.biometricsSetupSubTitle, biometricName))
           .font(.body)
           .foregroundColor(Color(.secondaryBraveLabel))
       }
       .fixedSize(horizontal: false, vertical: true)
       .multilineTextAlignment(.center)
+      .padding(.top, 28)
       Button {
         // Store password in keychain
         if case let status = keyringStore.storePasswordInKeychain(password),
@@ -44,7 +93,7 @@ struct BiometricView: View {
           .frame(maxWidth: .infinity)
       }
       .buttonStyle(BraveFilledButtonStyle(size: .large))
-      .padding(.vertical, 20)
+      .padding(.top, 80)
       Button(action: {
         onSkip()
       }) {
@@ -52,6 +101,7 @@ struct BiometricView: View {
           .font(Font.subheadline.weight(.medium))
           .foregroundColor(Color(.braveLabel))
       }
+      .padding(.top, 20)
     }
     .padding(.horizontal, 24)
     .alert(isPresented: Binding(
@@ -67,12 +117,14 @@ struct BiometricView: View {
   }
 }
 
+#if DEBUG
 struct BiometricView_Previews: PreviewProvider {
-    static var previews: some View {
-      BiometricView(
-        keyringStore: .previewStore,
-        password: "",
-        onSkip: {}
-      )
-    }
+  static var previews: some View {
+    BiometricView(
+      keyringStore: .previewStore,
+      password: "",
+      onSkip: {}
+    )
+  }
 }
+#endif

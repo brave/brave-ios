@@ -62,10 +62,10 @@ private struct RestoreWalletView: View {
   }
 
   private func validate(_ completion: @escaping (Bool) -> Void) {
-    keyringStore.isStrongPassword(password) { isValid in
+    keyringStore.isStrongPassword(password) { status in
       if phrase.isEmpty {
         restoreError = .invalidPhrase
-      } else if !isValid {
+      } else if status == .weak || status == .none {
         restoreError = .requirementsNotMet
       } else if password != repeatedPassword {
         restoreError = .inputsDontMatch
