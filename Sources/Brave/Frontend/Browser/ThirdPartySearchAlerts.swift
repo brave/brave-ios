@@ -26,9 +26,9 @@ class ThirdPartySearchAlerts: UIAlertController {
   static func addThirdPartySearchEngine(_ engine: OpenSearchEngine, completion: @escaping (UIAlertAction) -> Void) -> UIAlertController {
     let alertMessage = """
       \n\(engine.displayName)
-      \nSearch Template:
+      \n\(Strings.CustomSearchEngine.searchTemplateTitle)
       \(engine.searchTemplate)
-      \nSuggestion Template:
+      \n\(Strings.CustomSearchEngine.suggestionTemplateTitle)
       \(engine.suggestTemplate ?? "N/A")
       \n\(Strings.CustomSearchEngine.thirdPartySearchEngineAddAlertDescription)
       """
