@@ -194,7 +194,7 @@ private struct CreateWalletView: View {
       .padding(.top, 80)
     }
     .padding(20)
-    .background(.white)
+    .background(Color(.braveBackground))
     .cornerRadius(8)
     .background(
       NavigationLink(

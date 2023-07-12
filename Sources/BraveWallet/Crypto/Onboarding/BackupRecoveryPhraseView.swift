@@ -18,6 +18,7 @@ struct BackupRecoveryPhraseView: View {
   @State private var isShowingSkipWarning: Bool = false
   @State private var hasCopied: Bool = false
   @State private var isShowingBiometricsPrompt: Bool = false
+  @State private var isShowingCompleteState: Bool = false
   
   init(
     password: String,
@@ -44,6 +45,7 @@ struct BackupRecoveryPhraseView: View {
           Text(Strings.Wallet.backupRecoveryPhraseSubtitle)
             .font(.subheadline)
             .foregroundColor(.secondary)
+            .padding(.bottom, 20)
         }
         .fixedSize(horizontal: false, vertical: true)
         .multilineTextAlignment(.center)
@@ -62,7 +64,6 @@ struct BackupRecoveryPhraseView: View {
               .stroke(Color(.braveDisabled), lineWidth: 1)
           )
         }
-        .padding(.top, 20)
         .padding(.horizontal)
         .blur(radius: isViewRecoveryPermitted ? 0 : 4)
         .overlay(
@@ -140,7 +141,7 @@ struct BackupRecoveryPhraseView: View {
         }),
         secondaryButton: WalletPromptButton(title: Strings.Wallet.backupSkipButtonTitle, action: { _ in
           isShowingSkipWarning = false
-          keyringStore.markOnboardingCompleted()
+          isShowingCompleteState = true
         }),
         showCloseButton: false,
         content: {
@@ -161,10 +162,20 @@ struct BackupRecoveryPhraseView: View {
         keyringStore: keyringStore,
         password: password,
         onSkip: {
+          isShowingBiometricsPrompt = true
+          keyringStore.markOnboardingCompleted()
+        },
+        onFinish: {
+          isShowingBiometricsPrompt = true
           keyringStore.markOnboardingCompleted()
         }
       )
     })
+    .sheet(isPresented: $isShowingCompleteState) {
+      OnBoardingCompletedView() {
+        keyringStore.markOnboardingCompleted()
+      }
+    }
     .onAppear {
       keyringStore.recoveryPhrase(password: password) { words in
         recoveryWords = words

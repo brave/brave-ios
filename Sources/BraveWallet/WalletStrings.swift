@@ -999,8 +999,8 @@ extension Strings {
       "wallet.biometricsSetupEnableButtonTitle",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Enable",
-      comment: "The button title that enables the biometric unlock feature"
+      value: "Use %@",
+      comment: "The button title that enables the biometric unlock feature. %@` will be replaced with the biometric type name of the current device."
     )
     public static let copyAddressButtonTitle = NSLocalizedString(
       "wallet.copyAddressButtonTitle",

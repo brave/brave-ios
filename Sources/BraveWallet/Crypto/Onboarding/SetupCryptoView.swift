@@ -11,18 +11,16 @@ import Strings
 
 struct SetupCryptoView: View {
   @ObservedObject var keyringStore: KeyringStore
-  
-  @Environment(\.colorScheme) private var colorScheme: ColorScheme
 
   var body: some View {
     ScrollView {
       VStack(spacing: 32) {
         VStack(spacing: 14) {
           Text(Strings.Wallet.setupCryptoTitle)
-            .foregroundColor(.primary)
+            .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
             .font(.largeTitle)
           Text(Strings.Wallet.setupCryptoSubtitle)
-            .foregroundColor(.secondary)
+            .foregroundColor(Color(uiColor: WalletV2Design.textSecondary))
             .font(.subheadline)
         }
         .fixedSize(horizontal: false, vertical: true)
@@ -32,21 +30,21 @@ struct SetupCryptoView: View {
             HStack(alignment: .top, spacing: 16) {
               Image("wallet-add", bundle: .module)
                 .frame(width: 32, height: 32)
-                .background(Color(.braveDisabled).opacity(0.5))
+                .background(Color(.secondaryButtonTint).opacity(0.3))
                 .clipShape(Circle())
               VStack(alignment: .leading, spacing: 12) {
                 Text(Strings.Wallet.setupCryptoCreateNewTitle)
                   .font(.title3.weight(.medium))
-                  .foregroundColor(.primary)
+                  .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
                 Text(Strings.Wallet.setupCryptoCreateNewSubTitle)
                   .font(.subheadline)
-                  .foregroundColor(.secondary)
+                  .foregroundColor(Color(uiColor: WalletV2Design.textSecondary))
               }
               .multilineTextAlignment(.leading)
               Spacer()
             }
             .padding(28)
-            .background(Color.white)
+            .background(Color(.braveBackground))
             .cornerRadius(16)
             .frame(maxWidth: .infinity)
           }
@@ -54,23 +52,22 @@ struct SetupCryptoView: View {
             HStack(alignment: .top, spacing: 16) {
               Image("wallet-import", bundle: .module)
                 .frame(width: 32, height: 32)
-                .background(Color(.braveDisabled).opacity(0.5))
+                .background(Color(.secondaryButtonTint).opacity(0.3))
                 .clipShape(Circle())
               VStack(alignment: .leading, spacing: 12) {
                 Group {
                   Text(Strings.Wallet.setupCryptoRestoreTitle)
                     .font(.title3.weight(.medium))
-                    .foregroundColor(.primary)
+                    .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
                   Text(Strings.Wallet.setupCryptoRestoreSubTitle)
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(Color(uiColor: WalletV2Design.textSecondary))
                 }
                 .multilineTextAlignment(.leading)
                 HStack(spacing: 14) {
                   Group {
-                    Image(braveSystemName: "leo.social.brave-favicon-fullheight")
-                      .renderingMode(.template)
-                      .foregroundColor(Color(.braveOrange))
+                    Image("wallet-brave-icon", bundle: .module)
+                      .resizable()
                     Image("wallet-phantom", bundle: .module)
                     Image("wallet-metamask", bundle: .module)
                     Image("wallet-coinbase", bundle: .module)
@@ -81,7 +78,7 @@ struct SetupCryptoView: View {
               Spacer()
             }
             .padding(28)
-            .background(Color.white)
+            .background(Color(.braveBackground))
             .cornerRadius(16)
           }
         }

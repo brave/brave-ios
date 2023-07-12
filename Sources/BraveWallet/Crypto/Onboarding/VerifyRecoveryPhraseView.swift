@@ -12,9 +12,6 @@ import LocalAuthentication
 struct VerifyRecoveryPhraseView: View {
   @ObservedObject var keyringStore: KeyringStore
 
-  @State private var recoveryWords: [RecoveryWord]
-  @State private var randomizedWords: [RecoveryWord]
-  @State private var selectedWords: [RecoveryWord] = []
   @State private var input: String = ""
   @State private var isShowingError = false
   @State private var activeCheckIndex: Int = 0
@@ -26,8 +23,12 @@ struct VerifyRecoveryPhraseView: View {
   
   @FocusState private var isTextFieldFocused: Bool
   
+  private var recoveryWords: [RecoveryWord]
   private let targetedRecoveryWordIndexes: [Int]
   private let password: String
+  private var isBiometricsAvailable: Bool {
+    LAContext().canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
+  }
   
   init(
     recoveryWords: [RecoveryWord],
@@ -35,7 +36,6 @@ struct VerifyRecoveryPhraseView: View {
     password: String
   ) {
     self.recoveryWords = recoveryWords
-    self.randomizedWords = recoveryWords.shuffled()
     self.keyringStore = keyringStore
     var loop = 3
     var indexes: [Int] = []
@@ -49,29 +49,13 @@ struct VerifyRecoveryPhraseView: View {
     self.targetedRecoveryWordIndexes = indexes
     self.password = password
   }
-
-  private var wordsSelectedInCorrectOrder: Bool {
-    recoveryWords == selectedWords
-  }
-
-  private func tappedWord(_ word: RecoveryWord) {
-    withAnimation(.default) {
-      selectedWords.append(word)
-    }
-  }
-
-  private func tappedVerify() {
-    guard wordsSelectedInCorrectOrder else { return }
-    keyringStore.notifyWalletBackupComplete()
+  
+  private func markOnboardingCompleted() {
     if keyringStore.isOnboardingVisible {
       keyringStore.markOnboardingCompleted()
     } else {
       modalPresentationMode = false
     }
-  }
-  
-  private var isBiometricsAvailable: Bool {
-    LAContext().canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
   }
   
   var body: some View {
@@ -119,6 +103,7 @@ struct VerifyRecoveryPhraseView: View {
               if isBiometricsAvailable {
                 isShowingBiometricsPrompt = true
               } else {
+                keyringStore.notifyWalletBackupComplete()
                 isShowingCompleteState = true
               }
             } else {
@@ -155,7 +140,7 @@ struct VerifyRecoveryPhraseView: View {
         }),
         secondaryButton: WalletPromptButton(title: Strings.Wallet.backupSkipButtonTitle, action: { _ in
           isShowingSkipWarning = false
-          keyringStore.markOnboardingCompleted()
+          isShowingCompleteState = true
         }),
         showCloseButton: false,
         content: {
@@ -176,23 +161,20 @@ struct VerifyRecoveryPhraseView: View {
         keyringStore: keyringStore,
         password: password,
         onSkip: {
+          isShowingBiometricsPrompt = false
           keyringStore.notifyWalletBackupComplete()
-          if keyringStore.isOnboardingVisible {
-            keyringStore.markOnboardingCompleted()
-          } else {
-            modalPresentationMode = false
-          }
+          isShowingCompleteState = true
+        },
+        onFinish: {
+          isShowingBiometricsPrompt = false
+          keyringStore.notifyWalletBackupComplete()
+          isShowingCompleteState = true
         }
       )
     })
     .sheet(isPresented: $isShowingCompleteState) {
       OnBoardingCompletedView() {
-        keyringStore.notifyWalletBackupComplete()
-        if keyringStore.isOnboardingVisible {
-          keyringStore.markOnboardingCompleted()
-        } else {
-          modalPresentationMode = false
-        }
+        markOnboardingCompleted()
       }
     }
   }

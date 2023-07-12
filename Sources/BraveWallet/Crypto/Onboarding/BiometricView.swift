@@ -13,6 +13,7 @@ struct BiometricView: View {
   var keyringStore: KeyringStore
   var password: String
   var onSkip: () -> Void
+  var onFinish: () -> Void
   
   @State private var biometricError: OSStatus?
   
@@ -60,7 +61,7 @@ struct BiometricView: View {
           .frame(width: 240, height: 240)
         Rectangle()
           .frame(width: 96, height: 96)
-          .foregroundColor(Color(.white))
+          .foregroundColor(Color(.braveBackground))
           .cornerRadius(20)
         if let biometricsIcon {
           biometricsIcon
@@ -87,9 +88,11 @@ struct BiometricView: View {
         if case let status = keyringStore.storePasswordInKeychain(password),
            status != errSecSuccess {
           biometricError = status
+        } else {
+          onFinish()
         }
       } label: {
-        Text(Strings.Wallet.web3DomainOptionEnabled)
+        Text(String.localizedStringWithFormat(Strings.Wallet.biometricsSetupEnableButtonTitle, biometricName))
           .frame(maxWidth: .infinity)
       }
       .buttonStyle(BraveFilledButtonStyle(size: .large))
@@ -111,7 +114,7 @@ struct BiometricView: View {
       Alert(
         title: Text(Strings.Wallet.biometricsSetupErrorTitle),
         message: Text(Strings.Wallet.biometricsSetupErrorMessage + (AppConstants.buildChannel.isPublic ? "" : " (\(biometricError ?? -1))")),
-        dismissButton: .default(Text(verbatim: Strings.OKString))
+        dismissButton: .default(Text( Strings.OKString))
       )
     }
   }
@@ -123,7 +126,8 @@ struct BiometricView_Previews: PreviewProvider {
     BiometricView(
       keyringStore: .previewStore,
       password: "",
-      onSkip: {}
+      onSkip: {},
+      onFinish: {}
     )
   }
 }

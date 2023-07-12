@@ -36,6 +36,8 @@ struct OnBoardingCompletedView: View {
     }
     .background(
       Image("wallet-background", bundle: .module)
+        .resizable()
+        .aspectRatio(contentMode: .fill)
     )
     .edgesIgnoringSafeArea(.all)
   }

@@ -88,11 +88,11 @@ enum PasswordStatus {
     case .none:
       return Color.clear
     case .invalid, .weak:
-      return Color(.braveErrorLabel)
+      return Color(uiColor: WalletV2Design.passwordWeakRed)
     case .medium:
-      return Color(.braveWarningLabel)
+      return Color(uiColor: WalletV2Design.passwordMediumYellow)
     case .strong:
-      return Color(.braveSuccessLabel)
+      return Color(uiColor: WalletV2Design.passwordStrongGreen)
     }
   }
   

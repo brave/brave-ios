@@ -244,4 +244,10 @@ enum WalletV2Design {
       )
     }
   })
+  
+  static let passwordWeakRed = UIColor(rgb: 0xd40033)
+  
+  static let passwordMediumYellow = UIColor(rgb: 0xe1A400)
+  
+  static let passwordStrongGreen = UIColor(rgb: 0x31803e)
 }
