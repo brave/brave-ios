@@ -93,6 +93,7 @@ extension BuyTokenStore {
   static var previewStore: BuyTokenStore {
     .init(
       blockchainRegistry: MockBlockchainRegistry(),
+      keyringService: MockKeyringService(),
       rpcService: MockJsonRpcService(),
       walletService: BraveWallet.TestBraveWalletService.previewWalletService,
       assetRatioService: BraveWallet.TestAssetRatioService.previewAssetRatioService,

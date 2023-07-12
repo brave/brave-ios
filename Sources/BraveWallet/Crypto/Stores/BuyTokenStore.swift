@@ -27,6 +27,7 @@ public class BuyTokenStore: ObservableObject {
   var allTokens: [BraveWallet.BlockchainToken] = []
 
   private let blockchainRegistry: BraveWalletBlockchainRegistry
+  private let keyringService: BraveWalletKeyringService
   private let rpcService: BraveWalletJsonRpcService
   private let walletService: BraveWalletBraveWalletService
   private let assetRatioService: BraveWalletAssetRatioService
@@ -50,12 +51,14 @@ public class BuyTokenStore: ObservableObject {
 
   public init(
     blockchainRegistry: BraveWalletBlockchainRegistry,
+    keyringService: BraveWalletKeyringService,
     rpcService: BraveWalletJsonRpcService,
     walletService: BraveWalletBraveWalletService,
     assetRatioService: BraveWalletAssetRatioService,
     prefilledToken: BraveWallet.BlockchainToken?
   ) {
     self.blockchainRegistry = blockchainRegistry
+    self.keyringService = keyringService
     self.rpcService = rpcService
     self.walletService = walletService
     self.assetRatioService = assetRatioService
@@ -158,27 +161,30 @@ public class BuyTokenStore: ObservableObject {
   
   @MainActor
   func updateInfo() async {
-//    orderedSupportedBuyOptions = [.ramp, .sardine, .transak]
-//    
-//    let coin = await walletService.selectedCoin()
-//    selectedNetwork = await rpcService.network(coin, origin: nil)
-//    await validatePrefilledToken(on: selectedNetwork) // selectedNetwork may change
-//    await fetchBuyTokens(network: selectedNetwork)
-//    
-//    // check if current selected network supports buy
-//    if WalletConstants.supportedTestNetworkChainIds.contains(selectedNetwork.chainId) {
-//      isSelectedNetworkSupported = false
-//    } else {
-//      isSelectedNetworkSupported = allTokens.contains(where: { token in
-//        return token.chainId.caseInsensitiveCompare(selectedNetwork.chainId) == .orderedSame
-//      })
-//    }
-//    
-//    // fetch all available currencies for on ramp providers
-//    supportedCurrencies = await blockchainRegistry.onRampCurrencies()
-//    if let firstCurrency = supportedCurrencies.first {
-//      selectedCurrency = firstCurrency
-//    }
+    orderedSupportedBuyOptions = [.ramp, .sardine, .transak]
+    
+    guard let selectedAccount = await keyringService.allAccounts().selectedAccount else {
+      assertionFailure("selectedAccount should never be nil.")
+      return
+    }
+    selectedNetwork = await rpcService.network(selectedAccount.coin, origin: nil)
+    await validatePrefilledToken(on: selectedNetwork) // selectedNetwork may change
+    await fetchBuyTokens(network: selectedNetwork)
+    
+    // check if current selected network supports buy
+    if WalletConstants.supportedTestNetworkChainIds.contains(selectedNetwork.chainId) {
+      isSelectedNetworkSupported = false
+    } else {
+      isSelectedNetworkSupported = allTokens.contains(where: { token in
+        return token.chainId.caseInsensitiveCompare(selectedNetwork.chainId) == .orderedSame
+      })
+    }
+    
+    // fetch all available currencies for on ramp providers
+    supportedCurrencies = await blockchainRegistry.onRampCurrencies()
+    if let firstCurrency = supportedCurrencies.first {
+      selectedCurrency = firstCurrency
+    }
   }
 }
 
