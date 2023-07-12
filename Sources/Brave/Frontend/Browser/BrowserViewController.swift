@@ -2543,6 +2543,10 @@ extension BrowserViewController: TabsBarViewControllerDelegate {
       break
     }
   }
+  
+  func tabsBarDidSelectAddNewWindow(_ isPrivate: Bool) {
+    self.openInNewWindow(url: nil, isPrivate: isPrivate)
+  }
 }
 
 extension BrowserViewController: TabDelegate {

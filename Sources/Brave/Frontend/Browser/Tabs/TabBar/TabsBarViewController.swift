@@ -14,7 +14,7 @@ protocol TabsBarViewControllerDelegate: AnyObject {
   func tabsBarDidLongPressAddTab(_ tabsBarController: TabsBarViewController, button: UIButton)
   func tabsBarDidSelectAddNewTab(_ isPrivate: Bool)
   func tabsBarDidChangeReaderModeVisibility(_ isHidden: Bool)
-
+  func tabsBarDidSelectAddNewWindow(_ isPrivate: Bool)
 }
 
 class TabsBarViewController: UIViewController {
@@ -123,6 +123,14 @@ class TabsBarViewController: UIViewController {
       })
 
     newTabMenu.append(openNewTab)
+    
+    newTabMenu.append(UIAction(title: Strings.newWindowTitle, image: UIImage(braveSystemNamed: "leo.window"), handler: UIAction.deferredActionHandler { [unowned self] _ in
+      self.delegate?.tabsBarDidSelectAddNewWindow(false)
+    }))
+        
+    newTabMenu.append(UIAction(title: Strings.newPrivateWindowTitle, image: UIImage(braveSystemNamed: "leo.window.tab-private"), handler: UIAction.deferredActionHandler { [unowned self] _ in
+      self.delegate?.tabsBarDidSelectAddNewWindow(true)
+    }))
 
     plusButton.menu = UIMenu(title: "", identifier: nil, children: newTabMenu)
     privateModeCancellable = tabManager?.privateBrowsingManager

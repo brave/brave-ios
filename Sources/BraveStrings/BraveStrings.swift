@@ -143,6 +143,8 @@ extension Strings {
       comment: "Error description when there is an error while navigating to Files App")
   public static let openInNewWindowTitle = NSLocalizedString("OpenInNewWindowTitle", tableName: "BraveShared", bundle: .module, value: "Open in New Window", comment: "Context menu item for opening a link in a new window")
   public static let openInNewPrivateWindowTitle = NSLocalizedString("OpenInNewPrivateWindowTitle", tableName: "BraveShared", bundle: .module, value: "Open in New Private Window", comment: "Context menu item for opening a link in a new private browsing window")
+  public static let newWindowTitle = NSLocalizedString("NewWindowTitle", tableName: "BraveShared", bundle: .module, value: "New Window", comment: "Context menu item for opening a new window")
+  public static let newPrivateWindowTitle = NSLocalizedString("NewPrivateWindowTitle", tableName: "BraveShared", bundle: .module, value: "New Private Window", comment: "Context menu item for opening a new private browsing window")
 }
 
 // MARK:-  DefaultBrowserIntroCalloutViewController.swift
