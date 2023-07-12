@@ -211,16 +211,10 @@ class MockKeyringService: BraveWalletKeyringService {
     completion(info)
   }
 
-//  func importFilecoinAccount(_ accountName: String, privateKey: String, network: String, completion: @escaping (Bool, String) -> Void) {
-//    completion(false, "")
-//  }
   func importFilecoinAccount(_ accountName: String, privateKey: String, network: String, completion: @escaping (BraveWallet.AccountInfo?) -> Void) {
     completion(nil)
   }
 
-//  func importAccount(fromJson accountName: String, password: String, json: String, completion: @escaping (Bool, String) -> Void) {
-//    completion(false, "")
-//  }
   func importAccount(fromJson accountName: String, password: String, json: String, completion: @escaping (BraveWallet.AccountInfo?) -> Void) {
     completion(nil)
   }

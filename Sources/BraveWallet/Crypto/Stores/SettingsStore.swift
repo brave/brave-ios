@@ -184,8 +184,6 @@ extension SettingsStore: BraveWalletKeyringServiceObserver {
     }
   }
   
-//  public func selectedAccountChanged(_ coin: BraveWallet.CoinType) {
-//  }
   public func selectedWalletAccountChanged(_ account: BraveWallet.AccountInfo) {
   }
   
