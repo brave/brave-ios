@@ -20,6 +20,10 @@ extension P3ATimedStorage where Value == Int {
 }
 
 struct PlaylistP3A {
+  static func recordHistogram() {
+    P3AFeatureUsage.playlistUsage.recordHistogram()
+  }
+  
   static func recordUsage() {
     let usage = P3AFeatureUsage.playlistUsage
     usage.recordUsage()
