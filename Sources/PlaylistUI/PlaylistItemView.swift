@@ -31,7 +31,6 @@ struct PlaylistItemView: View {
             LeoPlayingSoundView()
               .frame(width: 16, height: 16)
               .padding(2)
-//            Image(braveSystemName: "leo.playing.sound")
               .foregroundStyle(.white)
               .padding(8)
               .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 1)

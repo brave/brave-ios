@@ -50,10 +50,12 @@ struct PlaylistFolderListView: View {
   var folders: [Folder]
   var sharedFolders: [Folder]
   @Binding var selectedFolderID: Folder.ID?
-  
+  @State private var isPresentingCreatePlaylist = false
   @Environment(\.dismiss) private var dismiss
   
   struct NoUserFoldersView: View {
+    var onCreatePlaylist: () -> Void
+    
     var body: some View {
       VStack(spacing: 24) {
         Text("Create custom playlists: make it theme based or subject based. It’s all up to you.") // TODO: Localize
@@ -61,7 +63,7 @@ struct PlaylistFolderListView: View {
           .multilineTextAlignment(.center)
           .foregroundColor(Color(.braveLabel))
         Button {
-          
+          onCreatePlaylist()
         } label: {
           Text("Create Playlist") // TODO: Localize
             .foregroundColor(Color(.braveBlurpleTint))
@@ -112,10 +114,12 @@ struct PlaylistFolderListView: View {
         if sharedFolders.isEmpty {
           if folders.count == 1 {
             // Empty state
-            NoUserFoldersView()
-              .frame(maxWidth: .infinity, maxHeight: .infinity)
-              .aspectRatio(1, contentMode: .fit)
-              .padding(.vertical)
+            NoUserFoldersView {
+              isPresentingCreatePlaylist = true
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .aspectRatio(1, contentMode: .fit)
+            .padding(.vertical)
           }
         } else {
           Section {
@@ -141,7 +145,7 @@ struct PlaylistFolderListView: View {
     .toolbar {
       ToolbarItem(placement: .primaryAction) {
         Button("Create") { // TODO: Localize
-          // Create
+          isPresentingCreatePlaylist = true
         }
       }
       ToolbarItem(placement: .cancellationAction) {
@@ -152,6 +156,9 @@ struct PlaylistFolderListView: View {
     }
     .navigationTitle("Playlist") // TODO: Localize
     .navigationBarTitleDisplayMode(.inline)
+    .sheet(isPresented: $isPresentingCreatePlaylist) {
+      CreatePlaylistView(playLaterItems: folders.first(where: { $0.id == .defaultPlaylistID })?.items ?? [])
+    }
   }
 }
 
