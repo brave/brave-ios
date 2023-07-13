@@ -666,6 +666,27 @@ extension Strings {
       value: "Enter word in **position %d** from your recovery phrase.",
       comment: "The sub-title of the screen that user will verify his/her recovery phrase."
     )
+    public static let onboardingCompletedTitle = NSLocalizedString(
+      "wallet.onbordingCompletedTitle",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "You're all set!",
+      comment: "The title of the last step of creating a new wallet."
+    )
+    public static let onboardingCompletedSubTitle = NSLocalizedString(
+      "wallet.onbordingCompletedSubTitle",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Your Brave Wallet is ready to use.",
+      comment: "The subtitle of the last step of creating a new wallet."
+    )
+    public static let onboardingCompletedButtonTitle = NSLocalizedString(
+      "wallet.onbordingCompletedTitle",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Go to my portfolio",
+      comment: "The title of the button in the last step for user to create a new wallet. This will direct users to the wallet portfolio screen."
+    )
     public static let restoreWalletBackButtonTitle = NSLocalizedString(
       "wallet.restoreWalletBackButtonTitle",
       tableName: "BraveWallet",

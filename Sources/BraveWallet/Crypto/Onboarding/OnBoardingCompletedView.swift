@@ -13,11 +13,11 @@ struct OnBoardingCompletedView: View {
     ScrollView {
       VStack {
         Image("wallet-onboarding-complete", bundle: .module)
-        Text("You're all set!")
+        Text(Strings.Wallet.onboardingCompletedTitle)
           .font(.title)
           .foregroundColor(.primary)
           .fixedSize(horizontal: false, vertical: true)
-        Text("Your Brave Wallet is ready to use.")
+        Text(Strings.Wallet.onboardingCompletedSubTitle)
           .font(.subheadline)
           .foregroundColor(.secondary)
           .fixedSize(horizontal: false, vertical: true)
@@ -25,7 +25,7 @@ struct OnBoardingCompletedView: View {
         Button {
           onFinish()
         } label: {
-          Text("Go to my portfolio")
+          Text(Strings.Wallet.onboardingCompletedButtonTitle)
             .frame(maxWidth: .infinity)
         }
         .buttonStyle(BraveFilledButtonStyle(size: .large))
