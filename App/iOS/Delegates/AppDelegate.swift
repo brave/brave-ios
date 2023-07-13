@@ -178,7 +178,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       Preferences.PrivacyReports.ntpOnboardingCompleted.value = false
       Preferences.Privacy.shouldShowPersistentPrivateBrowsingAlert.value = false
     } else {
-      Preferences.Privacy.shouldShowPersistentPrivateBrowsingAlert.value = false
+      Preferences.Privacy.shouldShowPersistentPrivateBrowsingAlert.value = true
     }
 
     Preferences.General.isFirstLaunch.value = false

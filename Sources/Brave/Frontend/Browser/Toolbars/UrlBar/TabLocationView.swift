@@ -251,7 +251,7 @@ class TabLocationView: UIView {
 
   private var isVoiceSearchAvailable: Bool
 
-  init(voiceSearchSupported: Bool, privateBrowsingManager: privateBrowsingManager) {
+  init(voiceSearchSupported: Bool, privateBrowsingManager: PrivateBrowsingManager) {
     isVoiceSearchAvailable = voiceSearchSupported
     
     super.init(frame: .zero)
