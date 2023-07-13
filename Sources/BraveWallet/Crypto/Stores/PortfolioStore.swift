@@ -206,6 +206,13 @@ public class PortfolioStore: ObservableObject {
       var updatedUserVisibleAssets = buildAssetViewModels(allVisibleUserAssets: allVisibleUserAssets)
       // update userVisibleAssets on display immediately with empty values. Issue #5567
       self.userVisibleAssets = updatedUserVisibleAssets
+        .optionallyFilter(
+          shouldFilter: filters.isHidingSmallBalances,
+          isIncluded: { assetViewModel in
+            let value = (Double(assetViewModel.price) ?? 0) * assetViewModel.decimalBalance
+            return value >= 1
+          }
+        )
         .sorted(by: { lhs, rhs in
           AssetViewModel.sorted(by: filters.sortOrder, lhs: lhs, rhs: rhs)
         })
