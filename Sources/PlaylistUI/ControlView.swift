@@ -474,6 +474,11 @@ private struct FaviconImage: View {
       .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
       .task {
         do {
+#if DEBUG
+          if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1" {
+            return
+          }
+#endif
           if let url {
             image = try await FaviconFetcher.loadIcon(url: url, persistent: true).image
           }

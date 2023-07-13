@@ -9,6 +9,7 @@ import BraveUI
 import Introspect
 import Data
 import AVKit
+import Preferences
 
 // Note for morning: Pass in the drawer contents from the container view to share everything properly
 
@@ -86,9 +87,11 @@ public struct PlaylistSplitView: View {
   @State private var selectedFolderID: Folder.ID?
   @State private var sidebarFolderItemsPresented: Bool = true
   @State private var selectedItemID: Item.ID?
+  @ObservedObject private var autoPlay = Preferences.Option<Bool>(key: "playlist.firstLoadAutoPlay", default: false) // FIXME: Move playlist prefs
   
   public init(folders: [Folder]) {
     self.folders = folders
+    // FIXME: This will belong to the actual model logic later
     self._selectedFolderID = State(wrappedValue: folders.first?.id)
   }
   
@@ -313,6 +316,12 @@ public struct PlaylistSplitView: View {
       }
     }
     .navigationViewStyle(.stack)
+    .onAppear {
+      // FIXME: This will belong to the actual model logic later
+      if autoPlay.value, let folder = selectedFolder {
+        self.selectedItemID = folder.items.first?.id
+      }
+    }
     .onChange(of: horizontalSizeClass) { [oldValue=horizontalSizeClass] newValue in
       if oldValue == .compact, newValue == .regular, selectedFolderID == nil {
         // Reset the selected folder ID when moving from compact folder list to regular which always displays
@@ -399,6 +408,7 @@ public struct PlayerView: View {
   @Environment(\.interfaceOrientation) private var orientation
   
   @State private var isControlsVisible: Bool = true
+  @State private var player: AVPlayer?
   
   private var controlView: some View {
     ControlView(title: item?.name ?? "", publisherSource: item?.pageSource)
@@ -427,7 +437,7 @@ public struct PlayerView: View {
       // FIXME: Not sure what to do about this nonsense controls layout... Its expected that the video to be centered in the available space (excluding the controls) but somehow also take up the full amount of space and make the controls appear above them when the video is portrait which we don't know until we load the video
       VStack {
         // FIXME: Replace with a proper AVPlayer/UIViewRepresentable
-        VideoPlayer(player: item.map { .init(url: $0.source) })
+        VideoPlayer(player: player)
           .disabled(true)
           .aspectRatio(16/9, contentMode: .fit)
           .background(Color.black)
@@ -444,6 +454,13 @@ public struct PlayerView: View {
       }
       if orientation.isPortrait || orientation.isLandscape && isControlsVisible {
         controlView
+      }
+    }
+    .onChange(of: item) { newValue in
+      if let newValue {
+        player = .init(url: newValue.source)
+      } else {
+        player = nil
       }
     }
   }
