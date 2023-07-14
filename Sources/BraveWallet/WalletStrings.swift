@@ -4114,5 +4114,12 @@ extension Strings {
       value: "Deselect All",
       comment: "The title of a button that Deselects all visible options."
     )
+    public static let internalErrorMessage = NSLocalizedString(
+      "wallet.internalErrorMessage",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "An internal error has occurred",
+      comment: "The title of a button that Deselects all visible options."
+    )
   }
 }

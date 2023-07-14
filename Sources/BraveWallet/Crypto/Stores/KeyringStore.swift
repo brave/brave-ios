@@ -420,7 +420,6 @@ extension KeyringStore: BraveWalletKeyringServiceObserver {
       let newKeyring = await keyringService.keyringInfo(keyringId)
       let selectedAccount = await keyringService.allAccounts().selectedAccount
       // if the new Keyring doesn't have a selected account, select the first account
-      // TODO: verify if still needed
       if selectedAccount == nil, let newAccount = newKeyring.accountInfos.first {
         await keyringService.setSelectedAccount(newAccount.accountId)
       }

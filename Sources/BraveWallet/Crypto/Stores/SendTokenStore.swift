@@ -471,13 +471,13 @@ public class SendTokenStore: ObservableObject {
     completion: @escaping (_ success: Bool, _ errMsg: String?) -> Void
   ) {
     guard let token = self.selectedSendToken else {
-      completion(false, "An Internal Error")
+      completion(false, Strings.Wallet.internalErrorMessage)
       return
     }
     let amount = (token.isErc721 || token.isNft) ? "1" : amount
     keyringService.allAccounts { allAccounts in
       guard let selectedAccount = allAccounts.selectedAccount else {
-        completion(false, "An Internal Error")
+        completion(false, Strings.Wallet.internalErrorMessage)
         return
       }
       switch selectedAccount.coin {
@@ -486,7 +486,7 @@ public class SendTokenStore: ObservableObject {
       case .sol:
         self.sendTokenOnSol(amount: amount, token: token, fromAddress: selectedAccount.address, completion: completion)
       default:
-        completion(false, "An Internal Error")
+        completion(false, Strings.Wallet.internalErrorMessage)
       }
     }
   }
@@ -499,7 +499,7 @@ public class SendTokenStore: ObservableObject {
   ) {
     let weiFormatter = WeiFormatter(decimalFormatStyle: .decimals(precision: 18))
     guard let weiHexString = weiFormatter.weiString(from: amount.normalizedDecimals, radix: .hex, decimals: Int(token.decimals)) else {
-      completion(false, "An Internal Error")
+      completion(false, Strings.Wallet.internalErrorMessage)
       return
     }
     
@@ -566,7 +566,7 @@ public class SendTokenStore: ObservableObject {
     completion: @escaping (_ success: Bool, _ errMsg: String?) -> Void
   ) {
     guard let amount = WeiFormatter.decimalToAmount(amount.normalizedDecimals, tokenDecimals: Int(token.decimals)) else {
-      completion(false, "An Internal Error")
+      completion(false, Strings.Wallet.internalErrorMessage)
       return
     }
     
