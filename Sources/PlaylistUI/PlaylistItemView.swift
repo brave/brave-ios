@@ -12,10 +12,13 @@ enum DownloadState {
 }
 
 struct PlaylistItemView: View {
-  var title: String
+  var item: Item
   var isItemPlaying: Bool
-  var duration: Int // Duration<Seconds>
   var downloadState: DownloadState?
+  
+  var thumbnailContainerShape: some InsettableShape {
+    RoundedRectangle(cornerRadius: 8, style: .continuous)
+  }
   
   var body: some View {
     HStack(spacing: 12) {
@@ -23,7 +26,7 @@ struct PlaylistItemView: View {
         .aspectRatio(1.333, contentMode: .fit)
         .frame(height: 90)
         .overlay {
-          // Image
+          ThumbnailImage(itemURL: item.source, faviconURL: nil) // FIXME: Pass in favicon URL?
         }
         .overlay(alignment: .bottomLeading) {
           // Is Playing?
@@ -50,9 +53,10 @@ struct PlaylistItemView: View {
           }
         }
         .background(Color(.secondaryBraveBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .containerShape(thumbnailContainerShape)
+        .clipShape(thumbnailContainerShape)
       VStack(alignment: .leading, spacing: 8) {
-        Text(title)
+        Text(item.name)
           .multilineTextAlignment(.leading)
           .lineLimit(2)
           .fixedSize(horizontal: false, vertical: true)
@@ -60,9 +64,9 @@ struct PlaylistItemView: View {
           .foregroundColor(.primary)
         HStack {
           if #available(iOS 16.0, *) {
-            Text(Duration.seconds(duration), format: .time(pattern: .minuteSecond))
+            Text(Duration.seconds(item.duration), format: .time(pattern: .minuteSecond))
           } else {
-            Text("\(duration)") // FIXME: Use legacy formatter
+            Text("\(item.duration)") // FIXME: Use legacy formatter
           }
           if let downloadState {
             switch downloadState {
@@ -155,22 +159,19 @@ struct LeoPlayingSoundShape: Shape {
 struct PlaylistItemView_PreviewProvider: PreviewProvider {
   static var previews: some View {
     PlaylistItemView(
-      title: "I’m Dumb and Spent $7,000 on the New Mac Pro",
-      isItemPlaying: true,
-      duration: 750
+      item: .init(id: "1", dateAdded: .now, duration: 750, source: URL(string: "")!, name: "I’m Dumb and Spent $7,000 on the New Mac Pro", pageSource: URL(string: "")!),
+      isItemPlaying: true
     )
     .previewDisplayName("Playing")
     PlaylistItemView(
-      title: "I’m Dumb and Spent $7,000 on the New Mac Pro",
+      item: .init(id: "1", dateAdded: .now, duration: 750, source: URL(string: "")!, name: "I’m Dumb and Spent $7,000 on the New Mac Pro", pageSource: URL(string: "")!),
       isItemPlaying: false,
-      duration: 750,
       downloadState: .downloading(value: 21618799, total: 64618799)
     )
     .previewDisplayName("Downloading")
     PlaylistItemView(
-      title: "I’m Dumb and Spent $7,000 on the New Mac Pro",
+      item: .init(id: "1", dateAdded: .now, duration: 750, source: URL(string: "")!, name: "I’m Dumb and Spent $7,000 on the New Mac Pro", pageSource: URL(string: "")!),
       isItemPlaying: false,
-      duration: 750,
       downloadState: .completed(64618799)
     )
     .previewDisplayName("Downloaded")

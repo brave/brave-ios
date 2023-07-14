@@ -74,9 +74,8 @@ struct PlaylistItemListView: View {
               selectedItem = item
             } label: {
               PlaylistItemView(
-                title: item.name,
+                item: item,
                 isItemPlaying: false,
-                duration: Int(item.duration),
                 downloadState: nil
               )
               .contentShape(Rectangle())
