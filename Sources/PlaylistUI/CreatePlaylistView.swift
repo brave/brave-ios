@@ -54,12 +54,13 @@ struct CreatePlaylistView: View {
                     Color.clear
                       .aspectRatio(1.5, contentMode: .fit)
                       .overlay {
-                        Color.gray
-                          .clipShape(ContainerRelativeShape())
+                        ThumbnailImage(itemURL: item.source, faviconURL: nil) // FIXME: Pass in favicon url?
+                          .containerShape(ContainerRelativeShape())
                       }
                     Text(item.name)
-                      .font(.footnote)
+                      .font(.caption)
                       .padding(4)
+                      .lineLimit(1)
                   }
                   .padding(4)
                   .frame(maxWidth: .infinity, alignment: .leading)
@@ -70,7 +71,7 @@ struct CreatePlaylistView: View {
                 .toggleStyle(.playlistItemPicker)
               }
             }
-            .listRowBackground(Color.clear)
+            .listRowBackground(Color(.braveGroupedBackground))
             .listRowInsets(.zero)
           } header: {
             VStack(alignment: .leading) {
