@@ -4184,6 +4184,20 @@ extension Strings {
       value: "Assets with value less than $1",
       comment: "The description label of the filter option that hides assets if their fiat value is below $1, shown below the title. Used in Portfolio/NFT filters and display settings."
     )
+    public static let showNFTNetworkLogoTitle = NSLocalizedString(
+      "wallet.showNFTNetworkLogoTitle",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Network Logo",
+      comment: "The label of the filter option that hides the network logo on NFTs displayed in the grid. Used in NFT filters and display settings."
+    )
+    public static let showNFTNetworkLogoDescription = NSLocalizedString(
+      "wallet.showNFTNetworkLogoDescription",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Show network logo on NFTs",
+      comment: "The description label of the filter option that hides the network logo on NFTs displayed in the grid. Used in NFT filters and display settings."
+    )
     public static let selectAccountsTitle = NSLocalizedString(
       "wallet.selectAccountsTitle",
       tableName: "BraveWallet",
@@ -4262,7 +4276,7 @@ extension Strings {
       comment: "The title of the sort option that groups assets by each account. Used in Portfolio/NFT filters and display settings."
     )
     public static let groupByNetworksOptionTitle = NSLocalizedString(
-      "wallet.groupByNetworksTitle",
+      "wallet.groupByNetworksOptionTitle",
       tableName: "BraveWallet",
       bundle: .module,
       value: "Networks",

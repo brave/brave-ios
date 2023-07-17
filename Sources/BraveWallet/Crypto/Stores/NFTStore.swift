@@ -5,6 +5,7 @@
 
 import Foundation
 import BraveCore
+import Preferences
 
 struct NFTAssetViewModel: Identifiable, Equatable {
   var token: BraveWallet.BlockchainToken
@@ -24,13 +25,35 @@ struct NFTAssetViewModel: Identifiable, Equatable {
 public class NFTStore: ObservableObject {
   /// The users visible NFTs
   @Published private(set) var userVisibleNFTs: [NFTAssetViewModel] = []
-  /// The network filter in NFT tab
-  @Published var networkFilters: [Selectable<BraveWallet.NetworkInfo>] = [] {
-    didSet {
-      guard !oldValue.isEmpty else { return } // initial assignment to `networkFilters`
-      update()
-    }
+  /// All User Accounts
+  var allAccounts: [BraveWallet.AccountInfo] = []
+  /// All available networks
+  var allNetworks: [BraveWallet.NetworkInfo] = []
+  var filters: Filters {
+    let nonSelectedAccountAddresses = Preferences.Wallet.nonSelectedAccountsFilter.value
+    let nonSelectedNetworkChainIds = Preferences.Wallet.nonSelectedNetworksFilter.value
+    return Filters(
+      groupBy: .none,
+      sortOrder: SortOrder(rawValue: Preferences.Wallet.sortOrderFilter.value) ?? .valueDesc,
+      isHidingSmallBalances: Preferences.Wallet.isHidingSmallBalancesFilter.value,
+      isShowingNFTNetworkLogo: Preferences.Wallet.isShowingNFTNetworkLogoFilter.value,
+      accounts: allAccounts.map { account in
+          .init(
+            isSelected: !nonSelectedAccountAddresses.contains(where: { $0 == account.address }),
+            model: account
+          )
+      },
+      networks: allNetworks.map { network in
+          .init(
+            isSelected: !nonSelectedNetworkChainIds.contains(where: { $0 == network.chainId }),
+            model: network
+          )
+      }
+    )
   }
+  /// Flag indicating when we are saving filters. Since we are observing multiple `Preference.Option`s,
+  /// we should avoid calling `update()` in `preferencesDidChange()` unless another view changed.
+  private var isSavingFilters: Bool = false
   @Published var isLoadingDiscoverAssets: Bool = false
   
   public private(set) lazy var userAssetsStore: UserAssetsStore = .init(
@@ -81,19 +104,24 @@ public class NFTStore: ObservableObject {
         update()
       }
     }
+    Preferences.Wallet.showTestNetworks.observe(from: self)
+    Preferences.Wallet.isShowingNFTNetworkLogoFilter.observe(from: self)
+    Preferences.Wallet.nonSelectedNetworksFilter.observe(from: self)
   }
   
   func update() {
     self.updateTask?.cancel()
     self.updateTask = Task { @MainActor in
-      // setup network filters if not currently setup
-      if self.networkFilters.isEmpty {
-        self.networkFilters = await self.rpcService.allNetworksForSupportedCoins().map {
-          .init(isSelected: !WalletConstants.supportedTestNetworkChainIds.contains($0.chainId), model: $0)
+      self.allAccounts = await keyringService.allAccounts().accounts
+      self.allNetworks = await rpcService.allNetworksForSupportedCoins().filter { network in
+        if !Preferences.Wallet.showTestNetworks.value { // filter out test networks
+          return !WalletConstants.supportedTestNetworkChainIds.contains(where: { $0 == network.chainId })
         }
+        return true
       }
-      let networks: [BraveWallet.NetworkInfo] = self.networkFilters.filter(\.isSelected).map(\.model)
-      let allVisibleUserAssets = assetManager.getAllVisibleAssetsInNetworkAssets(networks: networks)
+      let filters = self.filters
+      let selectedNetworks = filters.networks.filter(\.isSelected).map(\.model)
+      let allVisibleUserAssets = assetManager.getAllVisibleAssetsInNetworkAssets(networks: selectedNetworks)
       var updatedUserVisibleNFTs: [NFTAssetViewModel] = []
       for networkAssets in allVisibleUserAssets {
         for token in networkAssets.tokens {
@@ -223,14 +251,8 @@ extension NFTStore: BraveWalletBraveWalletServiceObserver {
   }
   
   public func onNetworkListChanged() {
-    Task { @MainActor in
-      // A network was added or removed, update our network filters for the change.
-      self.networkFilters = await self.rpcService.allNetworksForSupportedCoins().map { network in
-        let defaultValue = !WalletConstants.supportedTestNetworkChainIds.contains(network.chainId)
-        let existingSelectionValue = self.networkFilters.first(where: { $0.model.chainId == network.chainId})?.isSelected
-        return .init(isSelected: existingSelectionValue ?? defaultValue, model: network)
-      }
-    }
+    // A network was added or removed, `update()` will update `allNetworks`.
+    update()
   }
   
   public func onDiscoverAssetsStarted() {
@@ -243,5 +265,23 @@ extension NFTStore: BraveWalletBraveWalletServiceObserver {
   }
   
   public func onResetWallet() {
+  }
+}
+
+extension NFTStore: PreferencesObserver {
+  func saveFilters(_ filters: Filters) {
+    isSavingFilters = true
+    defer {
+      isSavingFilters = false
+      update()
+    }
+    Preferences.Wallet.isShowingNFTNetworkLogoFilter.value = filters.isShowingNFTNetworkLogo
+    Preferences.Wallet.nonSelectedNetworksFilter.value = filters.networks
+      .filter({ !$0.isSelected })
+      .map(\.model.chainId)
+  }
+  public func preferencesDidChange(for key: String) {
+    guard !isSavingFilters else { return }
+    update()
   }
 }

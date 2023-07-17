@@ -51,6 +51,8 @@ struct Filters {
   let sortOrder: SortOrder
   /// If we are hiding small balances (less than $1 value). Default is true.
   let isHidingSmallBalances: Bool
+  /// If we are showing the network logo on NFTs. Default is true.
+  let isShowingNFTNetworkLogo: Bool
   /// All accounts and if they are currently selected. Default is all accounts selected.
   var accounts: [Selectable<BraveWallet.AccountInfo>]
   /// All networks and if they are currently selected. Default is all selected except known test networks.
@@ -65,13 +67,16 @@ struct FiltersDisplaySettingsView: View {
   @State var sortOrder: SortOrder
   /// If we are hiding small balances (less than $1 value). Default is false.
   @State var isHidingSmallBalances: Bool
+  /// If we are showing the network logo on NFTs. Default is true.
+  @State var isShowingNFTNetworkLogo: Bool
   
   /// All accounts and if they are currently selected. Default is all accounts selected.
   @State var accounts: [Selectable<BraveWallet.AccountInfo>]
   /// All networks and if they are currently selected. Default is all selected except known test networks.
   @State var networks: [Selectable<BraveWallet.NetworkInfo>]
   
-  var networkStore: NetworkStore
+  let isNFTFilters: Bool
+  let networkStore: NetworkStore
   let save: (Filters) -> Void
   
   /// Returns true if all accounts are selected
@@ -102,14 +107,17 @@ struct FiltersDisplaySettingsView: View {
   
   init(
     filters: Filters,
+    isNFTFilters: Bool,
     networkStore: NetworkStore,
     save: @escaping (Filters) -> Void
   ) {
     self._groupBy = State(initialValue: filters.groupBy)
     self._sortOrder = State(initialValue: filters.sortOrder)
     self._isHidingSmallBalances = State(initialValue: filters.isHidingSmallBalances)
+    self._isShowingNFTNetworkLogo = State(initialValue: filters.isShowingNFTNetworkLogo)
     self._accounts = State(initialValue: filters.accounts)
     self._networks = State(initialValue: filters.networks)
+    self.isNFTFilters = isNFTFilters
     self.networkStore = networkStore
     self.save = save
   }
@@ -124,16 +132,26 @@ struct FiltersDisplaySettingsView: View {
             .padding(.vertical, rowPadding)
            */
 
-          sortAssets
-            .padding(.vertical, rowPadding)
-
-          hideSmallBalances
-            .padding(.vertical, rowPadding)
+          if !isNFTFilters {
+            sortAssets
+              .padding(.vertical, rowPadding)
+            
+            hideSmallBalances
+              .padding(.vertical, rowPadding)
+          }
+          
+          if isNFTFilters {
+            showNFTNetworkLogo
+              .padding(.vertical, rowPadding)
+          }
 
           DividerLine()
 
-          accountFilters
-            .padding(.vertical, rowPadding)
+          if !isNFTFilters {
+            // Unavailable for NFTs until NFT supports grouping.
+            accountFilters
+              .padding(.vertical, rowPadding)
+          }
 
           networkFilters
             .padding(.vertical, rowPadding)
@@ -196,6 +214,20 @@ struct FiltersDisplaySettingsView: View {
         description: Strings.Wallet.hideSmallBalancesDescription,
         icon: .init(
           braveSystemName: "leo.eye.on",
+          iconContainerSize: min(iconContainerSize, maxIconContainerSize)
+        )
+      )
+    }
+    .tint(Color(.braveBlurpleTint))
+  }
+  
+  private var showNFTNetworkLogo: some View {
+    Toggle(isOn: $isShowingNFTNetworkLogo) {
+      FilterLabelView(
+        title: Strings.Wallet.showNFTNetworkLogoTitle,
+        description: Strings.Wallet.showNFTNetworkLogoDescription,
+        icon: .init(
+          braveSystemName: "leo.web3",
           iconContainerSize: min(iconContainerSize, maxIconContainerSize)
         )
       )
@@ -270,6 +302,7 @@ struct FiltersDisplaySettingsView: View {
           groupBy: groupBy,
           sortOrder: sortOrder,
           isHidingSmallBalances: isHidingSmallBalances,
+          isShowingNFTNetworkLogo: isShowingNFTNetworkLogo,
           accounts: accounts,
           networks: networks
         )
@@ -339,6 +372,7 @@ struct FiltersDisplaySettingsView_Previews: PreviewProvider {
         groupBy: .none,
         sortOrder: .valueDesc,
         isHidingSmallBalances: false,
+        isShowingNFTNetworkLogo: false,
         accounts: [
           .init(isSelected: true, model: .mockEthAccount),
           .init(isSelected: true, model: .mockSolAccount)
@@ -351,6 +385,7 @@ struct FiltersDisplaySettingsView_Previews: PreviewProvider {
           .init(isSelected: false, model: .mockGoerli)
         ]
       ),
+      isNFTFilters: false,
       networkStore: .previewStore,
       save: { _ in }
     )

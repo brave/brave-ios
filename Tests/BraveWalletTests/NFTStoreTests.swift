@@ -234,7 +234,7 @@ class NFTStoreTests: XCTestCase {
         XCTAssertEqual(lastUpdatedVisibleNFTs[safe: 0]?.nftMetadata?.description, mockSolMetadata.description)
       }.store(in: &cancellables)
     
-    store.networkFilters = [.init(isSelected: true, model: solNetwork)]
+//    store.networkFilters = [.init(isSelected: true, model: solNetwork)]
     await fulfillment(of: [userVisibleNFTsException], timeout: 1)
   }
 }
