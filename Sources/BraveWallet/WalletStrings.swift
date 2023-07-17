@@ -666,6 +666,14 @@ extension Strings {
       value: "Enter word in **position %d** from your recovery phrase.",
       comment: "The sub-title of the screen that user will verify his/her recovery phrase."
     )
+    
+    public static let verifyRecoveryPhraseError = NSLocalizedString(
+      "wallet.verifyRecoveryPhraseError",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Recovery phrase doesn't match.",
+      comment: "The error message when input phrase does not match the correct one."
+    )
     public static let onboardingCompletedTitle = NSLocalizedString(
       "wallet.onbordingCompletedTitle",
       tableName: "BraveWallet",
@@ -719,29 +727,36 @@ extension Strings {
       "wallet.restoreWalletTitle",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Restore Crypto Account",
+      value: "Import an existing wallet",
       comment: "The title on the restore wallet screen."
     )
     public static let restoreWalletSubtitle = NSLocalizedString(
       "wallet.restoreWalletSubtitle",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Enter your recovery phrase to restore your Brave wallet crypto account.",
+      value: "You can paste your entire recovery phrase into any field.",
       comment: "The subtitle on the restore wallet screen."
     )
     public static let restoreWalletPhrasePlaceholder = NSLocalizedString(
       "wallet.restoreWalletPhrasePlaceholder",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Enter your recovery phrase",
-      comment: "The placeholder on the mneomic/recovery phrase text field"
+      value: "Word #%d",
+      comment: "The placeholder on the mneomic/recovery phrase text field of each grid."
     )
     public static let restoreWalletImportFromLegacyBraveWallet = NSLocalizedString(
       "wallet.restoreWalletImportFromLegacyBraveWallet",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Import from legacy Brave crypto wallets?",
-      comment: "A toggle label to ask the user if their 24-word phrase is a legacy Brave crypto wallet"
+      value: "I have a 24-word recovery phrase",
+      comment: "A button title when 12 recovery-word grids are displayed for users to restore regular wallet. Users can click this button to display the 24 recovery-word grids to restore legacy wallet."
+    )
+    public static let restoreWalletImportFromRegularBraveWallet = NSLocalizedString(
+      "wallet.restoreWalletImportFromRegularBraveWallet",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "I have a 12-word recovery phrase",
+      comment: "A button title when 24 recovery-word grids are displayed for users to restore legacy wallet. Users can click this button to display the 12 recovery-word grids to restore regular wallet."
     )
     public static let restoreWalletShowRecoveryPhrase = NSLocalizedString(
       "wallet.restoreWalletShowRecoveryPhrase",

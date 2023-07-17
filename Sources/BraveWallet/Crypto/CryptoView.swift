@@ -237,7 +237,13 @@ public struct CryptoView: View {
         UIKitNavigationView {
           SetupCryptoView(keyringStore: keyringStore)
             .toolbar {
-              dismissButtonToolbarContents
+              ToolbarItemGroup(placement: .destructiveAction) {
+                Button(action: {
+                  dismissAction()
+                }) {
+                  Text(Strings.CancelString)
+                }
+              }
             }
         }
         .transition(.move(edge: .bottom))

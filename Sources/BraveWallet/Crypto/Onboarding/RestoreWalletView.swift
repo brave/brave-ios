@@ -19,107 +19,75 @@ struct RestoreWalletContainerView: View {
         .background(Color(.braveBackground))
     }
     .background(Color(.braveBackground).edgesIgnoringSafeArea(.all))
-    .navigationTitle("")
-    .navigationBarTitleDisplayMode(.inline)
     .introspectViewController { vc in
+      let appearance = UINavigationBarAppearance()
+      appearance.configureWithTransparentBackground()
+      vc.navigationItem.compactAppearance = appearance
+      vc.navigationItem.scrollEdgeAppearance = appearance
+      vc.navigationItem.standardAppearance = appearance
       vc.navigationItem.backButtonTitle = Strings.Wallet.restoreWalletBackButtonTitle
-      vc.navigationItem.backButtonDisplayMode = .minimal
+      vc.navigationItem.backButtonDisplayMode = .generic
     }
   }
 }
 
 private struct RestoreWalletView: View {
   @ObservedObject var keyringStore: KeyringStore
-
-  private enum RestoreWalletError: LocalizedError {
-    case invalidPhrase
-    case requirementsNotMet
-    case inputsDontMatch
-
-    var errorDescription: String? {
-      switch self {
-      case .invalidPhrase:
-        return Strings.Wallet.restoreWalletPhraseInvalidError
-      case .requirementsNotMet:
-        return Strings.Wallet.passwordDoesNotMeetRequirementsError
-      case .inputsDontMatch:
-        return Strings.Wallet.passwordsDontMatchError
-      }
-    }
-  }
-
-  @State private var password: String = ""
-  @State private var repeatedPassword: String = ""
-  @State private var phrase: String = ""
-  @State private var isEditingPhrase: Bool = false
-  @State private var showingRecoveryPhase: Bool = false
-  @State private var restoreError: RestoreWalletError?
-  @State private var isShowingLegacyWalletToggle: Bool = false
+  
+  @Environment(\.sizeCategory) private var sizeCategory
+  @Environment(\.dismiss) private var dismiss
+  
   @State private var isBraveLegacyWallet: Bool = false
+  @State private var isRevealRecoveryWords: Bool = true
+  @State private var scrollViewIndicatorState: Bool = false
+  @State private var recoveryWords: [String] = .init(repeating: "", count: 12)
+  @State private var newPassword: String = ""
+  @State private var isShowingCreateNewPassword: Bool = false
+  @State private var isShowingPhraseError: Bool = false
+  @State private var isShowingCompleteState: Bool = false
+  private let staticGridsViewHeight: CGFloat = 156
 
   private var isBiometricsAvailable: Bool {
     LAContext().canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
   }
-
-  private func validate(_ completion: @escaping (Bool) -> Void) {
-    keyringStore.isStrongPassword(password) { status in
-      if phrase.isEmpty {
-        restoreError = .invalidPhrase
-      } else if status == .weak || status == .none {
-        restoreError = .requirementsNotMet
-      } else if password != repeatedPassword {
-        restoreError = .inputsDontMatch
-      } else {
-        restoreError = nil
-      }
-      completion(restoreError == nil)
-    }
+  
+  private var numberOfColumns: Int {
+    sizeCategory.isAccessibilityCategory ? 2 : 3
   }
-
-  private func restore() {
-    validate { success in
-      if !success {
-        return
-      }
-      keyringStore.restoreWallet(
-        phrase: phrase,
-        password: password,
-        isLegacyBraveWallet: isBraveLegacyWallet
-      ) { success in
-        if !success {
-          restoreError = .invalidPhrase
-        } else {
-          keyringStore.resetKeychainStoredPassword()
-          if isBiometricsAvailable {
-            keyringStore.isRestoreFromUnlockBiometricsPromptVisible = true
-          } else {
-            // If we're displaying this via onboarding, mark as completed.
-            keyringStore.markOnboardingCompleted()
-          }
+  
+  private var isLegacyWallet: Bool {
+    recoveryWords.count == 24
+  }
+  
+  private var errorLabel: some View {
+    HStack(spacing: 12) {
+      Image(braveSystemName: "leo.warning.circle-filled")
+        .renderingMode(.template)
+        .foregroundColor(Color(.braveLighterOrange))
+      Text(Strings.Wallet.restoreWalletPhraseInvalidError)
+        .multilineTextAlignment(.leading)
+        .font(.callout)
+      Spacer()
+    }
+    .padding(12)
+    .background(
+      Color(.braveErrorBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+    )
+  }
+  
+  private func handleRecoveryWordsChanged(_ value: [String]) {
+    for word in value {
+      let phrases = word.split(separator: " ")
+      if phrases.count > 1 {
+        let currentLength = recoveryWords.count
+        var newPhrases = Array(repeating: "", count: currentLength)
+        for (index, pastedWord) in phrases.enumerated() {
+          newPhrases[index] = String(pastedWord)
         }
+        recoveryWords = newPhrases
+        break
       }
-    }
-  }
-
-  private func handlePhraseChanged(_ value: String) {
-    isShowingLegacyWalletToggle = value.split(separator: " ").count == 24
-    if restoreError == .invalidPhrase {
-      // Reset validation on user changing
-      restoreError = nil
-    }
-  }
-
-  private func handlePasswordChanged(_ value: String) {
-    if restoreError == .requirementsNotMet {
-      // Reset validation on user changing
-      restoreError = nil
-    }
-  }
-
-  private func handleRepeatedPasswordChanged(_ value: String) {
-    if restoreError == .inputsDontMatch {
-      // Reset validation on user changing
-      restoreError = nil
     }
   }
 
@@ -127,135 +95,119 @@ private struct RestoreWalletView: View {
     VStack(spacing: 48) {
       VStack(spacing: 14) {
         Text(Strings.Wallet.restoreWalletTitle)
-          .font(.headline)
-          .foregroundColor(.primary)
+          .font(.title)
+          .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
         Text(Strings.Wallet.restoreWalletSubtitle)
           .font(.subheadline)
-          .foregroundColor(.secondary)
+          .foregroundColor(Color(uiColor: WalletV2Design.textSecondary))
       }
       .multilineTextAlignment(.center)
       .fixedSize(horizontal: false, vertical: true)
-      VStack(spacing: 10) {
-        Group {
-          if showingRecoveryPhase {
-            TextField(Strings.Wallet.restoreWalletPhrasePlaceholder, text: $phrase)
-          } else {
-            SecureField(Strings.Wallet.restoreWalletPhrasePlaceholder, text: $phrase)
-          }
-        }
-        .textFieldStyle(BraveValidatedTextFieldStyle(error: restoreError, when: .invalidPhrase))
-        if isShowingLegacyWalletToggle {
-          HStack {
-            Toggle(Strings.Wallet.restoreWalletImportFromLegacyBraveWallet, isOn: $isBraveLegacyWallet)
-              .labelsHidden()
-              .scaleEffect(0.75)
-              .padding(-6)
-            Text(Strings.Wallet.restoreWalletImportFromLegacyBraveWallet)
-              .font(.footnote)
-              .onTapGesture {
-                withAnimation {
-                  showingRecoveryPhase.toggle()
-                }
+      let columns: [GridItem] = (0..<numberOfColumns).map { _ in .init(.flexible()) }
+      ScrollView {
+        LazyVGrid(columns: columns, spacing: 8) {
+          ForEach(self.recoveryWords.indices, id: \.self) { index in
+            VStack(alignment: .leading, spacing: 10) {
+              if isRevealRecoveryWords {
+                TextField(String.localizedStringWithFormat(Strings.Wallet.restoreWalletPhrasePlaceholder, (index + 1)), text: $recoveryWords[index])
+                  .autocapitalization(.none)
+                  .disableAutocorrection(true)
+                  .foregroundColor(Color(.braveLabel))
+              } else {
+                SecureField(String.localizedStringWithFormat(Strings.Wallet.restoreWalletPhrasePlaceholder, (index + 1)), text: $recoveryWords[index])
+                  .textContentType(.newPassword)
               }
-          }
-          .accessibilityElement(children: .combine)
-          .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        HStack {
-          HStack {
-            Toggle(Strings.Wallet.restoreWalletShowRecoveryPhrase, isOn: $showingRecoveryPhase)
-              .labelsHidden()
-              .toggleStyle(SwitchToggleStyle(tint: .accentColor))
-              .scaleEffect(0.75)
-              .padding(-6)
-            Text(Strings.Wallet.restoreWalletShowRecoveryPhrase)
-              .font(.footnote)
-              .onTapGesture {
-                withAnimation {
-                  showingRecoveryPhase.toggle()
-                }
-              }
-          }
-          .accessibilityElement(children: .combine)
-          .accessibilityAddTraits(.isButton)
-          Spacer()
-          Button(action: {
-            if let string = UIPasteboard.general.string {
-              phrase = string
+              Divider()
             }
-          }) {
-            Label(Strings.Wallet.pasteFromPasteboard, braveSystemImage: "leo.copy.plain-text")
-              .labelStyle(.iconOnly)
           }
         }
       }
-      VStack {
-        Text(Strings.Wallet.restoreWalletNewPasswordTitle)
-          .font(.subheadline.weight(.medium))
-        SecureField(Strings.Wallet.passwordPlaceholder, text: $password)
-          .textContentType(.newPassword)
-          .textFieldStyle(BraveValidatedTextFieldStyle(error: restoreError, when: .requirementsNotMet))
-        SecureField(Strings.Wallet.repeatedPasswordPlaceholder, text: $repeatedPassword)
-          .textContentType(.newPassword)
-          .textFieldStyle(BraveValidatedTextFieldStyle(error: restoreError, when: .inputsDontMatch))
+      .frame(height: staticGridsViewHeight)
+      .padding(.horizontal)
+      if isShowingPhraseError {
+        errorLabel
       }
-      .font(.subheadline)
-      .padding(.horizontal, 48)
-      Button(action: restore) {
-        Text(Strings.Wallet.restoreWalletButtonTitle)
+      HStack {
+        Spacer()
+        Button {
+          recoveryWords = isLegacyWallet ? .init(repeating: "", count: 12) : .init(repeating: "", count: 24)
+          scrollViewIndicatorState.toggle()
+        } label: {
+          Text(isLegacyWallet ? Strings.Wallet.restoreWalletImportFromRegularBraveWallet : Strings.Wallet.restoreWalletImportFromLegacyBraveWallet)
+            .fontWeight(.medium)
+            .foregroundColor(Color(.braveBlurpleTint))
+        }
+        Spacer()
+        Button {
+          isRevealRecoveryWords.toggle()
+        } label: {
+          Image(braveSystemName: isRevealRecoveryWords ? "leo.eye.off" : "leo.eye.on")
+            .foregroundColor(Color(.braveLabel))
+        }
       }
-      .buttonStyle(BraveFilledButtonStyle(size: .normal))
+      Button {
+        isShowingCreateNewPassword = true
+      } label: {
+        Text(Strings.Wallet.continueButtonTitle)
+          .frame(maxWidth: .infinity)
+      }
+      .buttonStyle(BraveFilledButtonStyle(size: .large))
     }
     .padding()
-    .onChange(of: phrase, perform: handlePhraseChanged)
-    .onChange(of: password, perform: handlePasswordChanged)
-    .onChange(of: repeatedPassword, perform: handleRepeatedPasswordChanged)
-    .background(
-      WalletPromptView(
-        isPresented: $keyringStore.isRestoreFromUnlockBiometricsPromptVisible,
-        primaryButton: .init(
-          title: Strings.Wallet.biometricsSetupEnableButtonTitle,
-          action: { navController in
-            defer {
-              keyringStore.isRestoreFromUnlockBiometricsPromptVisible = false
-              keyringStore.markOnboardingCompleted()
+    .onChange(of: recoveryWords, perform: handleRecoveryWordsChanged)
+    .scrollViewIndicatorFlash(staticContentHeight: staticGridsViewHeight)
+    .sheet(isPresented: $isShowingCreateNewPassword) {
+      NavigationView {
+        CreateWalletContainerView(
+          keyringStore: keyringStore,
+          restorePackage: RestorePackage(
+            recoveryWords: recoveryWords,
+            newPassword: newPassword,
+            onRestoreCompleted: { success, password in
+              if success {
+                isShowingPhraseError = false
+                keyringStore.resetKeychainStoredPassword()
+                if isBiometricsAvailable {
+                  keyringStore.isRestoreFromUnlockBiometricsPromptVisible = true
+                } else {
+                  // If we're displaying this via onboarding, mark as completed.
+                  keyringStore.markOnboardingCompleted()
+                }
+              } else {
+                newPassword = password
+                isShowingPhraseError = true
+              }
             }
-            // Store password in keychain
-            if case let status = keyringStore.storePasswordInKeychain(password),
-               status != errSecSuccess {
-              let isPublic = AppConstants.buildChannel.isPublic
-              let alert = UIAlertController(
-                title: Strings.Wallet.biometricsSetupErrorTitle,
-                message: Strings.Wallet.biometricsSetupErrorMessage + (isPublic ? "" : " (\(status))"),
-                preferredStyle: .alert
-              )
-              alert.addAction(.init(title: Strings.OKString, style: .default, handler: nil))
-              navController?.presentedViewController?.present(alert, animated: true)
-              // Unfortunately nothing else we can do here, the wallet is already restored. Maybe later can add
-              // an option to enable in `UnlockWalletView`
+          )
+        )
+        .toolbar {
+          ToolbarItemGroup(placement: .destructiveAction) {
+            Button(Strings.CancelString) {
+              isShowingCreateNewPassword = false
             }
-          }
-        ),
-        dismissAction: { _ in
-          keyringStore.isRestoreFromUnlockBiometricsPromptVisible = false
-          keyringStore.markOnboardingCompleted()
-        },
-        content: {
-          VStack {
-            Image(sharedName: "pin-migration-graphic")
-              .resizable()
-              .aspectRatio(contentMode: .fit)
-              .frame(maxWidth: 250)
-              .padding()
-            Text(Strings.Wallet.biometricsSetupTitle)
-              .font(.headline)
-              .fixedSize(horizontal: false, vertical: true)
-              .multilineTextAlignment(.center)
-              .padding(.bottom)
           }
         }
+      }
+    }
+    .sheet(isPresented: $keyringStore.isRestoreFromUnlockBiometricsPromptVisible) {
+      BiometricView(
+        keyringStore: keyringStore,
+        password: newPassword,
+        onSkip: {
+          keyringStore.isRestoreFromUnlockBiometricsPromptVisible = false
+          isShowingCompleteState = true
+        },
+        onFinish: {
+          keyringStore.isRestoreFromUnlockBiometricsPromptVisible = false
+          isShowingCompleteState = true
+        }
       )
-    )
+    }
+    .sheet(isPresented: $isShowingCompleteState) {
+      OnBoardingCompletedView() {
+        keyringStore.markOnboardingCompleted()
+      }
+    }
   }
 }
 

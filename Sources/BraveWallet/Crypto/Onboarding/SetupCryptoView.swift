@@ -11,7 +11,10 @@ import Strings
 
 struct SetupCryptoView: View {
   @ObservedObject var keyringStore: KeyringStore
-
+  
+  @State private var isShowingCreateNewWallet: Bool = false
+  @State private var isShowingRestoreExistedWallet: Bool = false
+  
   var body: some View {
     ScrollView {
       VStack(spacing: 32) {
@@ -26,7 +29,9 @@ struct SetupCryptoView: View {
         .fixedSize(horizontal: false, vertical: true)
         .multilineTextAlignment(.center)
         VStack(spacing: 24) {
-          NavigationLink(destination: CreateWalletContainerView(keyringStore: keyringStore)) {
+          Button {
+            isShowingCreateNewWallet = true
+          } label: {
             HStack(alignment: .top, spacing: 16) {
               Image("wallet-add", bundle: .module)
                 .frame(width: 32, height: 32)
@@ -48,7 +53,9 @@ struct SetupCryptoView: View {
             .cornerRadius(16)
             .frame(maxWidth: .infinity)
           }
-          NavigationLink(destination: RestoreWalletContainerView(keyringStore: keyringStore)) {
+          Button {
+            isShowingRestoreExistedWallet = true
+          } label: {
             HStack(alignment: .top, spacing: 16) {
               Image("wallet-import", bundle: .module)
                 .frame(width: 32, height: 32)
@@ -93,11 +100,33 @@ struct SetupCryptoView: View {
         .aspectRatio(contentMode: .fill)
     )
     .edgesIgnoringSafeArea(.all)
+    .background(
+      NavigationLink(
+        destination: CreateWalletContainerView(keyringStore: keyringStore),
+        isActive: $isShowingCreateNewWallet,
+        label: {
+          EmptyView()
+        }
+      )
+    )
+    .background(
+      NavigationLink(
+        destination: RestoreWalletContainerView(keyringStore: keyringStore),
+        isActive: $isShowingRestoreExistedWallet,
+        label: {
+          EmptyView()
+        }
+      )
+    )
     .accessibilityEmbedInScrollView()
-    .navigationBarTitleDisplayMode(.inline)
     .introspectViewController { vc in
+      let appearance = UINavigationBarAppearance()
+      appearance.configureWithTransparentBackground()
+      vc.navigationItem.compactAppearance = appearance
+      vc.navigationItem.scrollEdgeAppearance = appearance
+      vc.navigationItem.standardAppearance = appearance
       vc.navigationItem.backButtonTitle = Strings.Wallet.setupCryptoButtonBackButtonTitle
-      vc.navigationItem.backButtonDisplayMode = .minimal
+      vc.navigationItem.backButtonDisplayMode = .generic
     }
   }
 }

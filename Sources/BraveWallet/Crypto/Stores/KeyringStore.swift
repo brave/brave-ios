@@ -63,7 +63,7 @@ struct RecoveryWord: Hashable, Identifiable {
 }
 
 /// Validate if password is weak/medium/strong
-enum PasswordStatus {
+enum PasswordStatus: Equatable {
   case none // empty
   case invalid // less than 8
   case weak // between 8 to 12
@@ -321,7 +321,7 @@ public class KeyringStore: ObservableObject {
     keyringService.validatePassword(password, completion: completion)
   }
 
-  func isStrongPassword(_ password: String, completion: @escaping (PasswordStatus) -> Void) {
+  func validatePassword(_ password: String, completion: @escaping (PasswordStatus) -> Void) {
     if password.count >= 16 {
       completion(.strong)
     } else if password.count >= 12 {
@@ -335,9 +335,9 @@ public class KeyringStore: ObservableObject {
     }
   }
   
-  @MainActor func isStrongPassword(_ password: String) async -> PasswordStatus {
+  @MainActor func validatePassword(_ password: String) async -> PasswordStatus {
     await withCheckedContinuation { continuation in
-      isStrongPassword(password) { isStrong in
+      validatePassword(password) { isStrong in
         continuation.resume(returning: isStrong)
       }
     }

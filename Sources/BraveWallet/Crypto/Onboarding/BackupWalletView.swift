@@ -111,10 +111,10 @@ struct BackupWalletView: View {
           set: { if !$0 { recoveryWords = [] } }
         ),
         destination: {
-//          BackupRecoveryPhraseView(
-//            recoveryWords: recoveryWords,
-//            keyringStore: keyringStore
-//          )
+          BackupRecoveryPhraseView(
+            password: password,
+            keyringStore: keyringStore
+          )
         },
         label: {
           EmptyView()

@@ -9,20 +9,38 @@ import DesignSystem
 import Strings
 import struct Shared.AppConstants
 
+struct RestorePackage {
+  let recoveryWords: [String]
+  let newPassword: String
+  let onRestoreCompleted: (_ status: Bool, _ validPassword: String) -> Void
+}
+
 struct CreateWalletContainerView: View {
   @ObservedObject var keyringStore: KeyringStore
-
+  var restorePackage: RestorePackage?
+  
+  init(keyringStore: KeyringStore, restorePackage: RestorePackage? = nil) {
+    self.keyringStore = keyringStore
+    self.restorePackage = restorePackage
+  }
+  
   var body: some View {
     ScrollView(.vertical) {
-      CreateWalletView(keyringStore: keyringStore)
-        .background(Color(.braveBackground))
+      CreateWalletView(
+        keyringStore: keyringStore,
+        restorePackage: restorePackage
+      )
+      .background(Color(.braveBackground))
     }
     .background(Color(.braveBackground).edgesIgnoringSafeArea(.all))
-    .navigationTitle(Strings.Wallet.cryptoTitle)
-    .navigationBarTitleDisplayMode(.inline)
     .introspectViewController { vc in
+      let appearance = UINavigationBarAppearance()
+      appearance.configureWithTransparentBackground()
+      vc.navigationItem.compactAppearance = appearance
+      vc.navigationItem.scrollEdgeAppearance = appearance
+      vc.navigationItem.standardAppearance = appearance
       vc.navigationItem.backButtonTitle = Strings.Wallet.createWalletBackButtonTitle
-      vc.navigationItem.backButtonDisplayMode = .minimal
+      vc.navigationItem.backButtonDisplayMode = .generic
     }
   }
 }
@@ -43,24 +61,54 @@ private enum ValidationError: LocalizedError, Equatable {
 
 private struct CreateWalletView: View {
   @ObservedObject var keyringStore: KeyringStore
+  var restorePackage: RestorePackage?
 
-  @State private var password: String = ""
-  @State private var repeatedPassword: String = ""
+  @State private var password: String
+  @State private var repeatedPassword: String
   @State private var validationError: ValidationError?
   @State private var hasCreatedNewWallet: Bool = false
   @State private var passwordStatus: PasswordStatus = .none
   @State private var isInputsMatch: Bool = false
+  
+  @Environment(\.dismiss) var dismiss
+  
+  init(
+    keyringStore: KeyringStore,
+    restorePackage: RestorePackage? = nil
+  ) {
+    self.keyringStore = keyringStore
+    if let restorePackage {
+      _password = State(initialValue: restorePackage.newPassword)
+      _repeatedPassword = State(initialValue: restorePackage.newPassword)
+    } else {
+      _password = State(initialValue: "")
+      _repeatedPassword = State(initialValue: "")
+    }
+    self.restorePackage = restorePackage
+  }
 
   private func createWallet() {
-    keyringStore.createWallet(password: password) { mnemonic in
-      if !mnemonic.isEmpty {
-        hasCreatedNewWallet = true
+    if let restorePackage {
+      // restore wallet with recovery phrases and a new password
+      keyringStore.restoreWallet(
+        words: restorePackage.recoveryWords,
+        password: password,
+        isLegacyBraveWallet: restorePackage.recoveryWords.count == 24
+      ) { success in
+        restorePackage.onRestoreCompleted(success, password)
+        dismiss()
+      }
+    } else {
+      keyringStore.createWallet(password: password) { mnemonic in
+        if !mnemonic.isEmpty {
+          hasCreatedNewWallet = true
+        }
       }
     }
   }
 
   private func validatePassword() {
-    keyringStore.isStrongPassword(password) { status in
+    keyringStore.validatePassword(password) { status in
       passwordStatus = status
       if status == .none {
         validationError = nil
@@ -80,22 +128,6 @@ private struct CreateWalletView: View {
         }
       }
     }
-  }
-
-  private func handlePasswordChanged(_ value: String) {
-    if validationError == .requirementsNotMet {
-      // Reset validation on user changing
-      validationError = nil
-    }
-    validatePassword()
-  }
-
-  private func handleRepeatedPasswordChanged(_ value: String) {
-    if validationError == .inputsDontMatch {
-      // Reset validation on user changing
-      validationError = nil
-    }
-    validatePassword()
   }
   
   private func handleInputChange(_ value: String) {
@@ -141,18 +173,18 @@ private struct CreateWalletView: View {
           .font(.title)
           .padding(.bottom)
           .multilineTextAlignment(.center)
-          .foregroundColor(.primary)
+          .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
         Text(Strings.Wallet.createWalletSubTitle)
           .font(.subheadline)
           .padding(.bottom)
           .multilineTextAlignment(.center)
-          .foregroundColor(.secondary)
+          .foregroundColor(Color(uiColor: WalletV2Design.textSecondary))
       }
       VStack(alignment: .leading, spacing: 20) {
         VStack(spacing: 30) {
           VStack(alignment: .leading, spacing: 10) {
             Text(Strings.Wallet.passwordPlaceholder)
-              .foregroundColor(.primary)
+              .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
             HStack(spacing: 8) {
               SecureField(Strings.Wallet.passwordPlaceholder, text: $password)
                 .textContentType(.newPassword)
@@ -193,9 +225,9 @@ private struct CreateWalletView: View {
       .disabled(validationError != nil || password.isEmpty || repeatedPassword.isEmpty)
       .padding(.top, 80)
     }
-    .padding(20)
-    .background(Color(.braveBackground))
-    .cornerRadius(8)
+    .padding(.horizontal, 20)
+    .padding(.bottom, 20)
+    .background(Color(.braveBackground).edgesIgnoringSafeArea(.all))
     .background(
       NavigationLink(
         destination: BackupRecoveryPhraseView(

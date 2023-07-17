@@ -64,15 +64,18 @@ struct VerifyRecoveryPhraseView: View {
         HStack(spacing: 16) {
           Text(Strings.Wallet.verifyRecoveryPhraseTitle)
             .font(.title.weight(.medium))
-            .foregroundColor(.primary)
+            .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
             .fixedSize(horizontal: false, vertical: true)
           RecoveryPhrasePager(activeIndex: $activeCheckIndex)
         }
         Text(LocalizedStringKey(String.localizedStringWithFormat(Strings.Wallet.verifyRecoveryPhraseSubTitle, targetedRecoveryWordIndexes[activeCheckIndex] + 1)))
+          .font(.subheadline)
+          .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
         .fixedSize(horizontal: false, vertical: true)
         .padding(.bottom, 40)
         VStack(alignment: .leading) {
           TextField("", text: $input)
+            .font(.body)
             .focused($isTextFieldFocused)
             .autocorrectionDisabled()
             .autocapitalization(.none)
@@ -83,7 +86,7 @@ struct VerifyRecoveryPhraseView: View {
             Image(braveSystemName: "leo.warning.circle-filled")
               .renderingMode(.template)
               .foregroundColor(Color(.braveLighterOrange))
-            Text("Recovery phrase doesn't match.")
+            Text(Strings.Wallet.verifyRecoveryPhraseError)
               .multilineTextAlignment(.leading)
               .font(.callout)
             Spacer()
@@ -99,12 +102,16 @@ struct VerifyRecoveryPhraseView: View {
           if input == recoveryWords[targetIndex].value {
             isShowingError = false
             if activeCheckIndex == targetedRecoveryWordIndexes.count - 1 { // finished all checks
-              // check if biometric is available
-              if isBiometricsAvailable {
-                isShowingBiometricsPrompt = true
-              } else {
+              if keyringStore.isOnboardingVisible {
+                // check if biometric is available
+                if isBiometricsAvailable {
+                  isShowingBiometricsPrompt = true
+                } else {
+                  keyringStore.notifyWalletBackupComplete()
+                  isShowingCompleteState = true
+                }
+              } else { // coming from BackUpWalletView
                 keyringStore.notifyWalletBackupComplete()
-                isShowingCompleteState = true
               }
             } else {
               // next check
@@ -130,7 +137,8 @@ struct VerifyRecoveryPhraseView: View {
         .padding(.top, 16)
       }
     }
-    .padding()
+    .padding(.horizontal, 20)
+    .padding(.bottom, 20)
     .background(Color(.braveBackground).edgesIgnoringSafeArea(.all))
     .background(
       WalletPromptView(
@@ -176,6 +184,14 @@ struct VerifyRecoveryPhraseView: View {
       OnBoardingCompletedView() {
         markOnboardingCompleted()
       }
+    }
+    .introspectViewController { vc in
+      let appearance = UINavigationBarAppearance()
+      appearance.configureWithTransparentBackground()
+      vc.navigationItem.compactAppearance = appearance
+      vc.navigationItem.scrollEdgeAppearance = appearance
+      vc.navigationItem.standardAppearance = appearance
+      vc.navigationItem.backButtonDisplayMode = .generic
     }
   }
 }

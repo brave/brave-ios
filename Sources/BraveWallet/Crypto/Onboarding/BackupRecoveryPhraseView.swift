@@ -8,6 +8,7 @@ import SwiftUI
 import DesignSystem
 import Strings
 import struct Shared.AppConstants
+import LocalAuthentication
 
 struct BackupRecoveryPhraseView: View {
   @ObservedObject var keyringStore: KeyringStore
@@ -19,6 +20,10 @@ struct BackupRecoveryPhraseView: View {
   @State private var hasCopied: Bool = false
   @State private var isShowingBiometricsPrompt: Bool = false
   @State private var isShowingCompleteState: Bool = false
+  
+  private var isBiometricsAvailable: Bool {
+    LAContext().canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
+  }
   
   init(
     password: String,
@@ -41,10 +46,10 @@ struct BackupRecoveryPhraseView: View {
         Group {
           Text(Strings.Wallet.backupRecoveryPhraseTitle)
             .font(.title)
-            .foregroundColor(.primary)
+            .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
           Text(Strings.Wallet.backupRecoveryPhraseSubtitle)
             .font(.subheadline)
-            .foregroundColor(.secondary)
+            .foregroundColor(Color(uiColor: WalletV2Design.textSecondary))
             .padding(.bottom, 20)
         }
         .fixedSize(horizontal: false, vertical: true)
@@ -122,8 +127,13 @@ struct BackupRecoveryPhraseView: View {
       .padding()
     }
     .introspectViewController { vc in
+      let appearance = UINavigationBarAppearance()
+      appearance.configureWithTransparentBackground()
+      vc.navigationItem.compactAppearance = appearance
+      vc.navigationItem.scrollEdgeAppearance = appearance
+      vc.navigationItem.standardAppearance = appearance
       vc.navigationItem.backButtonTitle = Strings.Wallet.backupRecoveryPhraseBackButtonTitle
-      vc.navigationItem.backButtonDisplayMode = .minimal
+      vc.navigationItem.backButtonDisplayMode = .generic
     }
     .background(Color(.braveBackground).edgesIgnoringSafeArea(.all))
     .alertOnScreenshot {
@@ -141,17 +151,21 @@ struct BackupRecoveryPhraseView: View {
         }),
         secondaryButton: WalletPromptButton(title: Strings.Wallet.backupSkipButtonTitle, action: { _ in
           isShowingSkipWarning = false
-          isShowingCompleteState = true
+          if isBiometricsAvailable {
+            isShowingBiometricsPrompt = true
+          } else {
+            isShowingCompleteState = true
+          }
         }),
         showCloseButton: false,
         content: {
           VStack(alignment: .leading, spacing: 20) {
             Text(Strings.Wallet.backupSkipPromptTitle)
               .font(.subheadline.weight(.medium))
-              .foregroundColor(.primary)
+              .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
             Text(Strings.Wallet.backupSkipPromptSubTitle)
               .font(.subheadline)
-              .foregroundColor(.secondary)
+              .foregroundColor(Color(uiColor: WalletV2Design.textSecondary))
           }
           .multilineTextAlignment(.leading)
           .padding(.vertical, 20)
@@ -162,12 +176,12 @@ struct BackupRecoveryPhraseView: View {
         keyringStore: keyringStore,
         password: password,
         onSkip: {
-          isShowingBiometricsPrompt = true
-          keyringStore.markOnboardingCompleted()
+          isShowingBiometricsPrompt = false
+          isShowingCompleteState = true
         },
         onFinish: {
-          isShowingBiometricsPrompt = true
-          keyringStore.markOnboardingCompleted()
+          isShowingBiometricsPrompt = false
+          isShowingCompleteState = true
         }
       )
     })
