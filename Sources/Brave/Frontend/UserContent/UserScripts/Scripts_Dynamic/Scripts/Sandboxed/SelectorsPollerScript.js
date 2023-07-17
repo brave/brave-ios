@@ -335,12 +335,8 @@ window.__firefox__.execute(function($) {
 
   const usePolling = (observer) => {
     if (observer) {
-      const mutations = observer.takeRecords()
       observer.disconnect()
-
-      if (mutations) {
-        queueSelectorsFromMutations(mutations)
-      }
+      notYetQueriedElements.length = 0
     }
 
     const futureTimeMs = window.Date.now() + returnToMutationObserverIntervalMs
