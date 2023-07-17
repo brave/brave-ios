@@ -59,6 +59,10 @@ window.__firefox__.execute(function($) {
   const scoreCalcIntervalMs = 1000
   // The begin of the time frame to calc |currentMutationScore|.
   let currentMutationStartTime = performance.now()
+  // Elements that are not yet queried for selectors
+  const notYetQueriedElements = []
+  // The query to perform when extracting classes and ids
+  const classIdWithoutHtmlOrBody = '[id]:not(html):not(body),[class]:not(html):not(body)'
 
   const CC = {
     allSelectors: new Set(),
@@ -112,6 +116,13 @@ window.__firefox__.execute(function($) {
    * Send any pending id and class selectors to iOS so we can determine hide selectors.
    */
   const sendPendingSelectorsIfNeeded = async () => {
+    for (const elements of notYetQueriedElements) {
+      for (const element of elements) {
+        extractNewSelectors(element)
+      }
+    }
+    notYetQueriedElements.length = 0
+
     if (CC.pendingSelectors.ids.size === 0 && CC.pendingSelectors.classes.size === 0) {
       return
     }
@@ -358,12 +369,14 @@ window.__firefox__.execute(function($) {
           }
           break
         case 'childList':
-          if (mutation.addedNodes.length > 0) {
-            mutationScore += mutation.addedNodes.length
-
-            for (const node of mutation.addedNodes) {
-              if (!isElement(node)) { continue }
-              querySelectorsFromElement(node)
+          for (const node of mutation.addedNodes) {
+            if (!isElement(node)) { continue }
+            notYetQueriedElements.push([node])
+            mutationScore += 1
+            if (node.firstElementChild !== null) {
+              const nodeList = node.querySelectorAll(classIdWithoutHtmlOrBody)
+              notYetQueriedElements.push(nodeList)
+              mutationScore += nodeList.length
             }
           }
       }
@@ -710,7 +723,7 @@ window.__firefox__.execute(function($) {
    */
   const querySelectorsFromElement = (element) => {
     extractNewSelectors(element)
-    const elmWithClassOrId = element.querySelectorAll('[class],[id]')
+    const elmWithClassOrId = element.querySelectorAll(classIdWithoutHtmlOrBody)
 
     elmWithClassOrId.forEach((node) => {
       extractNewSelectors(node)
