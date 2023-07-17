@@ -466,18 +466,6 @@ public struct PlayerView: View {
   }
 }
 
-public struct PlayerBackgroundView: View {
-  public var body: some View {
-    ZStack {
-      // Thumbnail or some representation of the video
-//      LinearGradient(braveGradient: .gradient03)
-      Color(.braveBlurple)
-      VisualEffectView(effect: UIBlurEffect(style: .systemThickMaterialDark))
-    }
-    .ignoresSafeArea()
-  }
-}
-
 public struct PlaylistView: View {
   public var folder: Folder?
   @Binding public var item: Item?
@@ -490,6 +478,7 @@ public struct PlaylistView: View {
   
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   @Environment(\.interfaceOrientation) private var orientation
+  @Environment(\.colorScheme) private var colorScheme
   
 //  public init(folders: [Folder], initiallySelectedFolder: Folder.ID? = nil) {
 //    self.folders = folders
@@ -616,6 +605,26 @@ public struct PlaylistView: View {
       }
     }
     .frame(maxHeight: .infinity)
+    // ------------------------------------------
+    // In order for vibrancy + foregroundStyle to work correctly a Material must be set directly
+    // via the `background(_:)` modifier that doesn't take a ViewBuilder, however then we cannot
+    // set the color scheme for just the background, so we have to set it explicitly to dark after
+    // the background modifier, and ensure that we're using the system scheme before it to affect
+    // the rest of Playlist.
+    .environment(\.colorScheme, colorScheme)
+    .background(Material.regular)
+    .environment(\.colorScheme, .dark)
+    // ------------------------------------------
+    .background {
+      Color(.braveBlurple)
+        .overlay {
+          if let item {
+            ThumbnailImage(itemURL: item.source, faviconURL: nil)
+              .transition(.opacity.animation(.linear(duration: 0.1)))
+          }
+        }
+        .ignoresSafeArea()
+    }
     .background {
       GeometryReader { proxy in
         Color.clear
@@ -625,7 +634,6 @@ public struct PlaylistView: View {
           }
       }
     }
-    .background(PlayerBackgroundView())
   }
 }
 
