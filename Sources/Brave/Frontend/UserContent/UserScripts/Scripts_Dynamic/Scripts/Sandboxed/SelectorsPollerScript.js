@@ -144,6 +144,33 @@ window.__firefox__.execute(function($) {
   }
 
   /**
+   * The timer for sending selectors to the browser
+   */
+  let sendPendingSelectorsTimerId
+
+  /**
+   * Send any pending id and class selectors to iOS so we can determine hide selectors.
+   * Do this throttled so we don't send selectors too often.
+   */
+  const sendPendingSelectorsThrottled = () => {
+    if (!args.fetchNewClassIdRulesThrottlingMs) {
+      sendPendingSelectorsIfNeeded()
+      return
+    }
+    
+    // Ensure we are not already waiting on a timer
+    if (sendPendingSelectorsTimerId) {
+      // Each time this is called cancel the timer and allow a new one to start
+      window.clearTimeout(sendPendingSelectorsTimerId)
+    }
+    
+    sendPendingSelectorsTimerId = window.setTimeout(() => {
+      sendPendingSelectorsIfNeeded()
+      delete sendPendingSelectorsTimerId
+    }, args.fetchNewClassIdRulesThrottlingMs)
+  }
+
+  /**
    * Extract any new id selector from the element
    * @param {object} element The element to extract from
    * @returns True or false indicating if anything was extracted
@@ -259,7 +286,7 @@ window.__firefox__.execute(function($) {
     const mutationScore = queueSelectorsFromMutations(mutations)
 
     if (mutationScore > 0) {
-      sendPendingSelectorsIfNeeded()
+      sendPendingSelectorsThrottled()
     }
 
     // Check the conditions to switch to the alternative strategy
@@ -698,7 +725,7 @@ window.__firefox__.execute(function($) {
     querySelectorsFromElement(document)
 
     // Send any found selectors to the browser
-    sendPendingSelectorsIfNeeded()
+    sendPendingSelectorsThrottled()
 
     if (switchToMutationObserverAtTime !== undefined &&
       window.Date.now() >= switchToMutationObserverAtTime) {
