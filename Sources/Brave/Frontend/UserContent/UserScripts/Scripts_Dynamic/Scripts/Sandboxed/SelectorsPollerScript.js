@@ -110,11 +110,10 @@ window.__firefox__.execute(function($) {
 
   /**
    * Send any pending id and class selectors to iOS so we can determine hide selectors.
-   * @returns A promise containing new selectors that need to be hidden
    */
   const sendPendingSelectorsIfNeeded = async () => {
     if (CC.pendingSelectors.ids.size === 0 && CC.pendingSelectors.classes.size === 0) {
-      return false
+      return
     }
 
     const ids = Array.from(CC.pendingSelectors.ids)
@@ -123,7 +122,6 @@ window.__firefox__.execute(function($) {
     CC.pendingSelectors.classes = new Set()
 
     let hasChanges = false
-
     const results = await sendSelectors(ids, classes)
     if (results.standardSelectors && results.standardSelectors.length > 0) {
       if (processHideSelectors(results.standardSelectors, !args.hideFirstPartyContent)) {
@@ -137,7 +135,12 @@ window.__firefox__.execute(function($) {
       }
     }
 
-    return hasChanges
+    if (!hasChanges) { return }
+    setRulesOnStylesheet()
+
+    if (!args.hideFirstPartyContent) {
+      pumpCosmeticFilterQueuesOnIdle()
+    }
   }
 
   /**
@@ -252,18 +255,11 @@ window.__firefox__.execute(function($) {
     return ('innerText' in node)
   }
 
-  const onMutations = async (mutations, observer) => {
+  const onMutations = (mutations, observer) => {
     const mutationScore = queueSelectorsFromMutations(mutations)
 
     if (mutationScore > 0) {
-      const changes = await sendPendingOriginsIfNeeded()
-      if (changes) {
-        setRulesOnStylesheet()
-        
-        if (!args.hideFirstPartyContent) {
-          pumpCosmeticFilterQueuesOnIdle()
-        }
-      }
+      sendPendingSelectorsIfNeeded()
     }
 
     // Check the conditions to switch to the alternative strategy
@@ -310,7 +306,7 @@ window.__firefox__.execute(function($) {
     }
 
     const futureTimeMs = window.Date.now() + returnToMutationObserverIntervalMs
-    const queryAttrsFromDocumentBound = querySelectorsFromElement.bind(undefined, document, futureTimeMs)
+    const queryAttrsFromDocumentBound = querySelectorsFromDocument.bind(undefined, futureTimeMs)
     selectorsPollingIntervalId = window.setInterval(queryAttrsFromDocumentBound, selectorsPollingIntervalMs)
   }
 
@@ -683,27 +679,30 @@ window.__firefox__.execute(function($) {
 
   /**
    * Extract any selectors from the document
-   * @param {*} switchToMutationObserverAtTime A timestamp that identifies when we should switch to the mutation observer
+   * @param {object} element The element to extract the selectors from
    */
-  const querySelectorsFromElement = async (element, switchToMutationObserverAtTime) => {
+  const querySelectorsFromElement = (element) => {
     extractNewSelectors(element)
     const elmWithClassOrId = element.querySelectorAll('[class],[id]')
 
     elmWithClassOrId.forEach((node) => {
       extractNewSelectors(node)
     })
+  }
+
+  /**
+   * Extract any selectors from the document
+   * @param {number} switchToMutationObserverAtTime A timestamp indicating when we shoudl switch back to mutation observer
+   */
+  const querySelectorsFromDocument = (switchToMutationObserverAtTime) => {
+    querySelectorsFromElement(document)
+
+    // Send any found selectors to the browser
+    sendPendingSelectorsIfNeeded()
 
     if (switchToMutationObserverAtTime !== undefined &&
       window.Date.now() >= switchToMutationObserverAtTime) {
-      useMutationObserver()
-    }
-
-    const changes = await sendPendingSelectorsIfNeeded()
-    if (!changes) { return }
-    setRulesOnStylesheet()
-
-    if (!args.hideFirstPartyContent) {
-      pumpCosmeticFilterQueuesOnIdle()
+      useMutationObserver('CALLBACK')
     }
   }
 
@@ -714,7 +713,10 @@ window.__firefox__.execute(function($) {
   const startPollingSelectors = async () => {
     // First queue up any classes and ids that exist before the mutation observer
     // starts running.
-    await querySelectorsFromElement(document)
+    querySelectorsFromElement(document)
+
+    // Send any found selectors to the browser and await the results
+    await sendPendingSelectorsIfNeeded()
 
     // Second, set up a mutation observer to handle any new ids or classes
     // that are added to the document.
