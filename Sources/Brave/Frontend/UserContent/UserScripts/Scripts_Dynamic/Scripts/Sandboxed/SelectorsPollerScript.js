@@ -136,7 +136,7 @@ window.__firefox__.execute(function($) {
     }
 
     if (!hasChanges) { return }
-    setRulesOnStylesheet()
+    setRulesOnStylesheetThrottled()
 
     if (!args.hideFirstPartyContent) {
       pumpCosmeticFilterQueuesOnIdle()
@@ -693,7 +693,7 @@ window.__firefox__.execute(function($) {
     queueIsSleeping = true
 
     await sendPendingOriginsIfNeeded()
-    setRulesOnStylesheet()
+    setRulesOnStylesheetThrottled()
 
     window.setTimeout(() => {
       // Set this to false now even though there's a gap in time between now and
@@ -880,7 +880,7 @@ window.__firefox__.execute(function($) {
 
     // If we have some new values, we want to unhide any new selectors
     unhideSelectorsMatchingElementIf1P(elementsWithURLs)
-    setRulesOnStylesheet()
+    setRulesOnStylesheetThrottled()
   }
 
   /**
@@ -1004,6 +1004,28 @@ window.__firefox__.execute(function($) {
     }).join('')
 
     CC.cosmeticStyleSheet.innerText = ruleText
+  }
+
+  /**
+   * The timer id for throttling setRulesOnStylesheet
+   */
+  let setRulesTimerId
+  
+  /**
+   * This method only allows a single setRulesOnStylesheet to be applied.
+   * This is an optimaization so we don't constantly re-apply rules
+   * for each small change that may happen simultaneously.
+   */
+  const setRulesOnStylesheetThrottled = () => {
+    if (setRulesTimerId) {
+      // Each time this is called cancell the timer and allow a new one to start
+      window.clearTimeout(setRulesTimerId)
+    }
+    
+    setRulesTimerId = window.setTimeout(() => {
+      setRulesOnStylesheet()
+      delete setRulesTimerId
+    }, 200)
   }
 
   /**
