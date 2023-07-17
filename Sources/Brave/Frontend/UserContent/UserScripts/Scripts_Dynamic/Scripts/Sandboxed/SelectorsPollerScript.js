@@ -979,7 +979,7 @@ window.__firefox__.execute(function($) {
 
     // Start a timer that moves the stylesheet down
     window.setInterval(() => {
-      if (styleElm.nextElementSibling === null || styleElm.parentElement === targetElm) {
+      if (styleElm.nextElementSibling === null || styleElm.parentElement !== targetElm) {
         return
       }
       moveStyle()
