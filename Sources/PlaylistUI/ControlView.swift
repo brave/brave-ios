@@ -97,7 +97,7 @@ struct ControlView: View {
           }
         }
       }
-      .foregroundStyle(Color.white.opacity(0.75))
+      .foregroundStyle(.secondary)
       .dynamicTypeSize(...DynamicTypeSize.accessibility3)
       .disabled(isScrubbing)
       .opacity(isScrubbing ? 0.5 : 1.0)
@@ -212,7 +212,7 @@ struct PlaybackControls: View {
         }
       })
       .toggleStyle(.button)
-      .foregroundStyle(Color.white)
+      .foregroundStyle(.primary)
       .font(.title)
       Spacer()
       Button { } label: {

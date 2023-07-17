@@ -20,6 +20,7 @@ struct ThumbnailImage: View {
           Image(uiImage: image)
             .resizable()
             .aspectRatio(contentMode: .fill)
+            .transition(.opacity.animation(.linear(duration: 0.1)))
         }
       }
       .clipShape(ContainerRelativeShape())
