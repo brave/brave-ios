@@ -27,13 +27,13 @@ private class WarningCell: MultilineSubtitleCell {
 /// A place where all rewards debugging information will live.
 class RewardsInternalsViewController: TableViewController {
 
-  private let ledger: BraveLedger
+  private let rewardsAPI: BraveRewardsAPI
   private var internalsInfo: BraveCore.BraveRewards.RewardsInternalsInfo?
 
-  init(ledger: BraveLedger) {
-    self.ledger = ledger
+  init(rewardsAPI: BraveRewardsAPI) {
+    self.rewardsAPI = rewardsAPI
     super.init(style: .insetGrouped)
-    ledger.rewardsInternalInfo { [weak self] info in
+    rewardsAPI.rewardsInternalInfo { [weak self] info in
       self?.internalsInfo = info
       self?.reloadSections()
     }
@@ -57,7 +57,7 @@ class RewardsInternalsViewController: TableViewController {
   }
 
   @objc private func tappedShare() {
-    let controller = RewardsInternalsShareController(ledger: self.ledger, initiallySelectedSharables: RewardsInternalsSharable.default)
+    let controller = RewardsInternalsShareController(rewardsAPI: self.rewardsAPI, initiallySelectedSharables: RewardsInternalsSharable.default)
     let container = UINavigationController(rootViewController: controller)
     present(container, animated: true)
   }
@@ -109,7 +109,7 @@ struct RewardsInternalsBasicInfoGenerator: RewardsInternalsFileGenerator {
   func generateFiles(at path: String, using builder: RewardsInternalsSharableBuilder, completion: @escaping (Error?) -> Void) {
     // Only 1 file to make here
     var internals: BraveCore.BraveRewards.RewardsInternalsInfo?
-    builder.ledger.rewardsInternalInfo { info in
+    builder.rewardsAPI.rewardsInternalInfo { info in
       internals = info
     }
     guard let info = internals else {

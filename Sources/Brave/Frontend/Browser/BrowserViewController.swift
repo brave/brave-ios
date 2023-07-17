@@ -215,7 +215,7 @@ public class BrowserViewController: UIViewController {
   private var cancellables: Set<AnyCancellable> = []
 
   let rewards: BraveRewards
-  var ledgerObserver: LedgerObserver?
+  var rewardsObserver: RewardsObserver?
   var promotionFetchTimer: Timer?
   private var notificationsHandler: AdsNotificationHandler?
   let notificationsPresenter = BraveNotificationsPresenter()
@@ -324,16 +324,16 @@ public class BrowserViewController: UIViewController {
     super.init(nibName: nil, bundle: nil)
     didInit()
 
-    rewards.ledgerServiceDidStart = { [weak self] _ in
+    rewards.rewardsServiceDidStart = { [weak self] _ in
       self?.setupLedger()
     }
 
     rewards.ads.captchaHandler = self
     let shouldStartAds = rewards.ads.isEnabled || Preferences.BraveNews.isEnabled.value
     if shouldStartAds {
-      // Only start ledger service automatically if ads is enabled
+      // Only start rewards service automatically if ads is enabled
       if rewards.isEnabled {
-        rewards.startLedgerService(nil)
+        rewards.startRewardsService(nil)
       } else {
         rewards.ads.initialize(walletInfo: .init()) { _ in }
       }
@@ -458,7 +458,7 @@ public class BrowserViewController: UIViewController {
     Preferences.PrivacyReports.captureVPNAlerts.observe(from: self)
     Preferences.Wallet.defaultEthWallet.observe(from: self)
 
-    if rewards.ledger != nil {
+    if rewards.rewardsAPI != nil {
       // Ledger was started immediately due to user having ads enabled
       setupLedger()
     }
@@ -1065,8 +1065,8 @@ public class BrowserViewController: UIViewController {
     super.viewWillAppear(animated)
     updateToolbarUsingTabManager(tabManager)
 
-    if let tabId = tabManager.selectedTab?.rewardsId, rewards.ledger?.selectedTabId == 0 {
-      rewards.ledger?.selectedTabId = tabId
+    if let tabId = tabManager.selectedTab?.rewardsId, rewards.rewardsAPI?.selectedTabId == 0 {
+      rewards.rewardsAPI?.selectedTabId = tabId
     }
   }
 
@@ -1139,7 +1139,7 @@ public class BrowserViewController: UIViewController {
     screenshotHelper.viewIsVisible = false
     super.viewWillDisappear(animated)
 
-    rewards.ledger?.selectedTabId = 0
+    rewards.rewardsAPI?.selectedTabId = 0
   }
 
   /// A layout guide defining where the favorites and NTP overlay are placed
