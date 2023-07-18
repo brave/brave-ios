@@ -21,8 +21,6 @@ struct VerifyRecoveryPhraseView: View {
 
   @Environment(\.modalPresentationMode) @Binding private var modalPresentationMode
   
-  @FocusState private var isTextFieldFocused: Bool
-  
   private var recoveryWords: [RecoveryWord]
   private let targetedRecoveryWordIndexes: [Int]
   private let password: String
@@ -31,22 +29,14 @@ struct VerifyRecoveryPhraseView: View {
   }
   
   init(
-    recoveryWords: [RecoveryWord],
     keyringStore: KeyringStore,
+    recoveryWords: [RecoveryWord],
+    targetedRecoveryWordIndexes: [Int],
     password: String
   ) {
-    self.recoveryWords = recoveryWords
     self.keyringStore = keyringStore
-    var loop = 3
-    var indexes: [Int] = []
-    while loop != 0 {
-      let randomIndex = Int.random(in: 0..<recoveryWords.count)
-      if !indexes.contains(randomIndex) {
-        indexes.append(randomIndex)
-        loop -= 1
-      }
-    }
-    self.targetedRecoveryWordIndexes = indexes
+    self.recoveryWords = recoveryWords
+    self.targetedRecoveryWordIndexes = targetedRecoveryWordIndexes
     self.password = password
   }
   
@@ -76,7 +66,6 @@ struct VerifyRecoveryPhraseView: View {
         VStack(alignment: .leading) {
           TextField("", text: $input)
             .font(.body)
-            .focused($isTextFieldFocused)
             .autocorrectionDisabled()
             .autocapitalization(.none)
           Divider()
@@ -201,12 +190,13 @@ struct VerifyRecoveryPhraseView_Previews: PreviewProvider {
   static var previews: some View {
     NavigationView {
       VerifyRecoveryPhraseView(
+        keyringStore: .previewStore,
         recoveryWords: [
           .init(value: "First", index: 0),
           .init(value: "Second", index: 1),
           .init(value: "Third", index: 2)
         ],
-        keyringStore: .previewStore,
+        targetedRecoveryWordIndexes: [0, 1, 2],
         password: ""
       )
     }

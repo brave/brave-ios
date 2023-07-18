@@ -18,6 +18,7 @@ struct BackupRecoveryPhraseView: View {
   @State private var isViewRecoveryPermitted: Bool = false
   @State private var isShowingSkipWarning: Bool = false
   @State private var hasCopied: Bool = false
+  @State private var verifyRecoveryWordIndexes: [Int]?
   @State private var isShowingBiometricsPrompt: Bool = false
   @State private var isShowingCompleteState: Bool = false
   
@@ -88,13 +89,18 @@ struct BackupRecoveryPhraseView: View {
             }
           }
           .padding(.top, 20)
-          NavigationLink(
-            destination: VerifyRecoveryPhraseView(
-              recoveryWords: recoveryWords,
-              keyringStore: keyringStore,
-              password: password
-            )
-          ) {
+          Button {
+            var loop = 3
+            var indexes: [Int] = []
+            while loop != 0 {
+              let randomIndex = Int.random(in: 0..<recoveryWords.count)
+              if !indexes.contains(randomIndex) {
+                indexes.append(randomIndex)
+                loop -= 1
+              }
+            }
+            verifyRecoveryWordIndexes = indexes
+          } label: {
             Text(Strings.Wallet.continueButtonTitle)
               .frame(maxWidth: .infinity)
           }
@@ -143,6 +149,26 @@ struct BackupRecoveryPhraseView: View {
         dismissButton: .cancel(Text(Strings.OKString))
       )
     }
+    .background(
+      NavigationLink(
+        isActive: Binding(
+          get: { verifyRecoveryWordIndexes != nil },
+          set: { if !$0 { verifyRecoveryWordIndexes = nil }}
+        ),
+        destination: {
+          if let verifyRecoveryWordIndexes {
+            VerifyRecoveryPhraseView(
+              keyringStore: keyringStore,
+              recoveryWords: recoveryWords,
+              targetedRecoveryWordIndexes: verifyRecoveryWordIndexes,
+              password: password
+            )
+          }
+        },
+        label: {
+          EmptyView()
+        })
+    )
     .background(
       WalletPromptView(
         isPresented: $isShowingSkipWarning,
