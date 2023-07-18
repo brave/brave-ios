@@ -35,7 +35,7 @@ struct PlaylistP3A {
     let weeklyBucket: [Bucket] = [
       .r(1...2),
       .r(3...4),
-      .r(5...7),
+      .r(5...6),
       7
     ]
     
