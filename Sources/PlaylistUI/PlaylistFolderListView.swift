@@ -11,6 +11,7 @@ import BraveUI
 import BraveStrings
 import DesignSystem
 
+// FIXME: Probably delete and just use CoreData types directly with FetchRequest
 public struct Folder: Identifiable, Equatable {
   public var id: String
   public var title: String
@@ -25,6 +26,7 @@ extension String {
   static let defaultPlaylistID: Folder.ID = PlaylistFolder.savedFolderUUID
 }
 
+// FIXME: Probably delete and just use CoreData types directly with FetchRequest
 public struct Item: Identifiable, Equatable {
   public var id: String
   public var dateAdded: Date

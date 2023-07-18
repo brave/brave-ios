@@ -78,6 +78,8 @@ public struct PlaylistContainerView: View {
 public struct PlaylistSplitView: View {
   public var folders: [Folder]
   
+  @StateObject private var model = PlayerModel()
+  
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   @Environment(\.dismiss) private var dismiss
   @Environment(\.interfaceOrientation) private var orientation
@@ -201,7 +203,7 @@ public struct PlaylistSplitView: View {
                 .ignoresSafeArea()
             }
           }
-          PlaylistView(folder: selectedFolder, item: selectedItemBinding)
+          PlaylistView(folder: selectedFolder, item: selectedItemBinding, model: model)
             .overlay {
               if orientation.isLandscape && (selectedFolder?.items.isEmpty == true || selectedFolder == nil) {
                 Color(.braveBackground)
@@ -234,7 +236,7 @@ public struct PlaylistSplitView: View {
           }
           ToolbarItem(placement: .navigationBarTrailing) {
             HStack {
-              if let folder = selectedFolder, !folder.items.isEmpty {
+              if let folder = selectedFolder, !folder.items.isEmpty, model.isPictureInPictureSupported {
                 Button { } label: {
                   Label("Enter Picture-in-Picture", braveSystemImage: "leo.picture.in-picture")
                 }
@@ -266,12 +268,12 @@ public struct PlaylistSplitView: View {
         PlaylistFolderListView(folders: folders, sharedFolders: [], selectedFolderID: $selectedFolderID)
           .background {
             NavigationLink(isActive: Binding(get: { selectedFolderID != nil }, set: { if !$0 { selectedFolderID = nil } })) {
-              PlaylistView(folder: selectedFolder, item: selectedItemBinding)
+              PlaylistView(folder: selectedFolder, item: selectedItemBinding, model: model)
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationTitle(selectedFolder?.title ?? "Playlist")
                 .toolbar {
                   HStack {
-                    if let folder = selectedFolder, !folder.items.isEmpty {
+                    if let folder = selectedFolder, !folder.items.isEmpty, model.isPictureInPictureSupported {
                       Button { } label: {
                         Image(braveSystemName: "leo.picture.in-picture")
                       }
@@ -318,9 +320,11 @@ public struct PlaylistSplitView: View {
     .navigationViewStyle(.stack)
     .onAppear {
       // FIXME: This will belong to the actual model logic later
+      model.folder = selectedFolder
       if autoPlay.value, let folder = selectedFolder {
         self.selectedItemID = folder.items.first?.id
       }
+      model.selectedItem = selectedItem
     }
     .onChange(of: horizontalSizeClass) { [oldValue=horizontalSizeClass] newValue in
       if oldValue == .compact, newValue == .regular, selectedFolderID == nil {
@@ -328,6 +332,9 @@ public struct PlaylistSplitView: View {
         // the player
         selectedFolderID = folders.first?.id
       }
+    }
+    .onChange(of: selectedFolderID) { _ in
+      model.folder = selectedFolder
     }
   }
 }
@@ -403,15 +410,15 @@ class OrientationWatcherViewController: UIViewController {
 }
 
 public struct PlayerView: View {
+  @ObservedObject var model: PlayerModel
   public var item: Item?
   
   @Environment(\.interfaceOrientation) private var orientation
   
   @State private var isControlsVisible: Bool = true
-  @State private var player: AVPlayer?
   
   private var controlView: some View {
-    ControlView(title: item?.name ?? "", publisherSource: item?.pageSource)
+    ControlView(model: model, title: item?.name ?? "", publisherSource: item?.pageSource)
       .padding(.vertical, 24)
       .contentShape(Rectangle())
       .background {
@@ -437,7 +444,7 @@ public struct PlayerView: View {
       // FIXME: Not sure what to do about this nonsense controls layout... Its expected that the video to be centered in the available space (excluding the controls) but somehow also take up the full amount of space and make the controls appear above them when the video is portrait which we don't know until we load the video
       VStack {
         // FIXME: Replace with a proper AVPlayer/UIViewRepresentable
-        VideoPlayer(player: player)
+        VideoPlayer(player: model.player)
           .disabled(true)
           .aspectRatio(16/9, contentMode: .fit)
           .background(Color.black)
@@ -457,11 +464,7 @@ public struct PlayerView: View {
       }
     }
     .onChange(of: item) { newValue in
-      if let newValue {
-        player = .init(url: newValue.source)
-      } else {
-        player = nil
-      }
+      model.selectedItem = newValue
     }
   }
 }
@@ -469,6 +472,7 @@ public struct PlayerView: View {
 public struct PlaylistView: View {
   public var folder: Folder?
   @Binding public var item: Item?
+  var model: PlayerModel
   
   @State private var drawerHeight: CGFloat = 0
   @State private var screenHeight: CGFloat = 0
@@ -546,7 +550,7 @@ public struct PlaylistView: View {
   
   public var body: some View {
     VStack(spacing: 0) {
-      PlayerView(item: item)
+      PlayerView(model: model, item: item)
         .frame(maxHeight: 800)
         .layoutPriority(1)
       if orientation.isPortrait {
