@@ -101,6 +101,7 @@ public class PortfolioStore: ObservableObject {
       groupBy: .none,
       sortOrder: SortOrder(rawValue: Preferences.Wallet.sortOrderFilter.value) ?? .valueDesc,
       isHidingSmallBalances: Preferences.Wallet.isHidingSmallBalancesFilter.value,
+      isHidingUnownedNFTs: Preferences.Wallet.isHidingUnownedNFTsFilter.value, // only shown from NFT tab
       isShowingNFTNetworkLogo: Preferences.Wallet.isShowingNFTNetworkLogoFilter.value, // only shown from NFT tab
       accounts: allAccounts.map { account in
           .init(

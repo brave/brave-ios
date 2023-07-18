@@ -121,7 +121,7 @@ struct NFTView: View {
         if #available(iOS 16, *) {
           view
             .presentationDetents([
-              .fraction(0.5),
+              .fraction(0.6),
               .large
             ])
         } else {

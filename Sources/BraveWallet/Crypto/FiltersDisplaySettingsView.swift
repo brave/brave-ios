@@ -51,6 +51,8 @@ struct Filters {
   let sortOrder: SortOrder
   /// If we are hiding small balances (less than $1 value). Default is true.
   let isHidingSmallBalances: Bool
+  /// If we are hiding unowned NFTs. Default is false.
+  let isHidingUnownedNFTs: Bool
   /// If we are showing the network logo on NFTs. Default is true.
   let isShowingNFTNetworkLogo: Bool
   /// All accounts and if they are currently selected. Default is all accounts selected.
@@ -67,6 +69,8 @@ struct FiltersDisplaySettingsView: View {
   @State var sortOrder: SortOrder
   /// If we are hiding small balances (less than $1 value). Default is false.
   @State var isHidingSmallBalances: Bool
+  /// If we are hiding unowned NFTs. Default is false.
+  @State var isHidingUnownedNFTs: Bool
   /// If we are showing the network logo on NFTs. Default is true.
   @State var isShowingNFTNetworkLogo: Bool
   
@@ -114,6 +118,7 @@ struct FiltersDisplaySettingsView: View {
     self._groupBy = State(initialValue: filters.groupBy)
     self._sortOrder = State(initialValue: filters.sortOrder)
     self._isHidingSmallBalances = State(initialValue: filters.isHidingSmallBalances)
+    self._isHidingUnownedNFTs = State(initialValue: filters.isHidingUnownedNFTs)
     self._isShowingNFTNetworkLogo = State(initialValue: filters.isShowingNFTNetworkLogo)
     self._accounts = State(initialValue: filters.accounts)
     self._networks = State(initialValue: filters.networks)
@@ -132,26 +137,24 @@ struct FiltersDisplaySettingsView: View {
             .padding(.vertical, rowPadding)
            */
 
-          if !isNFTFilters {
+          if isNFTFilters {
+            showNFTNetworkLogo
+              .padding(.vertical, rowPadding)
+            
+            hideUnownedNFTs
+              .padding(.vertical, rowPadding)
+          } else { // Portfolio filters
             sortAssets
               .padding(.vertical, rowPadding)
             
             hideSmallBalances
               .padding(.vertical, rowPadding)
           }
-          
-          if isNFTFilters {
-            showNFTNetworkLogo
-              .padding(.vertical, rowPadding)
-          }
 
           DividerLine()
-
-          if !isNFTFilters {
-            // Unavailable for NFTs until NFT supports grouping.
-            accountFilters
-              .padding(.vertical, rowPadding)
-          }
+          
+          accountFilters
+            .padding(.vertical, rowPadding)
 
           networkFilters
             .padding(.vertical, rowPadding)
@@ -212,6 +215,20 @@ struct FiltersDisplaySettingsView: View {
       FilterLabelView(
         title: Strings.Wallet.hideSmallBalancesTitle,
         description: Strings.Wallet.hideSmallBalancesDescription,
+        icon: .init(
+          braveSystemName: "leo.eye.on",
+          iconContainerSize: min(iconContainerSize, maxIconContainerSize)
+        )
+      )
+    }
+    .tint(Color(.braveBlurpleTint))
+  }
+  
+  private var hideUnownedNFTs: some View {
+    Toggle(isOn: $isHidingUnownedNFTs) {
+      FilterLabelView(
+        title: Strings.Wallet.hideUnownedNFTsTitle,
+        description: Strings.Wallet.hideUnownedNFTsDescription,
         icon: .init(
           braveSystemName: "leo.eye.on",
           iconContainerSize: min(iconContainerSize, maxIconContainerSize)
@@ -302,6 +319,7 @@ struct FiltersDisplaySettingsView: View {
           groupBy: groupBy,
           sortOrder: sortOrder,
           isHidingSmallBalances: isHidingSmallBalances,
+          isHidingUnownedNFTs: isHidingUnownedNFTs,
           isShowingNFTNetworkLogo: isShowingNFTNetworkLogo,
           accounts: accounts,
           networks: networks
@@ -372,6 +390,7 @@ struct FiltersDisplaySettingsView_Previews: PreviewProvider {
         groupBy: .none,
         sortOrder: .valueDesc,
         isHidingSmallBalances: false,
+        isHidingUnownedNFTs: false,
         isShowingNFTNetworkLogo: false,
         accounts: [
           .init(isSelected: true, model: .mockEthAccount),

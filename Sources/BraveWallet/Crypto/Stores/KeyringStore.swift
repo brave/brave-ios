@@ -315,6 +315,7 @@ public class KeyringStore: ObservableObject {
       }
       Preferences.Wallet.sortOrderFilter.reset()
       Preferences.Wallet.isHidingSmallBalancesFilter.reset()
+      Preferences.Wallet.isHidingUnownedNFTsFilter.reset()
       Preferences.Wallet.isShowingNFTNetworkLogoFilter.reset()
       Preferences.Wallet.nonSelectedAccountsFilter.reset()
       Preferences.Wallet.nonSelectedNetworksFilter.reset()
