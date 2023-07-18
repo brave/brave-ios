@@ -177,6 +177,7 @@ private struct RestoreWalletView: View {
                 newPassword = password
                 isShowingPhraseError = true
               }
+              isShowingCreateNewPassword = false
             }
           )
         )

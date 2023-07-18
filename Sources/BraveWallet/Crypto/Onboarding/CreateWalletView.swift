@@ -70,8 +70,6 @@ private struct CreateWalletView: View {
   @State private var passwordStatus: PasswordStatus = .none
   @State private var isInputsMatch: Bool = false
   
-  @Environment(\.dismiss) var dismiss
-  
   init(
     keyringStore: KeyringStore,
     restorePackage: RestorePackage? = nil
@@ -96,7 +94,6 @@ private struct CreateWalletView: View {
         isLegacyBraveWallet: restorePackage.recoveryWords.count == 24
       ) { success in
         restorePackage.onRestoreCompleted(success, password)
-        dismiss()
       }
     } else {
       keyringStore.createWallet(password: password) { mnemonic in
