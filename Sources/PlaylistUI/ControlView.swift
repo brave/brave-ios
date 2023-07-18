@@ -8,30 +8,14 @@ import SwiftUI
 import DesignSystem
 import Favicon
 
-enum ContentSpeed: Double {
-  case normal = 1.0
-  case fast = 1.5
-  case faster = 2
-  
-  mutating func increase() {
-    switch self {
-    case .normal: self = .fast
-    case .fast: self = .faster
-    case .faster: self = .normal
-    }
-  }
-}
-
 struct ControlView: View {
+  @ObservedObject var model: PlayerModel
+  
   var title: String
   var publisherSource: URL?
   
-  @State private var currentTime: Int = 68
-  @State private var totalDuration: Int = 1008
-  @State private var isPlaying: Bool = false
+  @State private var currentTime: TimeInterval = 0
   @State private var isScrubbing: Bool = false
-  @State private var isShuffleEnabled: Bool = false
-  @State private var contentSpeed: ContentSpeed = .normal
   @State private var stopPlaybackDate: Date?
   @State private var isPlaybackStopInfoPresented: Bool = false
   @State private var resumePlayingAfterScrub: Bool = false
@@ -62,7 +46,7 @@ struct ControlView: View {
           .lineLimit(1)
         Spacer()
         HStack(spacing: 24) {
-          if UIDevice.isPhone && orientation.isLandscape {
+          if UIDevice.isPhone && orientation.isLandscape && model.isPictureInPictureSupported {
             Button { } label: {
               Label("Enter Picture-in-Picture", braveSystemImage: "leo.picture.in-picture")
                 .labelStyle(.iconOnly)
@@ -75,29 +59,41 @@ struct ControlView: View {
         .buttonStyle(.spring(backgroundStyle: Color.white))
       }
       .frame(maxWidth: .infinity, alignment: .leading)
-      MediaScrubber(currentTime: $currentTime, totalDuration: totalDuration, isScrubbing: $isScrubbing)
+      MediaScrubber(
+        currentTime: Binding(
+          get: { Int(currentTime) },
+          set: { newValue in
+            Task { await model.seek(to: TimeInterval(newValue)) }
+          }
+        ),
+        totalDuration: Int(model.duration),
+        isScrubbing: $isScrubbing
+      )
       VStack(spacing: 24) {
         if (UIDevice.isPhone && orientation.isPortrait) || (UIDevice.isIpad && horizontalSizeClass == .compact) {
           HStack {
-            PlaybackControls(isPlaying: $isPlaying)
+            PlaybackControls(model: model)
               .imageScale(.large)
           }
           HStack {
-            LeadingExtraControls(isShuffleEnabled: $isShuffleEnabled, contentSpeed: $contentSpeed)
+            LeadingExtraControls(isShuffleEnabled: $model.isShuffleEnabled, contentSpeed: $model.playbackSpeed)
             Spacer()
             TrailingExtraControls(stopPlaybackDate: $stopPlaybackDate, isPlaybackStopInfoPresented: $isPlaybackStopInfoPresented)
           }
         } else {
           HStack {
-            LeadingExtraControls(isShuffleEnabled: $isShuffleEnabled, contentSpeed: $contentSpeed)
+            LeadingExtraControls(isShuffleEnabled: $model.isShuffleEnabled, contentSpeed: $model.playbackSpeed)
             Spacer()
-            PlaybackControls(isPlaying: $isPlaying)
+            PlaybackControls(model: model)
             Spacer()
             TrailingExtraControls(stopPlaybackDate: $stopPlaybackDate, isPlaybackStopInfoPresented: $isPlaybackStopInfoPresented)
           }
         }
       }
-      .foregroundStyle(.secondary)
+      .foregroundStyle(
+        UIDevice.isPhone && !orientation.isPortrait ? Color.white.opacity(0.75) :
+            .secondary // Use regular tinting when not on top of a blur Material
+      )
       .dynamicTypeSize(...DynamicTypeSize.accessibility3)
       .disabled(isScrubbing)
       .opacity(isScrubbing ? 0.5 : 1.0)
@@ -108,17 +104,14 @@ struct ControlView: View {
     .colorScheme(.dark)
     .onChange(of: isScrubbing) { newValue in
       if newValue {
-        resumePlayingAfterScrub = isPlaying
-        isPlaying = false
+        resumePlayingAfterScrub = model.isPlaying
+        model.pause()
       } else {
-        isPlaying = resumePlayingAfterScrub
+        if resumePlayingAfterScrub {
+          model.play()
+        }
       }
     }
-    .onReceive(Timer.publish(every: 1, on: .main, in: .default).autoconnect(), perform: { _ in
-      if isPlaying {
-        currentTime += 1
-      }
-    })
     .overlayPreferenceValue(SleepTimerBoundsPrefKey.self, { value in
       if isPlaybackStopInfoPresented, let stopPlaybackDate, let value = value.last {
         GeometryReader { proxy in
@@ -163,6 +156,11 @@ struct ControlView: View {
         .transition(.scale(scale: 0.2, anchor: .bottom).combined(with: .opacity).animation(.spring(response: 0.3, dampingFraction: 0.7)))
       }
     })
+    .task {
+      for await currentTime in model.currentTimeStream {
+        self.currentTime = currentTime
+      }
+    }
   }
 }
 
@@ -175,7 +173,7 @@ private struct SleepTimerBoundsPrefKey: PreferenceKey {
 }
 
 struct PlaybackControls: View {
-  @Binding var isPlaying: Bool
+  @ObservedObject var model: PlayerModel
   
   private var playButtonTransition: AnyTransition {
     .scale.combined(with: .opacity).animation(.spring(response: 0.3, dampingFraction: 0.7))
@@ -187,11 +185,13 @@ struct PlaybackControls: View {
         Label("Previous Item", braveSystemImage: "leo.start.outline")
       }
       Spacer()
-      Button { } label: {
+      Button {
+        Task { await model.seekBackwards() }
+      } label: {
         Label("Step Back", braveSystemImage: "leo.rewind.15")
       }
       Spacer()
-      Toggle(isOn: $isPlaying, label: {
+      Toggle(isOn: $model.isPlaying, label: {
         // Maintain the sizes when swapping images
         ZStack {
           Image(braveSystemName: "leo.pause.filled")
@@ -200,7 +200,7 @@ struct PlaybackControls: View {
         .accessibilityHidden(true)
         .hidden()
         .overlay {
-          if isPlaying {
+          if model.isPlaying {
             Label("Pause", braveSystemImage: "leo.pause.filled")
               .labelStyle(.iconOnly)
               .transition(playButtonTransition)
@@ -215,7 +215,9 @@ struct PlaybackControls: View {
       .foregroundStyle(.primary)
       .font(.title)
       Spacer()
-      Button { } label: {
+      Button {
+        Task { await model.seekForwards() }
+      } label: {
         Label("Step Forward", braveSystemImage: "leo.forward.15")
       }
       Spacer()
@@ -230,7 +232,7 @@ struct PlaybackControls: View {
 
 struct LeadingExtraControls: View {
   @Binding var isShuffleEnabled: Bool
-  @Binding var contentSpeed: ContentSpeed
+  @Binding var contentSpeed: PlayerModel.PlaybackSpeed
   
   var body: some View {
     Group {
@@ -378,35 +380,39 @@ struct MediaScrubber: View {
         .frame(height: barHeight)
         .clipShape(RoundedRectangle(cornerRadius: barHeight / 2))
         .overlay {
-          // Active value
-          GeometryReader { proxy in
-            Color.white
-              .frame(width: min(proxy.size.width, CGFloat(currentTime) / CGFloat(totalDuration) * proxy.size.width), alignment: .leading)
-              .clipShape(RoundedRectangle(cornerRadius: barHeight / 2))
-              .animation(.linear(duration: 0.1), value: currentTime)
+          if totalDuration > 0 {
+            // Active value
+            GeometryReader { proxy in
+              Color.white
+                .frame(width: min(proxy.size.width, CGFloat(currentTime) / CGFloat(totalDuration) * proxy.size.width), alignment: .leading)
+                .clipShape(RoundedRectangle(cornerRadius: barHeight / 2))
+                .animation(.linear(duration: 0.1), value: currentTime)
+            }
           }
         }
         .padding(.vertical, (thumbSize - barHeight) / 2)
         .overlay {
-          // Thumb
-          GeometryReader { proxy in
-            Color.white
-              .clipShape(Circle())
-              .shadow(radius: 4)
-              .frame(width: thumbSize, height: thumbSize)
-              .scaleEffect(isScrubbing ? 1.5 : 1)
-              .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isScrubbing)
-              .offset(x: min(proxy.size.width, (CGFloat(currentTime) / CGFloat(totalDuration) * proxy.size.width)) - (thumbSize / 2))
-              .animation(.linear(duration: 0.1), value: currentTime)
-              .gesture(
-                DragGesture(minimumDistance: 0)
-                  .updating($isScrubbingState, body: { _, state, _ in
-                    state = true
-                  })
-                  .onChanged { state in
-                    currentTime = max(0, min(totalDuration, Int((state.location.x / proxy.size.width) * CGFloat(totalDuration))))
-                  }
-              )
+          if totalDuration > 0 {
+            // Thumb
+            GeometryReader { proxy in
+              Color.white
+                .clipShape(Circle())
+                .shadow(radius: 4)
+                .frame(width: thumbSize, height: thumbSize)
+                .scaleEffect(isScrubbing ? 1.5 : 1)
+                .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isScrubbing)
+                .offset(x: min(proxy.size.width, (CGFloat(currentTime) / CGFloat(totalDuration) * proxy.size.width)) - (thumbSize / 2))
+                .animation(.linear(duration: 0.1), value: currentTime)
+                .gesture(
+                  DragGesture(minimumDistance: 0)
+                    .updating($isScrubbingState, body: { _, state, _ in
+                      state = true
+                    })
+                    .onChanged { state in
+                      currentTime = max(0, min(totalDuration, Int((state.location.x / proxy.size.width) * CGFloat(totalDuration))))
+                    }
+                )
+            }
           }
         }
       HStack {
@@ -433,25 +439,28 @@ struct MediaScrubber: View {
       isScrubbing = newValue
     }
     .accessibilityRepresentation {
-      Slider(
-        value: Binding(get: { CGFloat(currentTime) }, set: { currentTime = Int($0) }),
-        in: 0.0...CGFloat(totalDuration),
-        step: 1
-      ) {
-        Text("Current Media Time") // TODO: Localize
-      } minimumValueLabel: {
-        currentValueLabel
-      } maximumValueLabel: {
-        totalTimeLabel
+      if totalDuration > 0 {
+        Slider(
+          value: Binding(get: { CGFloat(currentTime) }, set: { currentTime = Int($0) }),
+          in: 0.0...CGFloat(totalDuration),
+          step: 1
+        ) {
+          Text("Current Media Time") // TODO: Localize
+        } minimumValueLabel: {
+          currentValueLabel
+        } maximumValueLabel: {
+          totalTimeLabel
+        }
       }
     }
+    .disabled(totalDuration == 0)
   }
 }
 
 #if DEBUG
 struct VideoControls_PreviewProvider: PreviewProvider {
   static var previews: some View {
-    ControlView(title: "Blah Bleh a Bluh Blah Blue", publisherSource: nil)
+    ControlView(model: .init(), title: "Blah Bleh a Bluh Blah Blue", publisherSource: nil)
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(Color(white: 0.1))
       .observingOrientation()

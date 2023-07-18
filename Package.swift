@@ -329,7 +329,18 @@ var package = Package(
     .target(name: "Strings"),
     .target(name: "RuntimeWarnings"),
     .target(name: "PrivateCDN", dependencies: ["SDWebImage"]),
-    .target(name: "PlaylistUI", dependencies: ["BraveUI", "DesignSystem", "Data", "BraveStrings", "Favicon"], plugins: ["LoggerPlugin"]),
+    .target(
+      name: "PlaylistUI",
+      dependencies: [
+        "BraveUI",
+        "DesignSystem",
+        "Data",
+        "BraveStrings",
+        "Favicon",
+        .product(name: "Collections", package: "swift-collections"),
+      ],
+      plugins: ["LoggerPlugin"]
+    ),
     .testTarget(name: "PrivateCDNTests", dependencies: ["PrivateCDN"]),
     .testTarget(name: "GrowthTests", dependencies: ["Growth", "Shared", "BraveShared", "BraveVPN"]),
     .plugin(name: "IntentBuilderPlugin", capability: .buildTool()),
