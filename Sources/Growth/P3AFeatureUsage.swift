@@ -101,7 +101,7 @@ public struct P3AFeatureUsage {
   }
   
   /// Records a typical returning usage metric histogram if you've set `returningUserHistogram`
-  private func recordReturningUsageMetric() {
+  func recordReturningUsageMetric() {
     guard let name = returningUserHistogram else { return }
     let returningUserState = returningUserState
     UmaHistogramEnumeration(name, sample: returningUserState)
