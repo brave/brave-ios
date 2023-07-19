@@ -132,15 +132,7 @@ struct BackupRecoveryPhraseView: View {
       }
       .padding()
     }
-    .introspectViewController { vc in
-      let appearance = UINavigationBarAppearance()
-      appearance.configureWithTransparentBackground()
-      vc.navigationItem.compactAppearance = appearance
-      vc.navigationItem.scrollEdgeAppearance = appearance
-      vc.navigationItem.standardAppearance = appearance
-      vc.navigationItem.backButtonTitle = Strings.Wallet.backupRecoveryPhraseBackButtonTitle
-      vc.navigationItem.backButtonDisplayMode = .generic
-    }
+    .transparentNavigationBar(backButtonTitle: Strings.Wallet.backupRecoveryPhraseBackButtonTitle, backButtonDisplayMode: .generic)
     .background(Color(.braveBackground).edgesIgnoringSafeArea(.all))
     .alertOnScreenshot {
       Alert(

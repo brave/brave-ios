@@ -13,6 +13,9 @@ struct RestorePackage {
   let recoveryWords: [String]
   let newPassword: String
   let onRestoreCompleted: (_ status: Bool, _ validPassword: String) -> Void
+  var isLegacyWallet: Bool {
+    recoveryWords.count == .legacyWalletRecoveryPhraseNumber
+  }
 }
 
 struct CreateWalletContainerView: View {
@@ -33,15 +36,7 @@ struct CreateWalletContainerView: View {
       .background(Color(.braveBackground))
     }
     .background(Color(.braveBackground).edgesIgnoringSafeArea(.all))
-    .introspectViewController { vc in
-      let appearance = UINavigationBarAppearance()
-      appearance.configureWithTransparentBackground()
-      vc.navigationItem.compactAppearance = appearance
-      vc.navigationItem.scrollEdgeAppearance = appearance
-      vc.navigationItem.standardAppearance = appearance
-      vc.navigationItem.backButtonTitle = Strings.Wallet.createWalletBackButtonTitle
-      vc.navigationItem.backButtonDisplayMode = .generic
-    }
+    .transparentNavigationBar(backButtonTitle: Strings.Wallet.createWalletBackButtonTitle, backButtonDisplayMode: .generic)
   }
 }
 
@@ -75,13 +70,8 @@ private struct CreateWalletView: View {
     restorePackage: RestorePackage? = nil
   ) {
     self.keyringStore = keyringStore
-    if let restorePackage {
-      _password = State(initialValue: restorePackage.newPassword)
-      _repeatedPassword = State(initialValue: restorePackage.newPassword)
-    } else {
-      _password = State(initialValue: "")
-      _repeatedPassword = State(initialValue: "")
-    }
+    _password = State(initialValue: restorePackage?.newPassword ?? "")
+    _repeatedPassword = State(initialValue: restorePackage?.newPassword ?? "")
     self.restorePackage = restorePackage
   }
 
@@ -91,7 +81,7 @@ private struct CreateWalletView: View {
       keyringStore.restoreWallet(
         words: restorePackage.recoveryWords,
         password: password,
-        isLegacyBraveWallet: restorePackage.recoveryWords.count == 24
+        isLegacyBraveWallet: restorePackage.isLegacyWallet
       ) { success in
         restorePackage.onRestoreCompleted(success, password)
       }

@@ -88,7 +88,7 @@ struct VerifyRecoveryPhraseView: View {
         }
         Button {
           let targetIndex = targetedRecoveryWordIndexes[activeCheckIndex]
-          if input == recoveryWords[targetIndex].value {
+          if input == recoveryWords[safe: targetIndex]?.value {
             isShowingError = false
             if activeCheckIndex == targetedRecoveryWordIndexes.count - 1 { // finished all checks
               if keyringStore.isOnboardingVisible {
@@ -174,14 +174,7 @@ struct VerifyRecoveryPhraseView: View {
         markOnboardingCompleted()
       }
     }
-    .introspectViewController { vc in
-      let appearance = UINavigationBarAppearance()
-      appearance.configureWithTransparentBackground()
-      vc.navigationItem.compactAppearance = appearance
-      vc.navigationItem.scrollEdgeAppearance = appearance
-      vc.navigationItem.standardAppearance = appearance
-      vc.navigationItem.backButtonDisplayMode = .generic
-    }
+    .transparentNavigationBar(backButtonDisplayMode: .generic)
   }
 }
 

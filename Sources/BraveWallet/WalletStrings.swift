@@ -201,7 +201,7 @@ extension Strings {
       "wallet.copyToPasteboard",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Click to copy",
+      value: "Tap to copy",
       comment: "A button title that when tapped will copy some data to the users clipboard"
     )
     public static let copiedToPasteboard = NSLocalizedString(
@@ -1037,6 +1037,20 @@ extension Strings {
       bundle: .module,
       value: "Use %@",
       comment: "The button title that enables the biometric unlock feature. %@` will be replaced with the biometric type name of the current device."
+    )
+    public static let biometricsSetupFaceId = NSLocalizedString(
+      "wallet.biometricsSetupFaceId",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Face ID",
+      comment: "Type of biometrics. This will be used in Biometric setup screen."
+    )
+    public static let biometricsSetupTouchId = NSLocalizedString(
+      "wallet.biometricsSetupTouchId",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Touch ID",
+      comment: "Type of biometrics. This will be used in Biometric setup screen."
     )
     public static let copyAddressButtonTitle = NSLocalizedString(
       "wallet.copyAddressButtonTitle",

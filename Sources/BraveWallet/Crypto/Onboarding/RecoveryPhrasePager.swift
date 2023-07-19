@@ -36,8 +36,8 @@ struct RecoveryPhrasePager: View {
 
 #if DEBUG
 struct RecoveryPhrasePager_Previews: PreviewProvider {
-    static var previews: some View {
-      RecoveryPhrasePager(activeIndex: .constant(0))
-    }
+  static var previews: some View {
+    RecoveryPhrasePager(activeIndex: .constant(0))
+  }
 }
 #endif

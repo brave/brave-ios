@@ -19,15 +19,7 @@ struct RestoreWalletContainerView: View {
         .background(Color(.braveBackground))
     }
     .background(Color(.braveBackground).edgesIgnoringSafeArea(.all))
-    .introspectViewController { vc in
-      let appearance = UINavigationBarAppearance()
-      appearance.configureWithTransparentBackground()
-      vc.navigationItem.compactAppearance = appearance
-      vc.navigationItem.scrollEdgeAppearance = appearance
-      vc.navigationItem.standardAppearance = appearance
-      vc.navigationItem.backButtonTitle = Strings.Wallet.restoreWalletBackButtonTitle
-      vc.navigationItem.backButtonDisplayMode = .generic
-    }
+    .transparentNavigationBar(backButtonTitle: Strings.Wallet.restoreWalletBackButtonTitle, backButtonDisplayMode: .generic)
   }
 }
 
@@ -130,7 +122,13 @@ private struct RestoreWalletView: View {
       HStack {
         Spacer()
         Button {
-          recoveryWords = isLegacyWallet ? .init(repeating: "", count: 12) : .init(repeating: "", count: 24)
+          // Regular wallet has `12` recovery-phrase
+          // Legacy wallet has `24` recovery-phrase
+          // This button is to toggle the current wallet type
+          // to the other type, meaning:
+          // regular(12) to legacy(24)
+          // or legacy(24) to regular(12)
+          recoveryWords = isLegacyWallet ? .init(repeating: "", count: .regularWalletRecoveryPhraseNumber) : .init(repeating: "", count: .legacyWalletRecoveryPhraseNumber)
           scrollViewIndicatorState.toggle()
         } label: {
           Text(isLegacyWallet ? Strings.Wallet.restoreWalletImportFromRegularBraveWallet : Strings.Wallet.restoreWalletImportFromLegacyBraveWallet)

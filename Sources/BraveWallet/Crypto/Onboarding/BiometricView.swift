@@ -39,9 +39,9 @@ struct BiometricView: View {
     if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil) {
       switch context.biometryType {
       case .faceID:
-        return "Face ID"
+        return Strings.Wallet.biometricsSetupFaceId
       case .touchID:
-        return "Touch ID"
+        return Strings.Wallet.biometricsSetupTouchId
       default:
         return ""
       }

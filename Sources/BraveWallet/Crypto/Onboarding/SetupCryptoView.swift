@@ -119,15 +119,7 @@ struct SetupCryptoView: View {
       )
     )
     .accessibilityEmbedInScrollView()
-    .introspectViewController { vc in
-      let appearance = UINavigationBarAppearance()
-      appearance.configureWithTransparentBackground()
-      vc.navigationItem.compactAppearance = appearance
-      vc.navigationItem.scrollEdgeAppearance = appearance
-      vc.navigationItem.standardAppearance = appearance
-      vc.navigationItem.backButtonTitle = Strings.Wallet.setupCryptoButtonBackButtonTitle
-      vc.navigationItem.backButtonDisplayMode = .generic
-    }
+    .transparentNavigationBar(backButtonTitle: Strings.Wallet.setupCryptoButtonBackButtonTitle, backButtonDisplayMode: .generic)
   }
 }
 
