@@ -738,7 +738,7 @@ window.__firefox__.execute(function($) {
 
     if (switchToMutationObserverAtTime !== undefined &&
       window.Date.now() >= switchToMutationObserverAtTime) {
-      useMutationObserver('CALLBACK')
+      useMutationObserver()
     }
   }
 
