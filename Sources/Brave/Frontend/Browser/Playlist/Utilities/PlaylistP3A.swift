@@ -40,6 +40,5 @@ struct PlaylistP3A {
     ]
     
     UmaHistogramRecordValueToBucket("Brave.Playlist.UsageDaysInWeek", buckets: weeklyBucket, value: daysUsedInWeekStorage.combinedValue)
-    usage.recordReturningUsageMetric()
   }
 }
