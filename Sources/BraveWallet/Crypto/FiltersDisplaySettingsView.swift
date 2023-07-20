@@ -59,6 +59,37 @@ struct Filters {
   var accounts: [Selectable<BraveWallet.AccountInfo>]
   /// All networks and if they are currently selected. Default is all selected except known test networks.
   var networks: [Selectable<BraveWallet.NetworkInfo>]
+  
+  init(
+    groupBy: GroupBy = .none,
+    sortOrder: SortOrder = SortOrder(rawValue: Preferences.Wallet.sortOrderFilter.value) ?? .valueDesc,
+    isHidingSmallBalances: Bool = Preferences.Wallet.isHidingSmallBalancesFilter.value,
+    isHidingUnownedNFTs: Bool = Preferences.Wallet.isHidingUnownedNFTsFilter.value,
+    isShowingNFTNetworkLogo: Bool = Preferences.Wallet.isShowingNFTNetworkLogoFilter.value,
+    accounts: [Selectable<BraveWallet.AccountInfo>],
+    networks: [Selectable<BraveWallet.NetworkInfo>]
+  ) {
+    self.groupBy = groupBy
+    self.sortOrder = sortOrder
+    self.isHidingSmallBalances = isHidingSmallBalances
+    self.isHidingUnownedNFTs = isHidingUnownedNFTs
+    self.isShowingNFTNetworkLogo = isShowingNFTNetworkLogo
+    self.accounts = accounts
+    self.networks = networks
+  }
+  
+  func save() {
+    Preferences.Wallet.sortOrderFilter.value = sortOrder.rawValue
+    Preferences.Wallet.isHidingSmallBalancesFilter.value = isHidingSmallBalances
+    Preferences.Wallet.isShowingNFTNetworkLogoFilter.value = isShowingNFTNetworkLogo
+    Preferences.Wallet.isHidingUnownedNFTsFilter.value = isHidingUnownedNFTs
+    Preferences.Wallet.nonSelectedAccountsFilter.value = accounts
+      .filter({ !$0.isSelected })
+      .map(\.model.address)
+    Preferences.Wallet.nonSelectedNetworksFilter.value = networks
+      .filter({ !$0.isSelected })
+      .map(\.model.chainId)
+  }
 }
 
 struct FiltersDisplaySettingsView: View {

@@ -98,11 +98,6 @@ public class PortfolioStore: ObservableObject {
     let nonSelectedAccountAddresses = Preferences.Wallet.nonSelectedAccountsFilter.value
     let nonSelectedNetworkChainIds = Preferences.Wallet.nonSelectedNetworksFilter.value
     return Filters(
-      groupBy: .none,
-      sortOrder: SortOrder(rawValue: Preferences.Wallet.sortOrderFilter.value) ?? .valueDesc,
-      isHidingSmallBalances: Preferences.Wallet.isHidingSmallBalancesFilter.value,
-      isHidingUnownedNFTs: Preferences.Wallet.isHidingUnownedNFTsFilter.value, // only shown from NFT tab
-      isShowingNFTNetworkLogo: Preferences.Wallet.isShowingNFTNetworkLogoFilter.value, // only shown from NFT tab
       accounts: allAccounts.map { account in
           .init(
             isSelected: !nonSelectedAccountAddresses.contains(where: { $0 == account.address }),
@@ -448,18 +443,9 @@ extension PortfolioStore: BraveWalletBraveWalletServiceObserver {
 extension PortfolioStore: PreferencesObserver {
   func saveFilters(_ filters: Filters) {
     isSavingFilters = true
-    defer {
-      isSavingFilters = false
-      update()
-    }
-    Preferences.Wallet.sortOrderFilter.value = filters.sortOrder.rawValue
-    Preferences.Wallet.isHidingSmallBalancesFilter.value = filters.isHidingSmallBalances
-    Preferences.Wallet.nonSelectedAccountsFilter.value = filters.accounts
-      .filter({ !$0.isSelected })
-      .map(\.model.address)
-    Preferences.Wallet.nonSelectedNetworksFilter.value = filters.networks
-      .filter({ !$0.isSelected })
-      .map(\.model.chainId)
+    filters.save()
+    isSavingFilters = false
+    update()
   }
   public func preferencesDidChange(for key: String) {
     guard !isSavingFilters else { return }

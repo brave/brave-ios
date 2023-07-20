@@ -34,11 +34,6 @@ public class NFTStore: ObservableObject {
     let nonSelectedAccountAddresses = Preferences.Wallet.nonSelectedAccountsFilter.value
     let nonSelectedNetworkChainIds = Preferences.Wallet.nonSelectedNetworksFilter.value
     return Filters(
-      groupBy: .none,
-      sortOrder: SortOrder(rawValue: Preferences.Wallet.sortOrderFilter.value) ?? .valueDesc,
-      isHidingSmallBalances: Preferences.Wallet.isHidingSmallBalancesFilter.value,
-      isHidingUnownedNFTs: Preferences.Wallet.isHidingUnownedNFTsFilter.value,
-      isShowingNFTNetworkLogo: Preferences.Wallet.isShowingNFTNetworkLogoFilter.value,
       accounts: allAccounts.map { account in
           .init(
             isSelected: !nonSelectedAccountAddresses.contains(where: { $0 == account.address }),
@@ -145,16 +140,10 @@ public class NFTStore: ObservableObject {
         }
       }
       self.userVisibleNFTs = updatedUserVisibleNFTs
-        .optionallyFilter(
-          shouldFilter: filters.isHidingUnownedNFTs,
-          isIncluded: { nftAsset in
-            let balancesForSelectedAccounts = nftAsset.balanceForAccounts.filter { balance in
-              selectedAccounts.contains(where: { account in
-                account.address == balance.key
-              })
-            }
-            return balancesForSelectedAccounts.contains(where: { $0.value > 0 })
-          })
+        .optionallyFilterUnownedNFTs(
+          isHidingUnownedNFTs: filters.isHidingUnownedNFTs,
+          selectedAccounts: selectedAccounts
+        )
       
       let allTokens = allVisibleUserAssets.flatMap(\.tokens)
       let allNFTs = allTokens.filter { $0.isNft || $0.isErc721 }
@@ -199,29 +188,19 @@ public class NFTStore: ObservableObject {
         }
       }
       self.userVisibleNFTs = updatedUserVisibleNFTs
-        .optionallyFilter(
-          shouldFilter: filters.isHidingUnownedNFTs,
-          isIncluded: { nftAsset in
-            let balancesForSelectedAccounts = nftAsset.balanceForAccounts.filter { balance in
-              selectedAccounts.contains(where: { account in
-                account.address == balance.key
-              })
-            }
-            return balancesForSelectedAccounts.contains(where: { $0.value > 0 })
-          })
+        .optionallyFilterUnownedNFTs(
+          isHidingUnownedNFTs: filters.isHidingUnownedNFTs,
+          selectedAccounts: selectedAccounts
+        )
     }
   }
   
   func updateNFTMetadataCache(for token: BraveWallet.BlockchainToken, metadata: NFTMetadata) {
     metadataCache[token.id] = metadata
     if let index = userVisibleNFTs.firstIndex(where: { $0.token.id == token.id }),
-       let viewModel = userVisibleNFTs[safe: index] {
-      userVisibleNFTs[index] = NFTAssetViewModel(
-        token: viewModel.token,
-        network: viewModel.network,
-        balanceForAccounts: viewModel.balanceForAccounts,
-        nftMetadata: metadata
-      )
+       var updatedViewModel = userVisibleNFTs[safe: index] {
+      updatedViewModel.nftMetadata = metadata
+      userVisibleNFTs[index] = updatedViewModel
     }
   }
   
@@ -321,21 +300,31 @@ extension NFTStore: BraveWalletBraveWalletServiceObserver {
 extension NFTStore: PreferencesObserver {
   func saveFilters(_ filters: Filters) {
     isSavingFilters = true
-    defer {
-      isSavingFilters = false
-      update()
-    }
-    Preferences.Wallet.isShowingNFTNetworkLogoFilter.value = filters.isShowingNFTNetworkLogo
-    Preferences.Wallet.isHidingUnownedNFTsFilter.value = filters.isHidingUnownedNFTs
-    Preferences.Wallet.nonSelectedAccountsFilter.value = filters.accounts
-      .filter({ !$0.isSelected })
-      .map(\.model.address)
-    Preferences.Wallet.nonSelectedNetworksFilter.value = filters.networks
-      .filter({ !$0.isSelected })
-      .map(\.model.chainId)
+    filters.save()
+    isSavingFilters = false
+    update()
   }
   public func preferencesDidChange(for key: String) {
     guard !isSavingFilters else { return }
     update()
+  }
+}
+
+private extension Array where Element == NFTAssetViewModel {
+  /// Optionally filters out NFTs not belonging to the given `selectedAccounts`.
+  func optionallyFilterUnownedNFTs(
+    isHidingUnownedNFTs: Bool,
+    selectedAccounts: [BraveWallet.AccountInfo]
+  ) -> [Element] {
+    optionallyFilter(
+      shouldFilter: isHidingUnownedNFTs,
+      isIncluded: { nftAsset in
+        let balancesForSelectedAccounts = nftAsset.balanceForAccounts.filter { balance in
+          selectedAccounts.contains(where: { account in
+            account.address == balance.key
+          })
+        }
+        return balancesForSelectedAccounts.contains(where: { $0.value > 0 })
+      })
   }
 }
