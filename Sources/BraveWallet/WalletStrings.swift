@@ -4296,5 +4296,12 @@ extension Strings {
       value: "Networks",
       comment: "The title of the sort option that groups assets by each network. Used in Portfolio/NFT filters and display settings."
     )
+    public static let internalErrorMessage = NSLocalizedString(
+      "wallet.internalErrorMessage",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "An internal error has occurred",
+      comment: "The title of a button that Deselects all visible options."
+    )
   }
 }
