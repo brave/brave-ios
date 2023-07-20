@@ -196,6 +196,7 @@ public class CryptoStore: ObservableObject {
     }
     let store = BuyTokenStore(
       blockchainRegistry: blockchainRegistry,
+      keyringService: keyringService,
       rpcService: rpcService,
       walletService: walletService,
       assetRatioService: assetRatioService,
@@ -594,7 +595,9 @@ extension CryptoStore: BraveWalletKeyringServiceObserver {
   }
   public func autoLockMinutesChanged() {
   }
-  public func selectedAccountChanged(_ coinType: BraveWallet.CoinType) {
+  public func selectedWalletAccountChanged(_ account: BraveWallet.AccountInfo) {
+  }
+  public func selectedDappAccountChanged(_ coin: BraveWallet.CoinType, account: BraveWallet.AccountInfo?) {
   }
   public func accountsAdded(_ addedAccounts: [BraveWallet.AccountInfo]) {
   }
