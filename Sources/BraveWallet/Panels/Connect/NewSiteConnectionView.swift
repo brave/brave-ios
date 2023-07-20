@@ -171,9 +171,9 @@ public struct NewSiteConnectionView: View {
         selectedAccounts.insert(keyringStore.selectedAccount.id)
       } else { // Need to fetch selected account for coin
         Task { @MainActor in
-          if let selectedAccount = await keyringStore.selectedAccount(for: coin) {
+          if let selectedAccount = await keyringStore.selectedDappAccount(for: coin) {
             if accounts.contains(selectedAccount.address) {
-              // currently gselected account exists in permissions request, select it
+              // currently selected account exists in permissions request, select it
               selectedAccounts.insert(selectedAccount.id)
             } else if let firstAccount = accounts.first {
               // else select the first account by default

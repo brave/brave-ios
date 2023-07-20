@@ -72,7 +72,6 @@ import BraveCore
     let walletService = BraveWallet.TestBraveWalletService()
     walletService._defaultBaseCurrency = { $0(CurrencyCode.usd.code) }
     walletService._addObserver = { _ in }
-    walletService._selectedCoin = { $0(BraveWallet.CoinType.eth) }
     let mockAssetManager = TestableWalletUserAssetManager()
     mockAssetManager._getAllUserAssetsInNetworkAssets = { _ in
       []

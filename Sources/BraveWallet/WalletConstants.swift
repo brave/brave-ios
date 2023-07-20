@@ -74,7 +74,7 @@ public struct WalletConstants {
   ]
   
   /// The currently supported coin types.
-  static var supportedCoinTypes: OrderedSet<BraveWallet.CoinType> {
+  public static var supportedCoinTypes: OrderedSet<BraveWallet.CoinType> {
     return [.eth, .sol]
   }
   
