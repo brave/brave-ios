@@ -233,7 +233,7 @@ class NewTabPageViewController: UIViewController {
       braveNewsFeatureUsage.recordHistogram()
       recordBraveNewsDaysUsedP3A()
     }
-    braveNewsFeatureUsage.recordReturningUsageMetric()
+    
     recordNewTabCreatedP3A()
     recordBraveNewsWeeklyUsageCountP3A()
   }
@@ -945,7 +945,6 @@ extension NewTabPageViewController {
     
     // Usage
     braveNewsFeatureUsage.recordUsage()
-    braveNewsFeatureUsage.recordReturningUsageMetric()
     var braveNewsWeeklyCount = P3ATimedStorage<Int>.braveNewsWeeklyCount
     braveNewsWeeklyCount.add(value: 1, to: Date())
     
