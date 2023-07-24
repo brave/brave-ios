@@ -46,7 +46,7 @@ window.__firefox__.includeOnce("YoutubeQuality", function($) {
     }
   }
   
-  var timeout = 0;
+  var ytQualityTimerId = 0;
   var chosenQuality = "";
   
   Object.defineProperty(window.__firefox__, '$<set_youtube_quality>', {
@@ -60,16 +60,16 @@ window.__firefox__.includeOnce("YoutubeQuality", function($) {
       
       chosenQuality = newVideoQuality;
       
-      clearInterval(timeout);
-      timeout = setInterval($(() => {
+      clearInterval(ytQualityTimerId);
+      ytQualityTimerId = setInterval($(() => {
         let player = findPlayer();
         if (attemptCount++ > maxAttempts) {
-          clearInterval(timeout);
+          clearInterval(ytQualityTimerId);
           return;
         }
         
         if (updatePlayerQuality(player, chosenQuality)) {
-          clearInterval(timeout);
+          clearInterval(ytQualityTimerId);
         }
       }), 500);
     })
