@@ -18,16 +18,6 @@ window.__firefox__.includeOnce("YoutubeQuality", function($) {
   function findPlayer() {
     return document.getElementById('movie_player') || document.querySelector('.html5-video-player');
   }
-  
-  // Returns -1 if the api does not exist.
-  // If it does exist it returns number of available video qualities of the player.
-  function hasAPIsAndEnoughVideoQualities(player) {
-    if (!player || typeof player.getAvailableQualityLevels === 'undefined') {
-      return -1;
-    }
-    
-    return player.getAvailableQualityLevels().length;
-  }
 
   // Returns false if something failed in the process - we may retry after a small delay
   function updatePlayerQuality(player, requestedQuality) {
