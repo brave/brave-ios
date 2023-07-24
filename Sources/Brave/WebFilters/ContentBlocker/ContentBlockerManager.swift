@@ -263,7 +263,7 @@ actor ContentBlockerManager {
   }
   
   /// Remove the rule list for the blocklist type
-  func removeRuleLists(for type: BlocklistType, force: Bool = false) async throws {
+  public func removeRuleLists(for type: BlocklistType, force: Bool = false) async throws {
     for mode in type.allowedModes {
       try await removeRuleList(forIdentifier: type.makeIdentifier(for: mode), force: force)
     }

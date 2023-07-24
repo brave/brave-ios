@@ -113,7 +113,7 @@ class AdBlockEngineManagerTests: XCTestCase {
         let uuid = UUID().uuidString
         
         await engineManager.add(
-          resource: .init(type: .dat, source: .filterList(componentId: uuid)),
+          resource: .init(type: .dat, source: .filterList(componentId: uuid, isAlwaysAggressive: false)),
           fileURL: sampleAdBlockDatURL,
           version: "1.0",
           relativeOrder: index
