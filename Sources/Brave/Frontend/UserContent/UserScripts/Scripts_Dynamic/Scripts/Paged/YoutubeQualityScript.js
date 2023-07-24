@@ -19,13 +19,16 @@ window.__firefox__.includeOnce("YoutubeQuality", function($) {
     return document.getElementById('movie_player') || document.querySelector('.html5-video-player');
   }
   
-  function hasAPIs(player) {
-    if (!player) {
-      return false;
+  // Returns -1 if the api does not exist.
+  // If it does exist it returns number of available video qualities of the player.
+  function hasAPIsAndEnoughVideoQualities(player) {
+    if (!player || typeof player.getAvailableQualityLevels === 'undefined') {
+      return -1;
     }
     
-    return typeof player.getAvailableQualityLevels !== 'undefined';
+    return player.getAvailableQualityLevels().length;
   }
+
   
   function updatePlayerQuality(player, requestedQuality) {
     let qualities = player.getAvailableQualityLevels();
@@ -46,6 +49,9 @@ window.__firefox__.includeOnce("YoutubeQuality", function($) {
   
   var timeout = 0;
   var chosenQuality = "";
+  // To not break the site completely, if it fails to upgrade few times we proceed with the default option.
+  var attemptCount = 0;
+  let maxAttempts = 3;
   
   Object.defineProperty(window.__firefox__, '$<set_youtube_quality>', {
     enumerable: false,
@@ -57,7 +63,9 @@ window.__firefox__.includeOnce("YoutubeQuality", function($) {
       clearInterval(timeout);
       timeout = setInterval($(() => {
         let player = findPlayer();
-        if (player && hasAPIs(player)) {
+        // The api must exist and has at least 1 video quality.
+        // Sometimes the video count does not load fast enough and a 500ms retry interval is needed.
+        if (hasAPIsAndEnoughVideoQualities(player) > 0 || attemptCount++ > maxAttempts) {
           clearInterval(timeout);
           updatePlayerQuality(player, chosenQuality);
         }
