@@ -64,7 +64,7 @@ window.__firefox__.includeOnce("YoutubeQuality", function($) {
       timeout = setInterval($(() => {
         let player = findPlayer();
         if (attemptCount++ > maxAttempts) {
-          clearInterval();
+          clearInterval(timeout);
           return;
         }
         
