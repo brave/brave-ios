@@ -29,45 +29,57 @@ window.__firefox__.includeOnce("YoutubeQuality", function($) {
     return player.getAvailableQualityLevels().length;
   }
 
-  
+  // Returns false if something failed in the process - we may retry after a small delay
   function updatePlayerQuality(player, requestedQuality) {
+    if (!player || typeof player.getAvailableQualityLevels === 'undefined') {
+      return false;
+    }
+    
     let qualities = player.getAvailableQualityLevels();
     if (qualities && qualities.length > 0 && requestedQuality.length > 0) {
       let quality = qualities.includes(requestedQuality) ? requestedQuality : qualities[0];
       
-      if (player.setPlaybackQuality) {
-        player.setPlaybackQuality(quality);
-      }
-      
       if (player.setPlaybackQualityRange) {
         player.setPlaybackQualityRange(quality);
+        return true;
       }
       
-      // console.log(player.getPlaybackQualityLabel());
+      if (player.setPlaybackQuality) {
+        player.setPlaybackQuality(quality);
+        return true;
+      }
+            
+      return false;
+    } else {
+      // Sometimes the video qualities do not load fast enough.
+      return false;
     }
   }
   
   var timeout = 0;
   var chosenQuality = "";
-  // To not break the site completely, if it fails to upgrade few times we proceed with the default option.
-  var attemptCount = 0;
-  let maxAttempts = 3;
   
   Object.defineProperty(window.__firefox__, '$<set_youtube_quality>', {
     enumerable: false,
     configurable: false,
     writable: false,
     value: $(function(newVideoQuality) {
+      // To not break the site completely, if it fails to upgrade few times we proceed with the default option.
+      var attemptCount = 0;
+      let maxAttempts = 3;
+      
       chosenQuality = newVideoQuality;
       
       clearInterval(timeout);
       timeout = setInterval($(() => {
         let player = findPlayer();
-        // The api must exist and has at least 1 video quality.
-        // Sometimes the video count does not load fast enough and a 500ms retry interval is needed.
-        if (hasAPIsAndEnoughVideoQualities(player) > 0 || attemptCount++ > maxAttempts) {
+        if (attemptCount++ > maxAttempts) {
+          clearInterval();
+          return;
+        }
+        
+        if (updatePlayerQuality(player, chosenQuality)) {
           clearInterval(timeout);
-          updatePlayerQuality(player, chosenQuality);
         }
       }), 500);
     })
