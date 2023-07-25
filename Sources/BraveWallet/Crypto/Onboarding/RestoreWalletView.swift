@@ -8,7 +8,7 @@ import SwiftUI
 import DesignSystem
 import Strings
 import struct Shared.AppConstants
-import LocalAuthentication
+import Preferences
 
 struct RestoreWalletContainerView: View {
   @ObservedObject var keyringStore: KeyringStore
@@ -33,15 +33,11 @@ private struct RestoreWalletView: View {
   @State private var isRevealRecoveryWords: Bool = true
   @State private var scrollViewIndicatorState: Bool = false
   @State private var recoveryWords: [String] = .init(repeating: "", count: 12)
-  @State private var newPassword: String = ""
+  @State private var newPassword: String?
   @State private var isShowingCreateNewPassword: Bool = false
   @State private var isShowingPhraseError: Bool = false
   @State private var isShowingCompleteState: Bool = false
   private let staticGridsViewHeight: CGFloat = 156
-
-  private var isBiometricsAvailable: Bool {
-    LAContext().canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
-  }
   
   private var numberOfColumns: Int {
     sizeCategory.isAccessibilityCategory ? 2 : 3
@@ -128,7 +124,7 @@ private struct RestoreWalletView: View {
           // to the other type, meaning:
           // regular(12) to legacy(24)
           // or legacy(24) to regular(12)
-          recoveryWords = isLegacyWallet ? .init(repeating: "", count: .regularWalletRecoveryPhraseNumber) : .init(repeating: "", count: .legacyWalletRecoveryPhraseNumber)
+          recoveryWords = .init(repeating: "", count: isLegacyWallet ? .regularWalletRecoveryPhraseNumber : .legacyWalletRecoveryPhraseNumber)
           scrollViewIndicatorState.toggle()
         } label: {
           Text(isLegacyWallet ? Strings.Wallet.restoreWalletImportFromRegularBraveWallet : Strings.Wallet.restoreWalletImportFromLegacyBraveWallet)
@@ -144,7 +140,21 @@ private struct RestoreWalletView: View {
         }
       }
       Button {
-        isShowingCreateNewPassword = true
+        if let newPassword, !newPassword.isEmpty {
+          keyringStore.restoreWallet(words: recoveryWords, password: newPassword, isLegacyBraveWallet: isLegacyWallet) { isMnemonicValid in
+            if isMnemonicValid {
+              isShowingPhraseError = false
+              keyringStore.resetKeychainStoredPassword()
+              if keyringStore.isOnboardingVisible {
+                Preferences.Wallet.isOnboardingCompleted.value = true
+              }
+            } else {
+              isShowingPhraseError = true
+            }
+          }
+        } else {
+          isShowingCreateNewPassword = true
+        }
       } label: {
         Text(Strings.Wallet.continueButtonTitle)
           .frame(maxWidth: .infinity)
@@ -160,16 +170,12 @@ private struct RestoreWalletView: View {
           keyringStore: keyringStore,
           restorePackage: RestorePackage(
             recoveryWords: recoveryWords,
-            newPassword: newPassword,
             onRestoreCompleted: { success, password in
               if success {
                 isShowingPhraseError = false
                 keyringStore.resetKeychainStoredPassword()
-                if isBiometricsAvailable {
-                  keyringStore.isRestoreFromUnlockBiometricsPromptVisible = true
-                } else {
-                  // If we're displaying this via onboarding, mark as completed.
-                  keyringStore.markOnboardingCompleted()
+                if keyringStore.isOnboardingVisible {
+                  Preferences.Wallet.isOnboardingCompleted.value = true
                 }
               } else {
                 newPassword = password
@@ -186,25 +192,6 @@ private struct RestoreWalletView: View {
             }
           }
         }
-      }
-    }
-    .sheet(isPresented: $keyringStore.isRestoreFromUnlockBiometricsPromptVisible) {
-      BiometricView(
-        keyringStore: keyringStore,
-        password: newPassword,
-        onSkip: {
-          keyringStore.isRestoreFromUnlockBiometricsPromptVisible = false
-          isShowingCompleteState = true
-        },
-        onFinish: {
-          keyringStore.isRestoreFromUnlockBiometricsPromptVisible = false
-          isShowingCompleteState = true
-        }
-      )
-    }
-    .sheet(isPresented: $isShowingCompleteState) {
-      OnBoardingCompletedView() {
-        keyringStore.markOnboardingCompleted()
       }
     }
   }

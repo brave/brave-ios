@@ -7,7 +7,7 @@ import Foundation
 import SwiftUI
 import DesignSystem
 import Strings
-import LocalAuthentication
+import Preferences
 
 struct VerifyRecoveryPhraseView: View {
   @ObservedObject var keyringStore: KeyringStore
@@ -15,18 +15,14 @@ struct VerifyRecoveryPhraseView: View {
   @State private var input: String = ""
   @State private var isShowingError = false
   @State private var activeCheckIndex: Int = 0
-  @State private var isShowingBiometricsPrompt: Bool = false
   @State private var isShowingSkipWarning: Bool = false
-  @State private var isShowingCompleteState: Bool = false
 
   @Environment(\.modalPresentationMode) @Binding private var modalPresentationMode
+  @FocusState private var focusedField: Bool
   
   private var recoveryWords: [RecoveryWord]
   private let targetedRecoveryWordIndexes: [Int]
   private let password: String
-  private var isBiometricsAvailable: Bool {
-    LAContext().canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
-  }
   
   init(
     keyringStore: KeyringStore,
@@ -38,14 +34,6 @@ struct VerifyRecoveryPhraseView: View {
     self.recoveryWords = recoveryWords
     self.targetedRecoveryWordIndexes = targetedRecoveryWordIndexes
     self.password = password
-  }
-  
-  private func markOnboardingCompleted() {
-    if keyringStore.isOnboardingVisible {
-      keyringStore.markOnboardingCompleted()
-    } else {
-      modalPresentationMode = false
-    }
   }
   
   var body: some View {
@@ -68,6 +56,7 @@ struct VerifyRecoveryPhraseView: View {
             .font(.body)
             .autocorrectionDisabled()
             .autocapitalization(.none)
+            .focused($focusedField)
           Divider()
         }
         if isShowingError {
@@ -93,12 +82,8 @@ struct VerifyRecoveryPhraseView: View {
             if activeCheckIndex == targetedRecoveryWordIndexes.count - 1 { // finished all checks
               if keyringStore.isOnboardingVisible {
                 // check if biometric is available
-                if isBiometricsAvailable {
-                  isShowingBiometricsPrompt = true
-                } else {
-                  keyringStore.notifyWalletBackupComplete()
-                  isShowingCompleteState = true
-                }
+                keyringStore.notifyWalletBackupComplete()
+                Preferences.Wallet.isOnboardingCompleted.value = true
               } else { // coming from BackUpWalletView
                 keyringStore.notifyWalletBackupComplete()
               }
@@ -137,7 +122,7 @@ struct VerifyRecoveryPhraseView: View {
         }),
         secondaryButton: WalletPromptButton(title: Strings.Wallet.backupSkipButtonTitle, action: { _ in
           isShowingSkipWarning = false
-          isShowingCompleteState = true
+          Preferences.Wallet.isOnboardingCompleted.value = true
         }),
         showCloseButton: false,
         content: {
@@ -153,28 +138,10 @@ struct VerifyRecoveryPhraseView: View {
           .padding(.vertical, 20)
         })
     )
-    .sheet(isPresented: $isShowingBiometricsPrompt, content: {
-      BiometricView(
-        keyringStore: keyringStore,
-        password: password,
-        onSkip: {
-          isShowingBiometricsPrompt = false
-          keyringStore.notifyWalletBackupComplete()
-          isShowingCompleteState = true
-        },
-        onFinish: {
-          isShowingBiometricsPrompt = false
-          keyringStore.notifyWalletBackupComplete()
-          isShowingCompleteState = true
-        }
-      )
-    })
-    .sheet(isPresented: $isShowingCompleteState) {
-      OnBoardingCompletedView() {
-        markOnboardingCompleted()
-      }
-    }
     .transparentNavigationBar(backButtonDisplayMode: .generic)
+    .onAppear {
+      focusedField = true
+    }
   }
 }
 

@@ -161,6 +161,8 @@ public class KeyringStore: ObservableObject {
   /// A list of default account with all support coin types
   @Published var defaultAccounts: [BraveWallet.AccountInfo] = []
   
+  var passwordToSaveInBiometric: String?
+  
   /// The origin of the active tab (if applicable). Used for fetching/selecting network for the DApp origin.
   public var origin: URLOrigin?
   
@@ -347,6 +349,9 @@ public class KeyringStore: ObservableObject {
     isCreatingWallet = true
     keyringService.createWallet(password) { [weak self] mnemonic in
       self?.updateKeyringInfo()
+      if !mnemonic.isEmpty {
+        self?.passwordToSaveInBiometric = password
+      }
       completion?(mnemonic)
     }
   }
@@ -375,6 +380,7 @@ public class KeyringStore: ObservableObject {
       guard let self = self else { return }
       if isMnemonicValid {
         // Restoring from wallet means you already have your phrase backed up
+        self.passwordToSaveInBiometric = password
         self.notifyWalletBackupComplete()
         self.updateKeyringInfo()
         self.resetKeychainStoredPassword()

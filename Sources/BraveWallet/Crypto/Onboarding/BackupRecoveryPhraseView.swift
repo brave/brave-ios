@@ -8,7 +8,7 @@ import SwiftUI
 import DesignSystem
 import Strings
 import struct Shared.AppConstants
-import LocalAuthentication
+import Preferences
 
 struct BackupRecoveryPhraseView: View {
   @ObservedObject var keyringStore: KeyringStore
@@ -19,13 +19,7 @@ struct BackupRecoveryPhraseView: View {
   @State private var isShowingSkipWarning: Bool = false
   @State private var hasCopied: Bool = false
   @State private var verifyRecoveryWordIndexes: [Int]?
-  @State private var isShowingBiometricsPrompt: Bool = false
-  @State private var isShowingCompleteState: Bool = false
-  
-  private var isBiometricsAvailable: Bool {
-    LAContext().canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil)
-  }
-  
+
   init(
     password: String,
     keyringStore: KeyringStore
@@ -56,21 +50,17 @@ struct BackupRecoveryPhraseView: View {
         .fixedSize(horizontal: false, vertical: true)
         .multilineTextAlignment(.center)
         RecoveryPhraseGrid(data: recoveryWords, id: \.self) { word in
-          HStack(spacing: 10) {
-            Text("#\(word.index + 1)")
-            Text("\(word.value)")
-              .customPrivacySensitive()
-              .multilineTextAlignment(.leading)
-              .frame(maxWidth: .infinity)
-          }
-          .font(.footnote.bold())
-          .padding(8)
-          .overlay(
-            RoundedRectangle(cornerRadius: 4)
-              .stroke(Color(.braveDisabled), lineWidth: 1)
-          )
+          Text("#\(word.index + 1) \(word.value)")
+            .customPrivacySensitive()
+            .multilineTextAlignment(.leading)
+            .frame(maxWidth: .infinity)
+            .font(.footnote.bold())
+            .padding(8)
+            .overlay(
+              RoundedRectangle(cornerRadius: 4)
+                .stroke(Color(.braveDisabled), lineWidth: 1)
+            )
         }
-        .padding(.horizontal)
         .blur(radius: isViewRecoveryPermitted ? 0 : 4)
         .overlay(
           RoundedRectangle(cornerRadius: 4)
@@ -169,11 +159,7 @@ struct BackupRecoveryPhraseView: View {
         }),
         secondaryButton: WalletPromptButton(title: Strings.Wallet.backupSkipButtonTitle, action: { _ in
           isShowingSkipWarning = false
-          if isBiometricsAvailable {
-            isShowingBiometricsPrompt = true
-          } else {
-            isShowingCompleteState = true
-          }
+          Preferences.Wallet.isOnboardingCompleted.value = true
         }),
         showCloseButton: false,
         content: {
@@ -189,25 +175,6 @@ struct BackupRecoveryPhraseView: View {
           .padding(.vertical, 20)
         })
     )
-    .sheet(isPresented: $isShowingBiometricsPrompt, content: {
-      BiometricView(
-        keyringStore: keyringStore,
-        password: password,
-        onSkip: {
-          isShowingBiometricsPrompt = false
-          isShowingCompleteState = true
-        },
-        onFinish: {
-          isShowingBiometricsPrompt = false
-          isShowingCompleteState = true
-        }
-      )
-    })
-    .sheet(isPresented: $isShowingCompleteState) {
-      OnBoardingCompletedView() {
-        keyringStore.markOnboardingCompleted()
-      }
-    }
     .onAppear {
       keyringStore.recoveryPhrase(password: password) { words in
         recoveryWords = words

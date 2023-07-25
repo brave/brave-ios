@@ -11,7 +11,6 @@ import struct Shared.AppConstants
 
 struct RestorePackage {
   let recoveryWords: [String]
-  let newPassword: String
   let onRestoreCompleted: (_ status: Bool, _ validPassword: String) -> Void
   var isLegacyWallet: Bool {
     recoveryWords.count == .legacyWalletRecoveryPhraseNumber
@@ -58,22 +57,14 @@ private struct CreateWalletView: View {
   @ObservedObject var keyringStore: KeyringStore
   var restorePackage: RestorePackage?
 
-  @State private var password: String
-  @State private var repeatedPassword: String
+  @State private var password: String = ""
+  @State private var repeatedPassword: String = ""
   @State private var validationError: ValidationError?
-  @State private var hasCreatedNewWallet: Bool = false
+  @State private var isNewWalletCreated: Bool = false
   @State private var passwordStatus: PasswordStatus = .none
   @State private var isInputsMatch: Bool = false
   
-  init(
-    keyringStore: KeyringStore,
-    restorePackage: RestorePackage? = nil
-  ) {
-    self.keyringStore = keyringStore
-    _password = State(initialValue: restorePackage?.newPassword ?? "")
-    _repeatedPassword = State(initialValue: restorePackage?.newPassword ?? "")
-    self.restorePackage = restorePackage
-  }
+  @FocusState private var focusedField: Bool
 
   private func createWallet() {
     if let restorePackage {
@@ -88,7 +79,7 @@ private struct CreateWalletView: View {
     } else {
       keyringStore.createWallet(password: password) { mnemonic in
         if !mnemonic.isEmpty {
-          hasCreatedNewWallet = true
+          isNewWalletCreated = true
         }
       }
     }
@@ -175,6 +166,7 @@ private struct CreateWalletView: View {
             HStack(spacing: 8) {
               SecureField(Strings.Wallet.passwordPlaceholder, text: $password)
                 .textContentType(.newPassword)
+                .focused($focusedField)
               Spacer()
               if passwordStatus != .none {
                 passwordStatusView(passwordStatus)
@@ -221,13 +213,16 @@ private struct CreateWalletView: View {
           password: password,
           keyringStore: keyringStore
         ),
-        isActive: $hasCreatedNewWallet
+        isActive: $isNewWalletCreated
       ) {
         EmptyView()
       }
     )
     .onChange(of: password, perform: handleInputChange)
     .onChange(of: repeatedPassword, perform: handleInputChange)
+    .onAppear {
+      focusedField = true
+    }
   }
 }
 
