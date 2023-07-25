@@ -19,7 +19,7 @@ extension Strings {
       "wallet.wallet",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Wallet",
+      value: "Brave Wallet",
       comment: "The title shown on the menu to access Brave Wallet"
     )
     public static let web3 = NSLocalizedString(

@@ -33,7 +33,7 @@ struct SetupCryptoView: View {
             isShowingCreateNewWallet = true
           } label: {
             HStack(alignment: .top, spacing: 16) {
-              Image("wallet-add", bundle: .module)
+              Image(braveSystemName: "leo.plus.add")
                 .frame(width: 32, height: 32)
                 .background(Color(.secondaryButtonTint).opacity(0.3))
                 .clipShape(Circle())
@@ -57,7 +57,7 @@ struct SetupCryptoView: View {
             isShowingRestoreExistedWallet = true
           } label: {
             HStack(alignment: .top, spacing: 16) {
-              Image("wallet-import", bundle: .module)
+              Image(braveSystemName: "leo.import.arrow")
                 .frame(width: 32, height: 32)
                 .background(Color(.secondaryButtonTint).opacity(0.3))
                 .clipShape(Circle())
