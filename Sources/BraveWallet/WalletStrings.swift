@@ -327,8 +327,15 @@ extension Strings {
       "wallet.passwordPlaceholder",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Enter new password",
+      value: "Enter password",
       comment: "A placeholder string that will be used on password text fields"
+    )
+    public static let newPasswordPlaceholder = NSLocalizedString(
+      "wallet.newPasswordPlaceholder",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Enter new password",
+      comment: "A placeholder string that will be used on password text fields to create a new wallet"
     )
     public static let repeatedPasswordPlaceholder = NSLocalizedString(
       "wallet.repeatedPasswordPlaceholder",

@@ -161,10 +161,10 @@ private struct CreateWalletView: View {
       VStack(alignment: .leading, spacing: 20) {
         VStack(spacing: 30) {
           VStack(alignment: .leading, spacing: 10) {
-            Text(Strings.Wallet.passwordPlaceholder)
+            Text(Strings.Wallet.newPasswordPlaceholder)
               .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
             HStack(spacing: 8) {
-              SecureField(Strings.Wallet.passwordPlaceholder, text: $password)
+              SecureField(Strings.Wallet.newPasswordPlaceholder, text: $password)
                 .textContentType(.newPassword)
                 .focused($focusedField)
               Spacer()
