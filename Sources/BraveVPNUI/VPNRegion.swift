@@ -8,6 +8,7 @@ import GuardianConnect
 import BraveUI
 import SwiftUI
 import Shared
+import BraveVPN
 
 extension GRDRegion {
   

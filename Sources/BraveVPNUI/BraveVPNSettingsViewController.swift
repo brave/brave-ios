@@ -11,6 +11,7 @@ import BraveUI
 import os.log
 import BraveShared
 import GuardianConnect
+import BraveVPN
 
 public class BraveVPNSettingsViewController: TableViewController {
 

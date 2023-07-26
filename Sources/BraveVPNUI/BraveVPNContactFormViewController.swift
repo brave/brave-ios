@@ -14,6 +14,7 @@ import BraveUI
 import os.log
 import BraveStrings
 import GuardianConnect
+import BraveVPN
 
 class BraveVPNContactFormViewController: TableViewController {
 

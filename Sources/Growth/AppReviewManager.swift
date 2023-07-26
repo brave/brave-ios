@@ -10,6 +10,7 @@ import Preferences
 import StoreKit
 import UIKit
 import BraveVPN
+import BraveVPNUI
 
 /// Singleton Manager handles App Review Criteria
 public class AppReviewManager: ObservableObject {

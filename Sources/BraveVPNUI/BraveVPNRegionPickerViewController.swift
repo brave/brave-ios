@@ -9,6 +9,7 @@ import BraveUI
 import Lottie
 import NetworkExtension
 import GuardianConnect
+import BraveVPN
 
 public class BraveVPNRegionPickerViewController: BraveVPNPickerViewController {
   private let regionList: [GRDRegion]

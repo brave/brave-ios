@@ -11,6 +11,9 @@
 		0A5E04F923FEADA800E5A3E9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0A5E04F823FEADA800E5A3E9 /* LaunchScreen.storyboard */; };
 		0A5E04FB23FEB53700E5A3E9 /* LaunchScreen.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0A5E04FA23FEB53700E5A3E9 /* LaunchScreen.xcassets */; };
 		270ECFC82838210F0089B8B7 /* Brave in Frameworks */ = {isa = PBXBuildFile; productRef = 270ECFC72838210F0089B8B7 /* Brave */; };
+		272861142A71BA9800CE04F0 /* ToggleVPNWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 272861132A71BA6A00CE04F0 /* ToggleVPNWidget.swift */; };
+		272861162A71BB6C00CE04F0 /* VPNAppIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 272861152A71BB6600CE04F0 /* VPNAppIntent.swift */; };
+		272861182A71BD7100CE04F0 /* BraveVPN in Frameworks */ = {isa = PBXBuildFile; productRef = 272861172A71BD7100CE04F0 /* BraveVPN */; };
 		272947DE29C8DB2000BF2FDC /* topics_news.en_US.json in Resources */ = {isa = PBXBuildFile; fileRef = 27444B6A29831BBE002E1EBE /* topics_news.en_US.json */; };
 		272947E329C8F86A00BF2FDC /* NewsTopicsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 272947E029C8F6F200BF2FDC /* NewsTopicsModel.swift */; };
 		272FC5AF2979EA700027C53D /* TopNewsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 272FC5AE2979E9D60027C53D /* TopNewsWidget.swift */; };
@@ -168,6 +171,8 @@
 		270ECFC628381E270089B8B7 /* brave-ios */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = "brave-ios"; path = ..; sourceTree = "<group>"; };
 		271D0F3A284FDB12002BCF91 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = Shortcuts/it.lproj/BrowserIntents.strings; sourceTree = "<group>"; };
 		27262B4C28BEB3D800A2E526 /* Intents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Intents.framework; path = System/Library/Frameworks/Intents.framework; sourceTree = SDKROOT; };
+		272861132A71BA6A00CE04F0 /* ToggleVPNWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToggleVPNWidget.swift; sourceTree = "<group>"; };
+		272861152A71BB6600CE04F0 /* VPNAppIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNAppIntent.swift; sourceTree = "<group>"; };
 		272947E029C8F6F200BF2FDC /* NewsTopicsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsTopicsModel.swift; sourceTree = "<group>"; };
 		272FC5AE2979E9D60027C53D /* TopNewsWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopNewsWidget.swift; sourceTree = "<group>"; };
 		273ACA2128492ECB008A58BB /* JitsiMeetSDK.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = JitsiMeetSDK.xcframework; path = ../ThirdParty/JitsiMeet/JitsiMeetSDK.xcframework; sourceTree = "<group>"; };
@@ -395,6 +400,7 @@
 				CA0391B6271E1023000EB13C /* SwiftUI.framework in Frameworks */,
 				CA986FB2298C1249000C6DD8 /* BraveWidgetsModels in Frameworks */,
 				27D5907129B7BA1B00AE9989 /* Preferences in Frameworks */,
+				272861182A71BD7100CE04F0 /* BraveVPN in Frameworks */,
 				CA0391B4271E1023000EB13C /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -578,6 +584,8 @@
 				441A635F272444DE001492C3 /* StatDataModel.swift */,
 				272FC5AE2979E9D60027C53D /* TopNewsWidget.swift */,
 				278BB9FE297B0A1E00690BE3 /* TopNewsListWidget.swift */,
+				272861132A71BA6A00CE04F0 /* ToggleVPNWidget.swift */,
+				272861152A71BB6600CE04F0 /* VPNAppIntent.swift */,
 				CA0391B8271E1023000EB13C /* BraveWidgets.swift */,
 				27D7FF5A29BA75AD0096DD93 /* WidgetStrings.swift */,
 				CA0391E5271E1382000EB13C /* BraveWidgets.intentdefinition */,
@@ -755,6 +763,7 @@
 				27D5907029B7BA1B00AE9989 /* Preferences */,
 				27D7FF5429BA69E50096DD93 /* BraveShields */,
 				27462BE929DF39EE00715268 /* OrderedCollections */,
+				272861172A71BD7100CE04F0 /* BraveVPN */,
 			);
 			productName = BraveWidgetsExtension;
 			productReference = CA0391B2271E1023000EB13C /* BraveWidgetsExtension.appex */;
@@ -1016,9 +1025,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				272861142A71BA9800CE04F0 /* ToggleVPNWidget.swift in Sources */,
 				272947E329C8F86A00BF2FDC /* NewsTopicsModel.swift in Sources */,
 				278BB9FF297B0A1E00690BE3 /* TopNewsListWidget.swift in Sources */,
 				CA0391FC271E143F000EB13C /* SingleStatWidget.swift in Sources */,
+				272861162A71BB6C00CE04F0 /* VPNAppIntent.swift in Sources */,
 				27A28ED528C00C1D001466A4 /* LockScreenShortcutWidget.swift in Sources */,
 				CA0391FB271E143F000EB13C /* StatsWidget.swift in Sources */,
 				CA0391F8271E143F000EB13C /* ShortcutsWidget.swift in Sources */,
@@ -3124,6 +3135,10 @@
 		270ECFC72838210F0089B8B7 /* Brave */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Brave;
+		};
+		272861172A71BD7100CE04F0 /* BraveVPN */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BraveVPN;
 		};
 		272FC5B02979F3AD0027C53D /* CodableHelpers */ = {
 			isa = XCSwiftPackageProductDependency;

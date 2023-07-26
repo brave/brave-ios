@@ -8,6 +8,7 @@ import Shared
 import BraveShared
 import os.log
 import BraveVPN
+import BraveVPNUI
 
 class BraveSkusWebHelper {
   /// On which hosts the receipt should be allowed to be exposed.

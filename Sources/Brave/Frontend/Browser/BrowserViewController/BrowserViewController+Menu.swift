@@ -13,6 +13,7 @@ import BraveWallet
 import BraveCore
 import os.log
 import BraveVPN
+import BraveVPNUI
 
 extension BrowserViewController {
   func featuresMenuSection(_ menuController: MenuViewController) -> some View {

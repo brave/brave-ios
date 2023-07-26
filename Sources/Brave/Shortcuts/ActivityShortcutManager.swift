@@ -12,6 +12,7 @@ import MobileCoreServices
 import UIKit
 import BrowserIntentsModels
 import BraveVPN
+import BraveVPNUI
 import BraveNews
 import Growth
 import os.log

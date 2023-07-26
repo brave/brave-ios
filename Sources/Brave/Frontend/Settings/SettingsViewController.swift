@@ -17,6 +17,7 @@ import SwiftUI
 import BraveWallet
 import BraveUI
 import BraveVPN
+import BraveVPNUI
 import BraveNews
 import Growth
 

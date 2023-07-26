@@ -22,6 +22,7 @@ import SwiftUI
 import class Combine.AnyCancellable
 import BraveWallet
 import BraveVPN
+import BraveVPNUI
 import BraveNews
 import Preferences
 import os.log
@@ -33,6 +34,7 @@ import Onboarding
 import Growth
 import BraveShields
 import CertificateUtilities
+import WidgetKit
 
 private let KVOs: [KVOConstants] = [
   .estimatedProgress,
@@ -718,7 +720,11 @@ public class BrowserViewController: UIViewController {
 
   @objc func vpnConfigChanged() {
     // Load latest changes to the vpn.
-    NEVPNManager.shared().loadFromPreferences { _ in }
+    NEVPNManager.shared().loadFromPreferences { _ in
+      DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+        WidgetCenter.shared.reloadTimelines(ofKind: "ToggleVPNWidget")
+      }
+    }
     
     if case .purchased(let enabled) = BraveVPN.vpnState, enabled {
       recordVPNUsageP3A(vpnEnabled: true)

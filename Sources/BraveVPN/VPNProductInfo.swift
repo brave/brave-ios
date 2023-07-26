@@ -11,8 +11,8 @@ import os.log
 public class VPNProductInfo: NSObject {
   // Prices are fetched once per launch and kept in memory.
   // If the prices could not be fetched, we retry after user tries to go to buy-vpn screen.
-  static var monthlySubProduct: SKProduct?
-  static var yearlySubProduct: SKProduct?
+  public static var monthlySubProduct: SKProduct?
+  public static var yearlySubProduct: SKProduct?
 
   /// Whether we have enough product info to present to the user.
   /// If the user has bought the vpn already, it returns `true` since we do not need price details anymore.
@@ -34,15 +34,15 @@ public class VPNProductInfo: NSObject {
   private let productRequest: SKProductsRequest
 
   /// These product ids work only on release channel.
-  struct ProductIdentifiers {
+  public struct ProductIdentifiers {
     /// Apple's monthly IAP
-    static let monthlySub = "bravevpn.monthly"
+    public static let monthlySub = "bravevpn.monthly"
     /// Apple's yearly IAP
-    static let yearlySub = "bravevpn.yearly"
+    public static let yearlySub = "bravevpn.yearly"
     /// account.brave.com  monthly subscription product
-    static let monthlySubSKU = "brave-premium"
+    public static let monthlySubSKU = "brave-premium"
 
-    static let all = Set<String>(arrayLiteral: monthlySub, yearlySub)
+    public static let all = Set<String>(arrayLiteral: monthlySub, yearlySub)
   }
 
   public override init() {

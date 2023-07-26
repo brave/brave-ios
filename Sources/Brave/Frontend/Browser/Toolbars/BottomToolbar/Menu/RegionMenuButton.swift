@@ -9,6 +9,9 @@ import BraveShared
 import SwiftUI
 import BraveUI
 import BraveVPN
+import BraveVPNUI
+import BraveVPN
+import BraveVPNUI
 import GuardianConnect
 
 /// A menu button that provides a shortcut to changing Brave VPN region

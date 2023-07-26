@@ -27,6 +27,7 @@ var package = Package(
     .library(name: "Strings", targets: ["Strings"]),
     .library(name: "BraveStrings", targets: ["BraveStrings"]),
     .library(name: "BraveVPN", targets: ["BraveVPN"]),
+    .library(name: "BraveVPNUI", targets: ["BraveVPNUI"]),
     .library(name: "BraveNews", targets: ["BraveNews"]),
     .library(name: "Favicon", targets: ["Favicon"]),
     .library(name: "FaviconModels", targets: ["FaviconModels"]),
@@ -124,7 +125,7 @@ var package = Package(
     .target(name: "BraveStrings", dependencies: ["Strings", "Preferences"]),
     .target(
       name: "Growth",
-      dependencies: ["BraveVPN", "Shared", "BraveShared", "Strings", "SnapKit", "CertificateUtilities"],
+      dependencies: ["BraveVPN", "BraveVPNUI", "Shared", "BraveShared", "Strings", "SnapKit", "CertificateUtilities"],
       plugins: ["LoggerPlugin"]
     ),
     .target(
@@ -199,6 +200,16 @@ var package = Package(
     .target(
       name: "BraveVPN",
       dependencies: [
+        "Then",
+        "Data",
+        "GuardianConnect",
+      ],
+      plugins: ["LoggerPlugin"]
+    ),
+    .target(
+      name: "BraveVPNUI",
+      dependencies: [
+        "BraveVPN",
         "BraveStrings",
         "SnapKit",
         "Then",
@@ -361,6 +372,7 @@ var braveTarget: PackageDescription.Target = .target(
     "BrowserIntentsModels",
     "BraveWidgetsModels",
     "BraveVPN",
+    "BraveVPNUI",
     "BraveNews",
     "Onboarding",
     "Growth",

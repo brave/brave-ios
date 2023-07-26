@@ -19,6 +19,7 @@ import BraveCore
 import Combine
 import Brave
 import BraveVPN
+import BraveVPNUI
 import Growth
 import RuntimeWarnings
 import BraveNews

@@ -9,6 +9,7 @@ import BraveUI
 import Lottie
 import NetworkExtension
 import GuardianConnect
+import BraveVPN
 
 class BraveVPNProtocolPickerViewController: BraveVPNPickerViewController {
   

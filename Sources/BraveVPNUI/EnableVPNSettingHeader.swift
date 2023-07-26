@@ -6,6 +6,7 @@
 import UIKit
 import Shared
 import BraveUI
+import BraveVPN
 
 public class EnableVPNSettingHeader: UIView {
 

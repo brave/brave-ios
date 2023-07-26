@@ -10,6 +10,7 @@ import NetworkExtension
 import Data
 import GuardianConnect
 import os.log
+import WidgetKit
 
 /// A static class to handle all things related to the Brave VPN service.
 public class BraveVPN {
@@ -22,11 +23,11 @@ public class BraveVPN {
 
   /// List of regions the VPN can connect to.
   /// This list is not static and should be refetched every now and then.
-  static var regions: [GRDRegion] = []
+  public static var regions: [GRDRegion] = []
   
   /// Record last used region
   /// It is used to hold details of the region when automatic selection is used
-  static var lastKnownRegion: GRDRegion?
+  public static var lastKnownRegion: GRDRegion?
   
   // Non translatable
   private static let connectionName = "Brave Firewall + VPN"
@@ -169,15 +170,6 @@ public class BraveVPN {
     case purchased(enabled: Bool)
 
     case expired
-
-    /// What view controller to show once user taps on `Enable VPN` button at one of places in the app.
-    public var enableVPNDestinationVC: UIViewController? {
-      switch self {
-      case .notPurchased, .expired: return BuyVPNViewController(iapObserver: iapObserver)
-      // Show nothing, the `Enable` button will now be used to connect and disconnect the vpn.
-      case .purchased: return nil
-      }
-    }
   }
 
   /// Current state ot the VPN service.
@@ -218,33 +210,12 @@ public class BraveVPN {
   public static var serverLocation: String? {
     helper.mainCredential?.hostnameDisplayValue
   }
-
-  /// Name of the purchased vpn plan.
-  public static var subscriptionName: String {
-    guard let credential = GRDSubscriberCredential.current() else {
-      logAndStoreError("subscriptionName: failed to retrieve subscriber credentials")
-      return ""
-    }
-    let productId = credential.subscriptionType
-    
-    switch productId {
-    case VPNProductInfo.ProductIdentifiers.monthlySub:
-      return Strings.VPN.vpnSettingsMonthlySubName
-    case VPNProductInfo.ProductIdentifiers.yearlySub:
-      return Strings.VPN.vpnSettingsYearlySubName
-    case VPNProductInfo.ProductIdentifiers.monthlySubSKU:
-      return Strings.VPN.vpnSettingsMonthlySubName
-    default:
-      assertionFailure("Can't get product id")
-      return ""
-    }
-  }
   
   // MARK: - Actions
 
   /// Reconnects to the vpn.
   /// The vpn must be configured prior to that otherwise it does nothing.
-  public static func reconnect() {
+  public static func reconnect(_ completion: ((Bool) -> Void)? = nil) {
     if reconnectPending {
       logAndStoreError("Can't reconnect the vpn while another reconnect is pending.")
       return
@@ -252,7 +223,7 @@ public class BraveVPN {
 
     reconnectPending = true
 
-    connectToVPN()
+    connectToVPN(completion: completion)
   }
 
   /// Disconnects the vpn.
@@ -264,6 +235,10 @@ public class BraveVPN {
     }
 
     helper.disconnectVPN()
+    
+    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+      WidgetCenter.shared.reloadTimelines(ofKind: "ToggleVPNWidget")
+    }
   }
 
   public static func connectToVPN(completion: ((Bool) -> Void)? = nil) {
@@ -284,6 +259,7 @@ public class BraveVPN {
         // Re-connected user should update last used region - detail is pulled
         fetchLastUsedRegionDetail() { _, _ in
           DispatchQueue.main.async {
+            WidgetCenter.shared.reloadTimelines(ofKind: "ToggleVPNWidget")
             completion?(status == .success)
           }
         }
@@ -307,7 +283,8 @@ public class BraveVPN {
           
         // First time user will connect automatic region - detail is pulled
         fetchLastUsedRegionDetail() { _, _ in
-          DispatchQueue.main.async {  
+          DispatchQueue.main.async {
+            WidgetCenter.shared.reloadTimelines(ofKind: "ToggleVPNWidget")
             completion?(success)
           }
         }
@@ -471,57 +448,6 @@ public class BraveVPN {
     }
   }
   
-  public static func sendVPNWorksInBackgroundNotification() {
-    switch vpnState {
-    case .expired, .notPurchased:
-      break
-    case .purchased(let enabled):
-      if !enabled || Preferences.VPN.vpnWorksInBackgroundNotificationShowed.value {
-        break
-      }
-
-      let center = UNUserNotificationCenter.current()
-      let notificationId = "vpnWorksInBackgroundNotification"
-
-      center.requestAuthorization(options: [.provisional, .alert, .sound, .badge]) { granted, error in
-        if let error = error {
-          Logger.module.error("Failed to request notifications permissions: \(error.localizedDescription)")
-          return
-        }
-
-        if !granted {
-          Logger.module.info("Not authorized to schedule a notification")
-          return
-        }
-
-        center.getPendingNotificationRequests { requests in
-          if requests.contains(where: { $0.identifier == notificationId }) {
-            // Already has one scheduled no need to schedule again.
-            // Should not happens since we push the notification right away.
-            return
-          }
-
-          let content = UNMutableNotificationContent()
-          content.title = Strings.VPN.vpnBackgroundNotificationTitle
-          content.body = Strings.VPN.vpnBackgroundNotificationBody
-
-          // Empty `UNNotificationTrigger` sends the notification right away.
-          let request = UNNotificationRequest(identifier: notificationId, content: content,
-                                              trigger: nil)
-
-          center.add(request) { error in
-            if let error = error {
-              Logger.module.error("Failed to add notification: \(error.localizedDescription)")
-              return
-            }
-
-            Preferences.VPN.vpnWorksInBackgroundNotificationShowed.value = true
-          }
-        }
-      }
-    }
-  }
-  
   /// The function that fetched the last used region details from timezones
   /// It used to get details of Region when Automatic Region is used
   /// Otherwise the region detail items will be empty
@@ -556,7 +482,7 @@ public class BraveVPN {
 
   /// Prints out the error to the logger and stores it in a in memory array.
   /// This can be further used for a customer support form.
-  private static func logAndStoreError(_ message: String, printToConsole: Bool = true) {
+  public static func logAndStoreError(_ message: String, printToConsole: Bool = true) {
     if printToConsole {
       Logger.module.error("\(message)")
     }

@@ -11,6 +11,7 @@ import Shared
 import SwiftKeychainWrapper
 import SwiftUI
 import BraveVPN
+import BraveVPNUI
 import Onboarding
 import SafariServices
 

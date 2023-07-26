@@ -9,6 +9,7 @@ import BraveShared
 import SwiftUI
 import BraveUI
 import BraveVPN
+import BraveVPNUI
 
 /// A menu button that provides a shortcut to toggling Brave VPN
 struct VPNMenuButton: View {

@@ -8,6 +8,7 @@ import Shared
 import Preferences
 import BraveCore
 import BraveVPN
+import BraveVPNUI
 import os.log
 
 public class BraveSkusManager {

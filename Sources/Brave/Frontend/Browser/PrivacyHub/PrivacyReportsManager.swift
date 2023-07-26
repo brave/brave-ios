@@ -9,6 +9,7 @@ import Preferences
 import Data
 import UIKit
 import BraveVPN
+import BraveVPNUI
 import os.log
 
 public struct PrivacyReportsManager {

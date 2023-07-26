@@ -9,6 +9,7 @@ import SwiftUI
 @main
 struct BraveWidgets: WidgetBundle {
   var body: some Widget {
+    ToggleVPNWidget()
     ShortcutsWidget()
     FavoritesWidget()
     TopNewsWidget()

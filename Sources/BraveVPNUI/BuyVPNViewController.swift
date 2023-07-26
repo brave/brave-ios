@@ -9,6 +9,7 @@ import Preferences
 import StoreKit
 import os.log
 import DesignSystem
+import BraveVPN
 
 class BuyVPNViewController: VPNSetupLoadingController {
     

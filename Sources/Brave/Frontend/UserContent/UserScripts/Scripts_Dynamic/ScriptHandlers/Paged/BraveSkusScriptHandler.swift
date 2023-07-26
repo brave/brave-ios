@@ -9,6 +9,7 @@ import Shared
 import BraveShared
 import BraveCore
 import BraveVPN
+import BraveVPNUI
 import os.log
 
 class BraveSkusScriptHandler: TabContentScript {

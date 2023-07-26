@@ -8,6 +8,7 @@ import Shared
 import Lottie
 import BraveUI
 import GuardianConnect
+import BraveVPN
 
 class InstallVPNViewController: VPNSetupLoadingController {
 

@@ -7,6 +7,7 @@ import UIKit
 import Shared
 import Preferences
 import DesignSystem
+import BraveVPN
 
 enum SubscriptionType: String {
   case yearly = "yearly", monthly = "monthly"
