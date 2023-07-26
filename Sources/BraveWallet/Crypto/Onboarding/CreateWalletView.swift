@@ -212,7 +212,7 @@ private struct CreateWalletView: View {
         destination: BackupRecoveryPhraseView(
           password: password,
           keyringStore: keyringStore
-        ),
+        ).navigationBarBackButtonHidden(),
         isActive: $isNewWalletCreated
       ) {
         EmptyView()

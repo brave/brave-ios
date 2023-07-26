@@ -31,13 +31,11 @@ private struct RestoreWalletView: View {
   
   @State private var isBraveLegacyWallet: Bool = false
   @State private var isRevealRecoveryWords: Bool = true
-  @State private var scrollViewIndicatorState: Bool = false
   @State private var recoveryWords: [String] = .init(repeating: "", count: 12)
   @State private var newPassword: String?
   @State private var isShowingCreateNewPassword: Bool = false
   @State private var isShowingPhraseError: Bool = false
   @State private var isShowingCompleteState: Bool = false
-  private let staticGridsViewHeight: CGFloat = 156
   
   private var numberOfColumns: Int {
     sizeCategory.isAccessibilityCategory ? 2 : 3
@@ -45,6 +43,14 @@ private struct RestoreWalletView: View {
   
   private var isLegacyWallet: Bool {
     recoveryWords.count == 24
+  }
+  
+  private var isContinueDisabled: Bool {
+    var wordCount = 0
+    for word in recoveryWords where !word.isEmpty {
+      wordCount += 1
+    }
+    return wordCount != (isLegacyWallet ? .legacyWalletRecoveryPhraseNumber : .regularWalletRecoveryPhraseNumber)
   }
   
   private var errorLabel: some View {
@@ -80,19 +86,19 @@ private struct RestoreWalletView: View {
   }
 
   var body: some View {
-    VStack(spacing: 48) {
-      VStack(spacing: 14) {
-        Text(Strings.Wallet.restoreWalletTitle)
-          .font(.title)
-          .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
-        Text(Strings.Wallet.restoreWalletSubtitle)
-          .font(.subheadline)
-          .foregroundColor(Color(uiColor: WalletV2Design.textSecondary))
-      }
-      .multilineTextAlignment(.center)
-      .fixedSize(horizontal: false, vertical: true)
-      let columns: [GridItem] = (0..<numberOfColumns).map { _ in .init(.flexible()) }
-      ScrollView {
+    ScrollView {
+      VStack(spacing: 48) {
+        VStack(spacing: 14) {
+          Text(Strings.Wallet.restoreWalletTitle)
+            .font(.title)
+            .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
+          Text(Strings.Wallet.restoreWalletSubtitle)
+            .font(.subheadline)
+            .foregroundColor(Color(uiColor: WalletV2Design.textSecondary))
+        }
+        .multilineTextAlignment(.center)
+        .fixedSize(horizontal: false, vertical: true)
+        let columns: [GridItem] = (0..<numberOfColumns).map { _ in .init(.flexible()) }
         LazyVGrid(columns: columns, spacing: 8) {
           ForEach(self.recoveryWords.indices, id: \.self) { index in
             VStack(alignment: .leading, spacing: 10) {
@@ -109,61 +115,60 @@ private struct RestoreWalletView: View {
             }
           }
         }
-      }
-      .frame(height: staticGridsViewHeight)
-      .padding(.horizontal)
-      if isShowingPhraseError {
-        errorLabel
-      }
-      HStack {
-        Spacer()
-        Button {
-          // Regular wallet has `12` recovery-phrase
-          // Legacy wallet has `24` recovery-phrase
-          // This button is to toggle the current wallet type
-          // to the other type, meaning:
-          // regular(12) to legacy(24)
-          // or legacy(24) to regular(12)
-          recoveryWords = .init(repeating: "", count: isLegacyWallet ? .regularWalletRecoveryPhraseNumber : .legacyWalletRecoveryPhraseNumber)
-          scrollViewIndicatorState.toggle()
-        } label: {
-          Text(isLegacyWallet ? Strings.Wallet.restoreWalletImportFromRegularBraveWallet : Strings.Wallet.restoreWalletImportFromLegacyBraveWallet)
-            .fontWeight(.medium)
-            .foregroundColor(Color(.braveBlurpleTint))
+        .padding(.horizontal)
+        if isShowingPhraseError {
+          errorLabel
         }
-        Spacer()
-        Button {
-          isRevealRecoveryWords.toggle()
-        } label: {
-          Image(braveSystemName: isRevealRecoveryWords ? "leo.eye.off" : "leo.eye.on")
-            .foregroundColor(Color(.braveLabel))
-        }
-      }
-      Button {
-        if let newPassword, !newPassword.isEmpty {
-          keyringStore.restoreWallet(words: recoveryWords, password: newPassword, isLegacyBraveWallet: isLegacyWallet) { isMnemonicValid in
-            if isMnemonicValid {
-              isShowingPhraseError = false
-              keyringStore.resetKeychainStoredPassword()
-              if keyringStore.isOnboardingVisible {
-                Preferences.Wallet.isOnboardingCompleted.value = true
-              }
-            } else {
-              isShowingPhraseError = true
-            }
+        HStack {
+          Spacer()
+          Button {
+            // Regular wallet has `12` recovery-phrase
+            // Legacy wallet has `24` recovery-phrase
+            // This button is to toggle the current wallet type
+            // to the other type, meaning:
+            // regular(12) to legacy(24)
+            // or legacy(24) to regular(12)
+            resignFirstResponder()
+            recoveryWords = .init(repeating: "", count: isLegacyWallet ? .regularWalletRecoveryPhraseNumber : .legacyWalletRecoveryPhraseNumber)
+          } label: {
+            Text(isLegacyWallet ? Strings.Wallet.restoreWalletImportFromRegularBraveWallet : Strings.Wallet.restoreWalletImportFromLegacyBraveWallet)
+              .fontWeight(.medium)
+              .foregroundColor(Color(.braveBlurpleTint))
           }
-        } else {
-          isShowingCreateNewPassword = true
+          Spacer()
+          Button {
+            isRevealRecoveryWords.toggle()
+          } label: {
+            Image(braveSystemName: isRevealRecoveryWords ? "leo.eye.off" : "leo.eye.on")
+              .foregroundColor(Color(.braveLabel))
+          }
         }
-      } label: {
-        Text(Strings.Wallet.continueButtonTitle)
-          .frame(maxWidth: .infinity)
+        Button {
+          if let newPassword, !newPassword.isEmpty {
+            keyringStore.restoreWallet(words: recoveryWords, password: newPassword, isLegacyBraveWallet: isLegacyWallet) { isMnemonicValid in
+              if isMnemonicValid {
+                isShowingPhraseError = false
+                keyringStore.resetKeychainStoredPassword()
+                if keyringStore.isOnboardingVisible {
+                  Preferences.Wallet.isOnboardingCompleted.value = true
+                }
+              } else {
+                isShowingPhraseError = true
+              }
+            }
+          } else {
+            isShowingCreateNewPassword = true
+          }
+        } label: {
+          Text(Strings.Wallet.continueButtonTitle)
+            .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(BraveFilledButtonStyle(size: .large))
+        .disabled(isContinueDisabled)
       }
-      .buttonStyle(BraveFilledButtonStyle(size: .large))
     }
     .padding()
     .onChange(of: recoveryWords, perform: handleRecoveryWordsChanged)
-    .scrollViewIndicatorFlash(staticContentHeight: staticGridsViewHeight)
     .sheet(isPresented: $isShowingCreateNewPassword) {
       NavigationView {
         CreateWalletContainerView(
@@ -194,6 +199,10 @@ private struct RestoreWalletView: View {
         }
       }
     }
+  }
+  
+  private func resignFirstResponder() {
+    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
   }
 }
 

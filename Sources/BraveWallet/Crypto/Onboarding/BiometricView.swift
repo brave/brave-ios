@@ -86,6 +86,7 @@ struct BiometricView: View {
            status != errSecSuccess {
           biometricError = status
         } else {
+          keyringStore.passwordToSaveInBiometric = nil
           completion()
         }
       } label: {
@@ -95,6 +96,7 @@ struct BiometricView: View {
       .buttonStyle(BraveFilledButtonStyle(size: .large))
       .padding(.top, 80)
       Button(action: {
+        keyringStore.passwordToSaveInBiometric = nil
         completion()
       }) {
         Text(Strings.Wallet.skipButtonTitle)
@@ -112,6 +114,7 @@ struct BiometricView: View {
         title: Text(Strings.Wallet.biometricsSetupErrorTitle),
         message: Text(Strings.Wallet.biometricsSetupErrorMessage + (AppConstants.buildChannel.isPublic ? "" : " (\(biometricError ?? -1))")),
         dismissButton: .default(Text( Strings.OKString), action: {
+          keyringStore.passwordToSaveInBiometric = nil
           completion()
         })
       )
