@@ -18,7 +18,7 @@ import SafariServices
 
 extension BrowserViewController {
   /*
-   Check FullScreenCalloutType to make alterations to pirotiry of pop-over variation
+   Check FullScreenCalloutType to make alterations to priority of pop-over variation
    
    Priority:
    - P3A
