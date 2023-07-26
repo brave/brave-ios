@@ -565,7 +565,7 @@ extension Strings {
       "wallet.setupCryptoTitle",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Browser native. Self-custody. And multi-chain.",
+      value: "Browser Native.\nSelf-Custody.\nMulti-chain.",
       comment: "The title displayed on the 'setup crypto' onboarding screen"
     )
     public static let setupCryptoSubtitle = NSLocalizedString(
@@ -621,7 +621,7 @@ extension Strings {
       "wallet.backupRecoveryPhraseTitle",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Save recovery phrase",
+      value: "Save Recovery Phrase",
       comment: "The title of the backup recovery phrase screen"
     )
     public static let backupRecoveryPhraseSubtitle = NSLocalizedString(
@@ -663,7 +663,7 @@ extension Strings {
       "wallet.verifyRecoveryPhraseTitle",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Let's check",
+      value: "Let's Check",
       comment: "The title of the screen that user will verify his/her recovery phrase."
     )
     public static let verifyRecoveryPhraseSubTitle = NSLocalizedString(
@@ -734,7 +734,7 @@ extension Strings {
       "wallet.restoreWalletTitle",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Import an existing wallet",
+      value: "Import an Existing Wallet",
       comment: "The title on the restore wallet screen."
     )
     public static let restoreWalletSubtitle = NSLocalizedString(
@@ -790,7 +790,7 @@ extension Strings {
       "wallet.createWalletTitle",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Create a password",
+      value: "Create a Password",
       comment: "The title of the create wallet screen"
     )
     public static let createWalletSubTitle = NSLocalizedString(

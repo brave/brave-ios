@@ -127,12 +127,12 @@ private struct CreateWalletView: View {
     }
   }
   
-  func errorLabel(_ error: ValidationError) -> some View {
+  func errorLabel(_ error: ValidationError?) -> some View {
     HStack(spacing: 12) {
       Image(braveSystemName: "leo.warning.circle-filled")
         .renderingMode(.template)
         .foregroundColor(Color(.braveLighterOrange))
-      Text(error.errorDescription ?? "")
+      Text(error?.errorDescription ?? "")
         .multilineTextAlignment(.leading)
         .font(.callout)
       Spacer()
@@ -142,6 +142,7 @@ private struct CreateWalletView: View {
       Color(.braveErrorBackground)
         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
     )
+    .hidden(isHidden: error == nil)
   }
 
   var body: some View {
@@ -192,9 +193,7 @@ private struct CreateWalletView: View {
           }
         }
         .font(.subheadline)
-        if let validationError {
-          errorLabel(validationError)
-        }
+        errorLabel(validationError)
       }
       Button(action: createWallet) {
         Text(Strings.Wallet.continueButtonTitle)
@@ -202,7 +201,7 @@ private struct CreateWalletView: View {
       }
       .buttonStyle(BraveFilledButtonStyle(size: .large))
       .disabled(validationError != nil || password.isEmpty || repeatedPassword.isEmpty)
-      .padding(.top, 80)
+      .padding(.top, 60)
     }
     .padding(.horizontal, 20)
     .padding(.bottom, 20)
