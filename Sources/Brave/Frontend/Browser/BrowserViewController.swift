@@ -931,12 +931,12 @@ public class BrowserViewController: UIViewController {
     syncPlaylistFolders()
     checkCrashRestorationOrSetupTabs()
     
-#if DEBUG
-    // FIXME: Remove later
-    let vc = UIHostingController(rootView: PlaylistContainerView())
-    vc.modalPresentationStyle = .fullScreen
-    self.present(vc, animated: true)
-#endif
+//#if DEBUG
+//    // FIXME: Remove later
+//    let vc = UIHostingController(rootView: PlaylistContainerView())
+//    vc.modalPresentationStyle = .fullScreen
+//    self.present(vc, animated: true)
+//#endif
   }
 
   public static let defaultBrowserNotificationId = "defaultBrowserNotification"
