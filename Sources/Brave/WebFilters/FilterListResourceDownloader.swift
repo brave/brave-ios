@@ -188,14 +188,13 @@ public class FilterListResourceDownloader {
   @MainActor private func register(filterList: FilterList) {
     guard adBlockServiceTasks[filterList.entry.componentId] == nil else { return }
     guard let adBlockService = adBlockService else { return }
-    guard let index = FilterListStorage.shared.filterLists.firstIndex(where: { $0.uuid == filterList.uuid }) else { return }
 
     adBlockServiceTasks[filterList.entry.componentId] = Task { @MainActor in
       for await folderURL in adBlockService.register(filterList: filterList) {
         guard let folderURL = folderURL else { continue }
         
         await self.loadShields(
-          fromComponentId: filterList.entry.componentId, folderURL: folderURL, relativeOrder: index,
+          fromComponentId: filterList.entry.componentId, folderURL: folderURL, relativeOrder: filterList.order,
           loadContentBlockers: true,
           isAlwaysAggressive: filterList.isAlwaysAggressive
         )
