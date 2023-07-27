@@ -13,14 +13,16 @@ import Preferences
 struct VPNAppIntent: AppIntent {
   static var title: LocalizedStringResource { "Toggle VPN" }
   static var isDiscoverable: Bool { false }
+  static var openAppWhenRun: Bool { true }
   
-  func perform() async throws -> some IntentResult {
-    let vpnProductInfo = VPNProductInfo()
-    
-    vpnProductInfo.load()
-    BraveVPN.initialize(customCredential: nil)
-    
-    try await Task.sleep(nanoseconds: NSEC_PER_MSEC * 1000)
+  @MainActor func perform() async throws -> some IntentResult {
+    if !BraveVPN.isInitialized {
+      // Fetching details of GRDRegion for Automatic Region selection
+      BraveVPN.fetchLastUsedRegionDetail()
+      BraveVPN.initialize(customCredential: nil)
+      
+      try await Task.sleep(nanoseconds: NSEC_PER_MSEC * 1000)
+    }
     
     if !BraveVPN.isConnected {
       await withCheckedContinuation { continuation in

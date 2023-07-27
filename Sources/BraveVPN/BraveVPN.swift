@@ -37,10 +37,13 @@ public class BraveVPN {
   /// This class is supposed to act as a namespace, disabling possibility of creating an instance of it.
   @available(*, unavailable)
   init() {}
+  
+  public private(set) static var isInitialized: Bool = false
 
   /// Initialize the vpn service. It should be called even if the user hasn't bought the vpn yet.
   /// This function can have side effects if the receipt has expired(removes the vpn connection then).
   public static func initialize(customCredential: SkusVPNCredential?) {
+    defer { isInitialized = true }
     func clearConfiguration() {
       GRDVPNHelper.clearVpnConfiguration()
       clearCredentials()
@@ -73,7 +76,7 @@ public class BraveVPN {
     helper.tunnelLocalizedDescription = connectionName
     helper.grdTunnelProviderManagerLocalizedDescription = connectionName
     helper.tunnelProviderBundleIdentifier = AppInfo.baseBundleIdentifier + ".BraveWireGuard"
-    helper.appGroupIdentifier = AppInfo.sharedContainerIdentifier
+    helper.appGroupIdentifier = AppInfo.keychainAccessGroupWithPrefix(Bundle.main.infoDictionaryString(forKey: "MozDevelopmentTeam"))
 
     if case .notPurchased = vpnState {
       // Unlikely if user has never bought the vpn, we clear vpn config here for safety.
@@ -120,8 +123,8 @@ public class BraveVPN {
   /// Connects to Guardian's server to validate locally stored receipt.
   /// Returns true if the receipt expired, false if not or nil if expiration status can't be determined.
   public static func validateReceipt(receiptHasExpired: ((Bool?) -> Void)? = nil) {
-    guard let receipt = receipt,
-    let bundleId = Bundle.main.bundleIdentifier else {
+    let bundleId = AppInfo.baseBundleIdentifier
+    guard let receipt = receipt else {
       receiptHasExpired?(nil)
       return
     }
@@ -267,7 +270,7 @@ public class BraveVPN {
     } else {
       // Setting User preferred Transport Protocol to WireGuard
       // In order to easily fetch and change in settings later
-      GRDTransportProtocol.setUserPreferred(.wireGuard)
+      GRDTransportProtocol.setUserPreferred(.ikEv2)
       
       // New user or no credentials and have to remake them.
       helper.configureFirstTimeUser(
@@ -484,7 +487,9 @@ public class BraveVPN {
   /// This can be further used for a customer support form.
   public static func logAndStoreError(_ message: String, printToConsole: Bool = true) {
     if printToConsole {
-      Logger.module.error("\(message)")
+//      Logger.module.error("\(message)")
+      print(message)
+      NSLog("%@", message)
     }
 
     // Extra safety here in case the log is spammed by many messages.

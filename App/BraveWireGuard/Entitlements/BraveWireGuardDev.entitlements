@@ -10,5 +10,9 @@
 	<array>
 		<string>group.$(MOZ_BUNDLE_ID).unique</string>
 	</array>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)$(MOZ_BUNDLE_ID)</string>
+	</array>
 </dict>
 </plist>

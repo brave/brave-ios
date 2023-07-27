@@ -22,6 +22,8 @@
 	<string>$(BRAVE_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(BRAVE_BUILD_ID)</string>
+	<key>MozDevelopmentTeam</key>
+	<string>$(DEVELOPMENT_TEAM)</string>
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionPointIdentifier</key>

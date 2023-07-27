@@ -36,11 +36,21 @@ struct ToggleVPNEntry: TimelineEntry {
 struct ToggleVPNWidgetProvider: TimelineProvider {
   typealias Entry = ToggleVPNEntry
   
+  func initializeVPN() {
+    if !BraveVPN.isInitialized {
+      // Fetching details of GRDRegion for Automatic Region selection
+      BraveVPN.fetchLastUsedRegionDetail()
+      BraveVPN.initialize(customCredential: nil)
+    }
+  }
+  
   func getSnapshot(in context: Context, completion: @escaping (ToggleVPNEntry) -> Void) {
+    initializeVPN()
     completion(.init(state: BraveVPN.vpnState))
   }
   
   func getTimeline(in context: Context, completion: @escaping (Timeline<ToggleVPNEntry>) -> Void) {
+    initializeVPN()
     completion(.init(entries: [.init(state: BraveVPN.vpnState)], policy: .after(.now.addingTimeInterval(60*60*15))))
   }
   

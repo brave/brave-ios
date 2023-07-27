@@ -6,5 +6,9 @@
 	<array>
 		<string>group.$(MOZ_BUNDLE_ID).unique</string>
 	</array>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)group.$(MOZ_BUNDLE_ID).unique</string>
+	</array>
 </dict>
 </plist>
