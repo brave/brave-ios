@@ -569,6 +569,7 @@ extension CryptoStore: BraveWalletKeyringServiceObserver {
     // 2. wipe user assets local storage
     // 3. migrate user assets with new keyring
     guard !isUpdatingUserAssets else { return }
+    isUpdatingUserAssets = true
     Preferences.Wallet.migrateCoreToWalletUserAssetCompleted.reset()
     WalletUserAssetGroup.removeAllGroup() { [weak self] in
       self?.userAssetManager.migrateUserAssets(completion: {
