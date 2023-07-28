@@ -581,10 +581,10 @@
 "customSearchEngine.engineAlertExistsAlertDescription" = "Aynı isimde bir arama motoru zaten var.";
 
 /* A description explaining that search template url is insecure, it is used for instance - Insecure Custom Search Template for Brave Search, Brave Search is a search engineand on a new seperate line */
-"customSearchEngine.insecureSearchTemplateURLErrorDescription" = "Güvenli Olmayan Özel Arama Şablonu:\" is enough no need for \"Şunun için";
+"customSearchEngine.insecureSearchTemplateURLErrorDescription" = "Güvenli Olmayan Özel Arama Şablonu:";
 
 /* A description explaining that suggestion template url is insecure, it is used for instance - Insecure Custom Suggestion Template for Brave Search, Brave Search is name of search engine on a new seperate line */
-"customSearchEngine.insecureSuggestionTemplateURLErrorDescription" = "Güvenli Olmayan Özel Öneri Şablonu:\" is enough no need for \"Şunun için";
+"customSearchEngine.insecureSuggestionTemplateURLErrorDescription" = "Güvenli Olmayan Öneri Arama Şablonu:";
 
 /* Navigation Bar title */
 "customSearchEngine.navigationTitle" = "Arama Motoru Ekle";
