@@ -23,7 +23,7 @@ public class BraveVPN {
       case none, cancelled, billingError, priceIncreaseConsent, notAvailable, unknown
     }
     
-    var receiptStatus: Status
+    var status: Status
     var expirationReason: ExpirationIntent = .none
     var autoRenewEnabled: Bool = false
   }
@@ -96,7 +96,7 @@ public class BraveVPN {
     }
     
     BraveVPN.validateReceiptData() { receiptResponse in
-      if receiptResponse?.receiptStatus == .expired {
+      if receiptResponse?.status == .expired {
         clearConfiguration()
         logAndStoreError("Receipt expired")
         return
@@ -176,7 +176,7 @@ public class BraveVPN {
   /// Returns true if the receipt expired, false if not or nil if expiration status can't be determined.
   public static func validateReceiptData(receiptResponse: ((ReceiptResponse?) -> Void)? = nil) {
     guard let receipt = receipt,
-    let bundleId = Bundle.main.bundleIdentifier else {
+          let bundleId = Bundle.main.bundleIdentifier else {
       receiptResponse?(nil)
       return
     }
@@ -205,46 +205,49 @@ public class BraveVPN {
       }
       
       let receiptResponseItem = GRDIAPReceiptResponse(withReceiptResponse: response)
-      
-      print("receiptResponse \(receiptResponseItem)")
-      
-      guard let newestReceiptLineItem = receiptResponseItem.lineItems.sorted(by: { $0.expiresDate > $1.expiresDate }).first else {
+      let processedReceiptDetail = BraveVPN.processReceiptResponse(receiptResponseItem: receiptResponseItem)
+
+      switch processedReceiptDetail.response.status {
+      case .expired:
         Preferences.VPN.expirationDate.value = Date(timeIntervalSince1970: 1)
-
-        receiptResponse?(ReceiptResponse(receiptStatus: .expired))
         logAndStoreError("VPN Subscription LineItems are empty subscription expired", printToConsole: false)
-        return
+      case .active, .retryPeriod:
+        if let info = processedReceiptDetail.info {
+          Preferences.VPN.expirationDate.value = info.0
+          Preferences.VPN.freeTrialUsed.value = info.1
+        }
+        
+        populateRegionDataIfNecessary()
+        GRDSubscriptionManager.setIsPayingUser(true)
       }
       
-      let lineItemMetaData =  receiptResponseItem.lineItemsMetadata.first(
-        where: { Int($0.originalTransactionId) ?? 00 == newestReceiptLineItem.originalTransactionId })
-      
-      Preferences.VPN.expirationDate.value = newestReceiptLineItem.expiresDate
-      Preferences.VPN.freeTrialUsed.value = !newestReceiptLineItem.isTrialPeriod
-      
-      populateRegionDataIfNecessary()
-      GRDSubscriptionManager.setIsPayingUser(true)
-      
-      guard let metadata = lineItemMetaData else {
-        receiptResponse?(ReceiptResponse(receiptStatus: .active))
-        return
-      }
-      
-      var receiptStatus: ReceiptResponse.Status = .active
-      // Expiration Intent is unsigned
-      let expirationIntent = ReceiptResponse.ExpirationIntent(rawValue: Int(metadata.expirationIntent)) ?? .none
-      // 0 is for turned off renewal, 1 is subscription renewal
-      let autoRenewEnabled: Bool = metadata.autoRenewStatus == 1
-
-      if lineItemMetaData?.isInBillingRetryPeriod == true {
-        receiptStatus = .retryPeriod
-      }
-
-      receiptResponse?(ReceiptResponse(
-        receiptStatus: receiptStatus,
-        expirationReason: expirationIntent,
-        autoRenewEnabled: autoRenewEnabled))
+      receiptResponse?(processedReceiptDetail.response)
     }
+  }
+  
+  public static func processReceiptResponse(receiptResponseItem: GRDIAPReceiptResponse) -> (response: ReceiptResponse, info: (Date, Bool)?) {
+    guard let newestReceiptLineItem = receiptResponseItem.lineItems.sorted(by: { $0.expiresDate > $1.expiresDate }).first else {
+      return (ReceiptResponse(status: .expired), nil)
+    }
+
+    let lineItemMetaData =  receiptResponseItem.lineItemsMetadata.first(
+      where: { Int($0.originalTransactionId) ?? 00 == newestReceiptLineItem.originalTransactionId })
+
+    guard let metadata = lineItemMetaData else {
+      return (ReceiptResponse(status: .active), nil)
+    }
+
+    let receiptStatus: ReceiptResponse.Status = lineItemMetaData?.isInBillingRetryPeriod == true ? .retryPeriod : .active
+    // Expiration Intent is unsigned
+    let expirationIntent = ReceiptResponse.ExpirationIntent(rawValue: Int(metadata.expirationIntent)) ?? .none
+    // 0 is for turned off renewal, 1 is subscription renewal
+    let autoRenewEnabled = metadata.autoRenewStatus == 1
+
+    return (ReceiptResponse(
+      status: receiptStatus,
+      expirationReason: expirationIntent,
+      autoRenewEnabled: autoRenewEnabled),
+    (newestReceiptLineItem.expiresDate, !newestReceiptLineItem.isTrialPeriod))
   }
 
   // MARK: - STATE
