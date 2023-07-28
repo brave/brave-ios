@@ -578,13 +578,13 @@
 "customSearchEngine.deleteEngineAlertTitle" = "%@ arama motorunu silmek istediğinizden emin misiniz?";
 
 /* The warning description shown to user when custom search engine already exists. */
-"customSearchEngine.engineAlertExistsAlertDescription" = "Aynı adda bir arama motoru zaten var.";
+"customSearchEngine.engineAlertExistsAlertDescription" = "Aynı isimde bir arama motoru zaten var.";
 
 /* A description explaining that search template url is insecure, it is used for instance - Insecure Custom Search Template for Brave Search, Brave Search is a search engineand on a new seperate line */
-"customSearchEngine.insecureSearchTemplateURLErrorDescription" = "Şunun için Güvenli Olmayan Özel Arama Şablonu:";
+"customSearchEngine.insecureSearchTemplateURLErrorDescription" = "Güvenli Olmayan Özel Arama Şablonu:\" is enough no need for \"Şunun için";
 
 /* A description explaining that suggestion template url is insecure, it is used for instance - Insecure Custom Suggestion Template for Brave Search, Brave Search is name of search engine on a new seperate line */
-"customSearchEngine.insecureSuggestionTemplateURLErrorDescription" = "Şunun için Güvenli Olmayan Özel Öneri Şablonu:";
+"customSearchEngine.insecureSuggestionTemplateURLErrorDescription" = "Güvenli Olmayan Özel Öneri Şablonu:\" is enough no need for \"Şunun için";
 
 /* Navigation Bar title */
 "customSearchEngine.navigationTitle" = "Arama Motoru Ekle";
@@ -3737,7 +3737,7 @@
 "vpn.subscribeVPNActionButtonTitle" = "Hemen Abone Olun";
 
 /* Pop up description the subscription for VPN can be used for all platforms */
-"vpn.subscribeVPNAllDevicesPopOverDescription" = "Bu doğru. Brave VPN aboneliğiniz artık 5 cihaza kadar kullanılabilir. iOS üzerinden abone olup Mav, Windows ve Android cihazınızda ücretsiz kullanabilirsiniz.";
+"vpn.subscribeVPNAllDevicesPopOverDescription" = "Bu doğru. Brave VPN aboneliğiniz artık 5 cihaza kadar kullanılabilir. iOS üzerinden abone olup Mac, Windows ve Android cihazınızda ücretsiz kullanabilirsiniz.";
 
 /* Pop up title the subscription for VPN can be used for all platforms */
 "vpn.subscribeVPNAllDevicesPopOverTitle" = "Şimdi, Brave VPN'i tüm cihazlarınızda aynı fiyata kullanın!";

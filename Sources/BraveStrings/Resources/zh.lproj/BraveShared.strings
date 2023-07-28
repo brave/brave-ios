@@ -2630,7 +2630,7 @@
 "settings.media.general" = "通用";
 
 /* Setting title for 'Media' sections. Media section offerts various options to manipulate media playback */
-"settings.media.rootSetting" = "媒體";
+"settings.media.rootSetting" = "媒体";
 
 /* Title for the quality settings view */
 "settings.qualitySettings" = "质量设置";
