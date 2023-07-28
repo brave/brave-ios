@@ -584,7 +584,7 @@
 "customSearchEngine.insecureSearchTemplateURLErrorDescription" = "Güvenli Olmayan Özel Arama Şablonu:";
 
 /* A description explaining that suggestion template url is insecure, it is used for instance - Insecure Custom Suggestion Template for Brave Search, Brave Search is name of search engine on a new seperate line */
-"customSearchEngine.insecureSuggestionTemplateURLErrorDescription" = "Güvenli Olmayan Öneri Arama Şablonu:";
+"customSearchEngine.insecureSuggestionTemplateURLErrorDescription" = "Güvenli Olmayan Öneri Şablonu:";
 
 /* Navigation Bar title */
 "customSearchEngine.navigationTitle" = "Arama Motoru Ekle";
