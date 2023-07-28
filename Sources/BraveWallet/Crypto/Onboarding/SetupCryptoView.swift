@@ -76,9 +76,13 @@ struct SetupCryptoView: View {
                     Image("wallet-brave-icon", bundle: .module)
                       .resizable()
                     Image("wallet-phantom", bundle: .module)
+                      .resizable()
                     Image("wallet-metamask", bundle: .module)
+                      .resizable()
                     Image("wallet-coinbase", bundle: .module)
+                      .resizable()
                   }
+                  .aspectRatio(contentMode: .fit)
                   .frame(width: 20, height: 20)
                 }
               }

@@ -18,7 +18,7 @@ struct VerifyRecoveryPhraseView: View {
   @State private var isShowingSkipWarning: Bool = false
 
   @Environment(\.modalPresentationMode) @Binding private var modalPresentationMode
-  @FocusState private var focusedField: Bool
+  @FocusState private var isFieldFocused: Bool
   
   private var recoveryWords: [RecoveryWord]
   private let targetedRecoveryWordIndexes: [Int]
@@ -56,7 +56,7 @@ struct VerifyRecoveryPhraseView: View {
             .font(.body)
             .autocorrectionDisabled()
             .autocapitalization(.none)
-            .focused($focusedField)
+            .focused($isFieldFocused)
           Divider()
         }
         if isShowingError {
@@ -101,14 +101,16 @@ struct VerifyRecoveryPhraseView: View {
         }
         .buttonStyle(BraveFilledButtonStyle(size: .large))
         .padding(.top, 86)
-        Button(action: {
-          isShowingSkipWarning = true
-        }) {
-          Text(Strings.Wallet.skipButtonTitle)
-            .font(Font.subheadline.weight(.medium))
-            .foregroundColor(Color(.braveLabel))
+        if keyringStore.isOnboardingVisible {
+          Button(action: {
+            isShowingSkipWarning = true
+          }) {
+            Text(Strings.Wallet.skipButtonTitle)
+              .font(Font.subheadline.weight(.medium))
+              .foregroundColor(Color(.braveLabel))
+          }
+          .padding(.top, 16)
         }
-        .padding(.top, 16)
       }
     }
     .padding(.horizontal, 20)
@@ -140,7 +142,7 @@ struct VerifyRecoveryPhraseView: View {
     )
     .transparentNavigationBar(backButtonDisplayMode: .generic)
     .onAppear {
-      focusedField = true
+      isFieldFocused = true
     }
   }
 }

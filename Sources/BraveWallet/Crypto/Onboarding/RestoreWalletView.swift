@@ -46,11 +46,7 @@ private struct RestoreWalletView: View {
   }
   
   private var isContinueDisabled: Bool {
-    var wordCount = 0
-    for word in recoveryWords where !word.isEmpty {
-      wordCount += 1
-    }
-    return wordCount != (isLegacyWallet ? .legacyWalletRecoveryPhraseNumber : .regularWalletRecoveryPhraseNumber)
+    !recoveryWords.allSatisfy({ !$0.isEmpty })
   }
   
   private var errorLabel: some View {

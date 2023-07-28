@@ -565,7 +565,7 @@ extension Strings {
       "wallet.setupCryptoTitle",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Browser Native.\nSelf-Custody.\nMulti-chain.",
+      value: "Secure. Multi-chain. And built right into the browser.",
       comment: "The title displayed on the 'setup crypto' onboarding screen"
     )
     public static let setupCryptoSubtitle = NSLocalizedString(

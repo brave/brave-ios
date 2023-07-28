@@ -66,20 +66,24 @@ struct BackupRecoveryPhraseView: View {
           RoundedRectangle(cornerRadius: 4)
             .stroke(Color(.braveDisabled), lineWidth: isViewRecoveryPermitted ? 0 : 1)
         )
-        if isViewRecoveryPermitted {
-          Button(action: copyRecoveryPhrase) {
-            if hasCopied {
-              Text("\(Strings.Wallet.copiedToPasteboard)  \(Image(braveSystemName: "leo.check.normal"))")
-                .font(.subheadline.bold())
-                .foregroundColor(Color(.braveSuccessLabel))
-            } else {
-              Text(Strings.Wallet.copyToPasteboard)
-                .font(.subheadline.bold())
-                .foregroundColor(Color(.braveBlurpleTint))
-            }
+        Button {
+          copyRecoveryPhrase()
+        } label: {
+          if hasCopied {
+            Text("\(Strings.Wallet.copiedToPasteboard)  \(Image(braveSystemName: "leo.check.normal"))")
+              .font(.subheadline.bold())
+              .foregroundColor(Color(.braveSuccessLabel))
+          } else {
+            Text(Strings.Wallet.copyToPasteboard)
+              .font(.subheadline.bold())
+              .foregroundColor(Color(.braveBlurpleTint))
           }
-          .padding(.top, 20)
-          Button {
+        }
+        .padding(.top, 20)
+        .hidden(isHidden: !isViewRecoveryPermitted)
+        .disabled(hasCopied)
+        Button {
+          if isViewRecoveryPermitted { // user has revealed the phrases, continue to the next step
             var loop = 3
             var indexes: [Int] = []
             while loop != 0 {
@@ -90,25 +94,17 @@ struct BackupRecoveryPhraseView: View {
               }
             }
             verifyRecoveryWordIndexes = indexes
-          } label: {
-            Text(Strings.Wallet.continueButtonTitle)
-              .frame(maxWidth: .infinity)
-          }
-          .buttonStyle(BraveFilledButtonStyle(size: .large))
-          .padding(.top, 72)
-          .padding(.horizontal)
-        } else {
-          Button {
+          } else { // user wants to reveal the phrases
             isViewRecoveryPermitted = true
-          } label: {
-            Text(Strings.Wallet.viewRecoveryPhraseButtonTitle
-            )
-              .frame(maxWidth: .infinity)
           }
-          .buttonStyle(BraveFilledButtonStyle(size: .large))
-          .padding(.top, 72)
-          .padding(.horizontal)
+        } label: {
+          Text(isViewRecoveryPermitted ? Strings.Wallet.continueButtonTitle : Strings.Wallet.viewRecoveryPhraseButtonTitle
+          )
+          .frame(maxWidth: .infinity)
         }
+        .buttonStyle(BraveFilledButtonStyle(size: .large))
+        .padding(.top, 72)
+        .padding(.horizontal)
         if keyringStore.isOnboardingVisible {
           Button(action: {
             isShowingSkipWarning = true

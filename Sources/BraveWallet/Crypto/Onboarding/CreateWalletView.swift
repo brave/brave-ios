@@ -64,7 +64,7 @@ private struct CreateWalletView: View {
   @State private var passwordStatus: PasswordStatus = .none
   @State private var isInputsMatch: Bool = false
   
-  @FocusState private var focusedField: Bool
+  @FocusState private var isFieldFocused: Bool
 
   private func createWallet() {
     if let restorePackage {
@@ -167,7 +167,7 @@ private struct CreateWalletView: View {
             HStack(spacing: 8) {
               SecureField(Strings.Wallet.newPasswordPlaceholder, text: $password)
                 .textContentType(.newPassword)
-                .focused($focusedField)
+                .focused($isFieldFocused)
               Spacer()
               if passwordStatus != .none {
                 passwordStatusView(passwordStatus)
@@ -220,7 +220,7 @@ private struct CreateWalletView: View {
     .onChange(of: password, perform: handleInputChange)
     .onChange(of: repeatedPassword, perform: handleInputChange)
     .onAppear {
-      focusedField = true
+      isFieldFocused = true
     }
   }
 }
