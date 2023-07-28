@@ -100,11 +100,13 @@ private struct RestoreWalletView: View {
             VStack(alignment: .leading, spacing: 10) {
               if isRevealRecoveryWords {
                 TextField(String.localizedStringWithFormat(Strings.Wallet.restoreWalletPhrasePlaceholder, (index + 1)), text: $recoveryWords[index])
+                  .customPrivacySensitive()
                   .autocapitalization(.none)
                   .disableAutocorrection(true)
                   .foregroundColor(Color(.braveLabel))
               } else {
                 SecureField(String.localizedStringWithFormat(Strings.Wallet.restoreWalletPhrasePlaceholder, (index + 1)), text: $recoveryWords[index])
+                  .customPrivacySensitive()
                   .textContentType(.newPassword)
               }
               Divider()
