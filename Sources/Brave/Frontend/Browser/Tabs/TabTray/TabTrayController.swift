@@ -19,7 +19,7 @@ protocol TabTrayDelegate: AnyObject {
   func tabOrderChanged()
 }
 
-class TabTrayController: LoadingViewController {
+class TabTrayController: AuthenticationController {
 
   typealias DataSource = UICollectionViewDiffableDataSource<TabTraySection, Tab>
   typealias Snapshot = NSDiffableDataSourceSnapshot<TabTraySection, Tab>
@@ -47,7 +47,6 @@ class TabTrayController: LoadingViewController {
   let tabManager: TabManager
   let braveCore: BraveCoreMain
   
-  private let windowProtection: WindowProtection?
   private var openTabsSessionServiceListener: OpenTabsSessionStateListener?
   private var syncServicStateListener: AnyObject?
 
@@ -188,9 +187,8 @@ class TabTrayController: LoadingViewController {
   init(tabManager: TabManager, braveCore: BraveCoreMain, windowProtection: WindowProtection?) {
     self.tabManager = tabManager
     self.braveCore = braveCore
-    self.windowProtection = windowProtection
     
-    super.init(nibName: nil, bundle: nil)
+    super.init(windowProtection: windowProtection)
 
     if !UIAccessibility.isReduceMotionEnabled {
       transitioningDelegate = self
