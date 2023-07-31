@@ -124,14 +124,14 @@ class MockBraveWalletService: BraveWalletBraveWalletService {
     completion("", "")
   }
   
-  func notifyGetPublicKeyRequestProcessed(_ approved: Bool, origin: URLOrigin) {
+  func notifyGetPublicKeyRequestProcessed(_ requestId: String, approved: Bool) {
   }
   
   func pendingGetEncryptionPublicKeyRequests() async -> [BraveWallet.GetEncryptionPublicKeyRequest] {
     return []
   }
   
-  func notifyDecryptRequestProcessed(_ approved: Bool, origin: URLOrigin) {
+  func notifyDecryptRequestProcessed(_ requestId: String, approved: Bool) {
   }
   
   func pendingDecryptRequests() async -> [BraveWallet.DecryptRequest] {
@@ -150,15 +150,15 @@ class MockBraveWalletService: BraveWalletBraveWalletService {
     self.coin = coin
   }
   
-  func addPermission(_ accountId: BraveWallet.AccountId, origin: URLOrigin, completion: @escaping (Bool) -> Void) {
+  func addPermission(_ accountId: BraveWallet.AccountId, completion: @escaping (Bool) -> Void) {
     completion(false)
   }
   
-  func hasPermission(_ accountId: BraveWallet.AccountId, origin: URLOrigin, completion: @escaping (Bool, Bool) -> Void) {
-    completion(false, false)
+  func hasPermission(_ accounts: [BraveWallet.AccountId], completion: @escaping (Bool, [BraveWallet.AccountId]) -> Void) {
+    completion(false, [])
   }
   
-  func resetPermission(_ accountId: BraveWallet.AccountId, origin: URLOrigin, completion: @escaping (Bool) -> Void) {
+  func resetPermission(_ accountId: BraveWallet.AccountId, completion: @escaping (Bool) -> Void) {
     completion(false)
   }
   
@@ -196,7 +196,7 @@ class MockBraveWalletService: BraveWalletBraveWalletService {
     completion([])
   }
 
-  func isPermissionDenied(_ coin: BraveWallet.CoinType, origin: URLOrigin, completion: @escaping (Bool) -> Void) {
+  func isPermissionDenied(_ coin: BraveWallet.CoinType, completion: @escaping (Bool) -> Void) {
     completion(false)
   }
 
