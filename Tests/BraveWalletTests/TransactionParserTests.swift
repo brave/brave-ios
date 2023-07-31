@@ -20,6 +20,7 @@ private extension BraveWallet.AccountInfo {
         keyringId: coin.keyringId,
         kind: .derived,
         address: address,
+        bitcoinAccountIndex: 0,
         uniqueKey: address
       ),
       address: address,
