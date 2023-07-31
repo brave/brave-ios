@@ -260,6 +260,7 @@ extension BrowserViewController {
   private func presentVPNUpdateBillingCallout(skipSafeGuards: Bool = false) {
     if !skipSafeGuards {
       // TODO: Condition
+      return
     }
     
     presentVPNChurnPromoCallout(for: .updateBillingExpired) {
