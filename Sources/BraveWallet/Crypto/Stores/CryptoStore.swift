@@ -655,6 +655,9 @@ extension CryptoStore: BraveWalletBraveWalletServiceObserver {
   }
   
   public func onDiscoverAssetsCompleted(_ discoveredAssets: [BraveWallet.BlockchainToken]) {
+    // Failsafe incase two CryptoStore's are initialized (see brave-ios #7804) and asset
+    // migration is slow. Makes sure auto-discovered assets during asset migration to
+    // CoreData are added after.
     if !isUpdatingUserAssets {
       for asset in discoveredAssets {
         userAssetManager.addUserAsset(asset, completion: nil)
