@@ -104,11 +104,16 @@ public class WindowProtection {
   }
   
   private let onCancelPressed = PassthroughSubject<Void, Never>()
-  
+  private let didFinalizeAuthentication = PassthroughSubject<Bool, Never>()
+
   var cancelPressed: AnyPublisher<Void, Never> {
     onCancelPressed.eraseToAnyPublisher()
   }
   
+  var finalizedAuthentication: AnyPublisher<Bool, Never> {
+    didFinalizeAuthentication.eraseToAnyPublisher()
+  }
+    
   public init?(window: UIWindow) {
     guard let scene = window.windowScene else { return nil }
     protectedWindow = window
@@ -208,6 +213,8 @@ public class WindowProtection {
             Logger.module.error("Failed to unlock browser using local authentication: \(error.localizedDescription)")
           }
         }
+        
+        self.didFinalizeAuthentication.send(success)
       }
     }
   }

@@ -35,17 +35,24 @@ public class LoadingViewController: UIViewController {
 }
 
 public class AuthenticationController: LoadingViewController {
+  enum AuthViewType {
+    case sync, tabTray
+  }
+  
   let windowProtection: WindowProtection?
   let requiresAuthentication: Bool
   
   // MARK: Lifecycle
 
   init(windowProtection: WindowProtection? = nil,
-       requiresAuthentication: Bool = false) {
+       requiresAuthentication: Bool = false,
+       isCancellable: Bool = false) {
     self.windowProtection = windowProtection
     self.requiresAuthentication = requiresAuthentication
     
     super.init(nibName: nil, bundle: nil)
+    
+    self.windowProtection?.isCancellable = isCancellable
   }
   
   required init?(coder: NSCoder) {
@@ -54,14 +61,14 @@ public class AuthenticationController: LoadingViewController {
   
   /// A method to ask biometric authentication to user
   /// - Parameter completion: block returning authentication status
-  func askForAuthentication(completion: ((Bool, LAError.Code?) -> Void)? = nil) {
+  func askForAuthentication(viewType: AuthViewType = .sync, completion: ((Bool, LAError.Code?) -> Void)? = nil) {
     guard let windowProtection = windowProtection else {
       completion?(false, nil)
       return
     }
 
     if !windowProtection.isPassCodeAvailable {
-      showSetPasscodeError() {
+      showSetPasscodeError(viewType: viewType) {
         completion?(false, LAError.passcodeNotSet)
       }
     } else {
@@ -74,10 +81,10 @@ public class AuthenticationController: LoadingViewController {
   
   /// An alert presenter for passcode error to warn user to setup passcode to use feature
   /// - Parameter completion: block after Ok button is pressed
-  func showSetPasscodeError(completion: @escaping (() -> Void)) {
+  func showSetPasscodeError(viewType: AuthViewType, completion: @escaping (() -> Void)) {
     let alert = UIAlertController(
       title: Strings.Sync.syncSetPasscodeAlertTitle,
-      message: Strings.Sync.syncSetPasscodeAlertDescription,
+      message: viewType == .sync ? Strings.Sync.syncSetPasscodeAlertDescription : Strings.Privacy.tabTraySetPasscodeAlertDescription,
       preferredStyle: .alert)
 
     alert.addAction(

@@ -19,7 +19,6 @@ class SyncViewController: AuthenticationController {
        isAuthenticationCancellable: Bool = true,
        isModallyPresented: Bool = false) {
     self.isModallyPresented = isModallyPresented
-    
     super.init(windowProtection: windowProtection, requiresAuthentication: requiresAuthentication)
     
     windowProtection?.isCancellable = isAuthenticationCancellable

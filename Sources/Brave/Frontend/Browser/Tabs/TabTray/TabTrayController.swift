@@ -98,6 +98,7 @@ class TabTrayController: AuthenticationController {
   var tabTrayMode: TabTrayMode = .local
   private var privateModeCancellable: AnyCancellable?
   private var initialScrollCompleted = false
+  private var localAuthObservers = Set<AnyCancellable>()
   
   // MARK: User Interface Elements
   
@@ -188,7 +189,7 @@ class TabTrayController: AuthenticationController {
     self.tabManager = tabManager
     self.braveCore = braveCore
     
-    super.init(windowProtection: windowProtection)
+    super.init(windowProtection: windowProtection, isCancellable: true)
 
     if !UIAccessibility.isReduceMotionEnabled {
       transitioningDelegate = self
@@ -302,6 +303,11 @@ class TabTrayController: AuthenticationController {
       .sink(receiveValue: { [weak self] isPrivateBrowsing in
         self?.updateColors(isPrivateBrowsing)
       })
+    
+    windowProtection?.cancelPressed
+      .sink { [weak self] _ in
+        self?.navigationController?.popViewController(animated: true)
+    }.store(in: &localAuthObservers)
   
     reloadOpenTabsSession()
     
@@ -585,6 +591,14 @@ class TabTrayController: AuthenticationController {
   }
 
   @objc func togglePrivateModeAction() {
+    if !privateMode, Preferences.Privacy.privateBrowsingLock.value {
+      askForAuthentication(viewType: .tabTray)
+    } else {
+      toggleModeChanger()
+    }
+  }
+  
+  func toggleModeChanger() {
     tabTraySearchController.isActive = false
     
     // Mode Change action disabled while drap-drop is active
@@ -622,7 +636,6 @@ class TabTrayController: AuthenticationController {
     
     navigationController?.setNavigationBarHidden(privateMode, animated: false)
     tabTypeSelector.isHidden = privateMode
-
   }
 
   func remove(tab: Tab) {
