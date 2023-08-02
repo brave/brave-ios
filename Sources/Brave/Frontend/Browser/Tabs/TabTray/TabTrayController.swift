@@ -308,6 +308,14 @@ class TabTrayController: AuthenticationController {
       .sink { [weak self] _ in
         self?.navigationController?.popViewController(animated: true)
     }.store(in: &localAuthObservers)
+    
+    windowProtection?.finalizedAuthentication
+      .sink { [weak self] success in
+        if success {
+          self?.toggleModeChanger()
+        }
+        self?.navigationController?.popViewController(animated: true)
+    }.store(in: &localAuthObservers)
   
     reloadOpenTabsSession()
     
