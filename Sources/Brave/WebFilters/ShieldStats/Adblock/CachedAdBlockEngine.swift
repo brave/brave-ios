@@ -48,9 +48,6 @@ public class CachedAdBlockEngine {
   /// Returns all the models for this frame URL
   /// The results are cached per url, so you may call this method as many times for the same url without any performance implications.
   func cosmeticFilterModel(forFrameURL frameURL: URL) async throws -> CosmeticFilterModelTuple? {
-    return nil
-    /*
-     // TODO: Adblock fixup for v1.58.62
     return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<CosmeticFilterModelTuple?, Error>) in
       serialQueue.async { [weak self] in
         guard let self = self else {
@@ -69,14 +66,10 @@ public class CachedAdBlockEngine {
         }
       }
     }
-     */
   }
   
   /// Return the selectors that need to be hidden given the frameURL, ids and classes
   func selectorsForCosmeticRules(frameURL: URL, ids: [String], classes: [String]) async throws -> SelectorsTuple? {
-    return nil
-    // TODO: Adblock fixup for v1.58.62
-    /*
     return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<SelectorsTuple?, Error>) in
       serialQueue.async { [weak self] in
         guard let self = self else {
@@ -87,24 +80,16 @@ public class CachedAdBlockEngine {
         do {
           let model = try self.cachedCosmeticFilterModel(forFrameURL: frameURL)
           
-          let selectorsJSON = self.engine.stylesheetForCosmeticRulesIncluding(
+          let selectors = try self.engine.stylesheetForCosmeticRulesIncluding(
             classes: classes, ids: ids, exceptions: model?.exceptions ?? []
           )
           
-          guard let data = selectorsJSON.data(using: .utf8) else {
-            continuation.resume(returning: nil)
-            return
-          }
-          
-          let decoder = JSONDecoder()
-          let result = try decoder.decode([String].self, from: data)
-          continuation.resume(returning: (self.source, Set(result)))
+          continuation.resume(returning: (self.source, Set(selectors)))
         } catch {
           continuation.resume(throwing: error)
         }
       }
     }
-     */
   }
   
   /// Return a cosmetic filter modelf or the given frameURL
@@ -180,15 +165,39 @@ public class CachedAdBlockEngine {
     }
   }
   
+  /// Create multiple engines from the given resources by grouping them by their source
+  /// - Parameter resources: The resources to compile the engines from
+  /// - Returns: An array of compilation results
+  static func createEngines(
+    from resources: [AdBlockEngineManager.ResourceWithVersion]
+  ) async -> [Result<CachedAdBlockEngine, Error>] {
+    let groupedResources = Dictionary(grouping: resources, by: \.resource.source)
+    
+    return await groupedResources.asyncConcurrentMap { source, resources -> Result<CachedAdBlockEngine, Error> in
+      do {
+        let engine = try await CachedAdBlockEngine.createEngine(from: resources, source: source)
+        return .success(engine)
+      } catch {
+        return .failure(error)
+      }
+    }
+  }
+  
   /// Create an engine from the given resources
-  static func createEngine(from resources: [AdBlockEngineManager.ResourceWithVersion], source: AdBlockEngineManager.Source) async -> (engine: CachedAdBlockEngine, compileResults: [AdBlockEngineManager.ResourceWithVersion: Result<Void, Error>]) {
-    return await withCheckedContinuation { continuation in
+  static func createEngine(
+    from resources: [AdBlockEngineManager.ResourceWithVersion], source: AdBlockEngineManager.Source
+  ) async throws -> CachedAdBlockEngine {
+    return try await withCheckedThrowingContinuation { continuation in
       let serialQueue = DispatchQueue(label: "com.brave.WrappedAdBlockEngine.\(UUID().uuidString)")
       
       serialQueue.async {
-        let results = AdblockEngine.createEngine(from: resources)
-        let cachedEngine = CachedAdBlockEngine(engine: results.engine, source: source, serialQueue: serialQueue)
-        continuation.resume(returning: (cachedEngine, results.compileResults))
+        do {
+          let engine = try AdblockEngine.createEngine(from: resources)
+          let cachedEngine = CachedAdBlockEngine(engine: engine, source: source, serialQueue: serialQueue)
+          continuation.resume(returning: cachedEngine)
+        } catch {
+          continuation.resume(throwing: error)
+        }
       }
     }
   }
