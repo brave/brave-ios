@@ -41,7 +41,8 @@ extension AdblockEngine {
   public static func createEngine(from resources: [AdBlockEngineManager.ResourceWithVersion]) -> (engine: AdblockEngine, compileResults: [AdBlockEngineManager.ResourceWithVersion: Result<Void, Error>]) {
     let combinedRuleLists = Self.combineAllRuleLists(from: resources)
     // Create an engine with the combined rule lists
-    let engine = AdblockEngine(rules: combinedRuleLists)
+    // TODO: Adblock fixup for v1.58.62
+    let engine = try! AdblockEngine(rules: combinedRuleLists)
     // Compile remaining resources
     let compileResults = engine.compile(resources: resources)
     // Return the compiled data
