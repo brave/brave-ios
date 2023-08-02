@@ -262,5 +262,9 @@ class MockBraveWalletService: BraveWalletBraveWalletService {
   func setNetworkForSelectedAccountOnActiveOrigin(_ chainId: String, completion: @escaping (Bool) -> Void) {
     completion(false)
   }
+  
+  func convertFevm(toFvmAddress isMainnet: Bool, fevmAddresses: [String], completion: @escaping ([String: String]) -> Void) {
+    completion([:])
+  }
 }
 #endif
