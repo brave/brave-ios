@@ -594,6 +594,8 @@ extension BrowserViewController: TopToolbarDelegate {
       if let query = searchQuery {
         self.submitSearchText(query)
       }
+      
+      self.speechRecognizer.clearSearch()
     }
   }
 
