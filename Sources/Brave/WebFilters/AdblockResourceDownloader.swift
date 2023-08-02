@@ -139,6 +139,8 @@ public actor AdblockResourceDownloader: Sendable {
       // No modes are needed to be compiled
       guard !modes.isEmpty else { return }
       
+      /*
+       // TODO: Adblock fixup for v1.58.62
       do {
         guard let filterSet = try resource.downloadedString() else {
           assertionFailure("This file was downloaded successfully so it should not be nil")
@@ -158,6 +160,7 @@ public actor AdblockResourceDownloader: Sendable {
           "Failed to compile downloaded content blocker resource: \(error.localizedDescription)"
         )
       }
+       */
       
     case .debounceRules:
       // We don't want to setup the debounce rules more than once for the same cached file

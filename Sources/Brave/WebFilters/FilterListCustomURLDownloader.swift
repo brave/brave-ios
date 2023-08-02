@@ -66,6 +66,8 @@ actor FilterListCustomURLDownloader: ObservableObject {
   private func handle(downloadResult: ResourceDownloader<DownloadResource>.DownloadResult, for filterListCustomURL: FilterListCustomURL) async {
     let uuid = await filterListCustomURL.setting.uuid
     
+    /*
+     // TODO: Adblock fixup for v1.58.62
     // Compile this rule list if we haven't already or if the file has been modified
     if downloadResult.isModified {
       do {
@@ -89,6 +91,7 @@ actor FilterListCustomURLDownloader: ObservableObject {
         )
       }
     }
+     */
       
     // Add/remove the resource depending on if it is enabled/disabled
     if await filterListCustomURL.setting.isEnabled {

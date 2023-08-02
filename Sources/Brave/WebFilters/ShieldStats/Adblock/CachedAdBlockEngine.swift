@@ -48,6 +48,9 @@ public class CachedAdBlockEngine {
   /// Returns all the models for this frame URL
   /// The results are cached per url, so you may call this method as many times for the same url without any performance implications.
   func cosmeticFilterModel(forFrameURL frameURL: URL) async throws -> CosmeticFilterModelTuple? {
+    return nil
+    /*
+     // TODO: Adblock fixup for v1.58.62
     return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<CosmeticFilterModelTuple?, Error>) in
       serialQueue.async { [weak self] in
         guard let self = self else {
@@ -66,10 +69,14 @@ public class CachedAdBlockEngine {
         }
       }
     }
+     */
   }
   
   /// Return the selectors that need to be hidden given the frameURL, ids and classes
   func selectorsForCosmeticRules(frameURL: URL, ids: [String], classes: [String]) async throws -> SelectorsTuple? {
+    return nil
+    // TODO: Adblock fixup for v1.58.62
+    /*
     return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<SelectorsTuple?, Error>) in
       serialQueue.async { [weak self] in
         guard let self = self else {
@@ -97,6 +104,7 @@ public class CachedAdBlockEngine {
         }
       }
     }
+     */
   }
   
   /// Return a cosmetic filter modelf or the given frameURL

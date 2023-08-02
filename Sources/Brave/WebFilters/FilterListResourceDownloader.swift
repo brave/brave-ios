@@ -276,6 +276,8 @@ public class FilterListResourceDownloader {
       // No modes need to be compiled
       guard !modes.isEmpty else { return }
       
+      /*
+       // TODO: Adblock fixup for v1.58.62
       do {
         let filterSet = try String(contentsOf: filterListURL, encoding: .utf8)
         var wasTruncated: Bool = false
@@ -297,6 +299,7 @@ public class FilterListResourceDownloader {
         )
         #endif
       }
+       */
     }
   }
 }
