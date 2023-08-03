@@ -223,6 +223,8 @@ class BraveVPNContactFormViewController: TableViewController {
         
           let optionsVC =
             OptionSelectionViewController<IssueType>(
+              headerText: Strings.VPN.contactFormIssue,
+              footerText: Strings.VPN.contactFormIssueDescription,
               options: IssueType.allCases,
               optionChanged: optionChanged)
 
@@ -255,7 +257,12 @@ class BraveVPNContactFormViewController: TableViewController {
       $0.setToRecipients([self.supportEmail])
     }
 
-    mail.setSubject(Strings.VPN.contactFormTitle)
+    var formTitle = Strings.VPN.contactFormTitle
+    if let issue = contactForm.issue {
+      formTitle += " + \(issue)"
+    }
+    
+    mail.setSubject(formTitle)
     mail.setMessageBody(self.composeEmailBody(with: self.contactForm), isHTML: false)
     present(mail, animated: true)
   }
@@ -282,10 +289,18 @@ class BraveVPNContactFormViewController: TableViewController {
   }
 
   private func composeEmailBody(with contactForm: ContactForm) -> String {
-    var body = "\n\n"
+    var body = "\n"
 
     body.append(contentsOf: "#### \(Strings.VPN.contactFormDoNotEditText) ####\n\n")
 
+    body.append(Strings.VPN.contactFormPlatform)
+    body.append("\n\(UIDevice.current.systemName)\n\n")
+
+    if let issue = contactForm.issue {
+      body.append(Strings.VPN.contactFormIssue)
+      body.append("\n\(issue)\n\n")
+    }
+    
     if let hostname = contactForm.hostname {
       body.append(Strings.VPN.contactFormHostname)
       body.append("\n\(hostname)\n\n")
@@ -305,10 +320,7 @@ class BraveVPNContactFormViewController: TableViewController {
       body.append(Strings.VPN.contactFormAppVersion)
       body.append("\n\(appVersion)\n\n")
     }
-      
-    body.append(Strings.VPN.contactFormPlatform)
-    body.append("\n\(UIDevice.current.systemName)\n\n")
-
+    
     if let timezone = contactForm.timezone {
       body.append(Strings.VPN.contactFormTimezone)
       body.append("\n\(timezone)\n\n")
@@ -335,11 +347,6 @@ class BraveVPNContactFormViewController: TableViewController {
       }
 
       body.append("\n")
-    }
-
-    if let issue = contactForm.issue {
-      body.append(Strings.VPN.contactFormIssue)
-      body.append("\n\(issue)\n\n")
     }
 
     if let receipt = contactForm.receipt {
