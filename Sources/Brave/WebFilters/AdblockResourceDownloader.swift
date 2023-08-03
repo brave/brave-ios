@@ -139,20 +139,17 @@ public actor AdblockResourceDownloader: Sendable {
       // No modes are needed to be compiled
       guard !modes.isEmpty else { return }
       
-      /*
-       // TODO: Adblock fixup for v1.58.62
       do {
         guard let filterSet = try resource.downloadedString() else {
           assertionFailure("This file was downloaded successfully so it should not be nil")
           return
         }
         
-        var wasTruncated: Bool = false
-        let encodedContentRuleList = AdblockEngine.contentBlockerRules(fromFilterSet: filterSet, truncated: &wasTruncated)
+        let result = try AdblockEngine.contentBlockerRules(fromFilterSet: filterSet)
         
         // try to compile
         try await ContentBlockerManager.shared.compile(
-          encodedContentRuleList: encodedContentRuleList, for: blocklistType,
+          encodedContentRuleList: result.rulesJSON, for: blocklistType,
           modes: modes
         )
       } catch {
@@ -160,7 +157,6 @@ public actor AdblockResourceDownloader: Sendable {
           "Failed to compile downloaded content blocker resource: \(error.localizedDescription)"
         )
       }
-       */
       
     case .debounceRules:
       // We don't want to setup the debounce rules more than once for the same cached file
