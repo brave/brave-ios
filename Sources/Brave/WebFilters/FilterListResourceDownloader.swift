@@ -218,7 +218,7 @@ public class FilterListResourceDownloader {
     
     Task {
       await AdBlockEngineManager.shared.removeResources(
-        for: .filterList(componentId: filterList.entry.componentId, 
+        for: .filterList(componentId: filterList.entry.componentId,
         isAlwaysAggressive: filterList.isAlwaysAggressive
       ))
     }
@@ -276,15 +276,12 @@ public class FilterListResourceDownloader {
       // No modes need to be compiled
       guard !modes.isEmpty else { return }
       
-      /*
-       // TODO: Adblock fixup for v1.58.62
       do {
         let filterSet = try String(contentsOf: filterListURL, encoding: .utf8)
-        var wasTruncated: Bool = false
-        let jsonRules = AdblockEngine.contentBlockerRules(fromFilterSet: filterSet, truncated: &wasTruncated)
+        let result = try AdblockEngine.contentBlockerRules(fromFilterSet: filterSet)
         
         try await ContentBlockerManager.shared.compile(
-          encodedContentRuleList: jsonRules, for: blocklistType,
+          encodedContentRuleList: result.rulesJSON, for: blocklistType,
           options: .all, modes: modes
         )
         
@@ -299,7 +296,6 @@ public class FilterListResourceDownloader {
         )
         #endif
       }
-       */
     }
   }
 }

@@ -66,18 +66,15 @@ actor FilterListCustomURLDownloader: ObservableObject {
   private func handle(downloadResult: ResourceDownloader<DownloadResource>.DownloadResult, for filterListCustomURL: FilterListCustomURL) async {
     let uuid = await filterListCustomURL.setting.uuid
     
-    /*
-     // TODO: Adblock fixup for v1.58.62
     // Compile this rule list if we haven't already or if the file has been modified
     if downloadResult.isModified {
       do {
         let filterSet = try String(contentsOf: downloadResult.fileURL, encoding: .utf8)
-        var truncated: Bool = false
-        let jsonRules = AdblockEngine.contentBlockerRules(fromFilterSet: filterSet, truncated: &truncated)
+        let result = try AdblockEngine.contentBlockerRules(fromFilterSet: filterSet)
         let type = ContentBlockerManager.BlocklistType.customFilterList(uuid: uuid)
         
         try await ContentBlockerManager.shared.compile(
-          encodedContentRuleList: jsonRules,
+          encodedContentRuleList: result.rulesJSON,
           for: type,
           options: .all
         )
@@ -91,7 +88,6 @@ actor FilterListCustomURLDownloader: ObservableObject {
         )
       }
     }
-     */
       
     // Add/remove the resource depending on if it is enabled/disabled
     if await filterListCustomURL.setting.isEnabled {

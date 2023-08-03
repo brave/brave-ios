@@ -112,9 +112,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     // Override point for customization after application launch.
     var shouldPerformAdditionalDelegateHandling = true
-
-    // TODO: Adblock fixup for v1.58.62
-//    AdblockEngine.setDomainResolver(AdblockEngine.defaultDomainResolver)
+    AdblockEngine.setDomainResolver()
 
     UIView.applyAppearanceDefaults()
 
