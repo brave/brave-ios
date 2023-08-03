@@ -624,22 +624,6 @@ class TabTrayController: LoadingViewController {
         tabTrayView.collectionView.reloadData()
         navigationController?.setNavigationBarHidden(false, animated: false)
       }
-      
-      if Preferences.Privacy.shouldShowPersistentPrivateBrowsingAlert.value {
-        Preferences.Privacy.shouldShowPersistentPrivateBrowsingAlert.value = false
-        
-        let alert = UIAlertController(title: Strings.persistentPrivateBrowsingAlertTitle, message: Strings.persistentPrivateBrowsingAlertMessage, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: Strings.yes, style: .default) { [unowned self] _ in
-          Preferences.Privacy.persistentPrivateBrowsing.value = true
-          self.tabManager.saveAllTabs()
-        })
-        
-        alert.addAction(UIAlertAction(title: Strings.no, style: .cancel) { _ in
-          Preferences.Privacy.persistentPrivateBrowsing.value = false
-        })
-        
-        self.present(alert, animated: true)
-      }
     } else {
       tabTrayView.hidePrivateModeInfo()
       
