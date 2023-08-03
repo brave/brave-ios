@@ -18,6 +18,13 @@ public class WindowProtection {
   private class LockedViewController: UIViewController {
     let backgroundView = UIVisualEffectView(effect: UIBlurEffect(style: .systemThickMaterial))
     let lockImageView = UIImageView(image: UIImage(named: "browser-lock-icon", in: .module, compatibleWith: nil)!)
+    let titleLabel = UILabel().then {
+      $0.font = .preferredFont(for: .title3, weight: .semibold)
+      $0.adjustsFontForContentSizeCategory = true
+      $0.textColor = .bravePrimary
+      $0.numberOfLines = 0
+      $0.textAlignment = .center
+    }
     let unlockButton = FilledActionButton(type: .system).then {
       $0.setTitle(Strings.unlockButtonTitle, for: .normal)
       $0.titleLabel?.font = .preferredFont(forTextStyle: .headline)
@@ -25,7 +32,6 @@ public class WindowProtection {
       $0.backgroundColor = .braveBlurpleTint
       $0.isHidden = true
     }
-    
     let cancelButton = ActionButton(type: .system).then {
       $0.setTitle(Strings.cancelButtonTitle, for: .normal)
       $0.titleLabel?.font = .preferredFont(forTextStyle: .headline)
@@ -39,11 +45,18 @@ public class WindowProtection {
       super.viewDidLoad()
 
       view.addSubview(backgroundView)
+      view.addSubview(titleLabel)
       view.addSubview(lockImageView)
       view.addSubview(unlockButton)
       view.addSubview(cancelButton)
       backgroundView.snp.makeConstraints {
         $0.edges.equalTo(view)
+      }
+      titleLabel.snp.makeConstraints {
+        $0.leading.greaterThanOrEqualToSuperview().offset(20)
+        $0.trailing.lessThanOrEqualToSuperview().offset(-20)
+        $0.centerX.equalToSuperview()
+        $0.bottom.equalTo(lockImageView.snp.top).offset(-40)
       }
       lockImageView.snp.makeConstraints {
         $0.center.equalTo(view)
@@ -100,6 +113,13 @@ public class WindowProtection {
       if oldValue != isCancellable {
         lockedViewController.cancelButton.isHidden = !isCancellable
       }
+    }
+  }
+  
+  var unlockScreentitle: String = "" {
+    didSet {
+      lockedViewController.titleLabel.isHidden = unlockScreentitle.isEmpty
+      lockedViewController.titleLabel.text = unlockScreentitle
     }
   }
   

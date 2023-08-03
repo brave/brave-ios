@@ -46,13 +46,15 @@ public class AuthenticationController: LoadingViewController {
 
   init(windowProtection: WindowProtection? = nil,
        requiresAuthentication: Bool = false,
-       isCancellable: Bool = false) {
+       isCancellable: Bool = false,
+       unlockScreentitle: String = "") {
     self.windowProtection = windowProtection
     self.requiresAuthentication = requiresAuthentication
     
     super.init(nibName: nil, bundle: nil)
     
     self.windowProtection?.isCancellable = isCancellable
+    self.windowProtection?.unlockScreentitle = unlockScreentitle
   }
   
   required init?(coder: NSCoder) {

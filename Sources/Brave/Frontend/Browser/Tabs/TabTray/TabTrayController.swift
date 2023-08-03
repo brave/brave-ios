@@ -189,7 +189,7 @@ class TabTrayController: AuthenticationController {
     self.tabManager = tabManager
     self.braveCore = braveCore
     
-    super.init(windowProtection: windowProtection, isCancellable: true)
+    super.init(windowProtection: windowProtection, isCancellable: true, unlockScreentitle: "Private Browsing is Locked")
 
     if !UIAccessibility.isReduceMotionEnabled {
       transitioningDelegate = self
