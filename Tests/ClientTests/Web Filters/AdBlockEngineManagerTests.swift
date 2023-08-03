@@ -50,9 +50,7 @@ class AdBlockEngineManagerTests: XCTestCase {
     let expectation = expectation(description: "Compiled engine resources")
     let stats = AdBlockStats()
     let engineManager = AdBlockEngineManager(stats: stats)
-    
-    // TODO: Adblock fixup for v1.58.62
-//    AdblockEngine.setDomainResolver(AdblockEngine.defaultDomainResolver)
+    AdblockEngine.setDomainResolver()
     
     Task.detached {
       for (index, (source, url)) in filterListURLs.enumerated() {
@@ -113,8 +111,6 @@ class AdBlockEngineManagerTests: XCTestCase {
   }
   
   func testPerformance() throws {
-    // TODO: Adblock fixup for v1.58.62
-//    AdblockEngine.setDomainResolver(AdblockEngine.defaultDomainResolver)
     // Given
     // Ad block data and an engine manager
     let sampleAdBlockDatURL = Bundle.module.url(forResource: "rs-ABPFilterParserData", withExtension: "dat")!
