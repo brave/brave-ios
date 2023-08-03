@@ -565,18 +565,25 @@ class SettingsViewController: TableViewController {
       selection: { [unowned self] in
 
         let vc = { () -> UIViewController? in
-          switch BraveVPN.vpnState {
-          case .notPurchased, .expired:
-            return BraveVPN.vpnState.enableVPNDestinationVC
-          case .purchased:
-            let vc = BraveVPNSettingsViewController()
-            vc.openURL = { [unowned self] url in
-              self.settingsDelegate?.settingsOpenURLInNewTab(url)
-              self.dismiss(animated: true)
-            }
-
-            return vc
+          let vc = BraveVPNSettingsViewController()
+          vc.openURL = { [unowned self] url in
+            self.settingsDelegate?.settingsOpenURLInNewTab(url)
+            self.dismiss(animated: true)
           }
+          return vc
+          
+//          switch BraveVPN.vpnState {
+//          case .notPurchased, .expired:
+//            return BraveVPN.vpnState.enableVPNDestinationVC
+//          case .purchased:
+//            let vc = BraveVPNSettingsViewController()
+//            vc.openURL = { [unowned self] url in
+//              self.settingsDelegate?.settingsOpenURLInNewTab(url)
+//              self.dismiss(animated: true)
+//            }
+//
+//            return vc
+//          }
         }()
 
         guard let vcToShow = vc else { return }
