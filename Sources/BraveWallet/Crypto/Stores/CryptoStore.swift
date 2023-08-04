@@ -561,7 +561,7 @@ extension CryptoStore: BraveWalletKeyringServiceObserver {
   }
   public func keyringCreated(_ keyringId: BraveWallet.KeyringId) {
     Task { @MainActor [weak self] in
-      if let newCoin = WalletConstants.supportedCoinTypes.first(where: { $0.keyringId == keyringId }) {
+      if let newCoin = WalletConstants.supportedCoinTypes.first(where: { $0.keyringIds.contains(keyringId) }) {
         self?.userAssetManager.migrateUserAssets(for: newCoin, completion: {
           self?.updateAssets()
         })

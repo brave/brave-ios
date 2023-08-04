@@ -110,7 +110,7 @@ class AccountActivityStore: ObservableObject {
       self.userVisibleAssets = updatedUserVisibleAssets
       self.userVisibleNFTs = updatedUserVisibleNFTs
       
-      let keyringForAccount = await keyringService.keyringInfo(coin.keyringId)
+      let keyringForAccount = await keyringService.keyringInfo(account.keyringId)
       typealias TokenNetworkAccounts = (token: BraveWallet.BlockchainToken, network: BraveWallet.NetworkInfo, accounts: [BraveWallet.AccountInfo])
       let allTokenNetworkAccounts = allVisibleUserAssets.flatMap { networkAssets in
         networkAssets.tokens.map { token in

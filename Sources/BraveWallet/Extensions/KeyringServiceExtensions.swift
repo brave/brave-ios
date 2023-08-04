@@ -18,9 +18,35 @@ extension BraveWalletKeyringService {
       of: BraveWallet.KeyringInfo.self,
       returning: [BraveWallet.KeyringInfo].self,
       body: { @MainActor group in
-        for coin in coins {
+        let keyringIds: [BraveWallet.KeyringId] = coins.flatMap { $0.keyringIds }
+        for keyringId in keyringIds {
           group.addTask { @MainActor in
-            await self.keyringInfo(coin.keyringId)
+            await self.keyringInfo(keyringId)
+          }
+        }
+        return await group.reduce([BraveWallet.KeyringInfo](), { partialResult, prior in
+          return partialResult + [prior]
+        })
+        .sorted(by: { lhs, rhs in
+          (lhs.coin ?? .eth).sortOrder < (rhs.coin ?? .eth).sortOrder
+        })
+      }
+    )
+    return allKeyrings
+  }
+  
+  // Fetches all keyrings for all given keyring IDs
+  func keyrings(
+    for keyringIds: [BraveWallet.KeyringId]
+  ) async -> [BraveWallet.KeyringInfo] {
+    var allKeyrings: [BraveWallet.KeyringInfo] = []
+    allKeyrings = await withTaskGroup(
+      of: BraveWallet.KeyringInfo.self,
+      returning: [BraveWallet.KeyringInfo].self,
+      body: { @MainActor group in
+        for keyringId in keyringIds {
+          group.addTask { @MainActor in
+            await self.keyringInfo(keyringId)
           }
         }
         return await group.reduce([BraveWallet.KeyringInfo](), { partialResult, prior in

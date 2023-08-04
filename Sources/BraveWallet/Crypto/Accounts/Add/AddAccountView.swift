@@ -19,16 +19,33 @@ struct AddAccountView: View {
   @State private var originPassword: String = ""
   @State private var failedToImport: Bool = false
   @State private var selectedCoin: BraveWallet.CoinType?
+  @State private var filNetwork: BraveWallet.NetworkInfo
   @ScaledMetric(relativeTo: .body) private var privateKeyFieldHeight: CGFloat = 140.0
   @Environment(\.presentationMode) @Binding var presentationMode
   @Environment(\.appRatingRequestAction) private var appRatingRequest
 
   @ScaledMetric private var iconSize = 40.0
   private let maxIconSize: CGFloat = 80.0
+  private var allFilNetworks: [BraveWallet.NetworkInfo]
   
   var preSelectedCoin: BraveWallet.CoinType?
   var onCreate: (() -> Void)?
   var onDismiss: (() -> Void)?
+  
+  init(
+    keyringStore: KeyringStore,
+    networkStore: NetworkStore,
+    preSelectedCoin: BraveWallet.CoinType? = nil,
+    onCreate: (() -> Void)? = nil,
+    onDismiss: (() -> Void)? = nil
+  ) {
+    self.keyringStore = keyringStore
+    self.allFilNetworks = networkStore.allChains.filter { $0.coin == .fil }
+    self.preSelectedCoin = preSelectedCoin
+    self.onCreate = onCreate
+    self.onDismiss = onDismiss
+    _filNetwork = .init(initialValue: self.allFilNetworks.first ?? .init())
+  }
 
   private func addAccount(for coin: BraveWallet.CoinType) {
     let accountName = name.isEmpty ? defaultAccountName(for: coin, isPrimary: privateKey.isEmpty) : name
@@ -36,7 +53,7 @@ struct AddAccountView: View {
     
     if privateKey.isEmpty {
       // Add normal account
-      keyringStore.addPrimaryAccount(accountName, coin: coin) { success in
+      keyringStore.addPrimaryAccount(accountName, coin: coin, chainId: filNetwork.chainId) { success in
         if success {
           onCreate?()
           appRatingRequest?()
@@ -56,7 +73,7 @@ struct AddAccountView: View {
       if isJSONImported {
         keyringStore.addSecondaryAccount(accountName, json: privateKey, password: originPassword, completion: handler)
       } else {
-        keyringStore.addSecondaryAccount(accountName, coin: coin, privateKey: privateKey, completion: handler)
+        keyringStore.addSecondaryAccount(accountName, coin: coin, chainId: filNetwork.chainId, privateKey: privateKey, completion: handler)
       }
     }
   }
@@ -86,6 +103,18 @@ struct AddAccountView: View {
   
   @ViewBuilder private var addAccountView: some View {
     List {
+      if selectedCoin == .fil && !allFilNetworks.isEmpty {
+        Picker(selection: $filNetwork) {
+          ForEach(allFilNetworks) { network in
+            Text(network.chainName)
+              .foregroundColor(Color(.secondaryBraveLabel))
+              .tag(network)
+          }
+        } label: {
+          Text("Network")
+            .foregroundColor(Color(.braveLabel))
+        }
+      }
       accountNameSection
       if isJSONImported {
         originPasswordSection
@@ -310,7 +339,10 @@ struct AddAccountView: View {
 struct AddAccountView_Previews: PreviewProvider {
   static var previews: some View {
     NavigationView {
-      AddAccountView(keyringStore: .previewStore)
+      AddAccountView(
+        keyringStore: .previewStore,
+        networkStore: .previewStore
+      )
     }
   }
 }

@@ -104,18 +104,18 @@ extension BraveWallet.AccountId {
 }
 
 extension BraveWallet.CoinType {
-  public var keyringId: BraveWallet.KeyringId {
+  public var keyringIds: [BraveWallet.KeyringId] {
     switch self {
     case .eth:
-      return BraveWallet.KeyringId.default
+      return [.default]
     case .sol:
-      return BraveWallet.KeyringId.solana
+      return [.solana]
     case .fil:
-      return BraveWallet.KeyringId.filecoin
+      return [.filecoin, .filecoinTestnet]
     case .btc:
-      return BraveWallet.KeyringId.bitcoin84
+      return [.bitcoin84, .bitcoin84Testnet]
     @unknown default:
-      return BraveWallet.KeyringId.default
+      return [.default]
     }
   }
   
@@ -339,6 +339,23 @@ extension BraveWallet.OnRampProvider {
 extension BraveWallet.CoinMarket {
   static func abbreviateToBillion(input: Double) -> Double {
     input / 1000000000
+  }
+}
+
+extension BraveWallet.KeyringId {
+  static func keyringId(for coin: BraveWallet.CoinType, _ chainId: String) -> BraveWallet.KeyringId {
+    switch coin {
+    case .eth:
+      return .default
+    case .sol:
+      return .solana
+    case .fil:
+      return chainId == BraveWallet.FilecoinMainnet ? .filecoin : .filecoinTestnet
+    case.btc:
+      return chainId == BraveWallet.BitcoinMainnet ? .bitcoin84 : .bitcoin84Testnet
+    @unknown default:
+      return .default
+    }
   }
 }
 

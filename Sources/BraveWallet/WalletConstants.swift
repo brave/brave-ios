@@ -76,8 +76,13 @@ public struct WalletConstants {
     BraveWallet.FilecoinMainnet
   ]
   
-  /// The currently supported coin types.
-  public static var supportedCoinTypes: OrderedSet<BraveWallet.CoinType> {
+  /// The currently supported coin types in wallet
+  static var supportedCoinTypes: OrderedSet<BraveWallet.CoinType> {
+    return [.eth, .sol, .fil]
+  }
+  
+  /// The currently supported coin types in dapps
+  public static var supportedCoinTypesForDapps: OrderedSet<BraveWallet.CoinType> {
     return [.eth, .sol]
   }
   

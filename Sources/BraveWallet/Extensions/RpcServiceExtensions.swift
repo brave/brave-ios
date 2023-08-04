@@ -84,7 +84,24 @@ extension BraveWalletJsonRpcService {
           }
         }
       }
-    case .fil, .btc:
+    case .fil:
+      balance(account.address, coin: account.coin, chainId: network.chainId) { amount, status, _ in
+        guard status == .success && !amount.isEmpty else {
+          completion(nil)
+          return
+        }
+        let formatter = WeiFormatter(decimalFormatStyle: decimalFormatStyle)
+        if let valueString = formatter.decimalString(
+          for: "\(amount)",
+          radix: .decimal,
+          decimals: Int(token.decimals)
+        ) {
+          completion(Double(valueString))
+        } else {
+          completion(nil)
+        }
+      }
+    case .btc:
       completion(nil)
     @unknown default:
       completion(nil)

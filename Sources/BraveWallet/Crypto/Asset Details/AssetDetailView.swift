@@ -211,7 +211,10 @@ struct AssetDetailView: View {
       Color.clear
         .sheet(isPresented: $isShowingAddAccount) {
           NavigationView {
-            AddAccountView(keyringStore: keyringStore)
+            AddAccountView(
+              keyringStore: keyringStore,
+              networkStore: networkStore
+            )
           }
           .navigationViewStyle(StackNavigationViewStyle())
         }
