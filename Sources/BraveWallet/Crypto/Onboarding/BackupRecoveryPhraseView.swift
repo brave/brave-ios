@@ -51,7 +51,7 @@ struct BackupRecoveryPhraseView: View {
         .multilineTextAlignment(.center)
         RecoveryPhraseGrid(data: recoveryWords, id: \.self) { word in
           Text("#\(word.index + 1) \(word.value)")
-            .customPrivacySensitive()
+            .customPrivacySensitive(isDisclosed: isViewRecoveryPermitted)
             .multilineTextAlignment(.leading)
             .frame(maxWidth: .infinity)
             .font(.footnote.bold())
@@ -61,11 +61,6 @@ struct BackupRecoveryPhraseView: View {
                 .stroke(Color(.braveDisabled), lineWidth: 1)
             )
         }
-        .blur(radius: isViewRecoveryPermitted ? 0 : 4)
-        .overlay(
-          RoundedRectangle(cornerRadius: 4)
-            .stroke(Color(.braveDisabled), lineWidth: isViewRecoveryPermitted ? 0 : 1)
-        )
         Button {
           copyRecoveryPhrase()
         } label: {

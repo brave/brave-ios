@@ -12,8 +12,7 @@ import Strings
 struct SetupCryptoView: View {
   @ObservedObject var keyringStore: KeyringStore
   
-  @State private var isShowingCreateNewWallet: Bool = false
-  @State private var isShowingRestoreExistedWallet: Bool = false
+  @State private var setupOption: LegalView.SetupOption?
   
   var body: some View {
     ScrollView {
@@ -30,7 +29,7 @@ struct SetupCryptoView: View {
         .multilineTextAlignment(.center)
         VStack(spacing: 24) {
           Button {
-            isShowingCreateNewWallet = true
+            setupOption = .new
           } label: {
             HStack(alignment: .top, spacing: 16) {
               Image(braveSystemName: "leo.plus.add")
@@ -45,6 +44,7 @@ struct SetupCryptoView: View {
                   .font(.subheadline)
                   .foregroundColor(Color(uiColor: WalletV2Design.textSecondary))
               }
+              .fixedSize(horizontal: false, vertical: true)
               .multilineTextAlignment(.leading)
               Spacer()
             }
@@ -54,7 +54,7 @@ struct SetupCryptoView: View {
             .frame(maxWidth: .infinity)
           }
           Button {
-            isShowingRestoreExistedWallet = true
+            setupOption = .restore
           } label: {
             HStack(alignment: .top, spacing: 16) {
               Image(braveSystemName: "leo.import.arrow")
@@ -70,6 +70,7 @@ struct SetupCryptoView: View {
                     .font(.subheadline)
                     .foregroundColor(Color(uiColor: WalletV2Design.textSecondary))
                 }
+                .fixedSize(horizontal: false, vertical: true)
                 .multilineTextAlignment(.leading)
                 HStack(spacing: 14) {
                   Group {
@@ -93,6 +94,10 @@ struct SetupCryptoView: View {
             .cornerRadius(16)
           }
         }
+        Text(Strings.Wallet.setupCryptoDisclaimer)
+          .font(.caption2)
+          .foregroundColor(Color(.secondaryBraveLabel))
+          .multilineTextAlignment(.center)
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .padding(24)
@@ -106,17 +111,15 @@ struct SetupCryptoView: View {
     .edgesIgnoringSafeArea(.all)
     .background(
       NavigationLink(
-        destination: CreateWalletContainerView(keyringStore: keyringStore),
-        isActive: $isShowingCreateNewWallet,
-        label: {
-          EmptyView()
-        }
-      )
-    )
-    .background(
-      NavigationLink(
-        destination: RestoreWalletContainerView(keyringStore: keyringStore),
-        isActive: $isShowingRestoreExistedWallet,
+        isActive: Binding(
+          get: { setupOption != nil },
+          set: { if !$0 { setupOption = nil } }
+        ),
+        destination: {
+          if let option = setupOption {
+            LegalView(keyringStore: keyringStore, setupOption: option)
+          }
+        },
         label: {
           EmptyView()
         }
