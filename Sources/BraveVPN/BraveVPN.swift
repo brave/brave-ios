@@ -134,48 +134,6 @@ public class BraveVPN {
   }
   
   /// Connects to Guardian's server to validate locally stored receipt.
-  /// Returns true if the receipt expired, false if not or nil if expiration status can't be determined.
-  public static func validateReceipt(receiptHasExpired: ((Bool?) -> Void)? = nil) {
-    guard let receipt = receipt,
-    let bundleId = Bundle.main.bundleIdentifier else {
-      receiptHasExpired?(nil)
-      return
-    }
-    
-    if Preferences.VPN.skusCredential.value != nil {
-      // Receipt verification applies to Apple's IAP only,
-      // if we detect Brave's SKU token we should not look at Apple's receipt.
-      return
-    }
-
-    housekeepingApi.verifyReceipt(receipt, bundleId: bundleId) { validSubscriptions, success, error in
-      if !success {
-        // Api call for receipt verification failed,
-        // we do not know if the receipt has expired or not.
-        receiptHasExpired?(nil)
-        logAndStoreError("Api call for receipt verification failed: \(error ?? "unknown error")")
-        return
-      }
-
-      guard let validSubscriptions = validSubscriptions,
-            let newestReceipt = validSubscriptions.sorted(by: { $0.expiresDate > $1.expiresDate }).first else {
-        // Setting super old date to force expiration logic in the UI.
-        Preferences.VPN.expirationDate.value = Date(timeIntervalSince1970: 1)
-        receiptHasExpired?(true)
-        logAndStoreError("vpn expired", printToConsole: false)
-        return
-      }
-
-      Preferences.VPN.expirationDate.value = newestReceipt.expiresDate
-      Preferences.VPN.freeTrialUsed.value = !newestReceipt.isTrialPeriod
-      populateRegionDataIfNecessary()
-      
-      GRDSubscriptionManager.setIsPayingUser(true)
-      receiptHasExpired?(false)
-    }
-  }
-  
-  /// Connects to Guardian's server to validate locally stored receipt.
   /// Returns ReceiptResponse whoich hold information about status of receipt expiration etc
   public static func validateReceiptData(receiptResponse: ((ReceiptResponse?) -> Void)? = nil) {
     guard let receipt = receipt,
