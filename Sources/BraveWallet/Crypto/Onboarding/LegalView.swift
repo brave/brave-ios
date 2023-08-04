@@ -26,8 +26,8 @@ struct LegalView: View {
   
   var body: some View {
     ScrollView {
-      VStack(spacing: 48) {
-        VStack(spacing: 14) {
+      VStack(spacing: 20) {
+        VStack(spacing: 8) {
           Text(Strings.Wallet.legalTitle)
             .font(.title)
             .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
@@ -37,24 +37,29 @@ struct LegalView: View {
         }
         .multilineTextAlignment(.center)
         .fixedSize(horizontal: false, vertical: true)
-        HStack(alignment: .top, spacing: 16) {
-          Toggle("", isOn: $isResponsibilityCheckboxChecked)
-            .labelsHidden()
-            .tint(Color(.braveBlurpleTint))
+        .padding(.bottom, 20)
+        HStack(alignment: .top, spacing: 8) {
+          LegalCheckbox(isChecked: $isResponsibilityCheckboxChecked)
+            .font(.title2)
           Text(Strings.Wallet.legalUserResponsibility)
             .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
-            .font(.body)
+            .font(.subheadline)
             .frame(maxWidth: .infinity, alignment: .leading)
+            .onTapGesture {
+              isResponsibilityCheckboxChecked.toggle()
+            }
         }
-        HStack(alignment: .top, spacing: 16) {
-          Toggle("", isOn: $isTermsCheckboxChecked)
-            .labelsHidden()
-            .tint(Color(.braveBlurpleTint))
+        HStack(spacing: 8) {
+          LegalCheckbox(isChecked: $isTermsCheckboxChecked)
+            .font(.title2)
           Text(LocalizedStringKey(String.localizedStringWithFormat(Strings.Wallet.legalTermOfUse, WalletConstants.braveWalletTermsOfUse.absoluteDisplayString)))
             .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
             .tint(Color(.braveBlurpleTint))
-            .font(.body)
+            .font(.subheadline)
             .frame(maxWidth: .infinity, alignment: .leading)
+            .onTapGesture {
+              isTermsCheckboxChecked.toggle()
+            }
         }
         Button {
           if setupOption == .new {
@@ -93,6 +98,20 @@ struct LegalView: View {
     .accessibilityEmbedInScrollView()
     .background(Color(.braveBackground).edgesIgnoringSafeArea(.all))
     .transparentNavigationBar(backButtonTitle: Strings.Wallet.web3DomainInterstitialPageTAndU.capitalizeFirstLetter, backButtonDisplayMode: .generic)
+  }
+}
+
+struct LegalCheckbox: View {
+  @Binding var isChecked: Bool
+  
+  var body: some View {
+    Button {
+      isChecked.toggle()
+    } label: {
+      Image(braveSystemName: isChecked ? "leo.checkbox.checked" : "leo.checkbox.unchecked")
+        .renderingMode(.template)
+        .foregroundColor(Color(isChecked ? .braveBlurpleTint : .braveDisabled))
+    }
   }
 }
 
