@@ -326,7 +326,7 @@ extension BrowserViewController: TabManagerDelegate {
           handler: UIAction.deferredActionHandler { [weak self] _ in
             guard let self = self else { return }
             
-            if PrivateBrowsingManager.shared.isPrivateBrowsing {
+            if privateBrowsingManager.isPrivateBrowsing {
               return
             }
             

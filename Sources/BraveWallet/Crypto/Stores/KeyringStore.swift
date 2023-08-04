@@ -456,7 +456,7 @@ extension KeyringStore: BraveWalletKeyringServiceObserver {
   }
 
   public func keyringCreated(_ keyringId: BraveWallet.KeyringId) {
-    if isOnboardingVisible, !isCreatingWallet, keyringId == BraveWallet.DefaultKeyringId {
+    if isOnboardingVisible, !isCreatingWallet, keyringId == BraveWallet.KeyringId.default {
       // Another window has created a wallet. We should dismiss onboarding on this
       // window and allow the other window to continue with it's onboarding flow.
       isOnboardingVisible = false
@@ -476,7 +476,7 @@ extension KeyringStore: BraveWalletKeyringServiceObserver {
   }
 
   public func keyringRestored(_ keyringId: BraveWallet.KeyringId) {
-    if isOnboardingVisible && !isRestoringWallet, keyringId == BraveWallet.DefaultKeyringId {
+    if isOnboardingVisible && !isRestoringWallet, keyringId == BraveWallet.KeyringId.default {
       // Another window has restored a wallet. We should dismiss onboarding on this
       // window and allow the other window to continue with it's onboarding flow.
       isOnboardingVisible = false
