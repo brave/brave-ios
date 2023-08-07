@@ -59,6 +59,8 @@ public class BrowserViewController: UIViewController {
 
     let toolBarInteraction = UIContextMenuInteraction(delegate: self)
     topToolbar.locationView.addInteraction(toolBarInteraction)
+    let reloadInteraction = UIContextMenuInteraction(delegate: self)
+    topToolbar.locationView.reloadButton.addInteraction(reloadInteraction)
     return topToolbar
   }()
   

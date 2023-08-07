@@ -202,11 +202,6 @@ extension BrowserViewController: TopToolbarDelegate {
     }
   }
 
-  func topToolbarDidLongPressReaderMode(_ topToolbar: TopToolbarView) -> Bool {
-    // Maybe we want to add something here down the road
-    return false
-  }
-
   func topToolbarDidPressPlaylistButton(_ urlBar: TopToolbarView) {
     guard let tab = tabManager.selectedTab, let playlistItem = tab.playlistItem else { return }
     let state = urlBar.locationView.playlistButton.buttonState
@@ -266,10 +261,6 @@ extension BrowserViewController: TopToolbarDelegate {
     } else {
       return (topToolbar?.absoluteString, false)
     }
-  }
-
-  func topToolbarDidLongPressLocation(_ topToolbar: TopToolbarView) {
-    // The actions are carried to menu actions for Top ToolBar Location View
   }
 
   func topToolbarDidPressScrollToTop(_ topToolbar: TopToolbarView) {
@@ -530,10 +521,6 @@ extension BrowserViewController: TopToolbarDelegate {
 
   func topToolbarDidTapBraveRewardsButton(_ topToolbar: TopToolbarView) {
     showBraveRewardsPanel()
-  }
-
-  func topToolbarDidLongPressBraveRewardsButton(_ topToolbar: TopToolbarView) {
-    showRewardsDebugSettings()
   }
 
   func topToolbarDidTapMenuButton(_ topToolbar: TopToolbarView) {
@@ -926,6 +913,51 @@ extension BrowserViewController: ToolbarDelegate {
 
 extension BrowserViewController: UIContextMenuInteractionDelegate {
   public func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
+    
+    var configuration: UIContextMenuConfiguration?
+    
+    switch interaction.view?.accessibilityIdentifier {
+    case topToolbar.locationView.reloadButtonAccessibilityIdentifier:
+      configuration = reloadButtonMenuConfiguration
+    default:
+      configuration = locationViewMenuConfiguration
+    }
+    
+    if #available(iOS 16.0, *) {
+      configuration?.preferredMenuElementOrder = .priority
+    }
+    
+    return configuration
+  }
+  
+  private var reloadButtonMenuConfiguration: UIContextMenuConfiguration {
+    let configuration =  UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [unowned self] _ in
+      var actionMenu: [UIMenu] = []
+      
+      let tab = tabManager.selectedTab
+      
+      let title = tab?.isDesktopSite == true ? Strings.appMenuViewMobileSiteTitleString : Strings.appMenuViewDesktopSiteTitleString
+      
+      let icon = tab?.isDesktopSite == true ? "leo.smartphone" : "leo.monitor"
+      
+      let copyAction = UIAction(
+        title: title,
+        image: UIImage(braveSystemNamed: icon),
+        handler: UIAction.deferredActionHandler { [weak tab] _ in
+          tab?.switchUserAgent()
+        })
+
+      let copyMenu = UIMenu(title: "", options: .displayInline, children: [copyAction])
+      
+      actionMenu = [copyMenu]
+      
+      return UIMenu(title: "", identifier: nil, children: actionMenu)
+    }
+    
+    return configuration
+  }
+  
+  private var locationViewMenuConfiguration: UIContextMenuConfiguration {
     let configuration =  UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [unowned self] _ in
       var actionMenu: [UIMenu] = []
       var pasteMenuChildren: [UIAction] = []
@@ -977,10 +1009,6 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
       }
 
       return UIMenu(title: "", identifier: nil, children: actionMenu)
-    }
-      
-    if #available(iOS 16.0, *) {
-      configuration.preferredMenuElementOrder = .priority
     }
     
     return configuration
