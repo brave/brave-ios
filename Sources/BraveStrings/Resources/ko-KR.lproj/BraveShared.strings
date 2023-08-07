@@ -2219,7 +2219,7 @@
 "RestoredFavoritesFolderName" = "복원된 즐겨찾기";
 
 /* Restore Tabs Affirmative Action */
-"RestoreTabAffirmativeButtonTitle" = "확인";
+"RestoreTabAffirmativeButtonTitle" = "예";
 
 /* Restore Tabs Negative Action */
 "RestoreTabNegativeButtonTitle" = "아니요";

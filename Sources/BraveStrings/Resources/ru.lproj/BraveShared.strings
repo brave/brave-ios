@@ -2219,7 +2219,7 @@
 "RestoredFavoritesFolderName" = "Восстановленное избранное";
 
 /* Restore Tabs Affirmative Action */
-"RestoreTabAffirmativeButtonTitle" = "ОК";
+"RestoreTabAffirmativeButtonTitle" = "Да";
 
 /* Restore Tabs Negative Action */
 "RestoreTabNegativeButtonTitle" = "Нет";

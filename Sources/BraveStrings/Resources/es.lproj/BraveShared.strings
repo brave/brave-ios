@@ -2219,7 +2219,7 @@
 "RestoredFavoritesFolderName" = "Favoritos restaurados";
 
 /* Restore Tabs Affirmative Action */
-"RestoreTabAffirmativeButtonTitle" = "Aceptar";
+"RestoreTabAffirmativeButtonTitle" = "Sí";
 
 /* Restore Tabs Negative Action */
 "RestoreTabNegativeButtonTitle" = "No";

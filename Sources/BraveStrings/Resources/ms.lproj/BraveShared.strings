@@ -2219,7 +2219,7 @@
 "RestoredFavoritesFolderName" = "Kegemaran yang Dipulihkan";
 
 /* Restore Tabs Affirmative Action */
-"RestoreTabAffirmativeButtonTitle" = "Okey";
+"RestoreTabAffirmativeButtonTitle" = "Ya";
 
 /* Restore Tabs Negative Action */
 "RestoreTabNegativeButtonTitle" = "Tidak";

@@ -2219,10 +2219,10 @@
 "RestoredFavoritesFolderName" = "Preferiti ripristinati";
 
 /* Restore Tabs Affirmative Action */
-"RestoreTabAffirmativeButtonTitle" = "OK";
+"RestoreTabAffirmativeButtonTitle" = "SÌ";
 
 /* Restore Tabs Negative Action */
-"RestoreTabNegativeButtonTitle" = "No";
+"RestoreTabNegativeButtonTitle" = "NO";
 
 /* Restore Tabs Prompt Description */
 "RestoreTabOnCrashAlertMessage" = "Sembra che Brave si sia arrestato in modo anomalo. Vuoi ripristinare le tue schede?";
