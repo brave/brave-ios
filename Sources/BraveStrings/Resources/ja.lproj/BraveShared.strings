@@ -2219,7 +2219,7 @@
 "RestoredFavoritesFolderName" = "復元されたお気に入り";
 
 /* Restore Tabs Affirmative Action */
-"RestoreTabAffirmativeButtonTitle" = "はい";
+"RestoreTabAffirmativeButtonTitle" = "OK";
 
 /* Restore Tabs Negative Action */
 "RestoreTabNegativeButtonTitle" = "いいえ";

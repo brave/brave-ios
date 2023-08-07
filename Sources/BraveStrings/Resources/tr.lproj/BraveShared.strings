@@ -2219,7 +2219,7 @@
 "RestoredFavoritesFolderName" = "Geri Yüklenen Sık Kullanılanlar";
 
 /* Restore Tabs Affirmative Action */
-"RestoreTabAffirmativeButtonTitle" = "Evet";
+"RestoreTabAffirmativeButtonTitle" = "Tamam";
 
 /* Restore Tabs Negative Action */
 "RestoreTabNegativeButtonTitle" = "Hayır";

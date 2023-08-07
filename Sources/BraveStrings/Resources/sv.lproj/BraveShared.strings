@@ -2219,7 +2219,7 @@
 "RestoredFavoritesFolderName" = "Återställda favoriter";
 
 /* Restore Tabs Affirmative Action */
-"RestoreTabAffirmativeButtonTitle" = "Ja";
+"RestoreTabAffirmativeButtonTitle" = "Okej";
 
 /* Restore Tabs Negative Action */
 "RestoreTabNegativeButtonTitle" = "Nej";
