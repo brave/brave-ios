@@ -2219,7 +2219,7 @@
 "RestoredFavoritesFolderName" = "恢復的最愛";
 
 /* Restore Tabs Affirmative Action */
-"RestoreTabAffirmativeButtonTitle" = "是的";
+"RestoreTabAffirmativeButtonTitle" = "確定";
 
 /* Restore Tabs Negative Action */
 "RestoreTabNegativeButtonTitle" = "否";
