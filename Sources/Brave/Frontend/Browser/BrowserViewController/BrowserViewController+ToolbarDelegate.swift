@@ -932,8 +932,6 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
   
   private var reloadButtonMenuConfiguration: UIContextMenuConfiguration {
     let configuration =  UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [unowned self] _ in
-      var actionMenu: [UIMenu] = []
-      
       let tab = tabManager.selectedTab
       
       let title = tab?.isDesktopSite == true ? Strings.appMenuViewMobileSiteTitleString : Strings.appMenuViewDesktopSiteTitleString
@@ -948,10 +946,7 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
         })
 
       let copyMenu = UIMenu(title: "", options: .displayInline, children: [copyAction])
-      
-      actionMenu = [copyMenu]
-      
-      return UIMenu(title: "", identifier: nil, children: actionMenu)
+      return UIMenu(children: [copyMenu])
     }
     
     return configuration
@@ -994,10 +989,10 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
           }
         })
 
-      let copyMenu = UIMenu(title: "", options: .displayInline, children: [copyAction])
+      let copyMenu = UIMenu(options: .displayInline, children: [copyAction])
       
       if UIPasteboard.general.hasStrings || UIPasteboard.general.hasURLs {
-        let pasteMenu = UIMenu(title: "", options: .displayInline, children: pasteMenuChildren)
+        let pasteMenu = UIMenu(options: .displayInline, children: pasteMenuChildren)
         
         actionMenu = [pasteMenu, copyMenu]
         
@@ -1008,7 +1003,7 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
         actionMenu = [copyMenu]
       }
 
-      return UIMenu(title: "", identifier: nil, children: actionMenu)
+      return UIMenu(children: actionMenu)
     }
     
     return configuration
