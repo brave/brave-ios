@@ -1127,9 +1127,9 @@ class TabManager: NSObject {
     }
 
     // NTP should not be passed as Recently Closed item
-    var recentlyClosedURL  = tab.url ?? SessionTab.from(tabId: tab.id)?.url
+    let recentlyClosedURL  = tab.url ?? SessionTab.from(tabId: tab.id)?.url
 
-    guard let tabUrl = recentlyClosedURL, InternalURL(tabUrl)?.isAboutHomeURL == false else {
+    guard let tabUrl = recentlyClosedURL, tabUrl.isWebPage() else {
       return nil
     }
       
