@@ -71,4 +71,8 @@ class MockBlockchainRegistry: BraveWalletBlockchainRegistry {
   func topDapps(_ chainId: String, coin: BraveWallet.CoinType, completion: @escaping ([BraveWallet.Dapp]) -> Void) {
     completion([])
   }
+  
+  func coingeckoId(_ chainId: String, contractAddress: String, completion: @escaping (String?) -> Void) {
+    completion(nil)
+  }
 }
