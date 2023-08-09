@@ -164,6 +164,29 @@ public class PortfolioStore: ObservableObject {
   
   @Published private(set) var isLoadingDiscoverAssets: Bool = false
   
+  var isShowingAssetsLoadingState: Bool {
+    if filters.isHidingSmallBalances || filters.groupBy != .none {
+      // 1. If we are hiding small balances, assets will be hidden
+      // unless they previously had fetched balance.
+      // 2. If assets are grouped, groups with 0 total balance are hidden.
+      // Show loading state when fetching balances for first time.
+      return isLoadingBalances && tokenBalancesCache
+        .filter { $0.value.values.reduce(0, +) > 0 }
+        .isEmpty
+    }
+    // if we are not hiding small balances then assets are displayed
+    // with empty balance, show them while balance is fetched
+    return false
+  }
+  
+  var isShowingAssetsEmptyState: Bool {
+    guard !isShowingAssetsLoadingState else { return false }
+    if filters.groupBy == .none, let noneGroup = assetGroups.first {
+      return noneGroup.assets.isEmpty
+    }
+    return assetGroups.isEmpty
+  }
+  
   /// All User Accounts
   var allAccounts: [BraveWallet.AccountInfo] = []
   /// All available networks

@@ -4296,5 +4296,19 @@ extension Strings {
       value: "Networks",
       comment: "The title of the sort option that groups assets by each network. Used in Portfolio/NFT filters and display settings."
     )
+    public static let portfolioEmptyStateTitle = NSLocalizedString(
+      "wallet.portfolioEmptyStateTitle",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "No available assets",
+      comment: "The title of the empty state in Portfolio when no assets are shown."
+    )
+    public static let portfolioEmptyStateDescription = NSLocalizedString(
+      "wallet.portfolioEmptyStateDescription",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Deposit or purchase tokens to get started. If you don't see tokens from an imported account, check the filters and display settings. Unknown tokens may need to be added as custom assets.",
+      comment: "The title of the empty state in Portfolio when no assets are shown."
+    )
   }
 }

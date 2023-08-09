@@ -195,25 +195,55 @@ struct PortfolioView: View {
     .frame(maxWidth: .infinity, alignment: .leading)
   }
   
+  private var emptyAssetsState: some View {
+    VStack(spacing: 10) {
+      Image("portfolio-empty", bundle: .module)
+        .aspectRatio(contentMode: .fit)
+      Text(Strings.Wallet.portfolioEmptyStateTitle)
+        .font(.headline)
+        .foregroundColor(Color(WalletV2Design.textPrimary))
+      Text(Strings.Wallet.portfolioEmptyStateDescription)
+        .font(.footnote)
+        .foregroundColor(Color(WalletV2Design.textSecondary))
+    }
+    .multilineTextAlignment(.center)
+    .padding(.vertical)
+  }
+  
   /// Grouped / Ungrouped asset `Section`s for the List
   @ViewBuilder private var assetSections: some View {
-    ForEach(portfolioStore.assetGroups) { group in
-      Section(
-        content: {
-          if group.groupType == .none {
-            ungroupedAssets(group)
-              .listRowBackground(Color(.secondaryBraveGroupedBackground))
-          } else {
-            groupedAssetsSection(for: group)
-              .listRowBackground(Color(.secondaryBraveGroupedBackground))
-          }
-        },
-        header: {
-          if group == portfolioStore.assetGroups.first {
-            assetSectionsHeader
+    if portfolioStore.isShowingAssetsLoadingState || portfolioStore.isShowingAssetsEmptyState {
+      Section(content: {
+        Group {
+          if portfolioStore.isShowingAssetsLoadingState {
+            SkeletonLoadingAssetView()
+          } else { // isShowingAssetsEmptyState
+            emptyAssetsState
           }
         }
-      )
+        .listRowBackground(Color(.secondaryBraveGroupedBackground))
+      }, header: {
+        assetSectionsHeader
+      })
+    } else {
+      ForEach(portfolioStore.assetGroups) { group in
+        Section(
+          content: {
+            if group.groupType == .none {
+              ungroupedAssets(group)
+                .listRowBackground(Color(.secondaryBraveGroupedBackground))
+            } else {
+              groupedAssetsSection(for: group)
+                .listRowBackground(Color(.secondaryBraveGroupedBackground))
+            }
+          },
+          header: {
+            if group == portfolioStore.assetGroups.first {
+              assetSectionsHeader
+            }
+          }
+        )
+      }
     }
   }
   
@@ -290,8 +320,9 @@ struct PortfolioView: View {
         if case let .network(networkInfo) = group.groupType {
           NetworkIcon(network: networkInfo, length: 32)
         } else if case let .account(accountInfo) = group.groupType {
-          Blockie(address: accountInfo.address)
+          Blockie(address: accountInfo.address, shape: .rectangle)
             .frame(width: 32, height: 32)
+            .clipShape(RoundedRectangle(cornerRadius: 4))
         }
         VStack(alignment: .leading) {
           Text(group.title)
