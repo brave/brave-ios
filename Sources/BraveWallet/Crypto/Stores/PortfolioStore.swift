@@ -10,10 +10,20 @@ import Combine
 import Data
 import Preferences
 
-public enum AssetGroupType: Equatable {
+public enum AssetGroupType: Equatable, Identifiable {
   case none
   case network(BraveWallet.NetworkInfo)
   case account(BraveWallet.AccountInfo)
+  
+  public var id: String {
+    switch self {
+    case .none: return "Group.none"
+    case let .network(network):
+      return "Group.network.\(network.id)"
+    case let .account(account):
+      return "Group.account.\(account.id)"
+    }
+  }
 }
 
 public struct AssetGroupViewModel: Identifiable, Equatable {
@@ -51,7 +61,7 @@ public struct AssetGroupViewModel: Identifiable, Equatable {
       return partialResult + assetValue
     }
   }
-  public var id: String { title }
+  public var id: String { "\(groupType.id) \(title)" }
 }
 
 public struct AssetViewModel: Identifiable, Equatable {
@@ -68,7 +78,7 @@ public struct AssetViewModel: Identifiable, Equatable {
   }
 
   public var id: String {
-    token.id + network.chainId
+    "\(groupType.id)\(token.id)\(network.chainId)"
   }
   
   /// The quantity / balance to display for this asset within it's `AssetGroupType`.
@@ -478,7 +488,7 @@ public class PortfolioStore: ObservableObject {
     }
 
     return groups
-      .optionallySort(shouldSort: canSortGroups, by: { $0.totalFiatValue > $1.totalFiatValue })
+      .sorted(by: { $0.totalFiatValue > $1.totalFiatValue })
       .optionallyFilter( // when grouping assets & hiding small balances
         shouldFilter: filters.groupBy != .none && filters.isHidingSmallBalances,
         isIncluded: { group in
@@ -486,17 +496,6 @@ public class PortfolioStore: ObservableObject {
           return (!group.assets.isEmpty && group.totalFiatValue > 0)
         }
       )
-  }
-  
-  private var canSortGroups: Bool {
-    if #available(iOS 17, *) {
-      return true
-    } else if #available(iOS 16.4, *) {
-      /// Sorting on iOS 16.4 up to iOS 17 can cause a crash:
-      /// `attempt to perform an insert and a move to the same section (1)`
-      return false
-    }
-    return true
   }
   
   private func buildAssetViewModels(

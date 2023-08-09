@@ -273,7 +273,7 @@ struct PortfolioView: View {
   
   /// Builds the expandable/collapseable (expanded by default) section content for a given group.
   @ViewBuilder private func groupedAssetsSection(for group: AssetGroupViewModel) -> some View {
-    DisclosureGroup(
+    WalletDisclosureGroup(
       isExpanded: Binding(
         get: { groupToggleState[group.id, default: true] },
         set: { isExpanded in
@@ -299,7 +299,6 @@ struct PortfolioView: View {
             )
           }
         }
-        .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 16))
       },
       label: {
         if case let .account(account) = group.groupType {

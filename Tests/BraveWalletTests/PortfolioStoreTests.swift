@@ -554,8 +554,8 @@ import Preferences
         // grouping by .account; 1 for each of the 4 accounts
         XCTAssertEqual(lastUpdatedAssetGroups.count, 4)
         guard let ethAccount1Group = lastUpdatedAssetGroups[safe: 0],
-              let ethAccount2Group = lastUpdatedAssetGroups[safe: 1],
-              let solAccount1Group = lastUpdatedAssetGroups[safe: 2],
+              let solAccount1Group = lastUpdatedAssetGroups[safe: 1],
+              let ethAccount2Group = lastUpdatedAssetGroups[safe: 2],
               let solAccount2Group = lastUpdatedAssetGroups[safe: 3] else {
           XCTFail("Unexpected test result")
           return
@@ -577,6 +577,14 @@ import Preferences
                        self.goerliNetwork.nativeToken.symbol)
         XCTAssertEqual(ethAccount1Group.assets[safe: 2]?.quantity, String(format: "%.04f", 0))
         
+        XCTAssertEqual(solAccount1Group.groupType, .account(self.solAccount1))
+        XCTAssertEqual(solAccount1Group.assets.count, 1)
+        // SOL (value = $775.3)
+        XCTAssertEqual(solAccount1Group.assets[safe: 0]?.token.symbol,
+                       BraveWallet.BlockchainToken.mockSolToken.symbol)
+        XCTAssertEqual(solAccount1Group.assets[safe: 0]?.quantity,
+                       String(format: "%.04f", self.mockSOLBalance))
+        
         XCTAssertEqual(ethAccount2Group.groupType, .account(self.ethAccount2))
         XCTAssertEqual(ethAccount2Group.assets.count, 3) // ETH Mainnet, USDC, ETH Goerli
         // USDC (value $0.01)
@@ -592,14 +600,6 @@ import Preferences
         XCTAssertEqual(ethAccount2Group.assets[safe: 2]?.token.symbol,
                        self.goerliNetwork.nativeToken.symbol)
         XCTAssertEqual(ethAccount2Group.assets[safe: 2]?.quantity, String(format: "%.04f", 0))
-        
-        XCTAssertEqual(solAccount1Group.groupType, .account(self.solAccount1))
-        XCTAssertEqual(solAccount1Group.assets.count, 1)
-        // SOL (value = $775.3)
-        XCTAssertEqual(solAccount1Group.assets[safe: 0]?.token.symbol,
-                       BraveWallet.BlockchainToken.mockSolToken.symbol)
-        XCTAssertEqual(solAccount1Group.assets[safe: 0]?.quantity,
-                       String(format: "%.04f", self.mockSOLBalance))
         
         XCTAssertEqual(solAccount2Group.groupType, .account(self.solAccount2))
         XCTAssertEqual(solAccount2Group.assets.count, 1)
@@ -699,20 +699,12 @@ import Preferences
         }
         // grouping by .network; 1 for each of the 2 networks, with Goerli group hidden due to 0 balance.
         XCTAssertEqual(lastUpdatedAssetGroups.count, 3)
-        guard let solMainnetGroup = lastUpdatedAssetGroups[safe: 0],
-              let ethMainnetGroup = lastUpdatedAssetGroups[safe: 1],
+        guard let ethMainnetGroup = lastUpdatedAssetGroups[safe: 0],
+              let solMainnetGroup = lastUpdatedAssetGroups[safe: 1],
               let ethGoerliGroup = lastUpdatedAssetGroups[safe: 2] else {
           XCTFail("Unexpected test result")
           return
         }
-        XCTAssertEqual(solMainnetGroup.groupType, .network(.mockSolana))
-        XCTAssertEqual(solMainnetGroup.assets.count, 1) // SOL
-        // SOL (value = $775.3)
-        XCTAssertEqual(solMainnetGroup.assets[safe: 0]?.token.symbol,
-                       BraveWallet.BlockchainToken.mockSolToken.symbol)
-        XCTAssertEqual(solMainnetGroup.assets[safe: 0]?.quantity,
-                       String(format: "%.04f", self.mockSOLBalance))
-        
         XCTAssertEqual(ethMainnetGroup.groupType, .network(.mockMainnet))
         XCTAssertEqual(ethMainnetGroup.assets.count, 2) // ETH Mainnet, USDC
         // ETH (value ~= $2741.7510399999996)
@@ -725,6 +717,14 @@ import Preferences
                        BraveWallet.BlockchainToken.mockUSDCToken.symbol)
         XCTAssertEqual(ethMainnetGroup.assets[safe: 1]?.quantity,
                        String(format: "%.04f", self.mockUSDCBalanceAccount1 + self.mockUSDCBalanceAccount2))
+        
+        XCTAssertEqual(solMainnetGroup.groupType, .network(.mockSolana))
+        XCTAssertEqual(solMainnetGroup.assets.count, 1) // SOL
+        // SOL (value = $775.3)
+        XCTAssertEqual(solMainnetGroup.assets[safe: 0]?.token.symbol,
+                       BraveWallet.BlockchainToken.mockSolToken.symbol)
+        XCTAssertEqual(solMainnetGroup.assets[safe: 0]?.quantity,
+                       String(format: "%.04f", self.mockSOLBalance))
         
         XCTAssertEqual(ethGoerliGroup.groupType, .network(.mockGoerli))
         XCTAssertEqual(ethGoerliGroup.assets.count, 1) // ETH Goerli
