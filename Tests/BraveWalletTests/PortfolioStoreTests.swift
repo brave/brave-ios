@@ -34,9 +34,14 @@ import Preferences
     $0.address = "mock_eth_id_2"
     $0.name = "Ethereum Account 2"
   }
-  let solAccount: BraveWallet.AccountInfo = .mockSolAccount
+  let solAccount1: BraveWallet.AccountInfo = .mockSolAccount
+  let solAccount2 = (BraveWallet.AccountInfo.mockSolAccount.copy() as! BraveWallet.AccountInfo).then {
+    $0.address = "mock_sol_id_2"
+    $0.name = "Solana Account 2"
+  }
   // Networks
   let ethNetwork: BraveWallet.NetworkInfo = .mockMainnet
+  let goerliNetwork: BraveWallet.NetworkInfo = .mockGoerli
   let solNetwork: BraveWallet.NetworkInfo = .mockSolana
   // ETH Asset, balance, price, history
   let mockETHBalanceAccount1: Double = 0.896
@@ -87,7 +92,7 @@ import Preferences
     let mockSOLLamportBalance: UInt64 = 3876535000 // ~3.8765 SOL
     let formatter = WeiFormatter(decimalFormatStyle: .decimals(precision: 18))
     // config Solana
-    let mockSolAccountInfos: [BraveWallet.AccountInfo] = [.mockSolAccount]
+    let mockSolAccountInfos: [BraveWallet.AccountInfo] = [solAccount1, solAccount2]
     let mockSolUserAssets: [BraveWallet.BlockchainToken] = [
       BraveWallet.NetworkInfo.mockSolana.nativeToken.copy(asVisibleAsset: true),
       .mockSpdToken // Verify non-visible assets not displayed #6386
@@ -145,7 +150,7 @@ import Preferences
     rpcService._allNetworks = { coin, completion in
       switch coin {
       case .eth:
-        completion([self.ethNetwork])
+        completion([self.ethNetwork, self.goerliNetwork])
       case .sol:
         completion([self.solNetwork])
       case .fil:
@@ -173,7 +178,12 @@ import Preferences
       }
     }
     rpcService._solanaBalance = { accountAddress, chainId, completion in
-      completion(mockSOLLamportBalance, .success, "") // sol balance
+      // sol balance
+      if accountAddress == self.solAccount1.address {
+        completion(mockSOLLamportBalance, .success, "")
+      } else {
+        completion(0, .success, "")
+      }
     }
     let walletService = BraveWallet.TestBraveWalletService()
     walletService._addObserver = { _ in }
@@ -340,10 +350,10 @@ import Preferences
       isHidingSmallBalances: store.filters.isHidingSmallBalances,
       isHidingUnownedNFTs: store.filters.isHidingUnownedNFTs,
       isShowingNFTNetworkLogo: store.filters.isShowingNFTNetworkLogo,
-      accounts: [ethAccount1, ethAccount2, solAccount].map {
+      accounts: [ethAccount1, ethAccount2, solAccount1, solAccount2].map {
         .init(isSelected: true, model: $0)
       },
-      networks: [ethNetwork, solNetwork].map {
+      networks: [ethNetwork, goerliNetwork, solNetwork].map {
         .init(isSelected: true, model: $0)
       }
     ))
@@ -391,10 +401,10 @@ import Preferences
       isHidingSmallBalances: true,
       isHidingUnownedNFTs: store.filters.isHidingUnownedNFTs,
       isShowingNFTNetworkLogo: store.filters.isShowingNFTNetworkLogo,
-      accounts: [ethAccount1, ethAccount2, solAccount].map {
+      accounts: [ethAccount1, ethAccount2, solAccount1, solAccount2].map {
         .init(isSelected: true, model: $0)
       },
-      networks: [ethNetwork, solNetwork].map {
+      networks: [ethNetwork, goerliNetwork, solNetwork].map {
         .init(isSelected: true, model: $0)
       }
     ))
@@ -445,10 +455,10 @@ import Preferences
       isHidingSmallBalances: false,
       isHidingUnownedNFTs: store.filters.isHidingUnownedNFTs,
       isShowingNFTNetworkLogo: store.filters.isShowingNFTNetworkLogo,
-      accounts: [ethAccount1, ethAccount2, solAccount].map { // deselect ethAccount2
+      accounts: [ethAccount1, ethAccount2, solAccount1, solAccount2].map { // deselect ethAccount2
         .init(isSelected: $0 != ethAccount2, model: $0)
       },
-      networks: [ethNetwork, solNetwork].map {
+      networks: [ethNetwork, goerliNetwork, solNetwork].map {
         .init(isSelected: true, model: $0)
       }
     ))
@@ -496,10 +506,10 @@ import Preferences
       isHidingSmallBalances: false,
       isHidingUnownedNFTs: store.filters.isHidingUnownedNFTs,
       isShowingNFTNetworkLogo: store.filters.isShowingNFTNetworkLogo,
-      accounts: [ethAccount1, ethAccount2, solAccount].map {
+      accounts: [ethAccount1, ethAccount2, solAccount1, solAccount2].map {
         .init(isSelected: true, model: $0)
       },
-      networks: [ethNetwork, solNetwork].map { // only select Ethereum networks
+      networks: [ethNetwork, goerliNetwork, solNetwork].map { // only select Ethereum networks
         .init(isSelected: $0.coin == .eth, model: $0)
       }
     ))
@@ -522,7 +532,8 @@ import Preferences
           XCTFail("Unexpected test result")
           return
         }
-        XCTAssertEqual(lastUpdatedAssetGroups.count, 3) // grouping by .account; 1 for each of the 3 accounts
+        // grouping by .account; 1 for each of the 3 accounts except solAccount2 group hidden due to 0 balance
+        XCTAssertEqual(lastUpdatedAssetGroups.count, 3)
         guard let ethAccount1Group = lastUpdatedAssetGroups[safe: 0],
               let ethAccount2Group = lastUpdatedAssetGroups[safe: 1],
               let solAccountGroup = lastUpdatedAssetGroups[safe: 2] else {
@@ -561,6 +572,8 @@ import Preferences
                        BraveWallet.BlockchainToken.mockSolToken.symbol)
         XCTAssertEqual(solAccountGroup.assets[safe: 0]?.quantity,
                        String(format: "%.04f", self.mockSOLBalance))
+        // solAccount2 hidden due to 0 balance
+        XCTAssertNil(lastUpdatedAssetGroups[safe: 3])
       }
       .store(in: &cancellables)
     store.saveFilters(.init(
@@ -569,10 +582,10 @@ import Preferences
       isHidingSmallBalances: store.filters.isHidingSmallBalances,
       isHidingUnownedNFTs: store.filters.isHidingUnownedNFTs,
       isShowingNFTNetworkLogo: store.filters.isShowingNFTNetworkLogo,
-      accounts: [ethAccount1, ethAccount2, solAccount].map {
+      accounts: [ethAccount1, ethAccount2, solAccount1, solAccount2].map {
         .init(isSelected: true, model: $0)
       },
-      networks: [ethNetwork, solNetwork].map {
+      networks: [ethNetwork, goerliNetwork, solNetwork].map {
         .init(isSelected: true, model: $0)
       }
     ))
@@ -609,7 +622,6 @@ import Preferences
                        BraveWallet.BlockchainToken.mockUSDCToken.symbol)
         XCTAssertEqual(ethAccount1Group.assets[safe: 1]?.quantity,
                        String(format: "%.04f", self.mockUSDCBalanceAccount1))
-        // ethAccount2 hidden
         
         XCTAssertEqual(solAccountGroup.groupType, .account(.mockSolAccount))
         XCTAssertEqual(solAccountGroup.assets.count, 1)
@@ -618,6 +630,9 @@ import Preferences
                        BraveWallet.BlockchainToken.mockSolToken.symbol)
         XCTAssertEqual(solAccountGroup.assets[safe: 0]?.quantity,
                        String(format: "%.04f", self.mockSOLBalance))
+        // ethAccount2, solAccount2 hidden
+        XCTAssertNil(lastUpdatedAssetGroups[safe: 2])
+        XCTAssertNil(lastUpdatedAssetGroups[safe: 3])
       }
       .store(in: &cancellables)
     store.saveFilters(.init(
@@ -626,10 +641,10 @@ import Preferences
       isHidingSmallBalances: store.filters.isHidingSmallBalances,
       isHidingUnownedNFTs: store.filters.isHidingUnownedNFTs,
       isShowingNFTNetworkLogo: store.filters.isShowingNFTNetworkLogo,
-      accounts: [ethAccount1, ethAccount2, solAccount].map {
+      accounts: [ethAccount1, ethAccount2, solAccount1, solAccount2].map {
         .init(isSelected: $0 != ethAccount2, model: $0)
       },
-      networks: [ethNetwork, solNetwork].map {
+      networks: [ethNetwork, goerliNetwork, solNetwork].map {
         .init(isSelected: true, model: $0)
       }
     ))
@@ -652,7 +667,7 @@ import Preferences
           XCTFail("Unexpected test result")
           return
         }
-        // grouping by .network; 1 for each of the 2 networks
+        // grouping by .network; 1 for each of the 2 networks, with Goerli group hidden due to 0 balance.
         XCTAssertEqual(lastUpdatedAssetGroups.count, 2)
         guard let solMainnetGroup = lastUpdatedAssetGroups[safe: 0],
               let ethMainnetGroup = lastUpdatedAssetGroups[safe: 1] else {
@@ -679,6 +694,8 @@ import Preferences
                        BraveWallet.BlockchainToken.mockUSDCToken.symbol)
         XCTAssertEqual(ethMainnetGroup.assets[safe: 1]?.quantity,
                        String(format: "%.04f", self.mockUSDCBalanceAccount1 + self.mockUSDCBalanceAccount2))
+        // Goerli network group hidden for 0 balance
+        XCTAssertNil(lastUpdatedAssetGroups[safe: 2])
       }
       .store(in: &cancellables)
     store.saveFilters(.init(
@@ -687,10 +704,10 @@ import Preferences
       isHidingSmallBalances: store.filters.isHidingSmallBalances,
       isHidingUnownedNFTs: store.filters.isHidingUnownedNFTs,
       isShowingNFTNetworkLogo: store.filters.isShowingNFTNetworkLogo,
-      accounts: [ethAccount1, ethAccount2, solAccount].map {
+      accounts: [ethAccount1, ethAccount2, solAccount1, solAccount2].map {
         .init(isSelected: true, model: $0)
       },
-      networks: [ethNetwork, solNetwork].map {
+      networks: [ethNetwork, goerliNetwork, solNetwork].map {
         .init(isSelected: true, model: $0)
       }
     ))
@@ -721,7 +738,9 @@ import Preferences
                        BraveWallet.BlockchainToken.mockSolToken.symbol)
         XCTAssertEqual(solMainnetGroup.assets[safe: 0]?.quantity,
                        String(format: "%.04f", self.mockSOLBalance))
-        // eth network hidden
+        // eth mainnet, goerli network group hidden
+        XCTAssertNil(lastUpdatedAssetGroups[safe: 1])
+        XCTAssertNil(lastUpdatedAssetGroups[safe: 2])
       }
       .store(in: &cancellables)
     store.saveFilters(.init(
@@ -730,10 +749,10 @@ import Preferences
       isHidingSmallBalances: store.filters.isHidingSmallBalances,
       isHidingUnownedNFTs: store.filters.isHidingUnownedNFTs,
       isShowingNFTNetworkLogo: store.filters.isShowingNFTNetworkLogo,
-      accounts: [ethAccount1, ethAccount2, solAccount].map {
+      accounts: [ethAccount1, ethAccount2, solAccount1, solAccount2].map {
         .init(isSelected: true, model: $0)
       },
-      networks: [ethNetwork, solNetwork].map { // hide ethNetwork
+      networks: [ethNetwork, goerliNetwork, solNetwork].map { // hide ethNetwork
         .init(isSelected: $0 != ethNetwork, model: $0)
       }
     ))

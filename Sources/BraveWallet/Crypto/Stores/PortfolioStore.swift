@@ -415,10 +415,10 @@ public class PortfolioStore: ObservableObject {
 
     return groups
 //      .sorted(by: { $0.totalFiatValue > $1.totalFiatValue }) // TODO: Resolve crash when sorting on iOS (16.4 ..< 17.0)
-      .optionallyFilter( // when grouping assets, hide groups without assets.
+      .optionallyFilter( // when grouping assets, hide groups without assets or zero fiat value.
         shouldFilter: filters.groupBy != .none,
         isIncluded: { group in
-          return !group.assets.isEmpty
+          return (!group.assets.isEmpty && group.totalFiatValue > 0)
         }
       )
   }
