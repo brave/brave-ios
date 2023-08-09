@@ -115,10 +115,10 @@ public class BraveVPNSettingsViewController: TableViewController {
           accessory: .view(switchView), uuid: vpnStatusSectionCellId)
     ], uuid: vpnStatusSectionCellId)
     
-    let subscriptionStatus = BraveVPN.hasExpired == true ?
+    let subscriptionStatus = BraveVPN.vpnState == .expired ?
     Strings.VPN.subscriptionStatusExpired : BraveVPN.subscriptionName
     
-    let expiration = BraveVPN.hasExpired == true ? "-" : expirationDate
+    let expiration = BraveVPN.vpnState == .expired ? "-" : expirationDate
     
     let subscriptionSection =
     Section(header: .title(Strings.VPN.settingsSubscriptionSection),
