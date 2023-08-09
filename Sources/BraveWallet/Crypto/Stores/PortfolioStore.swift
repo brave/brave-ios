@@ -437,13 +437,24 @@ public class PortfolioStore: ObservableObject {
     }
 
     return groups
-//      .sorted(by: { $0.totalFiatValue > $1.totalFiatValue }) // TODO: Resolve crash when sorting on iOS (16.4 ..< 17.0)
+      .optionallySort(shouldSort: canSortGroups, by: { $0.totalFiatValue > $1.totalFiatValue })
       .optionallyFilter( // when grouping assets, hide groups without assets or zero fiat value.
         shouldFilter: filters.groupBy != .none,
         isIncluded: { group in
           return (!group.assets.isEmpty && group.totalFiatValue > 0)
         }
       )
+  }
+  
+  private var canSortGroups: Bool {
+    if #available(iOS 17, *) {
+      return true
+    } else if #available(iOS 16.4, *) {
+      /// Sorting on iOS 16.4 up to iOS 17 can cause a crash:
+      /// `attempt to perform an insert and a move to the same section (1)`
+      return false
+    }
+    return true
   }
   
   private func buildAssetViewModels(
@@ -681,5 +692,11 @@ extension Array {
   @inlinable public func optionallyFilter(shouldFilter: Bool, isIncluded: (Element) throws -> Bool) rethrows -> [Element] {
     guard shouldFilter else { return self }
     return try filter(isIncluded)
+  }
+  
+  /// `sort` helper that skips iterating through the entire array when not applying any sorting.
+  @inlinable public func optionallySort(shouldSort: Bool, by sort: (Element, Element) throws -> Bool) rethrows -> [Element] {
+    guard shouldSort else { return self }
+    return try sorted(by: sort)
   }
 }
