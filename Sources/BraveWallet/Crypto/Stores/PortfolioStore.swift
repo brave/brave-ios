@@ -479,9 +479,10 @@ public class PortfolioStore: ObservableObject {
 
     return groups
       .optionallySort(shouldSort: canSortGroups, by: { $0.totalFiatValue > $1.totalFiatValue })
-      .optionallyFilter( // when grouping assets, hide groups without assets or zero fiat value.
-        shouldFilter: filters.groupBy != .none,
+      .optionallyFilter( // when grouping assets & hiding small balances
+        shouldFilter: filters.groupBy != .none && filters.isHidingSmallBalances,
         isIncluded: { group in
+          // hide groups without assets or zero fiat value.
           return (!group.assets.isEmpty && group.totalFiatValue > 0)
         }
       )
@@ -526,7 +527,7 @@ public class PortfolioStore: ObservableObject {
         shouldFilter: filters.isHidingSmallBalances,
         isIncluded: { asset in
           let value = (Double(asset.price) ?? 0) * asset.totalBalance
-          return value >= 1
+          return value >= 0.05
         }
       )
       .sorted(by: { lhs, rhs in
@@ -558,7 +559,7 @@ public class PortfolioStore: ObservableObject {
           shouldFilter: filters.isHidingSmallBalances,
           isIncluded: { asset in
             let value = (Double(asset.price) ?? 0) * asset.totalBalance
-            return value >= 1
+            return value >= 0.05
           }
         )
         .sorted(by: { lhs, rhs in
@@ -588,7 +589,7 @@ public class PortfolioStore: ObservableObject {
           isIncluded: { asset in
             let balanceForAccount = asset.balanceForAccounts[account.address] ?? 0
             let value = (Double(asset.price) ?? 0) * balanceForAccount
-            return value >= 1
+            return value >= 0.05
           }
         )
         .sorted(by: { lhs, rhs in

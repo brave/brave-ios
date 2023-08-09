@@ -4175,14 +4175,14 @@ extension Strings {
       tableName: "BraveWallet",
       bundle: .module,
       value: "Hide Small Balances",
-      comment: "The label of the filter option that hides assets if their fiat value is below $1. Used in Portfolio/NFT filters and display settings."
+      comment: "The label of the filter option that hides assets if their fiat value is below $0.05. Used in Portfolio/NFT filters and display settings."
     )
     public static let hideSmallBalancesDescription = NSLocalizedString(
       "wallet.hideSmallBalancesDescription",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Assets with value less than $1",
-      comment: "The description label of the filter option that hides assets if their fiat value is below $1, shown below the title. Used in Portfolio/NFT filters and display settings."
+      value: "Assets with value less than $0.05",
+      comment: "The description label of the filter option that hides assets if their fiat value is below $0.05, shown below the title. Used in Portfolio/NFT filters and display settings."
     )
     public static let hideUnownedNFTsTitle = NSLocalizedString(
       "wallet.hideUnownedNFTsTitle",
