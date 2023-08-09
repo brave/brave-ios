@@ -101,16 +101,24 @@ public struct AssetViewModel: Identifiable, Equatable {
     case .valueAsc, .valueDesc:
       if let lhsPrice = Double(lhs.price),
          let rhsPrice = Double(rhs.price) {
-        if sortOrder == .valueAsc {
-          return (lhsPrice * lhs.totalBalance) < (rhsPrice * rhs.totalBalance)
+        let lhsValue = (lhsPrice * lhs.totalBalance)
+        let rhsValue = (rhsPrice * rhs.totalBalance)
+        if lhsValue == rhsValue, lhsValue <= 0 {
+          return emptyBalanceSort(lhs: lhs, rhs: rhs)
         }
-        return (lhsPrice * lhs.totalBalance) > (rhsPrice * rhs.totalBalance)
+        if sortOrder == .valueAsc {
+          return lhsValue < rhsValue
+        }
+        return lhsValue > rhsValue
       } else if let lhsPrice = Double(lhs.price), (lhsPrice * lhs.totalBalance) > 0 {
         // lhs has a non-zero value
         return true
       } else if let rhsPrice = Double(rhs.price), (rhsPrice * rhs.totalBalance) > 0 {
         // rhs has a non-zero value
         return false
+      }
+      if lhs.totalBalance == rhs.totalBalance, lhs.totalBalance <= 0 {
+        return emptyBalanceSort(lhs: lhs, rhs: rhs)
       }
       // price unavailable, sort by balance
       if sortOrder == .valueAsc {
@@ -122,6 +130,39 @@ public struct AssetViewModel: Identifiable, Equatable {
     case .alphaDesc:
       return lhs.token.name.localizedStandardCompare(rhs.token.name) == .orderedDescending
     }
+  }
+  
+  /// Sorts primary networks to be first (Solana Mainnet first primary network), then sorts native assets to be first, then sorts alphabetically.
+  /// Used when two tokens have the same balance or fiat value (typically 0 / $0).
+  private static func emptyBalanceSort(lhs: AssetViewModel, rhs: AssetViewModel) -> Bool {
+    // sort primary networks to be first
+    let isLHSPrimaryNetwork = WalletConstants.primaryNetworkChainIds.contains(lhs.network.chainId)
+    let isRHSPrimaryNetwork = WalletConstants.primaryNetworkChainIds.contains(rhs.network.chainId)
+    if isLHSPrimaryNetwork && !isRHSPrimaryNetwork {
+      return true
+    } else if !isLHSPrimaryNetwork && isRHSPrimaryNetwork {
+      return false
+    } else if isLHSPrimaryNetwork, isRHSPrimaryNetwork,
+              lhs.network.chainId != rhs.network.chainId,
+              lhs.network.chainId == BraveWallet.SolanaMainnet {
+      // Solana Mainnet to be first primary network
+      return true
+    } else if isLHSPrimaryNetwork, isRHSPrimaryNetwork,
+              lhs.network.chainId != rhs.network.chainId,
+              rhs.network.chainId == BraveWallet.SolanaMainnet {
+      // Solana Mainnet to be first primary network
+      return false
+    }
+    // sort native tokens to be first
+    let isLHSNativeToken = lhs.network.isNativeAsset(lhs.token)
+    let isRHSNativeToken = rhs.network.isNativeAsset(rhs.token)
+    if isLHSNativeToken && !isRHSNativeToken {
+      return true
+    } else if !isLHSNativeToken && isRHSNativeToken {
+      return false
+    }
+    // sort by name
+    return lhs.token.name.localizedStandardCompare(rhs.token.name) == .orderedAscending
   }
 }
 
