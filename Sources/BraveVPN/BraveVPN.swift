@@ -13,24 +13,6 @@ import os.log
 
 /// A static class to handle all things related to the Brave VPN service.
 public class BraveVPN {
-  
-  public struct ReceiptResponse {
-    enum Status {
-      case active, expired, retryPeriod
-    }
-    
-    enum ExpirationIntent: Int {
-      case none, cancelled, billingError, priceIncreaseConsent, notAvailable, unknown
-    }
-    
-    var status: Status
-    var expiryReason: ExpirationIntent = .none
-    var expiryDate: Date?
-
-    var isInTrialPeriod: Bool = false
-    var autoRenewEnabled: Bool = false
-  }
-  
   private static let housekeepingApi = GRDHousekeepingAPI()
   private static let helper = GRDVPNHelper.sharedInstance()
   private static let serverManager = GRDServerManager()
@@ -99,6 +81,7 @@ public class BraveVPN {
     }
     
     BraveVPN.validateReceiptData() { receiptResponse in
+      // Clear configuration if only if the receipt response is expired (not retryPeriod)
       if receiptResponse?.status == .expired {
         clearConfiguration()
         logAndStoreError("Receipt expired")
@@ -183,6 +166,8 @@ public class BraveVPN {
         GRDSubscriptionManager.setIsPayingUser(true)
       }
       
+      Preferences.VPN.vpnReceiptStatus.value = processedReceiptDetail.status
+      
       receiptResponse?(processedReceiptDetail)
     }
   }
@@ -219,7 +204,7 @@ public class BraveVPN {
   public static var reconnectPending = false
 
   /// A state in which the vpn can be.
-  public enum State {
+  public enum State: Equatable {
     case notPurchased
     case purchased(enabled: Bool)
 
@@ -263,7 +248,7 @@ public class BraveVPN {
 
   /// Whether the vpn subscription has expired.
   /// Returns nil if there has been no subscription yet (user never bought the vpn).
-  public static var hasExpired: Bool? {
+  private static var hasExpired: Bool? {
     guard let expirationDate = Preferences.VPN.expirationDate.value else { return nil }
 
     return expirationDate < Date()
@@ -293,6 +278,25 @@ public class BraveVPN {
       assertionFailure("Can't get product id")
       return ""
     }
+  }
+  
+  // MARK: - ReceiptResponse
+  
+  public struct ReceiptResponse {
+    public enum Status: UserDefaultsEncodable {
+      case active, expired, retryPeriod
+    }
+    
+    enum ExpirationIntent: Int {
+      case none, cancelled, billingError, priceIncreaseConsent, notAvailable, unknown
+    }
+    
+    var status: Status
+    var expiryReason: ExpirationIntent = .none
+    var expiryDate: Date?
+
+    var isInTrialPeriod: Bool = false
+    var autoRenewEnabled: Bool = false
   }
   
   // MARK: - Actions
