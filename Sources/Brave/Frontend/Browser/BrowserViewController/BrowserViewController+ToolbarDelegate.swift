@@ -914,48 +914,25 @@ extension BrowserViewController: ToolbarDelegate {
 extension BrowserViewController: UIContextMenuInteractionDelegate {
   public func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
     
-    var configuration: UIContextMenuConfiguration?
-    
-    switch interaction.view?.accessibilityIdentifier {
-    case topToolbar.locationView.reloadButtonAccessibilityIdentifier:
-      configuration = reloadButtonMenuConfiguration
-    default:
-      configuration = locationViewMenuConfiguration
-    }
-    
-    if #available(iOS 16.0, *) {
-      configuration?.preferredMenuElementOrder = .priority
-    }
-    
-    return configuration
-  }
-  
-  private var reloadButtonMenuConfiguration: UIContextMenuConfiguration {
-    let configuration =  UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [unowned self] _ in
-      let tab = tabManager.selectedTab
-      
-      let title = tab?.isDesktopSite == true ? Strings.appMenuViewMobileSiteTitleString : Strings.appMenuViewDesktopSiteTitleString
-      
-      let icon = tab?.isDesktopSite == true ? "leo.smartphone" : "leo.monitor"
-      
-      let copyAction = UIAction(
-        title: title,
-        image: UIImage(braveSystemNamed: icon),
-        handler: UIAction.deferredActionHandler { [weak tab] _ in
-          tab?.switchUserAgent()
-        })
-
-      let copyMenu = UIMenu(title: "", options: .displayInline, children: [copyAction])
-      return UIMenu(children: [copyMenu])
-    }
-    
-    return configuration
-  }
-  
-  private var locationViewMenuConfiguration: UIContextMenuConfiguration {
-    let configuration =  UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [unowned self] _ in
-      var actionMenu: [UIMenu] = []
+    let configuration = UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [unowned self] _ in
+      var actionMenus: [UIMenu?] = []
       var pasteMenuChildren: [UIAction] = []
+      
+      let tab = tabManager.selectedTab
+      var reloadMenu: UIMenu?
+      
+      if let url = tab?.url, url.isWebPage() {
+        let reloadTitle = tab?.isDesktopSite == true ? Strings.appMenuViewMobileSiteTitleString : Strings.appMenuViewDesktopSiteTitleString
+        let reloadIcon = tab?.isDesktopSite == true ? "leo.smartphone" : "leo.monitor"
+        let reloadAction = UIAction(
+          title: reloadTitle,
+          image: UIImage(braveSystemNamed: reloadIcon),
+          handler: UIAction.deferredActionHandler { [weak tab] _ in
+            tab?.switchUserAgent()
+          })
+        
+        reloadMenu = UIMenu(options: .displayInline, children: [reloadAction])
+      }
       
       let pasteGoAction = UIAction(
         identifier: .pasteAndGo,
@@ -969,7 +946,6 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
         identifier: .paste,
         handler: UIAction.deferredActionHandler { _ in
           if let pasteboardContents = UIPasteboard.general.string {
-            // Enter overlay mode and make the search controller appear.
             self.topToolbar.enterOverlayMode(pasteboardContents, pasted: true, search: true)
           }
         })
@@ -980,6 +956,8 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
         pasteMenuChildren.reverse()
       }
       
+      var copyMenu: UIMenu?
+      
       let copyAction = UIAction(
         title: Strings.copyAddressTitle,
         image: UIImage(systemName: "doc.on.doc"),
@@ -989,21 +967,22 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
           }
         })
 
-      let copyMenu = UIMenu(options: .displayInline, children: [copyAction])
+      copyMenu = UIMenu(options: .displayInline, children: [copyAction])
       
       if UIPasteboard.general.hasStrings || UIPasteboard.general.hasURLs {
         let pasteMenu = UIMenu(options: .displayInline, children: pasteMenuChildren)
-        
-        actionMenu = [pasteMenu, copyMenu]
-        
-        if #unavailable(iOS 16.0), isUsingBottomBar {
-          actionMenu.reverse()
-        }
+        actionMenus.append(contentsOf: [pasteMenu, copyMenu])
       } else {
-        actionMenu = [copyMenu]
+        actionMenus.append(copyMenu)
       }
-
-      return UIMenu(children: actionMenu)
+      
+      actionMenus.append(reloadMenu)
+      
+      return UIMenu(children: actionMenus.compactMap { $0 })
+    }
+    
+    if #available(iOS 16.0, *) {
+      configuration.preferredMenuElementOrder = .priority
     }
     
     return configuration

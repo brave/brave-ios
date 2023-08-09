@@ -186,10 +186,8 @@ class TabLocationView: UIView {
     $0.addTarget(self, action: #selector(didTapWalletButton), for: .touchUpInside)
   }
   
-  let reloadButtonAccessibilityIdentifier = "TabToolbar.stopReloadButton"
-  
   lazy var reloadButton = ToolbarButton().then {
-    $0.accessibilityIdentifier = reloadButtonAccessibilityIdentifier
+    $0.accessibilityIdentifier = "TabToolbar.stopReloadButton"
     $0.isAccessibilityElement = true
     $0.accessibilityLabel = Strings.tabToolbarReloadButtonAccessibilityLabel
     $0.setImage(UIImage(braveSystemNamed: "leo.browser.refresh", compatibleWith: nil), for: .normal)
