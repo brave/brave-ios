@@ -133,7 +133,7 @@ class MockJsonRpcService: BraveWalletJsonRpcService {
   func addEthereumChainRequestCompleted(_ chainId: String, approved: Bool) {
   }
   
-  func notifySwitchChainRequestProcessed(_ approved: Bool, origin: URLOrigin) {
+  func notifySwitchChainRequestProcessed(_ requestId: String, approved: Bool) {
   }
   
   func setCustomNetworkForTesting(_ chainId: String, coin: BraveWallet.CoinType, providerUrl: URL) {
