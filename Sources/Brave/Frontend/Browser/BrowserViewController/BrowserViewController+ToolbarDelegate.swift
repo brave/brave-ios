@@ -956,8 +956,6 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
         pasteMenuChildren.reverse()
       }
       
-      var copyMenu: UIMenu?
-      
       let copyAction = UIAction(
         title: Strings.copyAddressTitle,
         image: UIImage(systemName: "doc.on.doc"),
@@ -967,7 +965,7 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
           }
         })
 
-      copyMenu = UIMenu(options: .displayInline, children: [copyAction])
+      let copyMenu = UIMenu(options: .displayInline, children: [copyAction])
       
       if UIPasteboard.general.hasStrings || UIPasteboard.general.hasURLs {
         let pasteMenu = UIMenu(options: .displayInline, children: pasteMenuChildren)
