@@ -209,4 +209,17 @@ class RecentSearchHeaderView: UICollectionReusableView {
 
     themeViews()
   }
+  
+  public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+    let adjustedBounds = CGRect(x: hideClearButton.center.x,
+                                y: hideClearButton.center.y,
+                                width: 0.0,
+                                height: 0.0).inset(by: UIEdgeInsets(top: -25.0, left: -25.0, bottom: -5.0, right: -25.0))
+
+    if adjustedBounds.contains(point) {
+      return hideClearButton
+    }
+
+    return super.hitTest(point, with: event)
+  }
 }
