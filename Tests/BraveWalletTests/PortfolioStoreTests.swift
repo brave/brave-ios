@@ -21,6 +21,7 @@ import Preferences
     resetFilters()
   }
   private func resetFilters() {
+    Preferences.Wallet.showTestNetworks.reset()
     Preferences.Wallet.groupByFilter.reset()
     Preferences.Wallet.sortOrderFilter.reset()
     Preferences.Wallet.isHidingSmallBalancesFilter.reset()
@@ -231,6 +232,7 @@ import Preferences
   
   /// Test `update()` will fetch all visible user assets from all networks and display them sorted by their balance.
   func testUpdate() async {
+    Preferences.Wallet.showTestNetworks.value = false
     let store = setupStore()
     
     // MARK: Default update() Test
@@ -314,6 +316,7 @@ import Preferences
   
   /// Test `assetGroups` will be sorted to from smallest to highest fiat value when `sortOrder` filter is `valueAsc`.
   func testFilterSort() async {
+    Preferences.Wallet.showTestNetworks.value = true
     let store = setupStore()
     let sortExpectation = expectation(description: "update-sortOrder")
     store.$assetGroups
@@ -374,6 +377,7 @@ import Preferences
   
   /// Test `assetGroups` will be filtered to remove small balances when `hideSmallBalances` filter is true.
   func testHideSmallBalances() async {
+    Preferences.Wallet.showTestNetworks.value = true
     let store = setupStore()
     let hideSmallBalancesExpectation = expectation(description: "update-hideSmallBalances")
     store.$assetGroups
@@ -425,6 +429,7 @@ import Preferences
   
   /// Test `assetGroups` will be filtered by accounts when `accounts` filter is has de-selected accounts.
   func testFilterAccounts() async {
+    Preferences.Wallet.showTestNetworks.value = true
     let store = setupStore()
     let accountsExpectation = expectation(description: "update-accounts")
     store.$assetGroups
@@ -483,6 +488,7 @@ import Preferences
   
   /// Test `assetGroups` will be filtered by network when `networks` filter is has de-selected networks.
   func testFilterNetworks() async {
+    Preferences.Wallet.showTestNetworks.value = true
     let store = setupStore()
     let networksExpectation = expectation(description: "update-networks")
     store.$assetGroups
@@ -538,6 +544,7 @@ import Preferences
   /// Test `assetGroups` will be grouped by account when `GroupBy` filter is assigned `.account`.
   /// Additionally, test de-selecting/hiding one of the available accounts.
   func testGroupByAccounts() async {
+    Preferences.Wallet.showTestNetworks.value = true
     let store = setupStore()
     let assetGroupsExpectation = expectation(description: "update-assetGroups")
     XCTAssertTrue(store.assetGroups.isEmpty)  // Initial state
@@ -684,6 +691,7 @@ import Preferences
   /// Test `assetGroups` will be grouped by network when `GroupBy` filter is assigned `.network`.
   /// Additionally, test de-selecting/hiding one of the available networks.
   func testGroupByNetworks() async {
+    Preferences.Wallet.showTestNetworks.value = true
     let store = setupStore()
     let assetGroupsExpectation = expectation(description: "update-assetGroups")
     XCTAssertTrue(store.assetGroups.isEmpty)  // Initial state
