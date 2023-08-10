@@ -13,7 +13,7 @@ struct OptionToggleView: View {
   @ObservedObject var option: Preferences.Option<Bool>
   let onChange: ShieldToggleView.OnChangeCallback?
   
-  init(title: String, subtitle: String?,
+  init(title: String, subtitle: String? = nil,
        option: Preferences.Option<Bool>, onChange: ShieldToggleView.OnChangeCallback? = nil) {
     self.title = title
     self.subtitle = subtitle
