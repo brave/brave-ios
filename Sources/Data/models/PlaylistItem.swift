@@ -349,8 +349,8 @@ final public class PlaylistItem: NSManagedObject, CRUD, Identifiable {
     }
   }
 
-  public static func removeItem(uuid: String) {
-    PlaylistItem.deleteAll(predicate: NSPredicate(format: "uuid == %@", uuid), context: .new(inMemory: false), includesPropertyValues: false)
+  public static func removeItem(uuid: String, completion: (() -> Void)? = nil) {
+    PlaylistItem.deleteAll(predicate: NSPredicate(format: "uuid == %@", uuid), context: .new(inMemory: false), includesPropertyValues: false, completion: completion)
   }
 
   public static func removeItems(_ items: [PlaylistInfo], completion: (() -> Void)? = nil) {

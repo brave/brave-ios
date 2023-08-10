@@ -38,6 +38,7 @@ var package = Package(
     .library(name: "Preferences", targets: ["Preferences"]),
     .library(name: "PrivateCDN", targets: ["PrivateCDN"]),
     .library(name: "CertificateUtilities", targets: ["CertificateUtilities"]),
+    .library(name: "Playlist", targets: ["Playlist"]),
     .library(name: "PlaylistUI", targets: ["PlaylistUI"]),
     .executable(name: "LeoAssetCatalogGenerator", targets: ["LeoAssetCatalogGenerator"]),
     .plugin(name: "IntentBuilderPlugin", targets: ["IntentBuilderPlugin"]),
@@ -328,6 +329,11 @@ var package = Package(
     .target(name: "Strings"),
     .target(name: "RuntimeWarnings"),
     .target(name: "PrivateCDN", dependencies: ["SDWebImage"]),
+    .target(
+      name: "Playlist",
+      dependencies: ["Shared", "Strings", "Preferences", "Data"],
+      plugins: ["LoggerPlugin"]
+    ),
     .target(
       name: "PlaylistUI",
       dependencies: [
