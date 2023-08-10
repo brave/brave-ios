@@ -96,10 +96,18 @@ public struct NewSiteConnectionView: View {
         Section {
           ForEach(accountInfos) { account in
             Button {
-              if selectedAccounts.contains(account.id) {
-                selectedAccounts.remove(account.id)
-              } else {
-                selectedAccounts.insert(account.id)
+              switch coin {
+              case .eth:
+                if selectedAccounts.contains(account.id) {
+                  selectedAccounts.remove(account.id)
+                } else {
+                  selectedAccounts.insert(account.id)
+                }
+              case .sol:
+                // only allow selecting one Solana account at a time
+                selectedAccounts = .init(arrayLiteral: account.id)
+              default:
+                break // not supported
               }
             } label: {
               HStack {
