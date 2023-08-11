@@ -8,10 +8,56 @@ import BraveStrings
 import Preferences
 import BraveUI
 import Data
+import LocalAuthentication
 
 struct PrivateTabsView: View {
+  enum AuthenticationType {
+    case faceID, touchID, pinCode, noAuthentication
+  }
+  
   @ObservedObject var privateBrowsingOnly = Preferences.Privacy.privateBrowsingOnly
   var tabManager: TabManager?
+  
+  private var localAuthenticationType: AuthenticationType {
+    let context = LAContext()
+    
+    if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: nil) {
+      switch context.biometryType {
+      case .faceID:
+        return .faceID
+      case .touchID:
+        return .touchID
+      default:
+        var error: NSError?
+        let policyEvaluation = context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error)
+        
+        if policyEvaluation {
+          return .pinCode
+        } else {
+          if (error as? LAError)?.code == .passcodeNotSet {
+            return .noAuthentication
+          }
+        }
+      }
+    }
+    
+    return .noAuthentication
+  }
+  
+  private var browsingLockTitle: String {
+    var title: String
+    
+    switch localAuthenticationType {
+    case .faceID:
+      title = Strings.TabsSettings.privateBrowsingLockTitleFaceID
+    case .touchID:
+      title = Strings.TabsSettings.privateBrowsingLockTitleTouchID
+    default:
+      title = Strings.TabsSettings.privateBrowsingLockTitlePinCode
+    }
+    
+    return title
+  }
 
   var body: some View {
     Form {
@@ -36,8 +82,23 @@ struct PrivateTabsView: View {
             }
           }
         }
-          OptionToggleView(title: Strings.TabsSettings.privateBrowsingLockTitle,
-                         option: Preferences.Privacy.privateBrowsingLock)
+          
+        switch localAuthenticationType {
+        case .faceID, .touchID, .pinCode:
+          OptionToggleView(title: browsingLockTitle,
+                           option: Preferences.Privacy.privateBrowsingLock)
+        case .noAuthentication:
+          Toggle(isOn: .constant(false)) {
+            VStack(alignment: .leading, spacing: 4) {
+              Text(browsingLockTitle)
+                .foregroundColor(Color(.bravePrimary))
+            }
+            .opacity(0.25)
+          }
+          .disabled(true)
+          .listRowBackground(Color(.secondaryBraveGroupedBackground))
+          .toggleStyle(SwitchToggleStyle(tint: .accentColor))
+        }
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
     }

@@ -3357,10 +3357,20 @@ extension Strings {
         "tabs.settings.privateTabsSettingsTitle", tableName: "BraveShared", bundle: .module,
         value: "Private Tabs",
         comment: "")
-    public static let privateBrowsingLockTitle =
+    public static let privateBrowsingLockTitleFaceID =
       NSLocalizedString(
-        "tabs.settings.privateBrowsingLock", tableName: "BraveShared", bundle: .module,
+        "tabs.settings.privateBrowsingLockTitleFaceID", tableName: "BraveShared", bundle: .module,
         value: "Require Face ID",
+        comment: "")
+    public static let privateBrowsingLockTitleTouchID =
+      NSLocalizedString(
+        "tabs.settings.privateBrowsingLockTitleTouchID", tableName: "BraveShared", bundle: .module,
+        value: "Require Touch ID",
+        comment: "")
+    public static let privateBrowsingLockTitlePinCode =
+      NSLocalizedString(
+        "tabs.settings.privateBrowsingLockTitlePinCode", tableName: "BraveShared", bundle: .module,
+        value: "Require Pin Code",
         comment: "")
     public static let persistentPrivateBrowsingTitle =
       NSLocalizedString(
