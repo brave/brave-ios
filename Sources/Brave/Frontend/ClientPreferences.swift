@@ -228,6 +228,8 @@ extension Preferences {
     /// The last time all playlist folders were synced
     static let lastPlaylistFoldersSyncTime =
       Option<Date?>(key: "playlist.lastPlaylistFoldersSyncTime", default: nil)
+    static let lastPlaylistIsDiskSpaceEncumberedWarningTime =
+        Option<Date?>(key: "playlist.lastPlaylistIsDiskSpaceEncumberedWarningTime", default: nil)
     /// Sync shared folders automatically preference
     static let syncSharedFoldersAutomatically =
       Option<Bool>(key: "playlist.syncSharedFoldersAutomatically", default: true)
