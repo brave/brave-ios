@@ -167,6 +167,7 @@ class AppReviewManagerTests: XCTestCase {
     Preferences.Review.launchCount.reset()
     Preferences.Review.daysInUse.reset()
     Preferences.AppState.backgroundedCleanly.reset()
+    Preferences.AppState.didShowStorageFullWarning.reset()
     Preferences.VPN.expirationDate.value = nil
     Preferences.Review.numberBookmarksAdded.reset()
     Preferences.Review.dateWalletConnectedToDapp.value = nil

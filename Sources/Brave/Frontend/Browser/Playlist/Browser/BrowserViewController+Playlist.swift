@@ -297,22 +297,9 @@ extension BrowserViewController: PlaylistScriptHandlerDelegate, PlaylistFolderSh
 
   func addToPlaylist(item: PlaylistInfo, folderUUID: String? = nil, completion: ((_ didAddItem: Bool) -> Void)? = nil) {
     PlaylistP3A.recordUsage()
-      
-    var didShowisDiskSpaceEncumberedWarningToday = false
-      
-      if let lastPlaylistIsDiskSpaceEncumberedWarningTime = Preferences.Playlist.lastPlaylistIsDiskSpaceEncumberedWarningTime.value {
-         let now = Date()
-         let timeSinceLastWarning = abs(now.timeIntervalSince1970 - lastPlaylistIsDiskSpaceEncumberedWarningTime.timeIntervalSince1970)
-         let hoursSinceLastWarning = timeSinceLastWarning / 3600
-          if hoursSinceLastWarning < 24 {
-              didShowisDiskSpaceEncumberedWarningToday = true
-          }
-      }
-      
-      didShowisDiskSpaceEncumberedWarningToday = false
     
-    if PlaylistManager.shared.isDiskSpaceEncumbered() && !didShowisDiskSpaceEncumberedWarningToday {
-      Preferences.Playlist.lastPlaylistIsDiskSpaceEncumberedWarningTime.value = Date()
+    if PlaylistManager.shared.isDiskSpaceEncumbered() && !Preferences.AppState.didShowStorageFullWarning.value {
+      Preferences.AppState.didShowStorageFullWarning.value = true
       let style: UIAlertController.Style = UIDevice.current.userInterfaceIdiom == .pad ? .alert : .actionSheet
       let alert = UIAlertController(
         title: Strings.PlayList.playlistDiskSpaceWarningTitle, message: Strings.PlayList.playlistDiskSpaceWarningMessage, preferredStyle: style)

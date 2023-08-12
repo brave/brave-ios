@@ -124,6 +124,8 @@ extension Preferences {
     /// and therefore we can try to load them right away and have them ready on the first tab load
     @MainActor public static let lastDefaultFilterListFolderPath =
       Option<String?>(key: "caching.last-default-filter-list-folder-path", default: nil)
+    /// A flag for determining if the app has already shown the Storage Full warning in this session
+    public static let didShowStorageFullWarning = Option<Bool>(key: "appstate.did-show-storage-warning", default: false)
   }
   
   public final class Chromium {
