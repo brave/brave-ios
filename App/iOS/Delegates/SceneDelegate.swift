@@ -157,7 +157,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   }
 
   func sceneDidDisconnect(_ scene: UIScene) {
-    Preferences.AppState.didShowStorageFullWarning.reset()
     log.debug("SCENE DISCONNECTED")
   }
 
