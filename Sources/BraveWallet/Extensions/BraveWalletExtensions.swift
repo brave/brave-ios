@@ -5,6 +5,7 @@
 
 import Foundation
 import BraveCore
+import OrderedCollections
 
 extension BraveWallet.TransactionInfo {
   var isSwap: Bool {
@@ -309,6 +310,8 @@ extension BraveWallet.OnRampProvider {
       return Strings.Wallet.sardineProviderName
     case .transak:
       return Strings.Wallet.transakProviderName
+    case .stripe:
+      return Strings.Wallet.stripeNetworkProviderName
     default:
       return ""
     }
@@ -322,6 +325,8 @@ extension BraveWallet.OnRampProvider {
       return Strings.Wallet.sardineProviderShortName
     case .transak:
       return Strings.Wallet.transakProviderShortName
+    case .stripe:
+      return Strings.Wallet.stripeNetworkProviderShortName
     default:
       return ""
     }
@@ -335,6 +340,8 @@ extension BraveWallet.OnRampProvider {
       return Strings.Wallet.sardineProviderDescription
     case .transak:
       return Strings.Wallet.transakProviderDescription
+    case .stripe:
+      return Strings.Wallet.stripeNetworkProviderDescription
     default:
       return ""
     }
@@ -348,9 +355,35 @@ extension BraveWallet.OnRampProvider {
       return "sardine-icon"
     case .transak:
       return "transak-icon"
+    case .stripe:
+      return "stripe-icon"
     default:
       return ""
     }
+  }
+  
+  /// Supported local codes for the `OnRampProvider`. Will return nil if all locale codes are supported.
+  private var supportedLocaleCodes: [String]? {
+    switch self {
+    case .stripe:
+      return ["en-us"]
+    default:
+      return nil
+    }
+  }
+  
+  /// All supported `OnRampProvider`s for users Locale.
+  static var allSupportedOnRampProviders: OrderedSet<BraveWallet.OnRampProvider> {
+    .init(WalletConstants.supportedOnRampProviders.filter { onRampProvider in
+      if let supportedLocaleCodes = onRampProvider.supportedLocaleCodes {
+        // Check if `Locale.preferredLanguages` contains any of the `supportedLocalCodes`
+        return supportedLocaleCodes.contains(where: { code in
+          Locale.preferredLanguages.first?.caseInsensitiveCompare(code) == .orderedSame
+        })
+      }
+      // all locale codes are supported for this `OnRampProvider`
+      return true
+    })
   }
 }
 

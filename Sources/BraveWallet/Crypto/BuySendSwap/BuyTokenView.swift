@@ -14,7 +14,7 @@ struct BuyTokenView: View {
   @ObservedObject var networkStore: NetworkStore
   @ObservedObject var buyTokenStore: BuyTokenStore
 
-  @State private var showProviderSelection = false
+  @State private var isShowingProviderSelection = false
   
   var onDismiss: (() -> Void)
 
@@ -80,7 +80,7 @@ struct BuyTokenView: View {
           Section(
             header: HStack {
               Button(action: {
-                showProviderSelection = true
+                isShowingProviderSelection = true
               }) {
                 Text(Strings.Wallet.purchaseMethodButtonTitle)
               }
@@ -120,7 +120,7 @@ struct BuyTokenView: View {
       )
       .background(
         NavigationLink(
-          isActive: $showProviderSelection,
+          isActive: $isShowingProviderSelection,
           destination: {
             BuyProviderSelectionView(
               buyTokenStore: buyTokenStore,
