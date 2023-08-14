@@ -28,16 +28,18 @@ struct PrivateTabsView: View {
       case .touchID:
         return .touchID
       default:
-        var error: NSError?
-        let policyEvaluation = context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error)
-        
-        if policyEvaluation {
-          return .pinCode
-        } else {
-          if (error as? LAError)?.code == .passcodeNotSet {
-            return .noAuthentication
-          }
-        }
+        return .noAuthentication
+      }
+    }
+    
+    var error: NSError?
+    let policyEvaluation = context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error)
+    
+    if policyEvaluation {
+      return .pinCode
+    } else {
+      if (error as? LAError)?.code == .passcodeNotSet {
+        return .noAuthentication
       }
     }
     
