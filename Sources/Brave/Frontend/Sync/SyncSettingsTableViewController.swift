@@ -84,14 +84,18 @@ class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, 
        syncAPI: BraveSyncAPI,
        syncProfileService: BraveSyncProfileServiceIOS,
        tabManager: TabManager,
-       windowProtection: WindowProtection?,
-       requiresAuthentication: Bool) {
+       windowProtection: WindowProtection?) {
     self.isModallyPresented = isModallyPresented
     self.syncAPI = syncAPI
     self.syncProfileService = syncProfileService
     self.tabManager = tabManager
     
-    super.init(windowProtection: windowProtection, requiresAuthentication: requiresAuthentication, isModallyPresented: isModallyPresented)
+    // Local Authentication (Biometric - Pincode) needed only for actions
+    // Enabling - disabling password sync and add new device
+    super.init(windowProtection: windowProtection,
+               requiresAuthentication: false,
+               isModallyPresented: isModallyPresented,
+               dismissPresenter: false)
   }
 
   required init?(coder: NSCoder) {
@@ -259,25 +263,37 @@ class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, 
   }
 
   @objc private func didToggleSyncType(_ toggle: UISwitch) {
-    switch toggle.tag {
-    case SyncDataTypes.bookmarks.rawValue:
-      Preferences.Chromium.syncBookmarksEnabled.value = toggle.isOn
-    case SyncDataTypes.history.rawValue:
-      Preferences.Chromium.syncHistoryEnabled.value = toggle.isOn
-    case SyncDataTypes.passwords.rawValue:
-      Preferences.Chromium.syncPasswordsEnabled.value = toggle.isOn
-    case SyncDataTypes.openTabs.rawValue:
-      Preferences.Chromium.syncOpenTabsEnabled.value = toggle.isOn
-      
-      // Sync Regular Tabs when open tabs are enabled
-      if Preferences.Chromium.syncOpenTabsEnabled.value {
-        tabManager.addRegularTabsToSyncChain()
+    let toggleExistingStatus = !toggle.isOn
+    toggle.setOn(toggleExistingStatus, animated: false)
+    
+    askForAuthentication() { [weak self] status, error in
+      guard let self = self, status else {
+        toggle.setOn(toggleExistingStatus, animated: false)
+        return
       }
-    default:
-      return
-    }
+      
+      toggle.setOn(!toggleExistingStatus, animated: false)
 
-    syncAPI.enableSyncTypes(syncProfileService: syncProfileService)
+      switch toggle.tag {
+      case SyncDataTypes.bookmarks.rawValue:
+        Preferences.Chromium.syncBookmarksEnabled.value = !toggleExistingStatus
+      case SyncDataTypes.history.rawValue:
+        Preferences.Chromium.syncHistoryEnabled.value = !toggleExistingStatus
+      case SyncDataTypes.passwords.rawValue:
+        Preferences.Chromium.syncPasswordsEnabled.value = !toggleExistingStatus
+      case SyncDataTypes.openTabs.rawValue:
+        Preferences.Chromium.syncOpenTabsEnabled.value = !toggleExistingStatus
+        
+        // Sync Regular Tabs when open tabs are enabled
+        if Preferences.Chromium.syncOpenTabsEnabled.value {
+          tabManager.addRegularTabsToSyncChain()
+        }
+      default:
+        return
+      }
+
+      syncAPI.enableSyncTypes(syncProfileService: syncProfileService)
+    }
   }
   
   /// Update visibility of view shown when no devices returned for sync session
@@ -307,11 +323,15 @@ class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, 
 
   @objc
   private func onSyncInternalsTapped() {
-    let syncInternalsController = syncAPI.createSyncInternalsController().then {
-      $0.title = Strings.braveSyncInternalsTitle
+    askForAuthentication() { [weak self] status, error in
+      guard let self = self, status else { return }
+      
+      let syncInternalsController = syncAPI.createSyncInternalsController().then {
+        $0.title = Strings.braveSyncInternalsTitle
+      }
+      
+      self.navigationController?.pushViewController(syncInternalsController, animated: true)
     }
-
-    navigationController?.pushViewController(syncInternalsController, animated: true)
   }
 }
 
@@ -559,16 +579,21 @@ extension SyncSettingsTableViewController {
   }
 
   private func addAnotherDevice() {
-    let view = SyncSelectDeviceTypeViewController()
-
-    view.syncInitHandler = { title, type in
-      let view = SyncAddDeviceViewController(title: title, type: type, syncAPI: self.syncAPI)
-      view.addDeviceHandler = {
-        self.navigationController?.popToViewController(self, animated: true)
+    askForAuthentication() { [weak self] status, error in
+      guard let self = self, status else { return }
+      
+      let view = SyncSelectDeviceTypeViewController()
+      
+      view.syncInitHandler = { title, type in
+        let view = SyncAddDeviceViewController(title: title, type: type, syncAPI: self.syncAPI)
+        view.addDeviceHandler = {
+          self.navigationController?.popToViewController(self, animated: true)
+        }
+        self.navigationController?.pushViewController(view, animated: true)
       }
+      
       self.navigationController?.pushViewController(view, animated: true)
     }
-    navigationController?.pushViewController(view, animated: true)
   }
 }
 
