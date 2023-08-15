@@ -264,7 +264,6 @@ class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, 
 
   @objc private func didToggleSyncType(_ toggle: UISwitch) {
     let toggleExistingStatus = !toggle.isOn
-    toggle.setOn(toggleExistingStatus, animated: false)
     
     askForAuthentication() { [weak self] status, error in
       guard let self = self, status else {

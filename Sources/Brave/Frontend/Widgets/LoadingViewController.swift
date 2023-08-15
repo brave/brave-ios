@@ -37,6 +37,15 @@ public class LoadingViewController: UIViewController {
 public class AuthenticationController: LoadingViewController {
   enum AuthViewType {
     case sync, tabTray
+    
+    var description: String {
+      switch self {
+      case .sync:
+        return Strings.Sync.syncSetPasscodeAlertDescription
+      case .tabTray:
+        return Strings.Privacy.tabTraySetPasscodeAlertDescription
+      }
+    }
   }
   
   let windowProtection: WindowProtection?
@@ -90,7 +99,7 @@ public class AuthenticationController: LoadingViewController {
   func showSetPasscodeError(viewType: AuthViewType, completion: @escaping (() -> Void)) {
     let alert = UIAlertController(
       title: Strings.Sync.syncSetPasscodeAlertTitle,
-      message: viewType == .sync ? Strings.Sync.syncSetPasscodeAlertDescription : Strings.Privacy.tabTraySetPasscodeAlertDescription,
+      message: viewType.description,
       preferredStyle: .alert)
 
     alert.addAction(
