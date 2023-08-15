@@ -37,10 +37,6 @@ struct PrivateTabsView: View {
     
     if policyEvaluation {
       return .pinCode
-    } else {
-      if (error as? LAError)?.code == .passcodeNotSet {
-        return .noAuthentication
-      }
     }
     
     return .noAuthentication
