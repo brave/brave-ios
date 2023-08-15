@@ -38,7 +38,7 @@ public class AuthenticationController: LoadingViewController {
   enum AuthViewType {
     case sync, tabTray
     
-    var description: String {
+    var detailText: String {
       switch self {
       case .sync:
         return Strings.Sync.syncSetPasscodeAlertDescription
@@ -99,7 +99,7 @@ public class AuthenticationController: LoadingViewController {
   func showSetPasscodeError(viewType: AuthViewType, completion: @escaping (() -> Void)) {
     let alert = UIAlertController(
       title: Strings.Sync.syncSetPasscodeAlertTitle,
-      message: viewType.description,
+      message: viewType.detailText,
       preferredStyle: .alert)
 
     alert.addAction(

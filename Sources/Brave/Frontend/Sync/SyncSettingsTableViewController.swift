@@ -273,22 +273,25 @@ class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, 
       
       toggle.setOn(!toggleExistingStatus, animated: false)
 
-      switch toggle.tag {
-      case SyncDataTypes.bookmarks.rawValue:
+      guard let syncDataType = SyncDataTypes(rawValue: toggle.tag) else {
+         Logger.module.error("Invalid Sync DataType")
+         return
+      }
+      
+      switch syncDataType {
+      case .bookmarks:
         Preferences.Chromium.syncBookmarksEnabled.value = !toggleExistingStatus
-      case SyncDataTypes.history.rawValue:
+      case .history:
         Preferences.Chromium.syncHistoryEnabled.value = !toggleExistingStatus
-      case SyncDataTypes.passwords.rawValue:
+      case .passwords:
         Preferences.Chromium.syncPasswordsEnabled.value = !toggleExistingStatus
-      case SyncDataTypes.openTabs.rawValue:
+      case .openTabs:
         Preferences.Chromium.syncOpenTabsEnabled.value = !toggleExistingStatus
         
         // Sync Regular Tabs when open tabs are enabled
         if Preferences.Chromium.syncOpenTabsEnabled.value {
           tabManager.addRegularTabsToSyncChain()
         }
-      default:
-        return
       }
 
       syncAPI.enableSyncTypes(syncProfileService: syncProfileService)
@@ -325,7 +328,7 @@ class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, 
     askForAuthentication() { [weak self] status, error in
       guard let self = self, status else { return }
       
-      let syncInternalsController = syncAPI.createSyncInternalsController().then {
+      let syncInternalsController = self.syncAPI.createSyncInternalsController().then {
         $0.title = Strings.braveSyncInternalsTitle
       }
       
