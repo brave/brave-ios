@@ -68,6 +68,7 @@ struct PrivateTabsView: View {
         footer: privateBrowsingOnly.value ? Text("") : Text(Strings.TabsSettings.persistentPrivateBrowsingDescription)) {
         if !privateBrowsingOnly.value {
           OptionToggleView(title: Strings.TabsSettings.persistentPrivateBrowsingTitle,
+                           subtitle: nil,
                            option: Preferences.Privacy.persistentPrivateBrowsing) { newValue in
             Task { @MainActor in
               if newValue {
@@ -88,6 +89,7 @@ struct PrivateTabsView: View {
         switch localAuthenticationType {
         case .faceID, .touchID, .pinCode:
           OptionToggleView(title: browsingLockTitle,
+                           subtitle: nil,
                            option: Preferences.Privacy.privateBrowsingLock)
         case .noAuthentication:
           Toggle(isOn: .constant(false)) {
