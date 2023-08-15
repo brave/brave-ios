@@ -263,22 +263,33 @@ class SyncSettingsTableViewController: SyncViewController, UITableViewDelegate, 
   }
 
   @objc private func didToggleSyncType(_ toggle: UISwitch) {
+    guard let syncDataType = SyncDataTypes(rawValue: toggle.tag) else {
+       Logger.module.error("Invalid Sync DataType")
+       return
+    }
+    
     let toggleExistingStatus = !toggle.isOn
     
-    askForAuthentication() { [weak self] status, error in
-      guard let self = self, status else {
-        toggle.setOn(toggleExistingStatus, animated: false)
-        return
+    if syncDataType == .passwords {
+      if toggleExistingStatus {
+        performSyncDataTypeStatusChange(type: syncDataType)
+      } else {
+        askForAuthentication() { status, error in
+          guard status else {
+            toggle.setOn(toggleExistingStatus, animated: false)
+            return
+          }
+          
+          toggle.setOn(!toggleExistingStatus, animated: false)
+          performSyncDataTypeStatusChange(type: syncDataType)
+        }
       }
-      
-      toggle.setOn(!toggleExistingStatus, animated: false)
-
-      guard let syncDataType = SyncDataTypes(rawValue: toggle.tag) else {
-         Logger.module.error("Invalid Sync DataType")
-         return
-      }
-      
-      switch syncDataType {
+    } else {
+      performSyncDataTypeStatusChange(type: syncDataType)
+    }
+    
+    func performSyncDataTypeStatusChange(type: SyncDataTypes) {
+      switch type {
       case .bookmarks:
         Preferences.Chromium.syncBookmarksEnabled.value = !toggleExistingStatus
       case .history:
