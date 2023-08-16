@@ -39,8 +39,7 @@ public class WalletStore {
     txService: BraveWalletTxService,
     ethTxManagerProxy: BraveWalletEthTxManagerProxy,
     solTxManagerProxy: BraveWalletSolanaTxManagerProxy,
-    ipfsApi: IpfsAPI,
-    webImageDownloader: WebImageDownloaderType
+    ipfsApi: IpfsAPI
   ) {
     self.keyringStore = .init(keyringService: keyringService, walletService: walletService, rpcService: rpcService)
     self.setUp(
@@ -53,8 +52,7 @@ public class WalletStore {
       txService: txService,
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
-      ipfsApi: ipfsApi,
-      webImageDownloader: webImageDownloader
+      ipfsApi: ipfsApi
     )
   }
 
@@ -68,8 +66,7 @@ public class WalletStore {
     txService: BraveWalletTxService,
     ethTxManagerProxy: BraveWalletEthTxManagerProxy,
     solTxManagerProxy: BraveWalletSolanaTxManagerProxy,
-    ipfsApi: IpfsAPI,
-    webImageDownloader: WebImageDownloaderType
+    ipfsApi: IpfsAPI
   ) {
     self.cancellable = self.keyringStore.$defaultKeyring
       .map(\.isKeyringCreated)
@@ -90,7 +87,6 @@ public class WalletStore {
             ethTxManagerProxy: ethTxManagerProxy,
             solTxManagerProxy: solTxManagerProxy,
             ipfsApi: ipfsApi,
-            webImageDownloader: webImageDownloader,
             origin: self.origin
           )
           if let cryptoStore = self.cryptoStore {

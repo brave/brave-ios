@@ -5,83 +5,70 @@
 
 import SwiftUI
 import SDWebImage
-import BraveCore
 
 public protocol WebImageDownloaderType: AnyObject {
-  func downloadImage(url: URL?) async -> UIImage?
-  func imageFromData(data: Data) -> UIImage?
+  func downloadImage(url: URL) async -> (UIImage?, Error?)
+  func imageFromData(data: Data) async -> UIImage?
 }
 
 struct WebImageDownloaderKey: EnvironmentKey {
-  static var defaultValue: WebImageDownloaderType? = SDWebImageManager.shared
+  static var defaultValue: WebImageDownloaderType = SDWebImageManager.shared
 }
 
 extension EnvironmentValues {
-  public var webImageDownloader: WebImageDownloaderType? {
+  public var webImageDownloader: WebImageDownloaderType {
     get { self[WebImageDownloaderKey.self] }
     set { self[WebImageDownloaderKey.self] = newValue }
   }
 }
 
 extension SDWebImageManager: WebImageDownloaderType {
-  @MainActor public func downloadImage(url: URL?) async -> UIImage? {
-    return await withCheckedContinuation { continuation in
-      loadImage(with: url, progress: nil) { image, _, _, _, _, _ in
-        continuation.resume(returning: image)
+  @MainActor public func downloadImage(url: URL) async -> (UIImage?, Error?) {
+    var operation: SDWebImageCombinedOperation?
+    return await withTaskCancellationHandler {
+      await withCheckedContinuation { continuation in
+        operation = loadImage(with: url, progress: nil) { image, _, error, _, _, _ in
+          continuation.resume(returning: (image, error))
+        }
       }
+    } onCancel: { [operation] in
+      operation?.cancel()
     }
   }
   
-  public func imageFromData(data: Data) -> UIImage? {
+  public func imageFromData(data: Data) async -> UIImage? {
     SDImageCodersManager.shared.decodedImage(with: data)
   }
 }
 
-extension BraveCore.WebImageDownloader: WebImageDownloaderType {
-  @MainActor public func downloadImage(url: URL?) async -> UIImage? {
-    if let url {
-      return await withCheckedContinuation { continuation in
-        downloadImage(url) { image, _, _ in
-          continuation.resume(returning: image)
-        }
-      }
-    }
-    return nil
-  }
-  
-  public func imageFromData(data: Data) -> UIImage? {
-    WebImageDownloader.image(from: data)
-  }
-}
-
 public struct WebImageReader<Content: View>: View {
-  var url: URL?
+  var url: URL
   
-  @Environment(\.webImageDownloader) private var imageDownloader: WebImageDownloaderType?
+  @Environment(\.webImageDownloader) private var imageDownloader: WebImageDownloaderType
   
   @State private var image: UIImage?
+  @State private var error: Error?
 
-  private var content: (_ image: UIImage?) -> Content
+  private var content: (_ image: UIImage?, _ error: Error?) -> Content
 
   public init(
-    url: URL?,
-    @ViewBuilder content: @escaping (_ image: UIImage?) -> Content
+    url: URL,
+    @ViewBuilder content: @escaping (_ image: UIImage?, _ error: Error?) -> Content
   ) {
     self.content = content
     self.url = url
   }
 
   public var body: some View {
-    content(image)
-      .onAppear {
-        if let urlString = url?.absoluteString {
-          if urlString.hasPrefix("data:image/"), let dataString = urlString.separatedBy(",").last, let data = Data(base64Encoded: dataString, options: .ignoreUnknownCharacters) {
-            image = imageDownloader?.imageFromData(data: data)
-          } else {
-            Task { @MainActor in
-              image = await imageDownloader?.downloadImage(url: url)
-            }
-          }
+    content(image, error)
+      .id(url)
+      .task {
+        if url.absoluteString.hasPrefix("data:image/"),
+           let dataString = url.absoluteString.separatedBy(",").last,
+           let data = Data(base64Encoded: dataString, options: .ignoreUnknownCharacters) {
+          image = await imageDownloader.imageFromData(data: data)
+        } else {
+          (image, error) = await imageDownloader.downloadImage(url: url)
         }
       }
   }

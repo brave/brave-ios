@@ -171,7 +171,7 @@ extension BrowserViewController {
           )
         }
         
-        let cryptoStore = CryptoStore.from(ipfsApi: braveCore.ipfsAPI, webImageDownloader: braveCore.webImageDownloader, privateMode: isPrivateMode)
+        let cryptoStore = CryptoStore.from(ipfsApi: braveCore.ipfsAPI, privateMode: isPrivateMode)
 
         let vc = SettingsViewController(
           profile: self.profile,
@@ -193,7 +193,7 @@ extension BrowserViewController {
   func presentWallet() {
     guard let walletStore = self.walletStore ?? newWalletStore() else { return }
     walletStore.origin = nil
-    let vc = WalletHostingViewController(walletStore: walletStore)
+    let vc = WalletHostingViewController(walletStore: walletStore, webImageDownloader: braveCore.webImageDownloader)
     vc.delegate = self
     self.dismiss(animated: true) {
       self.present(vc, animated: true)
