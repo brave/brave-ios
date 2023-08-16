@@ -7,6 +7,7 @@ import Foundation
 import BraveCore
 import Combine
 import Preferences
+import BraveUI
 
 /// The main wallet store
 public class WalletStore {
@@ -38,7 +39,8 @@ public class WalletStore {
     txService: BraveWalletTxService,
     ethTxManagerProxy: BraveWalletEthTxManagerProxy,
     solTxManagerProxy: BraveWalletSolanaTxManagerProxy,
-    ipfsApi: IpfsAPI
+    ipfsApi: IpfsAPI,
+    webImageDownloader: WebImageDownloaderType
   ) {
     self.keyringStore = .init(keyringService: keyringService, walletService: walletService, rpcService: rpcService)
     self.setUp(
@@ -51,7 +53,8 @@ public class WalletStore {
       txService: txService,
       ethTxManagerProxy: ethTxManagerProxy,
       solTxManagerProxy: solTxManagerProxy,
-      ipfsApi: ipfsApi
+      ipfsApi: ipfsApi,
+      webImageDownloader: webImageDownloader
     )
   }
 
@@ -65,7 +68,8 @@ public class WalletStore {
     txService: BraveWalletTxService,
     ethTxManagerProxy: BraveWalletEthTxManagerProxy,
     solTxManagerProxy: BraveWalletSolanaTxManagerProxy,
-    ipfsApi: IpfsAPI
+    ipfsApi: IpfsAPI,
+    webImageDownloader: WebImageDownloaderType
   ) {
     self.cancellable = self.keyringStore.$defaultKeyring
       .map(\.isKeyringCreated)
@@ -86,6 +90,7 @@ public class WalletStore {
             ethTxManagerProxy: ethTxManagerProxy,
             solTxManagerProxy: solTxManagerProxy,
             ipfsApi: ipfsApi,
+            webImageDownloader: webImageDownloader,
             origin: self.origin
           )
           if let cryptoStore = self.cryptoStore {

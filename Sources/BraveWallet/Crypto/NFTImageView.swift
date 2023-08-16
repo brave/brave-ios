@@ -21,7 +21,7 @@ struct NFTImageView<Placeholder: View>: View {
   
   var body: some View {
     if urlString.hasPrefix("data:image/") {
-      WebImageReader(url: URL(string: urlString)) { image, isFinished in
+      WebImageReader(url: URL(string: urlString)) { image in
         if let image = image {
           Image(uiImage: image)
             .resizable()
@@ -33,7 +33,7 @@ struct NFTImageView<Placeholder: View>: View {
     } else {
       if let url = URL(string: urlString), url.isSecureWebPage() {
         if urlString.hasSuffix(".svg") {
-          WebImageReader(url: url) { image, isFinished in
+          WebImageReader(url: url) { image in
             if let image = image {
               Image(uiImage: image)
                 .resizable()

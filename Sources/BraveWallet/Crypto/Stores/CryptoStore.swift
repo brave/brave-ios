@@ -7,6 +7,7 @@ import BraveCore
 import Combine
 import Preferences
 import Data
+import BraveUI
 
 enum PendingRequest: Equatable {
   case transactions([BraveWallet.TransactionInfo])
@@ -105,6 +106,7 @@ public class CryptoStore: ObservableObject {
   private let userAssetManager: WalletUserAssetManager
   private var isUpdatingUserAssets: Bool = false
   private var autoDiscoveredAssets: [BraveWallet.BlockchainToken] = []
+  let webImageDownloader: WebImageDownloaderType
   
   public init(
     keyringService: BraveWalletKeyringService,
@@ -117,6 +119,7 @@ public class CryptoStore: ObservableObject {
     ethTxManagerProxy: BraveWalletEthTxManagerProxy,
     solTxManagerProxy: BraveWalletSolanaTxManagerProxy,
     ipfsApi: IpfsAPI,
+    webImageDownloader: WebImageDownloaderType,
     origin: URLOrigin? = nil
   ) {
     self.keyringService = keyringService
@@ -129,6 +132,7 @@ public class CryptoStore: ObservableObject {
     self.ethTxManagerProxy = ethTxManagerProxy
     self.solTxManagerProxy = solTxManagerProxy
     self.ipfsApi = ipfsApi
+    self.webImageDownloader = webImageDownloader
     self.userAssetManager = WalletUserAssetManager(rpcService: rpcService, walletService: walletService)
     self.origin = origin
     

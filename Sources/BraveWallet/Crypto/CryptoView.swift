@@ -272,6 +272,10 @@ public struct CryptoView: View {
       .init(action: { [appRatingRequestAction] in
         appRatingRequestAction?()
       }))
+    .environment(
+      \.webImageDownloader,
+       walletStore.cryptoStore?.webImageDownloader
+    )
     .onChange(of: visibleScreen) { newValue in
       if case .panelUnlockOrSetup = presentingContext, newValue == .crypto {
         dismissAction()

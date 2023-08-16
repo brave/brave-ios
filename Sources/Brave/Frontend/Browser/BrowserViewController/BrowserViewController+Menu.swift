@@ -171,7 +171,7 @@ extension BrowserViewController {
           )
         }
         
-        let cryptoStore = CryptoStore.from(ipfsApi: braveCore.ipfsAPI, privateMode: isPrivateMode)
+        let cryptoStore = CryptoStore.from(ipfsApi: braveCore.ipfsAPI, webImageDownloader: braveCore.webImageDownloader, privateMode: isPrivateMode)
 
         let vc = SettingsViewController(
           profile: self.profile,

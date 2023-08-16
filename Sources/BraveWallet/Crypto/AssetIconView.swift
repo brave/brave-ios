@@ -59,7 +59,7 @@ struct AssetIconView: View {
           .resizable()
           .aspectRatio(contentMode: .fit)
       } else {
-        WebImageReader(url: URL(string: token.logo)) { image, isFinished in
+        WebImageReader(url: URL(string: token.logo)) { image in
           if let image = image {
             Image(uiImage: image)
               .resizable()

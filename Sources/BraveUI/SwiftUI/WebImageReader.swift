@@ -5,81 +5,82 @@
 
 import SwiftUI
 import SDWebImage
-import SDWebImageSVGNativeCoder
+import BraveCore
 
-private class WalletWebImageManager: ObservableObject {
-  /// loaded image, note when progressive loading, this will published multiple times with different partial image
-  @Published public var image: UIImage?
-  /// loaded image data, may be nil if hit from memory cache. This will only published once loading is finished
-  @Published public var isFinished: Bool = false
-  /// loading error
-  @Published public var error: Error?
+public protocol WebImageDownloaderType: AnyObject {
+  func downloadImage(url: URL?) async -> UIImage?
+  func imageFromData(data: Data) -> UIImage?
+}
 
-  private var manager = SDWebImageManager.shared
-  private var operation: SDWebImageOperation?
+struct WebImageDownloaderKey: EnvironmentKey {
+  static var defaultValue: WebImageDownloaderType? = SDWebImageManager.shared
+}
 
-  private var supportedCoders: [SDImageCoder] = [SDImageSVGNativeCoder.shared, SDImageAPNGCoder.shared, SDImageGIFCoder.shared]
-  
-  init() {}
-
-  func load(url: URL?, options: SDWebImageOptions = []) {
-    operation = manager.loadImage(
-      with: url, options: options, progress: nil,
-      completed: { [weak self] image, data, error, _, finished, _ in
-        guard let self = self else { return }
-        self.image = image
-        self.error = error
-        if finished {
-          self.isFinished = true
-        }
-      })
+extension EnvironmentValues {
+  public var webImageDownloader: WebImageDownloaderType? {
+    get { self[WebImageDownloaderKey.self] }
+    set { self[WebImageDownloaderKey.self] = newValue }
   }
+}
 
-  func cancel() {
-    operation?.cancel()
-    operation = nil
-  }
-  
-  func load(base64Str: String, options: [SDImageCoderOption: Any] = [:]) {
-    guard base64Str.hasPrefix("data:image/") else { return }
-    guard let dataString = base64Str.separatedBy(",").last else { return }
-    
-    let data = Data(base64Encoded: dataString, options: .ignoreUnknownCharacters)
-    for coder in supportedCoders where coder.canDecode(from: data) {
-      image = coder.decodedImage(with: data, options: options)
-      break
+extension SDWebImageManager: WebImageDownloaderType {
+  @MainActor public func downloadImage(url: URL?) async -> UIImage? {
+    return await withCheckedContinuation { continuation in
+      loadImage(with: url, progress: nil) { image, _, _, _, _, _ in
+        continuation.resume(returning: image)
+      }
     }
+  }
+  
+  public func imageFromData(data: Data) -> UIImage? {
+    SDImageCodersManager.shared.decodedImage(with: data)
+  }
+}
+
+extension BraveCore.WebImageDownloader: WebImageDownloaderType {
+  @MainActor public func downloadImage(url: URL?) async -> UIImage? {
+    if let url {
+      return await withCheckedContinuation { continuation in
+        downloadImage(url) { image, _, _ in
+          continuation.resume(returning: image)
+        }
+      }
+    }
+    return nil
+  }
+  
+  public func imageFromData(data: Data) -> UIImage? {
+    WebImageDownloader.image(from: data)
   }
 }
 
 public struct WebImageReader<Content: View>: View {
-  @StateObject private var imageManager: WalletWebImageManager = .init()
   var url: URL?
-  var options: SDWebImageOptions
-  var coderOptions: [SDImageCoderOption: Any]
+  
+  @Environment(\.webImageDownloader) private var imageDownloader: WebImageDownloaderType?
+  
+  @State private var image: UIImage?
 
-  private var content: (_ image: UIImage?, _ isFinished: Bool) -> Content
+  private var content: (_ image: UIImage?) -> Content
 
   public init(
     url: URL?,
-    options: SDWebImageOptions = [],
-    coderOptions: [SDImageCoderOption: Any] = [:],
-    @ViewBuilder content: @escaping (_ image: UIImage?, _ isFinished: Bool) -> Content
+    @ViewBuilder content: @escaping (_ image: UIImage?) -> Content
   ) {
     self.content = content
     self.url = url
-    self.options = options
-    self.coderOptions = coderOptions
   }
 
   public var body: some View {
-    content(imageManager.image, imageManager.isFinished)
+    content(image)
       .onAppear {
         if let urlString = url?.absoluteString {
-          if urlString.hasPrefix("data:image/") {
-            imageManager.load(base64Str: urlString)
-          } else if !imageManager.isFinished {
-              imageManager.load(url: url, options: options)
+          if urlString.hasPrefix("data:image/"), let dataString = urlString.separatedBy(",").last, let data = Data(base64Encoded: dataString, options: .ignoreUnknownCharacters) {
+            image = imageDownloader?.imageFromData(data: data)
+          } else {
+            Task { @MainActor in
+              image = await imageDownloader?.downloadImage(url: url)
+            }
           }
         }
       }

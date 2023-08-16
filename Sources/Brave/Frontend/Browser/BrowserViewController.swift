@@ -2785,7 +2785,7 @@ extension BrowserViewController: TabDelegate {
     let privateMode = privateBrowsingManager.isPrivateBrowsing
     // If we have an open `WalletStore`, use that so we can assign the pending request if the wallet is open,
     // which allows us to store the new `PendingRequest` triggering a modal presentation for that request.
-    guard let cryptoStore = self.walletStore?.cryptoStore ?? CryptoStore.from(ipfsApi: braveCore.ipfsAPI, privateMode: privateMode) else {
+    guard let cryptoStore = self.walletStore?.cryptoStore ?? CryptoStore.from(ipfsApi: braveCore.ipfsAPI, webImageDownloader: braveCore.webImageDownloader, privateMode: privateMode) else {
       return false
     }
     if await cryptoStore.isPendingRequestAvailable() {
@@ -3130,7 +3130,7 @@ extension BrowserViewController: PreferencesObserver {
       WalletProviderPermissionRequestsManager.shared.cancelAllPendingRequests(for: [.eth])
       WalletProviderAccountCreationRequestManager.shared.cancelAllPendingRequests(coins: [.eth])
       let privateMode = privateBrowsingManager.isPrivateBrowsing
-      if let cryptoStore = CryptoStore.from(ipfsApi: braveCore.ipfsAPI, privateMode: privateMode) {
+      if let cryptoStore = CryptoStore.from(ipfsApi: braveCore.ipfsAPI, webImageDownloader: braveCore.webImageDownloader, privateMode: privateMode) {
         cryptoStore.rejectAllPendingWebpageRequests()
       }
       updateURLBarWalletButton()
@@ -3141,7 +3141,7 @@ extension BrowserViewController: PreferencesObserver {
       WalletProviderPermissionRequestsManager.shared.cancelAllPendingRequests(for: [.sol])
       WalletProviderAccountCreationRequestManager.shared.cancelAllPendingRequests(coins: [.sol])
       let privateMode = privateBrowsingManager.isPrivateBrowsing
-      if let cryptoStore = CryptoStore.from(ipfsApi: braveCore.ipfsAPI, privateMode: privateMode) {
+      if let cryptoStore = CryptoStore.from(ipfsApi: braveCore.ipfsAPI, webImageDownloader: braveCore.webImageDownloader, privateMode: privateMode) {
         cryptoStore.rejectAllPendingWebpageRequests()
       }
       updateURLBarWalletButton()

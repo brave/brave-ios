@@ -6,8 +6,20 @@
 import Foundation
 import BraveCore
 import BraveShared
+import BraveUI
 
 #if DEBUG
+
+
+class TestableWalletImageDownloader: WebImageDownloaderType {
+  public func downloadImage(url: URL?) async -> UIImage? {
+    return nil
+  }
+  
+  public func imageFromData(data: Data) -> UIImage? {
+    return nil
+  }
+}
 
 extension WalletStore {
   static var previewStore: WalletStore {
@@ -21,7 +33,8 @@ extension WalletStore {
       txService: MockTxService(),
       ethTxManagerProxy: MockEthTxManagerProxy(),
       solTxManagerProxy: BraveWallet.TestSolanaTxManagerProxy.previewProxy,
-      ipfsApi: TestIpfsAPI()
+      ipfsApi: TestIpfsAPI(),
+      webImageDownloader: TestableWalletImageDownloader()
     )
   }
 }
@@ -38,7 +51,8 @@ extension CryptoStore {
       txService: MockTxService(),
       ethTxManagerProxy: MockEthTxManagerProxy(),
       solTxManagerProxy: BraveWallet.TestSolanaTxManagerProxy.previewProxy,
-      ipfsApi: TestIpfsAPI()
+      ipfsApi: TestIpfsAPI(),
+      webImageDownloader: TestableWalletImageDownloader()
     )
   }
 }
