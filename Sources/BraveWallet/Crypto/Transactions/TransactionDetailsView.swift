@@ -61,10 +61,17 @@ struct TransactionDetailsView: View {
           detailRow(title: Strings.Wallet.transactionDetailsDateTitle, value: dateFormatter.string(from: transactionDetailsStore.transaction.createdTime))
           if !transactionDetailsStore.transaction.txHash.isEmpty {
             Button(action: {
-              if let txNetwork = self.networkStore.allChains.first(where: { $0.chainId == transactionDetailsStore.transaction.chainId }),
-                 let baseURL = txNetwork.blockExplorerUrls.first.map(URL.init(string:)),
-                 let url = baseURL?.appendingPathComponent("tx/\(transactionDetailsStore.transaction.txHash)") {
-                openWalletURL(url)
+              if let txNetwork = self.networkStore.allChains.first(where: { $0.chainId == transactionDetailsStore.transaction.chainId }) {
+                if txNetwork.coin != .fil,
+                   let baseURL = txNetwork.blockExplorerUrls.first.map(URL.init(string:)),
+                   let url = baseURL?.appendingPathComponent("tx/\(transactionDetailsStore.transaction.txHash)") {
+                  openWalletURL(url)
+                } else if var urlComps = txNetwork.blockExplorerUrls.first.map(URLComponents.init(string:)) {
+                  urlComps?.queryItems = [URLQueryItem(name: "cid", value: transactionDetailsStore.transaction.txHash)]
+                  if let url = urlComps?.url {
+                    openWalletURL(url)
+                  }
+                }
               }
             }) {
               detailRow(title: Strings.Wallet.transactionDetailsTxHashTitle) {

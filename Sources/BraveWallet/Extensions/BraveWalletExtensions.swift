@@ -16,8 +16,14 @@ extension BraveWallet.TransactionInfo {
     }
   }
   var isEIP1559Transaction: Bool {
-    guard let ethTxData1559 = txDataUnion.ethTxData1559 else { return false }
-    return !ethTxData1559.maxPriorityFeePerGas.isEmpty && !ethTxData1559.maxFeePerGas.isEmpty
+    if coin == .eth {
+      guard let ethTxData1559 = txDataUnion.ethTxData1559 else { return false }
+      return !ethTxData1559.maxPriorityFeePerGas.isEmpty && !ethTxData1559.maxFeePerGas.isEmpty
+    } else if coin == .fil {
+      guard let filTxData = txDataUnion.filTxData else { return false }
+      return !filTxData.gasPremium.isEmpty && !filTxData.gasFeeCap.isEmpty
+    }
+    return false
   }
   var ethTxToAddress: String {
     // Eth transaction are all coming as `ethTxData1559`

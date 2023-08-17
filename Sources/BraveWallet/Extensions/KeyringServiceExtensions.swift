@@ -28,7 +28,11 @@ extension BraveWalletKeyringService {
           return partialResult + [prior]
         })
         .sorted(by: { lhs, rhs in
-          (lhs.coin ?? .eth).sortOrder < (rhs.coin ?? .eth).sortOrder
+          if lhs.coin == .fil && rhs.coin == .fil {
+            return lhs.id == BraveWallet.KeyringId.filecoin
+          } else {
+            return (lhs.coin ?? .eth).sortOrder < (rhs.coin ?? .eth).sortOrder
+          }
         })
       }
     )

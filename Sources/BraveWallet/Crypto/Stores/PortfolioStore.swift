@@ -355,7 +355,17 @@ public class PortfolioStore: ObservableObject {
           TokenNetworkAccounts(
             token: token,
             network: networkAssets.network,
-            accounts: selectedAccounts.filter { $0.coin == token.coin }
+            accounts: selectedAccounts.filter {
+              if token.coin == .fil {
+                if token.chainId == BraveWallet.FilecoinMainnet {
+                  return $0.keyringId == BraveWallet.KeyringId.filecoin
+                } else {
+                  return $0.keyringId == BraveWallet.KeyringId.filecoinTestnet
+                }
+              } else {
+                return $0.coin == token.coin
+              }
+            }
           )
         }
       }
@@ -564,7 +574,7 @@ public class PortfolioStore: ObservableObject {
         })
     case let .account(account):
       return allVisibleUserAssets
-        .filter { $0.network.coin == account.coin }
+        .filter { $0.network.coin == account.coin && $0.network.supportedKeyrings.contains(account.accountId.keyringId.rawValue as NSNumber) }
         .flatMap { networkAssets in
           networkAssets.tokens.map { token in
             AssetViewModel(

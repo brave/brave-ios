@@ -168,6 +168,13 @@ class TransactionDetailsStore: ObservableObject {
       case let .solSwapTransaction(details):
         self.title = Strings.Wallet.solanaSwapTransactionTitle
         self.value = details.fromAmount
+      case let .filSend(details):
+        self.title = Strings.Wallet.sent
+        self.value = String(format: "%@ %@", details.sendAmount, details.sendToken?.symbol ?? "")
+        self.fiat = details.sendFiat
+        if let sendToken = details.sendToken, let tokenPrice = assetRatios[sendToken.assetRatioId.lowercased()] {
+          self.marketPrice = currencyFormatter.string(from: NSNumber(value: tokenPrice)) ?? "$0.00"
+        }
       case .other:
         break
       }
