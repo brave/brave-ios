@@ -148,7 +148,7 @@ public class WindowProtection {
     NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)
       .sink(receiveValue: { [weak self] _ in
         guard let self = self else { return }
-        // Should set as non cancalbe for browser lock
+        // Should set as non cancallable for browser lock
         self.isCancellable = false
         // Update visibility when entering background
         self.isVisible = Preferences.Privacy.lockWithPasscode.value && self.context.canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
