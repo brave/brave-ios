@@ -298,7 +298,7 @@ extension BrowserViewController: PlaylistScriptHandlerDelegate, PlaylistFolderSh
   func addToPlaylist(item: PlaylistInfo, folderUUID: String? = nil, completion: ((_ didAddItem: Bool) -> Void)? = nil) {
     PlaylistP3A.recordUsage()
     
-      if PlaylistManager.shared.isDiskSpaceEncumbered() && !BrowserViewController.didShowStorageFullWarning {
+    if PlaylistManager.shared.isDiskSpaceEncumbered() && !BrowserViewController.didShowStorageFullWarning {
       BrowserViewController.didShowStorageFullWarning = true
       let style: UIAlertController.Style = UIDevice.current.userInterfaceIdiom == .pad ? .alert : .actionSheet
       let alert = UIAlertController(
