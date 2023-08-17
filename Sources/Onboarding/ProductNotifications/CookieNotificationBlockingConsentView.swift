@@ -89,9 +89,3 @@ public class CookieNotificationBlockingConsentViewController: UIHostingControlle
     view.backgroundColor = UIColor.braveBackground
   }
 }
-
-extension Task where Success == Never, Failure == Never {
-  public static func sleep(seconds: TimeInterval) async throws {
-    try await sleep(nanoseconds: NSEC_PER_MSEC * UInt64(seconds * 1000))
-  }
-}
