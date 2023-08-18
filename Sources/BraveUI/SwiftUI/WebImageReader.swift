@@ -7,7 +7,7 @@ import SwiftUI
 import SDWebImage
 
 public protocol WebImageDownloaderType: AnyObject {
-  func downloadImage(url: URL) async -> (UIImage?, Error?)
+  func downloadImage(url: URL) async -> UIImage?
   func imageFromData(data: Data) async -> UIImage?
 }
 
@@ -23,12 +23,12 @@ extension EnvironmentValues {
 }
 
 extension SDWebImageManager: WebImageDownloaderType {
-  @MainActor public func downloadImage(url: URL) async -> (UIImage?, Error?) {
+  public func downloadImage(url: URL) async -> UIImage? {
     var operation: SDWebImageCombinedOperation?
     return await withTaskCancellationHandler {
       await withCheckedContinuation { continuation in
-        operation = loadImage(with: url, progress: nil) { image, _, error, _, _, _ in
-          continuation.resume(returning: (image, error))
+        operation = loadImage(with: url, progress: nil) { image, _, _, _, _, _ in
+          continuation.resume(returning: image)
         }
       }
     } onCancel: { [operation] in
@@ -47,29 +47,28 @@ public struct WebImageReader<Content: View>: View {
   @Environment(\.webImageDownloader) private var imageDownloader: WebImageDownloaderType
   
   @State private var image: UIImage?
-  @State private var error: Error?
 
-  private var content: (_ image: UIImage?, _ error: Error?) -> Content
+  private var content: (_ image: UIImage?) -> Content
 
   public init(
     url: URL,
-    @ViewBuilder content: @escaping (_ image: UIImage?, _ error: Error?) -> Content
+    @ViewBuilder content: @escaping (_ image: UIImage?) -> Content
   ) {
     self.content = content
     self.url = url
   }
 
   public var body: some View {
-    content(image, error)
-      .id(url)
+    content(image)
       .task {
         if url.absoluteString.hasPrefix("data:image/"),
            let dataString = url.absoluteString.separatedBy(",").last,
            let data = Data(base64Encoded: dataString, options: .ignoreUnknownCharacters) {
           image = await imageDownloader.imageFromData(data: data)
         } else {
-          (image, error) = await imageDownloader.downloadImage(url: url)
+          image = await imageDownloader.downloadImage(url: url)
         }
       }
+      .id(url)
   }
 }

@@ -7,14 +7,10 @@ import BraveCore
 import BraveUI
 
 extension BraveCore.WebImageDownloader: WebImageDownloaderType {
-  @MainActor public func downloadImage(url: URL) async -> (UIImage?, Error?) {
+  @MainActor public func downloadImage(url: URL) async -> UIImage? {
     return await withCheckedContinuation { continuation in
-      downloadImage(url) { image, httpResponseCode, _ in
-        var error: Error?
-        if httpResponseCode < 200 || httpResponseCode > 299 {
-          error = NSError(domain: "com.brave.ios.BraveWallet.failed-to-load-image", code: 0)
-        }
-        continuation.resume(returning: (image, error))
+      downloadImage(url) { image, _, _ in
+        continuation.resume(returning: image)
       }
     }
   }

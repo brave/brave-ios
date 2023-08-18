@@ -22,7 +22,7 @@ struct NFTImageView<Placeholder: View>: View {
   var body: some View {
     if let url = URL(string: urlString) {
       if url.absoluteString.hasPrefix("data:image/") {
-        WebImageReader(url: url) { image, _ in
+        WebImageReader(url: url) { image in
           if let image = image {
             Image(uiImage: image)
               .resizable()
@@ -39,7 +39,7 @@ struct NFTImageView<Placeholder: View>: View {
             .indicator(.activity)
             .aspectRatio(contentMode: .fit)
         } else {
-          WebImageReader(url: url) { image, _ in
+          WebImageReader(url: url) { image in
             if let image = image {
               Image(uiImage: image)
                 .resizable()
