@@ -6,6 +6,7 @@ import Data
 import BraveShared
 import BraveCore
 import BraveUI
+import os.log
 
 /// Sometimes during heavy operations we want to prevent user from navigating back, changing screen etc.
 protocol NavigationPrevention {
@@ -17,6 +18,25 @@ class SyncWelcomeViewController: SyncViewController {
   
   private enum ActionType {
     case newUser, existingUser, internalSettings
+  }
+  
+  private enum SyncDeviceLimitLevel {
+    case safe, approvalNeeded, blocked
+  }
+  
+  private enum DeviceRetriavalError: Error {
+    case decodeError, fetchError, deviceNumberError
+    
+    var errorDescription: String {
+      switch self {
+      case .decodeError:
+        return "Decoding Error"
+      case .fetchError:
+        return "Fetch Error"
+      case .deviceNumberError:
+        return "Wrong number of devices"
+      }
+    }
   }
   
   private var overlayView: UIView?
@@ -309,43 +329,94 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
   func syncOnWordsEntered(_ controller: UIViewController & NavigationPrevention, codeWords: String) {
     controller.enableNavigationPrevention()
     
-    // DidJoinSyncChain is checking If the chain user trying to join is deleted recently
-    // returning an error accordingly - only error is Deleted Sync Chain atm
-    syncAPI.setDidJoinSyncChain { result in
-      if result {
-        // If chain is not deleted start listening for device state observer
-        // to validate devices are added to chain and show settings
-        self.syncDeviceInfoObserver = self.syncAPI.addDeviceStateObserver { [weak self] in
-          guard let self else { return }
-          self.syncServiceObserver = nil
-          self.syncDeviceInfoObserver = nil
-          
-          controller.disableNavigationPrevention()
-          self.pushSettings()
-        }
-      } else {
-        // Show an alert if the sync hain is deleted
-        let alert = UIAlertController(
-          title: Strings.Sync.syncChainAlreadyDeletedAlertTitle,
-          message: Strings.Sync.syncChainAlreadyDeletedAlertDescription,
-          preferredStyle: .alert)
-        
-        alert.addAction(UIAlertAction(title: Strings.OKString, style: .default) { _ in
-          // Leave sync chain should be called if there is deleted chain alert
-          // to reset sync and local preferences with observer
-          self.syncAPI.leaveSyncGroup()
-
-          controller.disableNavigationPrevention()
-          self.navigationController?.popViewController(animated: true)
-        })
-        
-        self.present(alert, animated: true, completion: nil)
-      }
+    let deviceListJSON = syncAPI.getDeviceListJSON()
+    
+    let deviceNumberLimit = fetchSyncDeviceLimitLevel(listJSON: syncAPI.getDeviceListJSON())
+    
+    if let limitError = deviceNumberLimit.error {
+      // TODO: Show and error with limitError.errorDescription
+      return
+    }
+    
+    guard let deviceLimitLevel = deviceNumberLimit.level else {
+      return
     }
 
-    // In parallel set code words - request sync and setup complete
-    // should be called on brave-core side
-    syncAPI.joinSyncGroup(codeWords: codeWords, syncProfileService: syncProfileServices)
-    handleSyncSetupFailure()
+    switch deviceLimitLevel {
+      case .safe:
+        joinSyncGroup()
+      case .approvalNeeded:
+        // TODO: Approval Route ask for approval if reject leave chain
+        print("Approval Needed")
+      case .blocked:
+        // TODO: Show can not join
+        print("Blocked")
+    }
+    
+    func joinSyncGroup() {
+      // DidJoinSyncChain is checking If the chain user trying to join is deleted recently
+      // returning an error accordingly - only error is Deleted Sync Chain atm
+      syncAPI.setDidJoinSyncChain { result in
+        if result {
+          // If chain is not deleted start listening for device state observer
+          // to validate devices are added to chain and show settings
+          self.syncDeviceInfoObserver = self.syncAPI.addDeviceStateObserver { [weak self] in
+            guard let self else { return }
+            self.syncServiceObserver = nil
+            self.syncDeviceInfoObserver = nil
+            
+            controller.disableNavigationPrevention()
+            self.pushSettings()
+          }
+        } else {
+          // Show an alert if the sync hain is deleted
+          let alert = UIAlertController(
+            title: Strings.Sync.syncChainAlreadyDeletedAlertTitle,
+            message: Strings.Sync.syncChainAlreadyDeletedAlertDescription,
+            preferredStyle: .alert)
+          
+          alert.addAction(UIAlertAction(title: Strings.OKString, style: .default) { _ in
+            // Leave sync chain should be called if there is deleted chain alert
+            // to reset sync and local preferences with observer
+            self.syncAPI.leaveSyncGroup()
+
+            controller.disableNavigationPrevention()
+            self.navigationController?.popViewController(animated: true)
+          })
+          
+          self.present(alert, animated: true, completion: nil)
+        }
+      }
+
+      // In parallel set code words - request sync and setup complete
+      // should be called on brave-core side
+      syncAPI.joinSyncGroup(codeWords: codeWords, syncProfileService: syncProfileServices)
+      handleSyncSetupFailure()
+    }
+  }
+  
+  private func fetchSyncDeviceLimitLevel(listJSON: String?) -> (level: SyncDeviceLimitLevel?, error: DeviceRetriavalError?) {
+        if let json = listJSON, let data = json.data(using: .utf8) {
+          do {
+            let devices = try JSONDecoder().decode([BraveSyncDevice].self, from: data)
+            
+            switch devices.count {
+            case 1...4:
+              return (.safe, nil)
+            case 5...9:
+              return (.approvalNeeded, nil)
+            case 10...:
+              return (.blocked, nil)
+            default:
+              return (nil, DeviceRetriavalError.deviceNumberError)
+            }
+          } catch {
+            Logger.module.error("\(error.localizedDescription)")
+            return (nil, DeviceRetriavalError.decodeError)
+          }
+        } else {
+          Logger.module.error("Something went wrong while retrieving Sync Devices..")
+          return (nil, DeviceRetriavalError.fetchError)
+        }
   }
 }
