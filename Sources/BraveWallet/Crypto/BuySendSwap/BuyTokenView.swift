@@ -69,10 +69,7 @@ struct BuyTokenView: View {
                     .foregroundColor(Color(.secondaryBraveLabel))
                 }
               }
-              TextField(
-                String.localizedStringWithFormat(Strings.Wallet.amountInCurrency, buyTokenStore.selectedCurrency.currencyCode),
-                text: $buyTokenStore.buyAmount
-              )
+              TextField("0", text: $buyTokenStore.buyAmount)
                 .keyboardType(.decimalPad)
             }
             .listRowBackground(Color(.secondaryBraveGroupedBackground))

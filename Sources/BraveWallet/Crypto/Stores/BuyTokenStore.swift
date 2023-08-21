@@ -215,7 +215,11 @@ public class BuyTokenStore: ObservableObject {
     
     // fetch all available currencies for on ramp providers
     supportedCurrencies = await blockchainRegistry.onRampCurrencies()
-    if let firstCurrency = supportedCurrencies.first {
+    if let usdCurrency = supportedCurrencies.first(where: {
+      $0.currencyCode.caseInsensitiveCompare(CurrencyCode.usd.code) == .orderedSame
+    }) {
+      selectedCurrency = usdCurrency
+    } else if let firstCurrency = supportedCurrencies.first {
       selectedCurrency = firstCurrency
     }
   }
