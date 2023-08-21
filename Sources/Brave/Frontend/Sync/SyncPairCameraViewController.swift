@@ -10,7 +10,7 @@ import BraveUI
 
 protocol SyncPairControllerDelegate: AnyObject {
   func syncOnScannedHexCode(_ controller: UIViewController & NavigationPrevention, hexCode: String)
-  func syncOnWordsEntered(_ controller: UIViewController & NavigationPrevention, codeWords: String)
+  func syncOnWordsEntered(_ controller: UIViewController & NavigationPrevention, codeWords: String, isCodeScanned: Bool)
 }
 
 class SyncPairCameraViewController: SyncViewController {

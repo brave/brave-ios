@@ -30,11 +30,11 @@ class SyncWelcomeViewController: SyncViewController {
     var errorDescription: String {
       switch self {
       case .decodeError:
-        return "Decoding Error"
+        return "Decoding Error while retrieving list of sync devices"
       case .fetchError:
-        return "Fetch Error"
+        return "Fetch Error while retrieving list of sync devices"
       case .deviceNumberError:
-        return "Wrong number of devices"
+        return "Incorrect number while retrieving list of sync devices"
       }
     }
   }
@@ -323,18 +323,21 @@ class SyncWelcomeViewController: SyncViewController {
 
 extension SyncWelcomeViewController: SyncPairControllerDelegate {
   func syncOnScannedHexCode(_ controller: UIViewController & NavigationPrevention, hexCode: String) {
-    syncOnWordsEntered(controller, codeWords: syncAPI.syncCode(fromHexSeed: hexCode))
+    syncOnWordsEntered(controller, codeWords: syncAPI.syncCode(fromHexSeed: hexCode), isCodeScanned: true)
   }
 
-  func syncOnWordsEntered(_ controller: UIViewController & NavigationPrevention, codeWords: String) {
+  func syncOnWordsEntered(_ controller: UIViewController & NavigationPrevention, codeWords: String, isCodeScanned: Bool) {
     controller.enableNavigationPrevention()
     
     let deviceListJSON = syncAPI.getDeviceListJSON()
+    let deviceNumberLimit = fetchSyncDeviceLimitLevel(listJSON: deviceListJSON)
     
-    let deviceNumberLimit = fetchSyncDeviceLimitLevel(listJSON: syncAPI.getDeviceListJSON())
-    
-    if let limitError = deviceNumberLimit.error {
-      // TODO: Show and error with limitError.errorDescription
+    if deviceNumberLimit.error != nil {
+      clearSyncChainWithAlert(
+        title: "Error",
+        message: "Something went wrong while retrieving devices in sync chain.",
+        controller: controller)
+      
       return
     }
     
@@ -343,14 +346,29 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
     }
 
     switch deviceLimitLevel {
-      case .safe:
+    case .safe:
+      joinSyncGroup()
+    case .approvalNeeded:
+      // TODO: Approval Route ask for approval if reject leave chain
+      print("Approval Needed")
+      
+      var alertMessage = isCodeScanned ? Strings.Sync.syncJoinChainCameraWarning : Strings.Sync.syncJoinChainCodewordsWarning
+      
+      alertMessage += "\n Device in Sync Chain:"
+      
+      let alert = UIAlertController(
+        title: Strings.syncJoinChainWarningTitle,
+        message: isCodeScanned ? Strings.Sync.syncJoinChainCameraWarning : Strings.Sync.syncJoinChainCodewordsWarning,
+        preferredStyle: .alert)
+      alert.addAction(UIAlertAction(title: Strings.yes, style: .default) { _ in
         joinSyncGroup()
-      case .approvalNeeded:
-        // TODO: Approval Route ask for approval if reject leave chain
-        print("Approval Needed")
-      case .blocked:
-        // TODO: Show can not join
-        print("Blocked")
+      })
+      alert.addAction(UIAlertAction(title: Strings.no, style: .default) { _ in
+        
+      })
+    case .blocked:
+      // TODO: Show can not join
+      print("Blocked")
     }
     
     func joinSyncGroup() {
@@ -369,22 +387,13 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
             self.pushSettings()
           }
         } else {
-          // Show an alert if the sync hain is deleted
-          let alert = UIAlertController(
+          // Show an alert if the sync chain is deleted
+          // Leave sync chain should be called if there is deleted chain alert
+          // to reset sync and local preferences with observer
+          self.clearSyncChainWithAlert(
             title: Strings.Sync.syncChainAlreadyDeletedAlertTitle,
             message: Strings.Sync.syncChainAlreadyDeletedAlertDescription,
-            preferredStyle: .alert)
-          
-          alert.addAction(UIAlertAction(title: Strings.OKString, style: .default) { _ in
-            // Leave sync chain should be called if there is deleted chain alert
-            // to reset sync and local preferences with observer
-            self.syncAPI.leaveSyncGroup()
-
-            controller.disableNavigationPrevention()
-            self.navigationController?.popViewController(animated: true)
-          })
-          
-          self.present(alert, animated: true, completion: nil)
+            controller: controller)
         }
       }
 
@@ -396,27 +405,43 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
   }
   
   private func fetchSyncDeviceLimitLevel(listJSON: String?) -> (level: SyncDeviceLimitLevel?, error: DeviceRetriavalError?) {
-        if let json = listJSON, let data = json.data(using: .utf8) {
-          do {
-            let devices = try JSONDecoder().decode([BraveSyncDevice].self, from: data)
-            
-            switch devices.count {
-            case 1...4:
-              return (.safe, nil)
-            case 5...9:
-              return (.approvalNeeded, nil)
-            case 10...:
-              return (.blocked, nil)
-            default:
-              return (nil, DeviceRetriavalError.deviceNumberError)
-            }
-          } catch {
-            Logger.module.error("\(error.localizedDescription)")
-            return (nil, DeviceRetriavalError.decodeError)
-          }
-        } else {
-          Logger.module.error("Something went wrong while retrieving Sync Devices..")
-          return (nil, DeviceRetriavalError.fetchError)
+    if let json = listJSON, let data = json.data(using: .utf8) {
+      do {
+       let devices = try JSONDecoder().decode([BraveSyncDevice].self, from: data)
+        switch devices.count {
+        case 1...4:
+          return (.safe, nil)
+        case 5...9:
+          return (.approvalNeeded, nil)
+        case 10...:
+          return (.blocked, nil)
+        default:
+          Logger.module.error("\(DeviceRetriavalError.deviceNumberError.errorDescription)")
+          return (nil, DeviceRetriavalError.deviceNumberError)
         }
+      } catch {
+        Logger.module.error("\(DeviceRetriavalError.decodeError.errorDescription) - \(error.localizedDescription)")
+        return (nil, DeviceRetriavalError.decodeError)
+      }
+    } else {
+      Logger.module.error("\(DeviceRetriavalError.fetchError.errorDescription)") // ("Something went wrong while retrieving Sync Devices..")
+      return (nil, DeviceRetriavalError.fetchError)
+    }
+  }
+  
+  private func clearSyncChainWithAlert(title: String, message: String, controller: UIViewController & NavigationPrevention) {
+    let alert = UIAlertController(
+      title: title,
+      message: message,
+      preferredStyle: .alert)
+    
+    alert.addAction(UIAlertAction(title: Strings.OKString, style: .default) { _ in
+      self.syncAPI.leaveSyncGroup()
+      
+      controller.disableNavigationPrevention()
+      self.navigationController?.popViewController(animated: true)
+    })
+    
+    present(alert, animated: true, completion: nil)
   }
 }

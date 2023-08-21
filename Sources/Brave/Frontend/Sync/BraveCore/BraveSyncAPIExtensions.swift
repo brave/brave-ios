@@ -66,6 +66,19 @@ extension BraveSyncAPI {
     }
     return false
   }
+  
+  @discardableResult
+  func joinSyncGroupTypesDisabled(codeWords: String, syncProfileService: BraveSyncProfileServiceIOS) -> Bool {
+    if setSyncCode(codeWords) {
+      syncProfileService.userSelectedTypes = []
+      requestSync()
+      setSetupComplete()
+      Preferences.Chromium.syncEnabled.value = true
+
+      return true
+    }
+    return false
+  }
 
   func removeDeviceFromSyncGroup(deviceGuid: String) {
     deleteDevice(deviceGuid)
