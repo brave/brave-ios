@@ -182,13 +182,17 @@ class BuyTokenStoreTests: XCTestCase {
     
     await store.updateInfo()
     
-    XCTAssertEqual(store.orderedSupportedBuyOptions.count, 3)
+    XCTAssertEqual(store.orderedSupportedBuyOptions.count, isTestRunningInUSRegion ? 4 : 3)
     XCTAssertNotNil(store.orderedSupportedBuyOptions.first)
     XCTAssertEqual(store.orderedSupportedBuyOptions.first, .ramp)
     XCTAssertNotNil(store.orderedSupportedBuyOptions[safe: 1])
     XCTAssertEqual(store.orderedSupportedBuyOptions[safe: 1], .sardine)
-    XCTAssertNotNil(store.orderedSupportedBuyOptions.last)
-    XCTAssertEqual(store.orderedSupportedBuyOptions.last, .transak)
+    XCTAssertNotNil(store.orderedSupportedBuyOptions[safe: 2])
+    XCTAssertEqual(store.orderedSupportedBuyOptions[safe: 2], .transak)
+    if isTestRunningInUSRegion {
+      XCTAssertNotNil(store.orderedSupportedBuyOptions[safe: 3])
+      XCTAssertEqual(store.orderedSupportedBuyOptions[safe: 3], .stripe)
+    }
   }
   
   @MainActor
@@ -241,9 +245,8 @@ class BuyTokenStoreTests: XCTestCase {
 
     // Test USD. Ramp, Sardine, Transak and Stripe (US locale only) are all supported.
     store.selectedCurrency = .mockUSD
-    // some providers are only available in the US. Check ourselves instead of swizzling `preferredLanguages`.
-    let isTestingInUSLocale = Locale.preferredLanguages.first?.caseInsensitiveCompare("en-us") == .orderedSame
-    if isTestingInUSLocale {
+    // some providers are only available in the US. Check ourselves instead of swizzling `regionCode` / `region`.
+    if isTestRunningInUSRegion {
       XCTAssertEqual(store.supportedProviders.count, 4)
       XCTAssertEqual(store.supportedProviders, [
         BraveWallet.OnRampProvider.ramp,
@@ -280,6 +283,10 @@ class BuyTokenStoreTests: XCTestCase {
     ])
     XCTAssertFalse(store.supportedProviders.contains(.transak))
     XCTAssertFalse(store.supportedProviders.contains(.stripe))
+  }
+  
+  private var isTestRunningInUSRegion: Bool {
+    Locale.current.safeRegionCode?.caseInsensitiveCompare("us") == .orderedSame
   }
 }
 

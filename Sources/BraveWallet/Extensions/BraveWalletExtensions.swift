@@ -362,11 +362,11 @@ extension BraveWallet.OnRampProvider {
     }
   }
   
-  /// Supported local codes for the `OnRampProvider`. Will return nil if all locale codes are supported.
-  private var supportedLocaleCodes: [String]? {
+  /// Supported local region identifiers / codes for the `OnRampProvider`. Will return nil if all locale region identifiers / codes are supported.
+  private var supportedLocaleRegionIdentifiers: [String]? {
     switch self {
     case .stripe:
-      return ["en-us"]
+      return ["us"]
     default:
       return nil
     }
@@ -375,15 +375,26 @@ extension BraveWallet.OnRampProvider {
   /// All supported `OnRampProvider`s for users Locale.
   static var allSupportedOnRampProviders: OrderedSet<BraveWallet.OnRampProvider> {
     .init(WalletConstants.supportedOnRampProviders.filter { onRampProvider in
-      if let supportedLocaleCodes = onRampProvider.supportedLocaleCodes {
-        // Check if `Locale.preferredLanguages` contains any of the `supportedLocalCodes`
-        return supportedLocaleCodes.contains(where: { code in
-          Locale.preferredLanguages.first?.caseInsensitiveCompare(code) == .orderedSame
+      if let supportedLocaleRegionIdentifiers = onRampProvider.supportedLocaleRegionIdentifiers {
+        // Check if `Locale` contains any of the `supportedLocaleRegionIdentifiers`
+        return supportedLocaleRegionIdentifiers.contains(where: { code in
+          Locale.current.safeRegionCode?.caseInsensitiveCompare(code) == .orderedSame
         })
       }
-      // all locale codes are supported for this `OnRampProvider`
+      // all locale codes/identifiers are supported for this `OnRampProvider`
       return true
     })
+  }
+}
+
+extension Locale {
+  /// The region identifier (iOS 16+) or region code for the `Locale`.
+  var safeRegionCode: String? {
+    if #available(iOS 16, *) {
+      return Locale.current.region?.identifier ?? Locale.current.regionCode
+    } else {
+      return Locale.current.regionCode
+    }
   }
 }
 
