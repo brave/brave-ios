@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "stripe-icon.svg",
+      "filename" : "link-by-stripe-icon.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
@@ -17,8 +17,5 @@
   "info" : {
     "author" : "xcode",
     "version" : 1
-  },
-  "properties" : {
-    "preserves-vector-representation" : true
   }
 }

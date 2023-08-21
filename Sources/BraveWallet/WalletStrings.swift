@@ -3247,15 +3247,8 @@ extension Strings {
       "wallet.stripeNetworkProviderName",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Stripe",
-      comment: "The name of one of the on ramp providers."
-    )
-    public static let stripeNetworkProviderShortName = NSLocalizedString(
-      "wallet.stripeNetworkProviderShortName",
-      tableName: "BraveWallet",
-      bundle: .module,
-      value: "Stripe",
-      comment: "The short name of one of the on ramp providers."
+      value: "%@ by %@",
+      comment: "The name of one of the on ramp providers where the first '%@' is `Link` and second '%@' is `Stripe` product names."
     )
     public static let stripeNetworkProviderDescription = NSLocalizedString(
       "wallet.stripeNetworkProviderDescription",
