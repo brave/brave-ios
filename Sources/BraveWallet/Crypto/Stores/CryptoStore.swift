@@ -560,13 +560,11 @@ extension CryptoStore: BraveWalletKeyringServiceObserver {
     rejectAllPendingWebpageRequests()
   }
   public func keyringCreated(_ keyringId: BraveWallet.KeyringId) {
-    Task { @MainActor [weak self] in
-      if let newCoin = WalletConstants.supportedCoinTypes.first(where: { $0.keyringIds.contains(keyringId) }) {
-        self?.userAssetManager.migrateUserAssets(for: newCoin, completion: {
-          self?.updateAssets()
-        })
-      }
-    }
+    // 1. We don't need to rely on this observer method to migrate user visible assets
+    // when user creates a new wallet, since in this case `CryptoStore` has not yet been initialized
+    // 2. We don't need to rely on this observer method to migrate user visible assets
+    // when user creates or imports a new account with a new keyring since any new
+    // supported coin type / keyring will be migrated inside `CryptoStore`'s init()
   }
   public func keyringRestored(_ keyringId: BraveWallet.KeyringId) {
     // This observer method will only get called when user restore a wallet
