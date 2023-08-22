@@ -12,6 +12,10 @@ import Preferences
 import BraveUI
 import os.log
 
+public enum AuthViewType {
+  case general, sync, tabTray, passwords
+}
+
 public class WindowProtection {
 
   private class LockedViewController: UIViewController {
@@ -178,7 +182,7 @@ public class WindowProtection {
     isVisible = false
   }
 
-  private func updateVisibleStatusForForeground(_ determineLockWithPasscode: Bool = true, completion: ((Bool, LAError.Code?) -> Void)? = nil) {
+  private func updateVisibleStatusForForeground(_ determineLockWithPasscode: Bool = true, viewType: AuthViewType = .general, completion: ((Bool, LAError.Code?) -> Void)? = nil) {
     var error: NSError?
     if !context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error),
       (error as? LAError)?.code == .passcodeNotSet {
@@ -240,13 +244,13 @@ public class WindowProtection {
     }
   }
 
-  func presentAuthenticationForViewController(determineLockWithPasscode: Bool = true, completion: ((Bool, LAError.Code?) -> Void)? = nil) {
+  func presentAuthenticationForViewController(determineLockWithPasscode: Bool = true, viewType: AuthViewType, completion: ((Bool, LAError.Code?) -> Void)? = nil) {
     if isVisible {
       return
     }
 
     context = LAContext()
-    updateVisibleStatusForForeground(determineLockWithPasscode) { status, error in
+    updateVisibleStatusForForeground(determineLockWithPasscode, viewType: viewType) { status, error in
       completion?(status, error)
     }
   }
