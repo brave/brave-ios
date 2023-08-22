@@ -27,6 +27,7 @@ class SyncWelcomeViewController: SyncViewController {
   private enum DeviceRetriavalError: Error {
     case decodeError, fetchError, deviceNumberError
     
+    // Text localization not necesseray, only used for logs
     var errorDescription: String {
       switch self {
       case .decodeError:
@@ -327,98 +328,139 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
   }
 
   func syncOnWordsEntered(_ controller: UIViewController & NavigationPrevention, codeWords: String, isCodeScanned: Bool) {
+    // Start Loading after Sync chain code words are entered
     controller.enableNavigationPrevention()
     
-    let deviceListJSON = syncAPI.getDeviceListJSON()
-    let deviceNumberLimit = fetchSyncDeviceLimitLevel(listJSON: deviceListJSON)
-    
-    if deviceNumberLimit.error != nil {
-      clearSyncChainWithAlert(
-        title: "Error",
-        message: "Something went wrong while retrieving devices in sync chain.",
-        controller: controller)
-      
-      return
-    }
-    
-    guard let deviceLimitLevel = deviceNumberLimit.level else {
-      return
-    }
+    // Join the sync chain but do not enable any sync type
+    // This includes the bookmark default type
+    runPostJoinSyncActions(using: controller, isCodeScanned: isCodeScanned)
 
-    switch deviceLimitLevel {
-    case .safe:
-      joinSyncGroup()
-    case .approvalNeeded:
-      // TODO: Approval Route ask for approval if reject leave chain
-      print("Approval Needed")
-      
-      var alertMessage = isCodeScanned ? Strings.Sync.syncJoinChainCameraWarning : Strings.Sync.syncJoinChainCodewordsWarning
-      
-      alertMessage += "\n Device in Sync Chain:"
-      
-      let alert = UIAlertController(
-        title: Strings.syncJoinChainWarningTitle,
-        message: isCodeScanned ? Strings.Sync.syncJoinChainCameraWarning : Strings.Sync.syncJoinChainCodewordsWarning,
-        preferredStyle: .alert)
-      alert.addAction(UIAlertAction(title: Strings.yes, style: .default) { _ in
-        joinSyncGroup()
-      })
-      alert.addAction(UIAlertAction(title: Strings.no, style: .default) { _ in
-        
-      })
-    case .blocked:
-      // TODO: Show can not join
-      print("Blocked")
-    }
-    
-    func joinSyncGroup() {
-      // DidJoinSyncChain is checking If the chain user trying to join is deleted recently
-      // returning an error accordingly - only error is Deleted Sync Chain atm
-      syncAPI.setDidJoinSyncChain { result in
-        if result {
-          // If chain is not deleted start listening for device state observer
-          // to validate devices are added to chain and show settings
-          self.syncDeviceInfoObserver = self.syncAPI.addDeviceStateObserver { [weak self] in
-            guard let self else { return }
-            self.syncServiceObserver = nil
-            self.syncDeviceInfoObserver = nil
-            
-            controller.disableNavigationPrevention()
-            self.pushSettings()
+    // In parallel set code words - request sync and setup complete
+    // should be called on brave-core side
+    syncAPI.joinSyncGroup(codeWords: codeWords, syncProfileService: syncProfileServices, shouldEnableBookmarks: false)
+    handleSyncSetupFailure()
+  }
+  
+  private func runPostJoinSyncActions(using controller: UIViewController & NavigationPrevention, isCodeScanned: Bool) {
+    // DidJoinSyncChain is checking If the chain user trying to join is deleted recently
+    // returning an error accordingly - only error is Deleted Sync Chain atm
+    syncAPI.setDidJoinSyncChain { result in
+      if result {
+        // If chain is not deleted start listening for device state observer
+        // to validate devices are added to chain and show settings
+        self.syncDeviceInfoObserver = self.syncAPI.addDeviceStateObserver { [weak self] in
+          guard let self else { return }
+          self.syncServiceObserver = nil
+          self.syncDeviceInfoObserver = nil
+          
+          // Stop Loading after device list can be fetched
+          controller.disableNavigationPrevention()
+                    
+          let deviceLimit = retrieveDeviceLimitLevel()
+          guard let deviceLimitLevel = deviceLimit.level else {
+            clearSyncChainWithAlert(
+              title: "Error",
+              message: "Something went wrong while retrieving devices in sync chain.",
+              controller: controller)
+            return
           }
-        } else {
-          // Show an alert if the sync chain is deleted
-          // Leave sync chain should be called if there is deleted chain alert
-          // to reset sync and local preferences with observer
-          self.clearSyncChainWithAlert(
-            title: Strings.Sync.syncChainAlreadyDeletedAlertTitle,
-            message: Strings.Sync.syncChainAlreadyDeletedAlertDescription,
-            controller: controller)
-        }
-      }
+          
+          switch deviceLimitLevel {
+          case .safe:
+            self.enableDefaultTypeAndPushSettings()
+          case .approvalNeeded:
+            // Showing and alert with device list; if user answers no - leave chain, if yes - enable the bookmarks type
+            var alertMessage = isCodeScanned ? Strings.Sync.syncJoinChainCameraWarning : Strings.Sync.syncJoinChainCodewordsWarning
+            alertMessage += "\n Device in Sync Chain:"
+            
+            if let namesDevicesSyncChain = fetchNamesOfDevicesInSyncChain() {
+              for name in namesDevicesSyncChain where !name.isEmpty {
+                alertMessage += "\n name"
+              }
+            }
 
-      // In parallel set code words - request sync and setup complete
-      // should be called on brave-core side
-      syncAPI.joinSyncGroup(codeWords: codeWords, syncProfileService: syncProfileServices)
-      handleSyncSetupFailure()
+            let alert = UIAlertController(
+              title: Strings.syncJoinChainWarningTitle,
+              message: isCodeScanned ? Strings.Sync.syncJoinChainCameraWarning : Strings.Sync.syncJoinChainCodewordsWarning,
+              preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: Strings.yes, style: .default) { _ in
+              self.enableDefaultTypeAndPushSettings()
+            })
+            alert.addAction(UIAlertAction(title: Strings.no, style: .default) { _ in
+              self.leaveIncompleteSyncChain()
+            })
+          case .blocked:
+            // Devices 10 and more - add alert to block and prevent sync
+            let alert = UIAlertController(
+              title: Strings.genericErrorTitle,
+              message: "Cant join sync chain. Exceeds the maximum number of devices (10)",
+              preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: Strings.OKString, style: .default) { _ in
+              self.leaveIncompleteSyncChain()
+            })
+          }
+        }
+      } else {
+        // Show an alert if the sync chain is deleted
+        // Leave sync chain should be called if there is deleted chain alert
+        // to reset sync and local preferences with observer
+        self.clearSyncChainWithAlert(
+          title: Strings.Sync.syncChainAlreadyDeletedAlertTitle,
+          message: Strings.Sync.syncChainAlreadyDeletedAlertDescription,
+          controller: controller)
+      }
     }
   }
   
-  private func fetchSyncDeviceLimitLevel(listJSON: String?) -> (level: SyncDeviceLimitLevel?, error: DeviceRetriavalError?) {
+  private func retrieveDeviceLimitLevel() -> (level: SyncDeviceLimitLevel?, error: DeviceRetriavalError?) {
+    let deviceListJSON = syncAPI.getDeviceListJSON()
+    let deviceList = fetchSyncDeviceList(listJSON: deviceListJSON)
+    
+    if let error = deviceList.error {
+      return (nil, error)
+    }
+    
+    guard let devices = deviceList.devices else {
+      return (nil, nil)
+    }
+    
+    var deviceLimitLevel: SyncDeviceLimitLevel?
+    
+    switch devices.count {
+    case 1...4:
+      deviceLimitLevel = .safe
+    case 5...9:
+      deviceLimitLevel = .approvalNeeded
+    case 10...:
+      deviceLimitLevel = .blocked
+    default:
+      Logger.module.error("\(DeviceRetriavalError.deviceNumberError.errorDescription)")
+      return (nil, DeviceRetriavalError.deviceNumberError)
+    }
+    
+    return (deviceLimitLevel, nil)
+  }
+  
+  private func fetchNamesOfDevicesInSyncChain() -> [String]? {
+    let deviceListJSON = syncAPI.getDeviceListJSON()
+    let deviceList = fetchSyncDeviceList(listJSON: deviceListJSON)
+    
+    if let error = deviceList.error {
+      return nil
+    }
+    
+    guard let devices = deviceList.devices else {
+      return nil
+    }
+    
+    return devices.map { $0.name ?? "" }
+  }
+  
+  private func fetchSyncDeviceList(listJSON: String?) -> (devices: [BraveSyncDevice]?, error: DeviceRetriavalError?) {
     if let json = listJSON, let data = json.data(using: .utf8) {
       do {
-       let devices = try JSONDecoder().decode([BraveSyncDevice].self, from: data)
-        switch devices.count {
-        case 1...4:
-          return (.safe, nil)
-        case 5...9:
-          return (.approvalNeeded, nil)
-        case 10...:
-          return (.blocked, nil)
-        default:
-          Logger.module.error("\(DeviceRetriavalError.deviceNumberError.errorDescription)")
-          return (nil, DeviceRetriavalError.deviceNumberError)
-        }
+        let devices = try JSONDecoder().decode([BraveSyncDevice].self, from: data)
+        return (devices, nil)
       } catch {
         Logger.module.error("\(DeviceRetriavalError.decodeError.errorDescription) - \(error.localizedDescription)")
         return (nil, DeviceRetriavalError.decodeError)
@@ -427,6 +469,17 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
       Logger.module.error("\(DeviceRetriavalError.fetchError.errorDescription)") // ("Something went wrong while retrieving Sync Devices..")
       return (nil, DeviceRetriavalError.fetchError)
     }
+  }
+  
+  private func enableDefaultTypeAndPushSettings() {
+    // Enable Bookmark Syncing and push settings
+    syncAPI.enableSyncTypes(syncProfileService: syncProfileServices)
+    pushSettings()
+  }
+  
+  private func leaveIncompleteSyncChain() {
+    syncAPI.leaveSyncGroup()
+    navigationController?.popToRootViewController(animated: true)
   }
   
   private func clearSyncChainWithAlert(title: String, message: String, controller: UIViewController & NavigationPrevention) {
