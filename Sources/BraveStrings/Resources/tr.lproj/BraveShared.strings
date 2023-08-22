@@ -995,7 +995,7 @@
 "login.loginListSearchBarPlaceHolderTitle" = "Filtrele";
 
 /* The message displayed in alert when a user needs to set a passcode */
-"login.syncSetPasscodeAlertDescription" = "Senkronizasyon zincirine bir cihaz eklemek veya şifre senkronizasyonunu açmak veya kapatmak için, önce cihazınıza bir parola belirlemeniz gerekmektedir.";
+"login.syncSetPasscodeAlertDescription" = "Senkronizasyon zincirine bir cihaz eklemek veya şifre senkronizasyonunu açmak veya kapatmak için, önce cihazınıza bir pin kodu belirlemeniz gerekmektedir.";
 
 /* Footer label describing when the current login was last modified with the timestamp as the parameter. */
 "LoginDetailLastModifiedCellFormatTitle" = "Son değiştirilen %@";
@@ -1901,7 +1901,7 @@
 "Privacy" = "Gizlilik";
 
 /* The message displayed in alert when a user needs to set a passcode */
-"privacy.tab.tray.passcode.alert" = "Özel gezinme moduna geçmek için, önce cihazınıza bir parola belirlemeniz gerekmektedir.";
+"privacy.tab.tray.passcode.alert" = "Özel gezinme moduna geçmek için, önce cihazınıza bir pin kodu belirlemeniz gerekmektedir.";
 
 /* Button text that takes user to a list of all trackers and ads we blocked. 'All time lists' refer to list of blocked trackers or websites which have the most trackers */
 "privacyHub.allTimeListsButtonText" = "Tüm zamanlar listeleri";
