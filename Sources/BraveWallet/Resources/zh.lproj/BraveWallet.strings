@@ -323,7 +323,7 @@
 "wallet.contractAddressAccessibilityLabel" = "合约地址";
 
 /* A button title that user has clicked to copy some data to the users clipboard */
-"wallet.copiedToPasteboard" = "已複製";
+"wallet.copiedToPasteboard" = "已复制";
 
 /* The button title that appears when long-pressing a wallet address that will copy said address to the users clipboard */
 "wallet.copyAddressButtonTitle" = "复制地址";
@@ -929,7 +929,7 @@
 "wallet.networkURLTitle" = "网络 URL";
 
 /* A placeholder string that will be used on password text fields to create a new wallet */
-"wallet.newPasswordPlaceholder" = "輸入新密碼";
+"wallet.newPasswordPlaceholder" = "输入新密码";
 
 /* A text displayed below the account address in new site connection confirmation step, in order to make sure users double check the account address they are going to allow the dapp to connect with. */
 "wallet.newSiteConnectConfirmationMessage" = "查看您允许的帐户的地址（必填）";
@@ -1040,7 +1040,7 @@
 "wallet.passwordDoesNotMeetRequirementsError" = "密码长度至少为 8 个字符。";
 
 /* A placeholder string that will be used on password text fields */
-"wallet.passwordPlaceholder" = "請輸入密碼";
+"wallet.passwordPlaceholder" = "请输入密码";
 
 /* The error displayed when entering two passwords that do not match that are expected to match */
 "wallet.passwordsDontMatchError" = "验证的密码不匹配";
@@ -1133,7 +1133,7 @@
 "wallet.repeatedPasswordMatch" = "符合！";
 
 /* A placeholder string that will be used on repeat password text fields */
-"wallet.repeatedPasswordPlaceholder" = "重新輸入密碼";
+"wallet.repeatedPasswordPlaceholder" = "重新输入密码";
 
 /* The title that will be displayed when long-pressing the back button in the navigation bar. As to gain access to your assets from a different device */
 "wallet.restoreWalletBackButtonTitle" = "还原钱包";
