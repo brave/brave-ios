@@ -5,16 +5,16 @@
 
 ### Web3
 
-- Added support for transactions from all networks on activity tab. ([#7233](https://github.com/brave/brave-ios/issues/7233))
-- Added support for Solana v0 VersionedTransactions. ([#7211](https://github.com/brave/brave-ios/issues/7211))
 - Implemented NFT auto discovery in Wallet. ([#7370](https://github.com/brave/brave-ios/issues/7370))
-- Implemented selected network per origin. ([#7225](https://github.com/brave/brave-ios/issues/7225))
-- Updated dApp requests to display network chain name. ([#7296](https://github.com/brave/brave-ios/issues/7296))
-- Updated pending transactions to show for all networks for a token. ([#7295](https://github.com/brave/brave-ios/issues/7295))
+- Added support to show transactions from all networks in activity tab. ([#7233](https://github.com/brave/brave-ios/issues/7233))
+- Added support for Solana v0 versioned transactions. ([#7211](https://github.com/brave/brave-ios/issues/7211))
+- Added the ability to connect to DApps by selected network per origin. ([#7225](https://github.com/brave/brave-ios/issues/7225))
+- Updated DApp requests to display network chain name. ([#7296](https://github.com/brave/brave-ios/issues/7296))
+- Updated pending transactions list to show the most recent one first. ([#7295](https://github.com/brave/brave-ios/issues/7295))
 - Updated sorting to show most recent wallet pending transactions first. ([#7572](https://github.com/brave/brave-ios/issues/7572))
 - Fixed a crash when migrating from a legacy wallet. ([#7464](https://github.com/brave/brave-ios/issues/7464))
 - Fixed an account change event not emitting correctly. ([#7463](https://github.com/brave/brave-ios/issues/7463))
-- Fixed transaction links not opening correct chain ID URL. ([#7455](https://github.com/brave/brave-ios/issues/7455))
+- Fixed transaction links to open correct block explorer irrespective of the active network. ([#7455](https://github.com/brave/brave-ios/issues/7455))
 - Fixed loading indicator not being removed during asset auto discovery. ([#7433](https://github.com/brave/brave-ios/issues/7433))
 
 ### General
