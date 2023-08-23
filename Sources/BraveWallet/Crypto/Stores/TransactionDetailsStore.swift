@@ -75,7 +75,7 @@ class TransactionDetailsStore: ObservableObject {
         return
       }
       self.network = network
-      let keringId = BraveWallet.KeyringId.keyringId(for: coin, transaction.chainId)
+      let keringId = BraveWallet.KeyringId.keyringId(for: coin, on: transaction.chainId)
       let keyring = await keyringService.keyringInfo(keringId)
       var allTokens: [BraveWallet.BlockchainToken] = await blockchainRegistry.allTokens(network.chainId, coin: network.coin) + tokenInfoCache.map(\.value)
       let userVisibleTokens: [BraveWallet.BlockchainToken] = assetManager.getAllUserAssetsInNetworkAssets(networks: [network]).flatMap { $0.tokens }

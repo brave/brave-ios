@@ -70,7 +70,7 @@ class TransactionsActivityStore: ObservableObject {
     updateTask?.cancel()
     updateTask = Task { @MainActor in
       let allKeyrings = await self.keyringService.keyrings(
-        for: WalletConstants.supportedCoinTypes
+        for: WalletConstants.supportedCoinTypes.coins()
       )
       let allAccountInfos = allKeyrings.flatMap(\.accountInfos)
       // setup network filters if not currently setup

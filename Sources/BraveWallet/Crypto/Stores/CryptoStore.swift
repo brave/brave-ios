@@ -410,9 +410,9 @@ public class CryptoStore: ObservableObject {
 
   @MainActor
   func fetchPendingTransactions() async -> [BraveWallet.TransactionInfo] {
-    let allKeyrings = await keyringService.keyrings(for: WalletConstants.supportedCoinTypes)
+    let allKeyrings = await keyringService.keyrings(for: WalletConstants.supportedCoinTypes.coins())
     var allNetworksForCoin: [BraveWallet.CoinType: [BraveWallet.NetworkInfo]] = [:]
-    for coin in WalletConstants.supportedCoinTypes {
+    for coin in WalletConstants.supportedCoinTypes.coins() {
       let allNetworks = await rpcService.allNetworks(coin)
       allNetworksForCoin[coin] = allNetworks
     }

@@ -18,7 +18,7 @@ extension BraveWalletKeyringService {
       of: BraveWallet.KeyringInfo.self,
       returning: [BraveWallet.KeyringInfo].self,
       body: { @MainActor group in
-        let keyringIds: [BraveWallet.KeyringId] = coins.flatMap { $0.keyringIds }
+        let keyringIds: [BraveWallet.KeyringId] = coins.flatMap(\.keyringIds)
         for keyringId in keyringIds {
           group.addTask { @MainActor in
             await self.keyringInfo(keyringId)

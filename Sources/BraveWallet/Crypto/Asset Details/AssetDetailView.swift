@@ -103,10 +103,17 @@ struct AssetDetailView: View {
             .contextMenu {
               if !txSummary.txHash.isEmpty {
                 Button(action: {
-                  if let txNetwork = self.networkStore.allChains.first(where: { $0.chainId == txSummary.txInfo.chainId }),
-                     let baseURL = txNetwork.blockExplorerUrls.first.map(URL.init(string:)),
-                     let url = baseURL?.appendingPathComponent("tx/\(txSummary.txHash)") {
-                    openWalletURL(url)
+                  if let txNetwork = self.networkStore.allChains.first(where: { $0.chainId == txSummary.txInfo.chainId }) {
+                    if txNetwork.coin != .fil,
+                       let baseURL = txNetwork.blockExplorerUrls.first.map(URL.init(string:)),
+                       let url = baseURL?.appendingPathComponent("tx/\(txSummary.txHash)") {
+                      openWalletURL(url)
+                    } else if var urlComps = txNetwork.blockExplorerUrls.first.map(URLComponents.init(string:)) {
+                      urlComps?.queryItems = [URLQueryItem(name: "cid", value: txSummary.txHash)]
+                      if let url = urlComps?.url {
+                        openWalletURL(url)
+                      }
+                    }
                   }
                 }) {
                   Label(Strings.Wallet.viewOnBlockExplorer, systemImage: "arrow.up.forward.square")

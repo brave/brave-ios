@@ -143,7 +143,7 @@ class SelectAccountTokenStore: ObservableObject {
   }
   
   @MainActor func update() async {
-    let allKeyrings = await keyringService.keyrings(for: WalletConstants.supportedCoinTypes)
+    let allKeyrings = await keyringService.keyrings(for: WalletConstants.supportedCoinTypes.coins())
     let allNetworks = await rpcService.allNetworksForSupportedCoins()
     self.allNetworks = allNetworks
     // setup network filters if not currently setup

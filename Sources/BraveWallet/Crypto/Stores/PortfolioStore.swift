@@ -357,11 +357,7 @@ public class PortfolioStore: ObservableObject {
             network: networkAssets.network,
             accounts: selectedAccounts.filter {
               if token.coin == .fil {
-                if token.chainId == BraveWallet.FilecoinMainnet {
-                  return $0.keyringId == BraveWallet.KeyringId.filecoin
-                } else {
-                  return $0.keyringId == BraveWallet.KeyringId.filecoinTestnet
-                }
+                return $0.keyringId == BraveWallet.KeyringId.keyringId(for: token.coin, on: token.chainId)
               } else {
                 return $0.coin == token.coin
               }

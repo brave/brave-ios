@@ -349,7 +349,7 @@ extension BraveWallet.CoinMarket {
 }
 
 extension BraveWallet.KeyringId {
-  static func keyringId(for coin: BraveWallet.CoinType, _ chainId: String) -> BraveWallet.KeyringId {
+  static func keyringId(for coin: BraveWallet.CoinType, on chainId: String) -> BraveWallet.KeyringId {
     switch coin {
     case .eth:
       return .default

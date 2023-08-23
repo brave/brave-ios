@@ -222,7 +222,7 @@ public class KeyringStore: ObservableObject {
     Task { @MainActor in // fetch all KeyringInfo for all coin types
       let selectedAccount = await keyringService.allAccounts().selectedAccount
       let selectedAccountAddress = selectedAccount?.address
-      let allKeyrings = await keyringService.keyrings(for: WalletConstants.supportedCoinTypes)
+      let allKeyrings = await keyringService.keyrings(for: WalletConstants.supportedCoinTypes.coins())
       if let defaultKeyring = allKeyrings.first(where: { $0.id == BraveWallet.KeyringId.default }) {
         self.defaultKeyring = defaultKeyring
         self.isDefaultKeyringLoaded = true
@@ -356,7 +356,7 @@ public class KeyringStore: ObservableObject {
         self.updateKeyringInfo()
         self.resetKeychainStoredPassword()
       }
-      for coin in WalletConstants.supportedCoinTypes {
+      for coin in WalletConstants.supportedCoinTypes.coins(.dapps) { // only coin types support dapps have permission management 
         Domain.clearAllWalletPermissions(for: coin)
       }
       Preferences.Wallet.sortOrderFilter.reset()
@@ -379,7 +379,7 @@ public class KeyringStore: ObservableObject {
   ) {
     keyringService.addAccount(
       coin,
-      keyringId: BraveWallet.KeyringId.keyringId(for: coin, chainId),
+      keyringId: BraveWallet.KeyringId.keyringId(for: coin, on: chainId),
       accountName: name
     ) { accountInfo in
       self.updateKeyringInfo()

@@ -413,13 +413,7 @@ public class SendTokenStore: ObservableObject {
   }
   
   private func validateFilcoinSendAddress() {
-    if !sendAddress.hasPrefix(BraveWallet.FilecoinMainnet) && !sendAddress.hasPrefix(BraveWallet.FilecoinTestnet) {
-      addressError = .notFilAddress
-    } else if (sendAddress.count == 41 || sendAddress.count == 86 || sendAddress.count == 44) { // secp256k have 41 address length and BLS keys have 86 and FEVM f410 keys have 44
-      addressError = nil
-    } else {
-      addressError = .notFilAddress
-    }
+    addressError = sendAddress.isFILAddress ? nil : .notFilAddress
   }
   
   public func enableENSOffchainLookup() {

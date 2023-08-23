@@ -91,7 +91,7 @@ struct AddAccountView: View {
   }
   
   private var showCoinSelection: Bool {
-    preSelectedCoin == nil && WalletConstants.supportedCoinTypes.count > 1
+    preSelectedCoin == nil && WalletConstants.supportedCoinTypes.coins().count > 1
   }
   
   private var navigationTitle: String {
@@ -103,7 +103,7 @@ struct AddAccountView: View {
   
   @ViewBuilder private var addAccountView: some View {
     List {
-      if selectedCoin == .fil && !allFilNetworks.isEmpty {
+      if (selectedCoin == .fil || preSelectedCoin == .fil) && !allFilNetworks.isEmpty {
         Picker(selection: $filNetwork) {
           ForEach(allFilNetworks) { network in
             Text(network.chainName)
@@ -111,9 +111,10 @@ struct AddAccountView: View {
               .tag(network)
           }
         } label: {
-          Text("Network")
+          Text(Strings.Wallet.transactionDetailsNetworkTitle)
             .foregroundColor(Color(.braveLabel))
         }
+        .listRowBackground(Color(.secondaryBraveGroupedBackground))
       }
       accountNameSection
       if isJSONImported {
@@ -151,7 +152,7 @@ struct AddAccountView: View {
           title: Text(Strings.Wallet.coinTypeSelectionHeader)
         )
       ) {
-        ForEach(Array(WalletConstants.supportedCoinTypes)) { coin in
+        ForEach(WalletConstants.supportedCoinTypes.coins().elements) { coin in
           NavigationLink(
             tag: coin,
             selection: $selectedCoin) {

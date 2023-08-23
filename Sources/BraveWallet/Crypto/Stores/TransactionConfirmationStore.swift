@@ -224,7 +224,7 @@ public class TransactionConfirmationStore: ObservableObject {
       clearTrasactionInfoBeforeUpdate()
       
       let coin = transaction.coin
-      let keyringId = BraveWallet.KeyringId.keyringId(for: transaction.coin, transaction.chainId)
+      let keyringId = BraveWallet.KeyringId.keyringId(for: transaction.coin, on: transaction.chainId)
       let keyring = await keyringService.keyringInfo(keyringId)
       if !allNetworks.contains(where: { $0.chainId == transaction.chainId }) {
         allNetworks = await rpcService.allNetworksForSupportedCoins()
@@ -597,9 +597,9 @@ public class TransactionConfirmationStore: ObservableObject {
   }
   
   @MainActor private func fetchAllTransactions() async -> [BraveWallet.TransactionInfo] {
-    let allKeyrings = await keyringService.keyrings(for: WalletConstants.supportedCoinTypes)
+    let allKeyrings = await keyringService.keyrings(for: WalletConstants.supportedCoinTypes.coins())
     var allNetworksForCoin: [BraveWallet.CoinType: [BraveWallet.NetworkInfo]] = [:]
-    for coin in WalletConstants.supportedCoinTypes {
+    for coin in WalletConstants.supportedCoinTypes.coins() {
       let allNetworks = await rpcService.allNetworks(coin)
       allNetworksForCoin[coin] = allNetworks
     }

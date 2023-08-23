@@ -158,7 +158,7 @@ class AssetDetailStore: ObservableObject {
         self.isSwapSupported = await swapService.isSwapSupported(token.chainId)
         
         // fetch accounts
-        let keyringId = BraveWallet.KeyringId.keyringId(for: token.coin, token.chainId)
+        let keyringId = BraveWallet.KeyringId.keyringId(for: token.coin, on: token.chainId)
         let keyring = await keyringService.keyringInfo(keyringId)
         var updatedAccounts = keyring.accountInfos.map {
           AccountAssetViewModel(account: $0, decimalBalance: 0.0, balance: "", fiatBalance: "")
