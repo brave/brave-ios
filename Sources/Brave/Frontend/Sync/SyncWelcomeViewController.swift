@@ -371,17 +371,17 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
           case .approvalNeeded:
             // Showing and alert with device list; if user answers no - leave chain, if yes - enable the bookmarks type
             var alertMessage = isCodeScanned ? Strings.Sync.syncJoinChainCameraWarning : Strings.Sync.syncJoinChainCodewordsWarning
-            alertMessage += "\n Device in Sync Chain:"
+            alertMessage += "\n\nDevices in Sync Chain:"
             
             if let namesDevicesSyncChain = fetchNamesOfDevicesInSyncChain() {
               for name in namesDevicesSyncChain where !name.isEmpty {
-                alertMessage += "\n name"
+                alertMessage += "\n \(name)"
               }
             }
 
             let alert = UIAlertController(
               title: Strings.syncJoinChainWarningTitle,
-              message: isCodeScanned ? Strings.Sync.syncJoinChainCameraWarning : Strings.Sync.syncJoinChainCodewordsWarning,
+              message: alertMessage,
               preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: Strings.yes, style: .default) { _ in
               self.enableDefaultTypeAndPushSettings()
@@ -389,6 +389,7 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
             alert.addAction(UIAlertAction(title: Strings.no, style: .default) { _ in
               self.leaveIncompleteSyncChain()
             })
+            present(alert, animated: true, completion: nil)
           case .blocked:
             // Devices 10 and more - add alert to block and prevent sync
             let alert = UIAlertController(
@@ -398,6 +399,7 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
             alert.addAction(UIAlertAction(title: Strings.OKString, style: .default) { _ in
               self.leaveIncompleteSyncChain()
             })
+            present(alert, animated: true, completion: nil)
           }
         }
       } else {
@@ -445,7 +447,7 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
     let deviceListJSON = syncAPI.getDeviceListJSON()
     let deviceList = fetchSyncDeviceList(listJSON: deviceListJSON)
     
-    if let error = deviceList.error {
+    if deviceList.error != nil {
       return nil
     }
     
