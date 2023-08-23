@@ -122,8 +122,8 @@ class SpeechRecognizer: ObservableObject {
         
         // Check voice input final
         if isFinal {
-          animationType = .stable
-          transcriptedIcon = "leo.check.circle-outline"
+          self.animationType = .stable
+          self.transcriptedIcon = "leo.check.circle-outline"
           
           // Remove audio buffer input
           audioEngine.inputNode.removeTap(onBus: 0)

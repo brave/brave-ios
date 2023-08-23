@@ -68,7 +68,7 @@ class InstallVPNViewController: VPNSetupLoadingController {
         // Retry installing profile twice if it fails
         // Error generated is WireGuard capabilities are not yet enabled on this node
         if self.installVPNProfileRetryCount < 2 {
-          installVPNAction()
+          self.installVPNAction()
         } else {
           presentErrorVPNInstallProfile()
         }

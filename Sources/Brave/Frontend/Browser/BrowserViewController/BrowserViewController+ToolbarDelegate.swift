@@ -540,7 +540,7 @@ extension BrowserViewController: TopToolbarDelegate {
           // Feedback indicating recognition is finalized
           AudioServicesPlayAlertSound(SystemSoundID(kSystemSoundID_Vibrate))
           UIImpactFeedbackGenerator(style: .medium).bzzt()
-          stopVoiceSearch(searchQuery: finalizedRecognition.searchQuery)
+          self.stopVoiceSearch(searchQuery: finalizedRecognition.searchQuery)
         }
       }
       
