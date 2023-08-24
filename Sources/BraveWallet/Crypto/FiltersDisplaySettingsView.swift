@@ -202,8 +202,8 @@ struct FiltersDisplaySettingsView: View {
           Button(action: resetToDefaults) {
             Text(Strings.Wallet.settingsResetTransactionAlertButtonTitle)
               .fontWeight(.semibold)
-              .foregroundColor(Color(uiColor: WalletV2Design.textInteractive))
           }
+          .disabled(isResetDisabled)
         }
       }
     }
@@ -378,6 +378,19 @@ struct FiltersDisplaySettingsView: View {
         .ignoresSafeArea()
     )
     .shadow(color: Color.black.opacity(0.04), radius: 16, x: 0, y: -8)
+  }
+  
+  private var isResetDisabled: Bool {
+    groupBy == GroupBy(rawValue: Preferences.Wallet.groupByFilter.defaultValue) ?? .none
+    && sortOrder == SortOrder(rawValue: Preferences.Wallet.sortOrderFilter.defaultValue) ?? .valueDesc
+    && isHidingSmallBalances == Preferences.Wallet.isHidingSmallBalancesFilter.defaultValue
+    && isHidingUnownedNFTs == Preferences.Wallet.isHidingUnownedNFTsFilter.defaultValue
+    && isShowingNFTNetworkLogo == Preferences.Wallet.isShowingNFTNetworkLogoFilter.defaultValue
+    && accounts.allSatisfy(\.isSelected)
+    && networks.allSatisfy { selectableNetwork in
+      let isTestnet = WalletConstants.supportedTestNetworkChainIds.contains(selectableNetwork.model.chainId)
+      return selectableNetwork.isSelected == !isTestnet
+    }
   }
   
   func resetToDefaults() {
