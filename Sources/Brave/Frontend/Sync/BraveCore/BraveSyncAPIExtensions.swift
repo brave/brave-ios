@@ -55,7 +55,7 @@ extension BraveSyncAPI {
   }
   
   @discardableResult
-  func joinSyncGroup(codeWords: String, syncProfileService: BraveSyncProfileServiceIOS, shouldEnableBookmarks: Bool = true) -> Bool {
+  func joinSyncGroup(codeWords: String, syncProfileService: BraveSyncProfileServiceIOS, shouldEnableBookmarks: Bool) -> Bool {
     if setSyncCode(codeWords) {
       enableSyncTypes(syncProfileService: syncProfileService, shouldEnableBookmarks: shouldEnableBookmarks)
       requestSync()
@@ -92,7 +92,7 @@ extension BraveSyncAPI {
     resetSync()
   }
 
-  func enableSyncTypes(syncProfileService: BraveSyncProfileServiceIOS, shouldEnableBookmarks: Bool = true) {
+  func enableSyncTypes(syncProfileService: BraveSyncProfileServiceIOS, shouldEnableBookmarks: Bool) {
     syncProfileService.userSelectedTypes = []
     
     // This value is true by default

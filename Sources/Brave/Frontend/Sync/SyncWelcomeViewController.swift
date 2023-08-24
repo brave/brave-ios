@@ -261,7 +261,7 @@ class SyncWelcomeViewController: SyncViewController {
         }
       }
       
-      self.syncAPI.joinSyncGroup(codeWords: self.syncAPI.getSyncCode(), syncProfileService: self.syncProfileServices)
+      self.syncAPI.joinSyncGroup(codeWords: self.syncAPI.getSyncCode(), syncProfileService: self.syncProfileServices, shouldEnableBookmarks: true)
       self.handleSyncSetupFailure()
     }
     
@@ -369,16 +369,19 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
           case .safe:
             self.enableDefaultTypeAndPushSettings()
           case .approvalNeeded:
+            let namesDevicesSyncChain = fetchNamesOfDevicesInSyncChain()
+
             // Showing and alert with device list; if user answers no - leave chain, if yes - enable the bookmarks type
             var alertMessage = isCodeScanned ? Strings.Sync.syncJoinChainCameraWarning : Strings.Sync.syncJoinChainCodewordsWarning
-            alertMessage += "\n\n\(Strings.Sync.syncDevicesInSyncChainTitle):"
             
-            if let namesDevicesSyncChain = fetchNamesOfDevicesInSyncChain() {
+            if !namesDevicesSyncChain.isEmpty {
+              alertMessage += "\n\n\(Strings.Sync.syncDevicesInSyncChainTitle):"
+              
               for name in namesDevicesSyncChain where !name.isEmpty {
                 alertMessage += "\n\(name)"
               }
             }
-
+            
             let alert = UIAlertController(
               title: Strings.syncJoinChainWarningTitle,
               message: alertMessage,
@@ -423,7 +426,7 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
     }
     
     guard let devices = deviceList.devices else {
-      return (nil, nil)
+      return (nil, DeviceRetriavalError.deviceNumberError)
     }
     
     var deviceLimitLevel: SyncDeviceLimitLevel?
@@ -443,16 +446,16 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
     return (deviceLimitLevel, nil)
   }
   
-  private func fetchNamesOfDevicesInSyncChain() -> [String]? {
+  private func fetchNamesOfDevicesInSyncChain() -> [String] {
     let deviceListJSON = syncAPI.getDeviceListJSON()
     let deviceList = fetchSyncDeviceList(listJSON: deviceListJSON)
     
     if deviceList.error != nil {
-      return nil
+      return []
     }
     
     guard let devices = deviceList.devices else {
-      return nil
+      return []
     }
     
     return devices.map { $0.name ?? "" }
@@ -475,7 +478,7 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
   
   private func enableDefaultTypeAndPushSettings() {
     // Enable Bookmark Syncing and push settings
-    syncAPI.enableSyncTypes(syncProfileService: syncProfileServices)
+    syncAPI.enableSyncTypes(syncProfileService: syncProfileServices, shouldEnableBookmarks: true)
     pushSettings()
   }
   
