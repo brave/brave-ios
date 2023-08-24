@@ -359,8 +359,8 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
           let deviceLimit = retrieveDeviceLimitLevel()
           guard let deviceLimitLevel = deviceLimit.level else {
             clearSyncChainWithAlert(
-              title: "Error",
-              message: "Something went wrong while retrieving devices in sync chain.",
+              title: Strings.genericErrorTitle,
+              message: Strings.Sync.syncDeviceFetchErrorAlertDescription,
               controller: controller)
             return
           }
@@ -371,11 +371,11 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
           case .approvalNeeded:
             // Showing and alert with device list; if user answers no - leave chain, if yes - enable the bookmarks type
             var alertMessage = isCodeScanned ? Strings.Sync.syncJoinChainCameraWarning : Strings.Sync.syncJoinChainCodewordsWarning
-            alertMessage += "\n\nDevices in Sync Chain:"
+            alertMessage += "\n\n\(Strings.Sync.syncDevicesInSyncChainTitle):"
             
             if let namesDevicesSyncChain = fetchNamesOfDevicesInSyncChain() {
               for name in namesDevicesSyncChain where !name.isEmpty {
-                alertMessage += "\n \(name)"
+                alertMessage += "\n\(name)"
               }
             }
 
@@ -394,7 +394,7 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
             // Devices 10 and more - add alert to block and prevent sync
             let alert = UIAlertController(
               title: Strings.genericErrorTitle,
-              message: "Cant join sync chain. Exceeds the maximum number of devices (10)",
+              message: Strings.Sync.syncMaximumDeviceReachedErrorDescription,
               preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: Strings.OKString, style: .default) { _ in
               self.leaveIncompleteSyncChain()
@@ -468,7 +468,7 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
         return (nil, DeviceRetriavalError.decodeError)
       }
     } else {
-      Logger.module.error("\(DeviceRetriavalError.fetchError.errorDescription)") // ("Something went wrong while retrieving Sync Devices..")
+      Logger.module.error("\(DeviceRetriavalError.fetchError.errorDescription)")
       return (nil, DeviceRetriavalError.fetchError)
     }
   }
