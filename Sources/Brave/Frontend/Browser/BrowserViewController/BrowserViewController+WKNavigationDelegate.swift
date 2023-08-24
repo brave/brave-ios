@@ -529,7 +529,6 @@ extension BrowserViewController: WKNavigationDelegate {
         let result = BraveCertificateUtility.verifyTrust(serverTrust,
                                                          host: host,
                                                          port: port)
-        let certificateChain = SecTrustCopyCertificateChain(serverTrust) as? [SecCertificate] ?? []
         
         // Cert is valid and should be pinned
         if result == 0 {
@@ -545,6 +544,7 @@ extension BrowserViewController: WKNavigationDelegate {
         // Cert is invalid and cannot be pinned
         Logger.module.error("CERTIFICATE_INVALID")
         let errorCode = CFNetworkErrors.braveCertificatePinningFailed.rawValue
+        let certificateChain = SecTrustCopyCertificateChain(serverTrust) as? [SecCertificate] ?? []
         
         let underlyingError = NSError(domain: kCFErrorDomainCFNetwork as String,
                                       code: Int(errorCode),

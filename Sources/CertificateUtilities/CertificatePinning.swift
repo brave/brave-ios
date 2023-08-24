@@ -4,9 +4,8 @@
 
 import Foundation
 import Shared
+import BraveCore
 import os.log
-
-// Taken from: https://github.com/Brandon-T/Jarvis and modified to simplify
 
 public class PinningCertificateEvaluator: NSObject, URLSessionDelegate {
   struct ExcludedPinningHostUrls {
@@ -18,65 +17,63 @@ public class PinningCertificateEvaluator: NSObject, URLSessionDelegate {
   }
 
   private let hosts: [String]
-  private let certificates: [SecCertificate]
-  private let options: PinningOptions
 
-  public init(hosts: [String], options: PinningOptions = [.default, .validateHost, .anchorSpecificAndSystemTrusts]) {
+  public init(hosts: [String]) {
     self.hosts = hosts
-    self.options = options
-
-    // Load certificates in the main bundle..
-    self.certificates = {
-      let paths = Set(
-        [".cer", ".CER", ".crt", ".CRT", ".der", ".DER"].map {
-          Bundle.module.paths(forResourcesOfType: $0, inDirectory: nil)
-        }.joined())
-
-      return paths.compactMap({ path -> SecCertificate? in
-        guard let certificateData = try? Data(contentsOf: URL(fileURLWithPath: path)) as CFData else {
-          return nil
-        }
-        return SecCertificateCreateWithData(nil, certificateData)
-      })
-    }()
   }
-
-  public init(hosts: [String: SecCertificate], options: PinningOptions = [.default, .validateHost, .anchorSpecificAndSystemTrusts]) {
-    self.hosts = hosts.map({ $0.key })
-    self.certificates = hosts.map({ $0.value })
-    self.options = options
-  }
-
-  public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-
-    DispatchQueue.global(qos: .userInitiated).async {
-      // Certificate pinning
-      if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust {
-        if let serverTrust = challenge.protectionSpace.serverTrust {
-          do {
-            let host = challenge.protectionSpace.host
-            if ExcludedPinningHostUrls.urls.contains(host) {
-              return completionHandler(.performDefaultHandling, nil)
-            }
-            
-            if !self.canPinHost(host) {
-              self.fatalErrorInDebugModeIfPinningFailed()
-              throw self.error(reason: "Host not specified for pinning: \(host)")
-            }
-            
-            try self.evaluate(serverTrust, forHost: host)
-            return completionHandler(.useCredential, URLCredential(trust: serverTrust))
-          } catch {
-            Logger.module.error("\(error.localizedDescription)")
-            self.fatalErrorInDebugModeIfPinningFailed()
-            return completionHandler(.cancelAuthenticationChallenge, nil)
-          }
+  
+  nonisolated public func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge) async -> (URLSession.AuthChallengeDisposition, URLCredential?) {
+    if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust {
+      if let serverTrust = challenge.protectionSpace.serverTrust {
+        let host = challenge.protectionSpace.host
+        let port = challenge.protectionSpace.port
+        
+        if ExcludedPinningHostUrls.urls.contains(host) {
+          return (.performDefaultHandling, nil)
         }
-        self.fatalErrorInDebugModeIfPinningFailed()
-        return completionHandler(.cancelAuthenticationChallenge, nil)
+        
+        if !self.canPinHost(host) {
+          Logger.module.error("Host not specified for pinning: \(host)")
+          self.fatalErrorInDebugModeIfPinningFailed()
+          return (.cancelAuthenticationChallenge, nil)
+        }
+        
+        let result = BraveCertificateUtility.verifyTrust(serverTrust,
+                                                         host: host,
+                                                         port: port)
+        
+        // Cert is valid and should be pinned
+        if result == 0 {
+          return (.useCredential, URLCredential(trust: serverTrust))
+        }
+        
+        // Cert is valid and should not be pinned
+        // Let the system handle it and we'll show an error if the system cannot validate it
+        if result == Int32.min {
+          return (.performDefaultHandling, nil)
+        }
+        
+        // Cert is invalid and cannot be pinned
+        let errorCode = Int32.min
+        let certificateChain = SecTrustCopyCertificateChain(serverTrust) as? [SecCertificate] ?? []
+        
+        let underlyingError = NSError(domain: kCFErrorDomainCFNetwork as String,
+                                      code: Int(errorCode),
+                                      userInfo: ["_kCFStreamErrorCodeKey": Int(errorCode)])
+        
+        let error = NSError(domain: kCFErrorDomainCFNetwork as String,
+                            code: Int(errorCode),
+                            userInfo: [NSURLErrorFailingURLErrorKey: challenge.protectionSpace.urlString() as Any,
+                                       "NSErrorPeerCertificateChainKey": certificateChain,
+                                               NSUnderlyingErrorKey: underlyingError])
+        
+        print(error)
+        fatalErrorInDebugModeIfPinningFailed()
+        return (.cancelAuthenticationChallenge, nil)
       }
-      return completionHandler(.performDefaultHandling, nil)
     }
+    
+    return (.performDefaultHandling, nil)
   }
 
   private func canPinHost(_ host: String) -> Bool {
@@ -88,53 +85,34 @@ public class PinningCertificateEvaluator: NSObject, URLSessionDelegate {
   }
 
   func evaluate(_ trust: SecTrust, forHost host: String) throws {
-    // Certificate validation
-    guard !certificates.isEmpty else {
-      throw error(reason: "Empty Certificates")
+    if ExcludedPinningHostUrls.urls.contains(host) {
+      return
     }
-
-    // Certificate anchoring
-    if options.contains(.anchorSpecificTrustsOnly) || options.contains(.anchorSpecificAndSystemTrusts) {
-      // Add the certificates to the trust
-      guard SecTrustSetAnchorCertificates(trust, certificates as CFArray) == errSecSuccess else {
-        throw error(reason: "Certificate Anchor Failed")
-      }
-
-      if options.contains(.anchorSpecificTrustsOnly) {
-        // Trust only the passed in certificates (true)
-        //
-        // This is the default behaviour, however we do it explicitly to throw an exception
-        // immediately upon failure
-        // The default behaviour will silently ignore the exception until validation
-        guard SecTrustSetAnchorCertificatesOnly(trust, true) == errSecSuccess else {
-          throw error(reason: "Self-Signed Certificate Anchor Only Failed")
-        }
-      } else {
-        // Trust also the built in system certificates (false)
-        guard SecTrustSetAnchorCertificatesOnly(trust, false) == errSecSuccess else {
-          throw error(reason: "Certificate Anchor Only Failed")
-        }
-      }
+    
+    if !self.canPinHost(host) {
+      Logger.module.error("Host not specified for pinning: \(host)")
+      self.fatalErrorInDebugModeIfPinningFailed()
+      throw self.error(reason: "Host not specified for pinning: \(host)")
     }
-
-    // Default validation
-    if options.contains(.default) {
-      guard SecTrustSetPolicies(trust, SecPolicyCreateSSL(true, nil)) == errSecSuccess else {
-        throw error(reason: "Trust Set Policies Failed")
-      }
-
-      var err: CFError?
-      if !SecTrustEvaluateWithError(trust, &err) {
-        if let err = err as Error? {
-          throw error(reason: "Trust Evaluation Failed: \(err)")
-        }
-
-        throw error(reason: "Unable to Evaluate Trust")
-      }
+    
+    let result = BraveCertificateUtility.verifyTrust(trust,
+                                                     host: host,
+                                                     port: 443)
+    
+    // Cert is valid and should be pinned
+    if result == 0 {
+      return
     }
-
-    // Host validation
-    if options.contains(.validateHost) {
+    
+    // Cert is valid and should not be pinned
+    // Let the system handle it and we'll show an error if the system cannot validate it
+    if result == Int32.min {
+      // Trust also the built in system certificates (false)
+      guard SecTrustSetAnchorCertificatesOnly(trust, false) == errSecSuccess else {
+        throw error(reason: "Certificate Anchor Only Failed")
+      }
+      
+      // Validate Host
       guard SecTrustSetPolicies(trust, SecPolicyCreateSSL(true, host as CFString)) == errSecSuccess else {
         throw error(reason: "Trust Set Policies for Host Failed")
       }
@@ -147,48 +125,31 @@ public class PinningCertificateEvaluator: NSObject, URLSessionDelegate {
 
         throw error(reason: "Unable to Evaluate Trust")
       }
+      
+      return
     }
-
-    // Certificate binary matching
-    let serverCertificates = Set(
-      (SecTrustCopyCertificateChain(trust) as? [SecCertificate] ?? [])
-        .map({ SecCertificateCopyData($0) as Data })
-    )
-
-    // Set Certificate validation
-    let clientCertificates = Set(certificates.compactMap({ SecCertificateCopyData($0) as Data }))
-    if serverCertificates.isDisjoint(with: clientCertificates) {
-      throw error(reason: "Pinning Failed")
-    }
+    
+    // Cert is invalid and cannot be pinned
+    let errorCode = Int32.min
+    let certificateChain = SecTrustCopyCertificateChain(trust) as? [SecCertificate] ?? []
+    
+    let underlyingError = NSError(domain: kCFErrorDomainCFNetwork as String,
+                                  code: Int(errorCode),
+                                  userInfo: ["_kCFStreamErrorCodeKey": Int(errorCode)])
+    
+    let error = NSError(domain: kCFErrorDomainCFNetwork as String,
+                        code: Int(errorCode),
+                        userInfo: [NSURLErrorFailingURLErrorKey: host as Any,
+                                   "NSErrorPeerCertificateChainKey": certificateChain,
+                                           NSUnderlyingErrorKey: underlyingError])
+    
+    fatalErrorInDebugModeIfPinningFailed()
+    throw self.error(reason: error.localizedDescription)
   }
 
   private func fatalErrorInDebugModeIfPinningFailed() {
     if !AppConstants.buildChannel.isPublic {
       assertionFailure("An SSL Pinning error has occurred")
     }
-  }
-
-  public struct PinningOptions: OptionSet {
-    public let rawValue: Int
-
-    public init(rawValue: Int) {
-      self.rawValue = rawValue
-    }
-
-    /// System's default pinning policies
-    public static let `default` = PinningOptions(rawValue: 1 << 0)
-
-    /// Host Validation
-    public static let validateHost = PinningOptions(rawValue: 1 << 1)
-
-    /// Anchor ONLY the specified trusts passed to `PinningCertificateEvaluator.evaluate(trust:host:)`
-    public static let anchorSpecificTrustsOnly = PinningOptions(rawValue: 1 << 2)
-
-    /// Anchor the specified trusts passed to `PinningCertificateEvaluator.evaluate(trust:host:)`
-    /// Also anchors the default trusts of the System
-    public static let anchorSpecificAndSystemTrusts = PinningOptions(rawValue: 1 << 3)
-
-    /// Default pinning policies + Host Validation + Anchor the specified trusts + Anchor system trusts
-    public static let all: PinningOptions = [.default, .validateHost, .anchorSpecificAndSystemTrusts]
   }
 }
