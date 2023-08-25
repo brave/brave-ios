@@ -11,6 +11,7 @@ import Shared
 import Data
 import MediaPlayer
 import os.log
+import Preferences
 
 private extension PlaylistListViewController {
   func shareItem(_ item: PlaylistInfo, anchorView: UIView?) {
@@ -173,14 +174,14 @@ extension PlaylistListViewController: UITableViewDelegate {
           UIAlertAction(
             title: Strings.PlayList.sharePlaylistOpenInNewPrivateTabTitle, style: .default,
             handler: { [weak self] _ in
-              if isPrivateBrowsing {
-                self?.openInNewTab(currentItem, isPrivate: true)
-              } else {
+              if !isPrivateBrowsing, Preferences.Privacy.privateBrowsingLock.value {
                 self?.askForLocalAuthentication { [weak self] success, error in
                   if success {
                     self?.openInNewTab(currentItem, isPrivate: true)
                   }
                 }
+              } else {
+                self?.openInNewTab(currentItem, isPrivate: true)
               }
             }))
 

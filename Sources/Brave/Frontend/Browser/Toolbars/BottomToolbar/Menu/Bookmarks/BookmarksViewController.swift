@@ -594,16 +594,16 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
         title: Strings.openNewPrivateTabButtonTitle,
         image: UIImage(systemName: "plus.square.fill.on.square.fill"),
         handler: UIAction.deferredActionHandler { [unowned self] _ in
-          if isPrivateBrowsing {
-            self.toolbarUrlActionsDelegate?.openInNewTab(bookmarkItemURL, isPrivate: true)
-            parent?.presentingViewController?.dismiss(animated: true)
-          } else {
+          if !isPrivateBrowsing, Preferences.Privacy.privateBrowsingLock.value {
             self.askForLocalAuthentication { [weak self] success, error in
               if success {
                 self?.toolbarUrlActionsDelegate?.openInNewTab(bookmarkItemURL, isPrivate: true)
                 self?.parent?.presentingViewController?.dismiss(animated: true)
               }
             }
+          } else {
+            self.toolbarUrlActionsDelegate?.openInNewTab(bookmarkItemURL, isPrivate: true)
+            parent?.presentingViewController?.dismiss(animated: true)
           }
         })
 

@@ -985,14 +985,14 @@ extension BrowserViewController: WKUIDelegate {
           title: Strings.openNewPrivateTabButtonTitle,
           image: UIImage(named: "private_glasses", in: .module, compatibleWith: nil)!.template
         ) { _ in
-          if tabType.isPrivate {
-            self.addTab(url: url, inPrivateMode: true, currentTab: currentTab)
-          } else {
+          if !tabType.isPrivate, Preferences.Privacy.privateBrowsingLock.value {
             self.askForLocalAuthentication { [weak self] success, error in
               if success {
                 self?.addTab(url: url, inPrivateMode: true, currentTab: currentTab)
               }
             }
+          } else {
+            self.addTab(url: url, inPrivateMode: true, currentTab: currentTab)
           }
         }
         openNewPrivateTabAction.accessibilityLabel = "linkContextMenu.openInNewPrivateTab"
@@ -1015,14 +1015,14 @@ extension BrowserViewController: WKUIDelegate {
             title: Strings.openInNewPrivateWindowTitle,
             image: UIImage(braveSystemNamed: "leo.window.tab-private")
           ) { _ in
-            if tabType.isPrivate {
-              
-            } else {
+            if !tabType.isPrivate, Preferences.Privacy.privateBrowsingLock.value {
               self.askForLocalAuthentication { [weak self] success, error in
                 if success {
                   self?.openInNewWindow(url: url, isPrivate: true)
                 }
               }
+            } else {
+              self.openInNewWindow(url: url, isPrivate: true)
             }
           }
           
