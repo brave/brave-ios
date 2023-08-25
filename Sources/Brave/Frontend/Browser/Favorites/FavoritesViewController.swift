@@ -358,7 +358,11 @@ extension FavoritesViewController: UICollectionViewDelegateFlowLayout {
           let openInNewPrivateTab = UIAction(
             title: Strings.openNewPrivateTabButtonTitle,
             handler: UIAction.deferredActionHandler { _ in
-              self.action(bookmark, .opened(inNewTab: true, switchingToPrivateMode: true))
+              self.askForLocalAuthentication { [weak self] success, error in
+                if success {
+                  self?.action(bookmark, .opened(inNewTab: true, switchingToPrivateMode: true))
+                }
+              }              
             })
           urlChildren.append(openInNewPrivateTab)
         }

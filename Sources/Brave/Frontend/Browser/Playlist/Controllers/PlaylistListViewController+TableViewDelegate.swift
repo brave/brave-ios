@@ -173,7 +173,15 @@ extension PlaylistListViewController: UITableViewDelegate {
           UIAlertAction(
             title: Strings.PlayList.sharePlaylistOpenInNewPrivateTabTitle, style: .default,
             handler: { [weak self] _ in
-              self?.openInNewTab(currentItem, isPrivate: true)
+              if isPrivateBrowsing {
+                self?.openInNewTab(currentItem, isPrivate: true)
+              } else {
+                self?.askForLocalAuthentication { [weak self] success, error in
+                  if success {
+                    self?.openInNewTab(currentItem, isPrivate: true)
+                  }
+                }
+              }
             }))
 
         if !isSharedFolder {

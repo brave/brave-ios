@@ -221,7 +221,11 @@ extension BrowserViewController: TabManagerDelegate {
         title: Strings.Hotkey.newPrivateTabTitle,
         image: UIImage(systemName: "plus.square.fill.on.square.fill"),
         handler: UIAction.deferredActionHandler { [unowned self] _ in
-          self.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: true)
+          self.askForLocalAuthentication { [weak self] success, error in
+            if success {
+              self?.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: true)
+            }
+          }
         })
 
       if (UIDevice.current.userInterfaceIdiom == .pad && tabsBar.view.isHidden == true) || (UIDevice.current.userInterfaceIdiom == .phone && toolbar == nil) {

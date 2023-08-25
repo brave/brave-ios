@@ -624,11 +624,23 @@ class NewTabPageViewController: UIViewController {
           completion: { _ in }
         )
       }
-      delegate?.navigateToInput(
-        url.absoluteString,
-        inNewTab: inNewTab,
-        switchingToPrivateMode: switchingToPrivateMode
-      )
+      if tab?.isPrivate == true {
+        delegate?.navigateToInput(
+          url.absoluteString,
+          inNewTab: inNewTab,
+          switchingToPrivateMode: switchingToPrivateMode
+        )
+      } else {
+        self.askForLocalAuthentication { [weak self] success, error in
+          if success {
+            self?.delegate?.navigateToInput(
+              url.absoluteString,
+              inNewTab: inNewTab,
+              switchingToPrivateMode: switchingToPrivateMode
+            )
+          }
+        }
+      }
       // Donate Open Brave News Activity for Custom Suggestions
       let openBraveNewsActivity = ActivityShortcutManager.shared.createShortcutActivity(type: .openBraveNews)
       self.userActivity = openBraveNewsActivity

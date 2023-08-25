@@ -2987,11 +2987,23 @@ extension BrowserViewController: NewTabPageDelegate {
     guard let url = favorite.url else { return }
     switch action {
     case .opened(let inNewTab, let switchingToPrivateMode):
-      navigateToInput(
-        url,
-        inNewTab: inNewTab,
-        switchingToPrivateMode: switchingToPrivateMode
-      )
+      if privateBrowsingManager.isPrivateBrowsing {
+        navigateToInput(
+          url,
+          inNewTab: inNewTab,
+          switchingToPrivateMode: switchingToPrivateMode
+        )
+      } else {
+        self.askForLocalAuthentication { [weak self] success, error in
+          if success {
+            self?.navigateToInput(
+              url,
+              inNewTab: inNewTab,
+              switchingToPrivateMode: switchingToPrivateMode
+            )
+          }
+        }
+      }
     case .edited:
       guard let title = favorite.displayTitle, let urlString = favorite.url else { return }
       let editPopup =

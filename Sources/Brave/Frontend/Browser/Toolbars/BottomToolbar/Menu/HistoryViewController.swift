@@ -321,7 +321,15 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
         title: Strings.openNewPrivateTabButtonTitle,
         image: UIImage(systemName: "plus.square.fill.on.square.fill"),
         handler: UIAction.deferredActionHandler { _ in
-          self.toolbarUrlActionsDelegate?.openInNewTab(historyItemURL, isPrivate: true)
+          if self.isPrivateBrowsing {
+            self.toolbarUrlActionsDelegate?.openInNewTab(historyItemURL, isPrivate: true)
+          } else {
+            self.askForLocalAuthentication { [weak self] success, error in
+              if success {
+                self?.toolbarUrlActionsDelegate?.openInNewTab(historyItemURL, isPrivate: true)
+              }
+            }
+          }
         })
 
       let copyAction = UIAction(
