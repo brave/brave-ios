@@ -264,7 +264,7 @@ extension PlaylistListViewController: UITableViewDelegate {
                 UIAction(
                   title: Strings.PlayList.sharePlaylistOpenInNewTabTitle, image: UIImage(systemName: "plus.square.on.square"),
                   handler: { [weak self] _ in
-                    self?.openInPrivateTabWithAuthentication(currentItem)
+                    self?.openInNewTab(currentItem, isPrivate: false)
                   }))
             }
 
@@ -272,7 +272,7 @@ extension PlaylistListViewController: UITableViewDelegate {
               UIAction(
                 title: Strings.PlayList.sharePlaylistOpenInNewPrivateTabTitle, image: UIImage(systemName: "plus.square.fill.on.square.fill"),
                 handler: { [weak self] _ in
-                  self?.openInNewTab(currentItem, isPrivate: true)
+                  self?.openInPrivateTabWithAuthentication(currentItem)
                 }))
 
             return actions
