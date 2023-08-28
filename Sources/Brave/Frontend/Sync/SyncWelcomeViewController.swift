@@ -382,7 +382,7 @@ extension SyncWelcomeViewController: SyncPairControllerDelegate {
               }
             }
             
-            alertMessage = "\n\n \(Strings.Sync.syncJoinChainCodewordsWarning)"
+            alertMessage += "\n\n \(Strings.Sync.syncJoinChainCodewordsWarning)"
 
             let alert = UIAlertController(
               title: Strings.syncJoinChainWarningTitle,
