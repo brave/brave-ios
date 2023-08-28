@@ -691,6 +691,7 @@ public class BrowserViewController: UIViewController {
   
   @objc func appWillTerminateNotification() {
     tabManager.saveAllTabs()
+    tabManager.removePrivateWindows()
   }
   
   @objc private func tappedCollapsedURLBar() {
@@ -983,7 +984,7 @@ public class BrowserViewController: UIViewController {
   }
 
   private func setupTabs() {
-    let isPrivate = Preferences.Privacy.privateBrowsingOnly.value
+    let isPrivate = privateBrowsingManager.isPrivateBrowsing || Preferences.Privacy.privateBrowsingOnly.value
     let noTabsAdded = self.tabManager.tabsForCurrentMode.isEmpty
     
     var tabToSelect: Tab?
