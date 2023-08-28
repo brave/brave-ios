@@ -6,13 +6,22 @@
 import XCTest
 import Combine
 import BraveCore
+import Preferences
 @testable import BraveWallet
 
 @MainActor class NetworkStoreTests: XCTestCase {
   
+  override func setUp() {
+    Preferences.Wallet.showTestNetworks.reset()
+  }
+  override func tearDown() {
+    Preferences.Wallet.showTestNetworks.reset()
+  }
+  
   private var cancellables: Set<AnyCancellable> = .init()
   
   private func setupServices() -> (BraveWallet.TestKeyringService, BraveWallet.TestJsonRpcService, BraveWallet.TestBraveWalletService, BraveWallet.TestSwapService) {
+    Preferences.Wallet.showTestNetworks.value = true
     let currentNetwork: BraveWallet.NetworkInfo = .mockMainnet
     let currentChainId = currentNetwork.chainId
     let allNetworks: [BraveWallet.CoinType: [BraveWallet.NetworkInfo]] = [

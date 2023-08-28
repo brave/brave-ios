@@ -6,9 +6,17 @@
 import Combine
 import XCTest
 import BraveCore
+import Preferences
 @testable import BraveWallet
 
 @MainActor class TransactionConfirmationStoreTests: XCTestCase {
+  
+  override func setUp() {
+    Preferences.Wallet.showTestNetworks.reset()
+  }
+  override func tearDown() {
+    Preferences.Wallet.showTestNetworks.reset()
+  }
   
   private var cancellables: Set<AnyCancellable> = .init()
   
@@ -28,6 +36,8 @@ import BraveCore
     makeErc20ApproveDataSuccess: Bool = true,
     setDataForUnapprovedTransactionSuccess: Bool = true
   ) -> TransactionConfirmationStore {
+    Preferences.Wallet.showTestNetworks.value = true
+    
     let mockEthAssetPrice: BraveWallet.AssetPrice = .init(fromAsset: "eth", toAsset: "usd", price: "3059.99", assetTimeframeChange: "-57.23")
     let mockSolAssetPrice: BraveWallet.AssetPrice = .init(fromAsset: "sol", toAsset: "usd", price: "39.57", assetTimeframeChange: "-57.23")
     let formatter = WeiFormatter(decimalFormatStyle: .decimals(precision: 18))
