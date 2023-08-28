@@ -12,7 +12,7 @@ import Preferences
 @MainActor class SelectAccountTokenStoreTests: XCTestCase {
   
   override func setUp() {
-    Preferences.Wallet.showTestNetworks.reset()
+    Preferences.Wallet.showTestNetworks.value = true
   }
   override func tearDown() {
     Preferences.Wallet.showTestNetworks.reset()
@@ -79,8 +79,6 @@ import Preferences
   /// Test `update()` will update `accountSections` for each account, and verify
   /// `filteredAccountSections` displays non-zero balance by default.
   func testUpdate() async {
-    Preferences.Wallet.showTestNetworks.value = true
-    
     let mockETHBalance: Double = 0.896
     let mockETHPrice: String = "3059.99" // ETH value = $2741.75104
     let mockUSDCBalance: Double = 4
@@ -297,8 +295,6 @@ import Preferences
   }
   
   func testNetworkFilter() {
-    Preferences.Wallet.showTestNetworks.value = true
-    
     let keyringService = BraveWallet.TestKeyringService()
     let rpcService = BraveWallet.TestJsonRpcService()
     let walletService = BraveWallet.TestBraveWalletService()

@@ -12,7 +12,7 @@ import Preferences
 @MainActor class TransactionConfirmationStoreTests: XCTestCase {
   
   override func setUp() {
-    Preferences.Wallet.showTestNetworks.reset()
+    Preferences.Wallet.showTestNetworks.value = true
   }
   override func tearDown() {
     Preferences.Wallet.showTestNetworks.reset()
@@ -36,8 +36,6 @@ import Preferences
     makeErc20ApproveDataSuccess: Bool = true,
     setDataForUnapprovedTransactionSuccess: Bool = true
   ) -> TransactionConfirmationStore {
-    Preferences.Wallet.showTestNetworks.value = true
-    
     let mockEthAssetPrice: BraveWallet.AssetPrice = .init(fromAsset: "eth", toAsset: "usd", price: "3059.99", assetTimeframeChange: "-57.23")
     let mockSolAssetPrice: BraveWallet.AssetPrice = .init(fromAsset: "sol", toAsset: "usd", price: "39.57", assetTimeframeChange: "-57.23")
     let formatter = WeiFormatter(decimalFormatStyle: .decimals(precision: 18))

@@ -12,7 +12,7 @@ import Preferences
 class TransactionsActivityStoreTests: XCTestCase {
   
   override func setUp() {
-    Preferences.Wallet.showTestNetworks.reset()
+    Preferences.Wallet.showTestNetworks.value = true
   }
   override func tearDown() {
     Preferences.Wallet.showTestNetworks.reset()
@@ -43,8 +43,6 @@ class TransactionsActivityStoreTests: XCTestCase {
   ]
   
   func testUpdate() {
-    Preferences.Wallet.showTestNetworks.value = true
-    
     let keyringService = BraveWallet.TestKeyringService()
     keyringService._addObserver = { _ in }
     keyringService._keyringInfo = { keyringId, completion in

@@ -12,7 +12,7 @@ import Preferences
 @MainActor class NetworkStoreTests: XCTestCase {
   
   override func setUp() {
-    Preferences.Wallet.showTestNetworks.reset()
+    Preferences.Wallet.showTestNetworks.value = true
   }
   override func tearDown() {
     Preferences.Wallet.showTestNetworks.reset()
@@ -21,7 +21,6 @@ import Preferences
   private var cancellables: Set<AnyCancellable> = .init()
   
   private func setupServices() -> (BraveWallet.TestKeyringService, BraveWallet.TestJsonRpcService, BraveWallet.TestBraveWalletService, BraveWallet.TestSwapService) {
-    Preferences.Wallet.showTestNetworks.value = true
     let currentNetwork: BraveWallet.NetworkInfo = .mockMainnet
     let currentChainId = currentNetwork.chainId
     let allNetworks: [BraveWallet.CoinType: [BraveWallet.NetworkInfo]] = [
