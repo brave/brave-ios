@@ -624,7 +624,7 @@ class NewTabPageViewController: UIViewController {
           completion: { _ in }
         )
       }
-      if tab?.isPrivate == false, Preferences.Privacy.privateBrowsingLock.value {
+      if switchingToPrivateMode, Preferences.Privacy.privateBrowsingLock.value {
         self.askForLocalAuthentication { [weak self] success, error in
           if success {
             self?.delegate?.navigateToInput(

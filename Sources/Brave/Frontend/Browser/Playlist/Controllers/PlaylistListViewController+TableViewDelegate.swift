@@ -107,6 +107,19 @@ private extension PlaylistListViewController {
       }
     }
   }
+  
+  func openInPrivateTabWithAuthentication(_ item: PlaylistInfo) {
+    if !isPrivateBrowsing, Preferences.Privacy.privateBrowsingLock.value {
+      askForLocalAuthentication { [weak self] success, _ in
+        if success {
+          self?.openInNewTab(item, isPrivate: true)
+        }
+      }
+    } else {
+      self.openInNewTab(item, isPrivate: true)
+    }
+  }
+  
 }
 
 // MARK: UITableViewDelegate
@@ -174,15 +187,7 @@ extension PlaylistListViewController: UITableViewDelegate {
           UIAlertAction(
             title: Strings.PlayList.sharePlaylistOpenInNewPrivateTabTitle, style: .default,
             handler: { [weak self] _ in
-              if !isPrivateBrowsing, Preferences.Privacy.privateBrowsingLock.value {
-                self?.askForLocalAuthentication { [weak self] success, error in
-                  if success {
-                    self?.openInNewTab(currentItem, isPrivate: true)
-                  }
-                }
-              } else {
-                self?.openInNewTab(currentItem, isPrivate: true)
-              }
+              self?.openInPrivateTabWithAuthentication(currentItem)
             }))
 
         if !isSharedFolder {
@@ -259,7 +264,7 @@ extension PlaylistListViewController: UITableViewDelegate {
                 UIAction(
                   title: Strings.PlayList.sharePlaylistOpenInNewTabTitle, image: UIImage(systemName: "plus.square.on.square"),
                   handler: { [weak self] _ in
-                    self?.openInNewTab(currentItem, isPrivate: false)
+                    self?.openInPrivateTabWithAuthentication(currentItem)
                   }))
             }
 

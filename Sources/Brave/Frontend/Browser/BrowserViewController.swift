@@ -2987,7 +2987,7 @@ extension BrowserViewController: NewTabPageDelegate {
     guard let url = favorite.url else { return }
     switch action {
     case .opened(let inNewTab, let switchingToPrivateMode):
-      if !privateBrowsingManager.isPrivateBrowsing, Preferences.Privacy.privateBrowsingLock.value {
+      if switchingToPrivateMode, Preferences.Privacy.privateBrowsingLock.value {
         self.askForLocalAuthentication { [weak self] success, error in
           if success {
             self?.navigateToInput(
