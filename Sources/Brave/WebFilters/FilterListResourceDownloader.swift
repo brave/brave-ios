@@ -257,7 +257,7 @@ public class FilterListResourceDownloader {
     if loadContentBlockers {
       let blocklistType = ContentBlockerManager.BlocklistType.filterList(componentId: componentId, isAlwaysAggressive: isAlwaysAggressive)
       let modes = await blocklistType.allowedModes.asyncFilter { mode in
-        if let loadedVersion = await FilterListStorage.shared.loadedRuleListVersions.value[componentId] {
+        if let loadedVersion = await FilterListStorage.shared.loadedRuleListVersions.isolatedValue[componentId] {
           // if we know the loaded version we can just check it (optimization)
           return loadedVersion != version
         } else {
@@ -277,7 +277,9 @@ public class FilterListResourceDownloader {
           options: .all, modes: modes
         )
         
-        await FilterListStorage.shared.loadedRuleListVersions.value[componentId] = version
+        await MainActor.run {
+          FilterListStorage.shared.loadedRuleListVersions.isolatedValue[componentId] = version
+        }
       } catch {
         ContentBlockerManager.log.error(
           "Failed to convert filter list `\(componentId)` to content blockers: \(error)"

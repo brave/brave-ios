@@ -79,6 +79,14 @@ extension Preferences {
     public func reset() {
       value = defaultValue
     }
+    
+    // An accessor to `value` which is MainActor isolated in case we need to ensure
+    // Note it would be best to make `value` MainActor isolated
+    // but this results in very large changes
+    @MainActor public var isolatedValue: ValueType {
+      get { return value }
+      set { value = newValue }
+    }
 
     /// Creates a preference
     public init(key: String, default: ValueType, container: UserDefaults = Preferences.defaultContainer) {
