@@ -7,9 +7,17 @@ import XCTest
 import Combine
 import BraveCore
 import BigNumber
+import Preferences
 @testable import BraveWallet
 
 class SendTokenStoreTests: XCTestCase {
+  override func setUp() {
+    Preferences.Wallet.showTestNetworks.value = true
+  }
+  override func tearDown() {
+    Preferences.Wallet.showTestNetworks.reset()
+  }
+  
   private var cancellables: Set<AnyCancellable> = []
   private let batSymbol = "BAT"
   
