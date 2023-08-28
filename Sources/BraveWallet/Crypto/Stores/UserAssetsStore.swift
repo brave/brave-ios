@@ -7,6 +7,7 @@ import Foundation
 import BraveCore
 import Combine
 import Data
+import Preferences
 
 public class AssetStore: ObservableObject, Equatable {
   @Published var token: BraveWallet.BlockchainToken
@@ -89,9 +90,16 @@ public class UserAssetsStore: ObservableObject {
     Task { @MainActor in
       // setup network filters if not currently setup
       if self.networkFilters.isEmpty {
-        self.networkFilters = await self.rpcService.allNetworksForSupportedCoins().map {
-          .init(isSelected: true, model: $0)
-        }
+        self.networkFilters = await self.rpcService.allNetworksForSupportedCoins()
+          .filter { network in
+            if !Preferences.Wallet.showTestNetworks.value { // filter out test networks
+              return !WalletConstants.supportedTestNetworkChainIds.contains(where: { $0 == network.chainId })
+            }
+            return true
+          }
+          .map {
+            .init(isSelected: true, model: $0)
+          }
       }
       let networks: [BraveWallet.NetworkInfo] = self.networkFilters.filter(\.isSelected).map(\.model)
       let allUserAssets = assetManager.getAllUserAssetsInNetworkAssets(networks: networks)
