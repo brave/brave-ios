@@ -723,6 +723,9 @@ extension PortfolioStore: PreferencesObserver {
   public func preferencesDidChange(for key: String) {
     guard !isSavingFilters else { return }
     update()
+    if key == Preferences.Wallet.showTestNetworks.key {
+      userAssetsStore.networkFilters.removeAll()
+    }
   }
 }
 
