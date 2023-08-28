@@ -295,7 +295,7 @@ extension BraveWalletJsonRpcService {
   /// Returns an array of all networks for the supported coin types. Result will exclude test networks if test networks is set to
   /// not shown in Wallet Settings
   @MainActor func allNetworksForSupportedCoins(respectTestnetPreference: Bool = true) async -> [BraveWallet.NetworkInfo] {
-    await allNetworks(for: WalletConstants.supportedCoinTypes.elements, respectTestnetPreference: respectTestnetPreference)
+    await allNetworks(for: WalletConstants.supportedCoinTypes.coins().elements, respectTestnetPreference: respectTestnetPreference)
   }
 
   /// Returns an array of all networks for givin coins. Result will exclude test networks if test networks is set to
