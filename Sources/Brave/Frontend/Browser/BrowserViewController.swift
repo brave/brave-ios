@@ -3177,9 +3177,8 @@ extension BrowserViewController: PreferencesObserver {
       if Preferences.Privacy.screenTimeEnabled.value {
         screenTimeViewController = STWebpageController()
         if let tab = tabManager.selectedTab {
-          recordScreentimeUsage(for: tab)
+          recordScreenTimeUsage(for: tab)
         }
-        updateViewConstraints()
       } else {
         screenTimeViewController?.view.removeFromSuperview()
         screenTimeViewController?.removeFromParent()
