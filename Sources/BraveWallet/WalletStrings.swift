@@ -3254,7 +3254,7 @@ extension Strings {
       "wallet.stripeNetworkProviderDescription",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Instantly buy crypto with credit card, debit card, or bank account on crypto.link.com",
+      value: "Pay with credit, debit, bank account.",
       comment: "The description of one of the 'Stripe' provider."
     )
     public static let solanaDappTransactionTitle = NSLocalizedString(
