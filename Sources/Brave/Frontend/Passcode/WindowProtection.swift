@@ -14,7 +14,7 @@ import SwiftKeychainWrapper
 import os.log
 
 public enum AuthViewType {
-  case general, sync, tabTray, passwords
+  case general, widget, sync, tabTray, passwords
 }
 
 public class WindowProtection {
@@ -217,6 +217,10 @@ public class WindowProtection {
     }
     
     lockedViewController.unlockButton.isHidden = true
+    if viewType == .widget {
+      isCancellable = false
+    }
+    
     context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: Strings.authenticationLoginsTouchReason) { success, error in
       DispatchQueue.main.async { [self] in
         if success {
@@ -231,8 +235,8 @@ public class WindowProtection {
               completion?(true, nil)
             })
         } else {
-          lockedViewController.unlockButton.isHidden = viewType == .general
-          
+          lockedViewController.unlockButton.isHidden = viewType == .general || viewType == .widget
+
           let errorPolicy = error as? LAError
           completion?(false, errorPolicy?.code)
           
