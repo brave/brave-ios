@@ -33,7 +33,7 @@ extension BraveWalletTxService {
           for chainId in chainIdsForKeyringCoin {
             for info in keyring.accountInfos {
               group.addTask { @MainActor in
-                await self.allTransactionInfo(info.coin, chainId: chainId, from: info.address)
+                await self.allTransactionInfo(info.coin, chainId: chainId, from: info.accountId)
               }
             }
           }
@@ -57,7 +57,7 @@ extension BraveWalletTxService {
       body: { @MainActor group in
         for network in networks {
           group.addTask { @MainActor in
-            await self.allTransactionInfo(accountInfo.coin, chainId: network.chainId, from: accountInfo.address)
+            await self.allTransactionInfo(accountInfo.coin, chainId: network.chainId, from: accountInfo.accountId)
           }
         }
         var allTx: [BraveWallet.TransactionInfo] = []

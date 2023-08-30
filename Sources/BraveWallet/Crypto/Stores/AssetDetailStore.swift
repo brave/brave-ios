@@ -291,7 +291,7 @@ class AssetDetailStore: ObservableObject {
           await self.txService.allTransactionInfo(
             network.coin,
             chainId: network.chainId,
-            from: account.address
+            from: account.accountId
           )
         }
       }
