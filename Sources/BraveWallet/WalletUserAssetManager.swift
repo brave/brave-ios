@@ -91,7 +91,7 @@ public class WalletUserAssetManager: WalletUserAssetManagerType {
   public func migrateUserAssets(completion: (() -> Void)? = nil) {
     Task { @MainActor in
       if !Preferences.Wallet.migrateCoreToWalletUserAssetCompleted.value {
-        migrateUserAssets(for: Array(WalletConstants.supportedCoinTypes.coins()), completion: completion)
+        migrateUserAssets(for: Array(WalletConstants.supportedCoinTypes()), completion: completion)
       } else {
         let allNetworks = await rpcService.allNetworksForSupportedCoins(respectTestnetPreference: false)
         DataController.performOnMainContext { context in
@@ -109,7 +109,7 @@ public class WalletUserAssetManager: WalletUserAssetManagerType {
   private func allNewCoinsIntroduced(networks: [BraveWallet.NetworkInfo], context: NSManagedObjectContext) -> [BraveWallet.CoinType] {
     guard let assetGroupIds = WalletUserAssetGroup.getAllGroups(context: context)?.map({ group in
       group.groupId
-    }) else { return WalletConstants.supportedCoinTypes.coins().elements }
+    }) else { return WalletConstants.supportedCoinTypes().elements }
     var newCoins: Set<BraveWallet.CoinType> = []
     for network in networks where !assetGroupIds.contains("\(network.coin.rawValue).\(network.chainId)") {
       newCoins.insert(network.coin)

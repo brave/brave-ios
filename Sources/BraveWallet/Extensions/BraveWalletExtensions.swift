@@ -252,6 +252,18 @@ extension BraveWallet.NetworkInfo {
   var walletUserAssetGroupId: String {
     "\(coin.rawValue).\(chainId)"
   }
+  
+  /// Generate the link for a submitted transaction with given transaction hash and coin type. 
+  func txBlockExplorerLink(txHash: String, for coin: BraveWallet.CoinType) -> URL? {
+    if coin != .fil,
+       let baseURL = blockExplorerUrls.first.map(URL.init(string:)) {
+      return baseURL?.appendingPathComponent("tx/\(txHash)")
+    } else if var urlComps = blockExplorerUrls.first.map(URLComponents.init(string:)) {
+      urlComps?.queryItems = [URLQueryItem(name: "cid", value: txHash)]
+      return urlComps?.url
+    }
+    return nil
+  }
 }
 
 extension BraveWallet.BlockchainToken {

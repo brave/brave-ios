@@ -139,7 +139,8 @@ import Preferences
     
     let keyringService = BraveWallet.TestKeyringService()
     keyringService._keyringInfo = { keyringId, completion in
-      if keyringId == BraveWallet.KeyringId.default {
+      switch keyringId {
+      case .default:
         let keyring: BraveWallet.KeyringInfo = .init(
           id: BraveWallet.KeyringId.default,
           isKeyringCreated: true,
@@ -148,7 +149,7 @@ import Preferences
           accountInfos: [.mockEthAccount, self.mockEthAccount2]
         )
         completion(keyring)
-      } else if keyringId == BraveWallet.KeyringId.solana {
+      case .solana:
         let keyring: BraveWallet.KeyringInfo = .init(
           id: BraveWallet.KeyringId.solana,
           isKeyringCreated: true,
@@ -157,10 +158,12 @@ import Preferences
           accountInfos: [.mockSolAccount]
         )
         completion(keyring)
-      } else if keyringId == BraveWallet.KeyringId.filecoin {
+      case .filecoin:
         completion(.mockFilecoinKeyringInfo)
-      } else {
+      case .filecoinTestnet:
         completion(.mockFilecoinTestnetKeyringInfo)
+      default:
+        completion(.mockDefaultKeyringInfo)
       }
     }
     let rpcService = BraveWallet.TestJsonRpcService()

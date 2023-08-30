@@ -91,7 +91,7 @@ struct AddAccountView: View {
   }
   
   private var showCoinSelection: Bool {
-    preSelectedCoin == nil && WalletConstants.supportedCoinTypes.coins().count > 1
+    preSelectedCoin == nil && WalletConstants.supportedCoinTypes().count > 1
   }
   
   private var navigationTitle: String {
@@ -152,7 +152,7 @@ struct AddAccountView: View {
           title: Text(Strings.Wallet.coinTypeSelectionHeader)
         )
       ) {
-        ForEach(WalletConstants.supportedCoinTypes.coins().elements) { coin in
+        ForEach(WalletConstants.supportedCoinTypes().elements) { coin in
           NavigationLink(
             tag: coin,
             selection: $selectedCoin) {

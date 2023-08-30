@@ -52,15 +52,16 @@ class TransactionsActivityStoreTests: XCTestCase {
     let keyringService = BraveWallet.TestKeyringService()
     keyringService._addObserver = { _ in }
     keyringService._keyringInfo = { keyringId, completion in
-      if keyringId == BraveWallet.KeyringId.default {
+      switch keyringId {
+      case .default:
         completion(.mockDefaultKeyringInfo)
-      } else if keyringId == .solana {
+      case .solana:
         completion(.mockSolanaKeyringInfo)
-      } else if keyringId == .filecoin {
+      case .filecoin:
         completion(.mockFilecoinKeyringInfo)
-      } else if keyringId == .filecoinTestnet {
+      case .filecoinTestnet:
         completion(.mockFilecoinTestnetKeyringInfo)
-      } else {
+      default:
         completion(.mockDefaultKeyringInfo)
       }
     }

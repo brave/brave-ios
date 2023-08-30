@@ -192,9 +192,7 @@ import Preferences
       .sink { allChains in
         defer { allChainsExpectation.fulfill() }
         XCTAssertEqual(allChains.count, expectedAllChains.count)
-        for chain in allChains {
-          XCTAssertTrue(expectedAllChains.contains(chain))
-        }
+        XCTAssertTrue(allChains.allSatisfy(expectedAllChains.contains(_:)))
       }
       .store(in: &cancellables)
     

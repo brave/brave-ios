@@ -40,17 +40,9 @@ struct TransactionStatusView: View {
           .buttonStyle(BraveFilledButtonStyle(size: .large))
           Button {
             if let tx = confirmationStore.allTxs.first(where: { $0.id == confirmationStore.activeTransactionId }),
-               let txNetwork = networkStore.allChains.first(where: { $0.chainId == tx.chainId }) {
-              if txNetwork.coin != .fil,
-                 let baseURL = txNetwork.blockExplorerUrls.first.map(URL.init(string:)),
-                 let url = baseURL?.appendingPathComponent("tx/\(tx.txHash)") {
-                openWalletURL(url)
-              } else if var urlComps = txNetwork.blockExplorerUrls.first.map(URLComponents.init(string:)) {
-                urlComps?.queryItems = [URLQueryItem(name: "cid", value: tx.txHash)]
-                if let url = urlComps?.url {
-                  openWalletURL(url)
-                }
-              }
+               let txNetwork = networkStore.allChains.first(where: { $0.chainId == tx.chainId }),
+               let url = txNetwork.txBlockExplorerLink(txHash: tx.txHash, for: txNetwork.coin) {
+              openWalletURL(url)
             }
           } label: {
             HStack {

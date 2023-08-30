@@ -334,7 +334,7 @@ public class PortfolioStore: ObservableObject {
       self.isLoadingBalances = true
       self.allAccounts = await keyringService.allAccounts().accounts
         .filter { account in
-          WalletConstants.supportedCoinTypes.coins().contains(account.coin)
+          WalletConstants.supportedCoinTypes().contains(account.coin)
         }
       self.allNetworks = await rpcService.allNetworksForSupportedCoins()
       let filters = self.filters

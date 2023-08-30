@@ -293,11 +293,11 @@ import Preferences
     let mockAssetManager = TestableWalletUserAssetManager()
     mockAssetManager._getAllVisibleAssetsInNetworkAssets = { networks in
       [
-        NetworkAssets(network: .mockMainnet, tokens: mockEthUserAssets.filter({ $0.visible == true }), sortOrder: 0),
-        NetworkAssets(network: .mockSolana, tokens: mockSolUserAssets.filter({ $0.visible == true }), sortOrder: 1),
-        NetworkAssets(network: .mockGoerli, tokens: mockEthGoerliUserAssets.filter({ $0.visible == true }), sortOrder: 2),
-        NetworkAssets(network: .mockFilecoinMainnet, tokens: mockFilUserAssets.filter({ $0.visible == true }), sortOrder: 3),
-        NetworkAssets(network: .mockFilecoinTestnet, tokens: mockFilTestnetUserAssets.filter({ $0.visible == true }), sortOrder: 4)
+        NetworkAssets(network: .mockMainnet, tokens: mockEthUserAssets.filter(\.visible), sortOrder: 0),
+        NetworkAssets(network: .mockSolana, tokens: mockSolUserAssets.filter(\.visible), sortOrder: 1),
+        NetworkAssets(network: .mockGoerli, tokens: mockEthGoerliUserAssets.filter(\.visible), sortOrder: 2),
+        NetworkAssets(network: .mockFilecoinMainnet, tokens: mockFilUserAssets.filter(\.visible), sortOrder: 3),
+        NetworkAssets(network: .mockFilecoinTestnet, tokens: mockFilTestnetUserAssets.filter(\.visible), sortOrder: 4)
       ].filter { networkAsset in networks.contains(where: { $0 == networkAsset.network }) }
     }
     return PortfolioStore(
