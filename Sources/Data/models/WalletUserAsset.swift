@@ -72,7 +72,7 @@ public final class WalletUserAsset: NSManagedObject, CRUD {
     self.isERC721 = asset.isErc721
     self.isERC1155 = asset.isErc1155
     self.isNFT = asset.isNft
-    self.isSpam = false
+    self.isSpam = asset.isSpam
     self.symbol = asset.symbol
     self.decimals = asset.decimals
     self.visible = asset.visible
