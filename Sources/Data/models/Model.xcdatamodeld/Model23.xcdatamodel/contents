@@ -218,7 +218,7 @@
         <attribute name="isERC721" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="isERC1155" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="isNFT" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
-        <attribute name="isSpam" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="isSpam" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="logo" optional="YES" attributeType="String"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="symbol" optional="YES" attributeType="String"/>
