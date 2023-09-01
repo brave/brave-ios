@@ -13,7 +13,7 @@ import BraveUI
 import os.log
 
 public enum AuthViewType {
-  case general, widget, sync, tabTray, passwords
+  case external, general, sync, tabTray, passwords
 }
 
 public class WindowProtection {
@@ -164,7 +164,7 @@ public class WindowProtection {
       .sink(receiveValue: { [weak self] _ in
         guard let self = self else { return }
         self.context = LAContext()  // Reset context for new session
-        self.updateVisibleStatusForForeground()
+        self.updateVisibleStatusForForeground(viewType: .external)
       })
       .store(in: &cancellables)
   }
@@ -216,7 +216,7 @@ public class WindowProtection {
     }
     
     lockedViewController.unlockButton.isHidden = true
-    if viewType == .widget {
+    if viewType == .external {
       isCancellable = false
     }
     
@@ -234,7 +234,7 @@ public class WindowProtection {
               completion?(true, nil)
             })
         } else {
-          lockedViewController.unlockButton.isHidden = viewType == .general || viewType == .widget
+          lockedViewController.unlockButton.isHidden = viewType == .general
 
           let errorPolicy = error as? LAError
           completion?(false, errorPolicy?.code)
