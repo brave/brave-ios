@@ -30,24 +30,55 @@ if (window.isSecureContext) {
     }));
   }
   
-  const provider = {
-    value: {
-      chainId: undefined,
-      networkVersion: undefined,
-      selectedAddress: undefined,
-      isMetaMask: true,
-      isBraveWallet: true,
-      request: $(function (args) /* -> Promise<unknown> */  {
+  const provider = {value: {}};
+  $Object.defineProperty(window, 'ethereum', provider);
+  $Object.defineProperty(window, 'braveEthereum', provider);
+  // When using `$Object.defineProperties` & setting `writable: false` we cannot
+  // update properties using `evaluateSafeJavaScript` / `updateEthereumProperties`.
+  // `chainId`, `networkVersion`, `selectedAddress` differ from desktop (are
+  // writable) because need to update in `updateEthereumProperties`
+  $Object.defineProperties(window.ethereum, {
+    chainId: {
+      value: undefined,
+      writable: true, // writable so `updateEthereumProperties()` can update.
+    },
+    networkVersion: {
+      value: undefined,
+      writable: true, // writable so `updateEthereumProperties()` can update.
+    },
+    selectedAddress: {
+      value: true,
+      writable: true, // writable so `updateEthereumProperties()` can update.
+    },
+    isBraveWallet: {
+      value: true,
+      writable: false,
+    },
+    isMetaMask: {
+      value: true,
+      writable: true, // https://github.com/brave/brave-browser/issues/22213
+    },
+    request: {
+      value: $(function (args) /* -> Promise<unknown> */  {
         return post('request', args)
       }),
-      isConnected: $(function() /* -> bool */ {
+      writable: false,
+    },
+    isConnected: {
+      value: $(function() /* -> bool */ {
         return true;
       }),
-      enable: $(function() /* -> void */ {
+      writable: false
+    },
+    enable: {
+      value: $(function() /* -> void */ {
         return post('enable', {})
       }),
-      // ethereum.sendAsync(payload: JsonRpcRequest, callback: JsonRpcCallback): void;
-      sendAsync: $(function(payload, callback) {
+      writable: false,
+    },
+    // ethereum.sendAsync(payload: JsonRpcRequest, callback: JsonRpcCallback): void;
+    sendAsync: {
+      value: $(function(payload, callback) {
         post('sendAsync', payload)
           .then((response) => {
             callback(null, response)
@@ -56,12 +87,15 @@ if (window.isSecureContext) {
             callback(response, null)
           })
       }),
-      /*
-      Available overloads for send:
-        ethereum.send(payload: JsonRpcRequest, callback: JsonRpcCallback): void;
-        ethereum.send(method: string, params?: Array<unknown>): Promise<JsonRpcResponse>;
-      */
-      send: $(function(
+      writable: false,
+    },
+    /*
+    Available overloads for send:
+      ethereum.send(payload: JsonRpcRequest, callback: JsonRpcCallback): void;
+      ethereum.send(method: string, params?: Array<unknown>): Promise<JsonRpcResponse>;
+    */
+    send: {
+      value: $(function(
         methodOrPayload /* : string or JsonRpcRequest */,
         paramsOrCallback /*  : Array<unknown> or JsonRpcCallback */
       ) {
@@ -89,13 +123,9 @@ if (window.isSecureContext) {
           }
         }
       }),
-      isUnlocked: $(function() /* -> Promise<boolean> */ {
-        return post('isUnlocked', {})
-      }),
+      writable: true, // https://github.com/brave/brave-browser/issues/25078
     }
-  };
-  $Object.defineProperty(window, 'ethereum', provider);
-  $Object.defineProperty(window, 'braveEthereum', provider);
+  });
 }
   
 });
