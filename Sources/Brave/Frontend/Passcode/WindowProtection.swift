@@ -210,6 +210,8 @@ public class WindowProtection {
   }
 
   private func presentLocalAuthentication(viewType: AuthViewType, completion: ((Bool, LAError.Code?) -> Void)? = nil) {
+    self.viewType = viewType
+
     if !context.canEvaluatePolicy(.deviceOwnerAuthentication, error: nil) {
       completion?(false, .passcodeNotSet)
       return
