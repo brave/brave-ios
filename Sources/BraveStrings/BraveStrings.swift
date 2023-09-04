@@ -3304,7 +3304,7 @@ extension Strings {
         comment: "The message displayed in alert when the maxmium of devices is reached")
     public static let syncJoinChainWarningTitle =
     NSLocalizedString(
-      "ysnc.syncJoinChainWarningTitle",
+      "sync.syncJoinChainWarningTitle",
       tableName: "BraveShared",
       bundle: .module,
       value: "Device Confirmation",
