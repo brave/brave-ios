@@ -247,25 +247,41 @@ window.__firefox__.execute(function($) {
     // always be within the expected range of -1 and 1.
     // This small decrease should not affect affect legitimite users of this api.
     // But will affect fingerprinters by introducing a small random change.
-    const fudgeFactor = args['fudgeFactor']
-    farbleAudio(fudgeFactor)
+    try {
+      const fudgeFactor = args['fudgeFactor']
+      farbleAudio(fudgeFactor)
+    } catch (error) {
+      console.error(`Failed to farble audio: ${error}`)
+    }
 
     // Fake data that is to be used to construct fake plugins
-    const fakePluginData = args['fakePluginData']
-    farblePlugins(fakePluginData)
+    try {
+      const fakePluginData = args['fakePluginData']
+      farblePlugins(fakePluginData)
+    } catch (error) {
+      console.error(`Failed to farble plugins: ${error}`)
+    }
 
     // A value representing a fake voice name that will be used to add a fake voice
-    const fakeVoiceName = args['fakeVoiceName']
-    // This value is used to get a random index between 0 and voices.length
-    // It's important to have a value between 0 - 1 in order to be within the
-    // array bounds
-    const randomVoiceIndexScale = args['randomVoiceIndexScale']
-    farbleVoices(fakeVoiceName, randomVoiceIndexScale)
+    try {
+      const fakeVoiceName = args['fakeVoiceName']
+      // This value is used to get a random index between 0 and voices.length
+      // It's important to have a value between 0 - 1 in order to be within the
+      // array bounds
+      const randomVoiceIndexScale = args['randomVoiceIndexScale']
+      farbleVoices(fakeVoiceName, randomVoiceIndexScale)
+    } catch (error) {
+      console.error(`Failed to farble voices: ${error}`)
+    }
 
     // This value lets us pick a value between 2 and window.navigator.hardwareConcurrency
     // It is a value between 0 and 1. For example 0.5 will give us 3 and
     // thus return 2 + 3 = 5 for hardware concurrency
-    const randomHardwareIndexScale = args['randomHardwareIndexScale']
-    farbleHardwareConcurrency(randomHardwareIndexScale)
+    try {
+      const randomHardwareIndexScale = args['randomHardwareIndexScale']
+      farbleHardwareConcurrency(randomHardwareIndexScale)
+    } catch (error) {
+      console.error(`Failed to farble hardware concurrency: ${error}`)
+    }
   })();
 });
