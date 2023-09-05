@@ -111,3 +111,4 @@ Sources/Brave/Assets/AllFramesAtDocumentEndSandboxed.js
 Sources/Brave/Assets/MainFrameAtDocumentStartSandboxed.js
 Sources/Brave/Assets/MainFrameAtDocumentEndSandboxed.js
 Sources/Brave/Assets/*LICENSE.txt
+Sources/Brave/Assets/WalletEthereumProvider.js

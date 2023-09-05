@@ -25,7 +25,8 @@ class EthereumProviderScriptHandler: TabContentScript {
     self.tab = tab
   }
   
-  static let scriptName = "WalletEthereumProviderScript"
+  // Must match output in `webpack.config.js`
+  static let scriptName = "WalletEthereumProvider"
   static let scriptId = UUID().uuidString
   static let messageHandlerName = "\(scriptName)_\(messageUUID)"
   static let scriptSandbox: WKContentWorld = .page

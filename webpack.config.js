@@ -14,6 +14,8 @@ const MainFrameAtDocumentEnd = glob.sync("./Sources/Brave/Frontend/UserContent/U
 const MainFrameAtDocumentStartSandboxed = glob.sync("./Sources/Brave/Frontend/UserContent/UserScripts/Sandboxed/MainFrame/AtDocumentStart/*.js");
 const MainFrameAtDocumentEndSandboxed = glob.sync("./Sources/Brave/Frontend/UserContent/UserScripts/Sandboxed/MainFrame/AtDocumentEnd/*.js");
 
+const walletEthereumProvider = glob.sync("./Sources/Brave/Frontend/UserContent/UserScripts/Scripts_Dynamic/Scripts/Paged/WalletEthereumProviderScript.js")[0];
+
 module.exports = {
   mode: "production",
   entry: {
@@ -25,7 +27,8 @@ module.exports = {
     MainFrameAtDocumentStart: MainFrameAtDocumentStart,
     MainFrameAtDocumentEnd: MainFrameAtDocumentEnd,
     MainFrameAtDocumentStartSandboxed: MainFrameAtDocumentStartSandboxed,
-    MainFrameAtDocumentEndSandboxed: MainFrameAtDocumentEndSandboxed
+    MainFrameAtDocumentEndSandboxed: MainFrameAtDocumentEndSandboxed,
+    "WalletEthereumProvider": walletEthereumProvider
   },
   // optimization: { minimize: false }, // use for debugging
   output: {

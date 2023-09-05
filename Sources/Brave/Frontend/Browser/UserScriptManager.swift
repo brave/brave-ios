@@ -83,7 +83,6 @@ class UserScriptManager {
     }
   }()
   
-  private var walletEthProviderScript: WKUserScript?
   private var walletSolProviderScript: WKUserScript?
   private var walletSolanaWeb3Script: WKUserScript?
   private var walletSolanaWalletStandardScript: WKUserScript?
@@ -141,21 +140,6 @@ class UserScriptManager {
   }
   
   func fetchWalletScripts(from braveWalletAPI: BraveWalletAPI) {
-    if let ethJS = braveWalletAPI.providerScripts(for: .eth)[.ethereum] {
-      let providerJS = """
-      window.__firefox__.execute(function($, $Object) {
-        if (window.isSecureContext) {
-          \(ethJS)
-        }
-      });
-      """
-      walletEthProviderScript = WKUserScript(
-        source: providerJS,
-        injectionTime: .atDocumentStart,
-        forMainFrameOnly: true,
-        in: EthereumProviderScriptHandler.scriptSandbox
-      )
-    }
     if let solanaWeb3Script = braveWalletAPI.providerScripts(for: .sol)[.solanaWeb3] {
       let script = """
         // Define a global variable with a random name
@@ -302,10 +286,6 @@ class UserScriptManager {
         
         // Inject ethereum provider
         scriptController.addUserScript(script)
-        
-        if let walletEthProviderScript = walletEthProviderScript {
-          scriptController.addUserScript(walletEthProviderScript)
-        }
       }
       
       // Inject SolanaWeb3Script.js
