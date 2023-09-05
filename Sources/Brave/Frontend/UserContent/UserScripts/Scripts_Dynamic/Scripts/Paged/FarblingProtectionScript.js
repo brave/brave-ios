@@ -165,12 +165,6 @@ window.__firefox__.execute(function($) {
           return fakePlugins.find((plugin) => plugin.name === name )
         }
         
-        const originalSymbol = window.navigator.plugins.Symbol
-        pluginsPrototype.Symbol = function () {
-          console.debug(arguments)
-          return Reflect.apply(originalSymbol, this, arguments)
-        }
-        
         // Adjust the length of the original plugin array
         Reflect.defineProperty(pluginsPrototype, 'length', {
           value: originalPluginsLength + fakePlugins.length
