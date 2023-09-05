@@ -86,7 +86,7 @@ window.__firefox__.execute(function($) {
     // 2. Farble plugin data
     // Injects fake plugins with fake mime-types
     // Random plugins are determined by the plugin data
-    const farblePlugins = (pluginData) => {
+    const farblePlugins = (fakePluginData) => {
       // Function that create a fake mime-type based on the given fake data
       const makeFakeMimeType = (fakeData) => {
         return Object.create(window.MimeType.prototype, {
@@ -130,34 +130,51 @@ window.__firefox__.execute(function($) {
         // We need the original length so we can reference it (as we will change it)
         const plugins = window.navigator.plugins
         const originalPluginsLength = plugins.length
-
-        // Adds a fake plugin for the given index on fakePluginData
-        const addPluginAtIndex = (newPlugin, index) => {
-          const pluginPosition = originalPluginsLength + index
-          window.navigator.plugins[pluginPosition] = newPlugin
-          window.navigator.plugins[newPlugin.name] = newPlugin
-        }
-
-        for (const [index, pluginData] of fakePluginData.entries()) {
-          const newPlugin = makeFakePlugin(pluginData)
-          addPluginAtIndex(newPlugin, index)
-        }
-
-        // Adjust the length of the original plugin array
-        Reflect.defineProperty(window.navigator.plugins, 'length', {
-          value: originalPluginsLength + fakePluginData.length
+        const pluginsPrototype = Object.getPrototypeOf(window.navigator.plugins)
+        
+        const fakePlugins = fakePluginData.map((pluginData) => {
+          return makeFakePlugin(pluginData)
         })
-
-        // Patch `PluginArray.item(index)` function to return the correct item
-        // otherwise it returns `undefined`
-        const originalItemFunction = plugins.item
-        window.PluginArray.prototype.item = function (index) {
+        
+        // Adds a fake plugin for the given index on fakePluginData
+        fakePlugins.forEach((newPlugin, index) => {
+          const pluginPosition = originalPluginsLength + index
+          pluginsPrototype[pluginPosition] = newPlugin
+          pluginsPrototype[newPlugin.name] = newPlugin
+        })
+        
+        // Farble the `item` method on the plugins array
+        const originalItem = window.navigator.plugins.item
+        pluginsPrototype.item = function () {
+          let index = arguments[0]
+          
           if (index < originalPluginsLength) {
-            return Reflect.apply(originalItemFunction, plugins, arguments)
+            return Reflect.apply(originalItem, this, arguments)
           } else {
-            return plugins[index]
+            const farbledIndex = index - originalPluginsLength
+            return fakePlugins[farbledIndex]
           }
         }
+        
+        // Farble the `namedItem` method on the plugins array
+        const originalNamedItem = window.navigator.plugins.namedItem
+        pluginsPrototype.namedItem = function () {
+          let name = arguments[0]
+          let namedPlugin = Reflect.apply(originalNamedItem, this, arguments)
+          if (namedPlugin) { return namedPlugin }
+          return fakePlugins.find((plugin) => plugin.name === name )
+        }
+        
+        const originalSymbol = window.navigator.plugins.Symbol
+        pluginsPrototype.Symbol = function () {
+          console.debug(arguments)
+          return Reflect.apply(originalSymbol, this, arguments)
+        }
+        
+        // Adjust the length of the original plugin array
+        Reflect.defineProperty(pluginsPrototype, 'length', {
+          value: originalPluginsLength + fakePlugins.length
+        })
       }
     }
 
