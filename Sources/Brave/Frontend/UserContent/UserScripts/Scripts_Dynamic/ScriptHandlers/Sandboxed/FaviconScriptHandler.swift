@@ -71,52 +71,41 @@ class FaviconScriptHandler: NSObject, TabContentScript {
   }
   
   private static func updateFavicon(tab: Tab?, url: URL, isPrivate: Bool, icon: UIImage?, iconUrl: URL?) {
-    if let icon = icon {
-      if let iconUrl = iconUrl {
-        Logger.module.debug("Fetched Favicon: \(iconUrl.absoluteString), for page: \(url.absoluteString)")
-      } else {
-        Logger.module.debug("Fetched Favicon for page: \(url.absoluteString)")
+    guard let icon = icon else {
+      Logger.module.error("Failed fetching Favicon: \(iconUrl?.absoluteString ?? "nil"), for page: \(url.absoluteString)")
+      
+      // Remove icon from the cache because the website removed possibly removed their icon
+      FaviconFetcher.updateCache(nil, for: url, persistent: !isPrivate)
+      
+      guard let tab = tab else { return }
+      tab.favicon = Favicon.default
+      TabEvent.post(.didLoadFavicon(Favicon.default), for: tab)
+      return
+    }
+    
+    Logger.module.debug("Fetched Favicon: \(iconUrl?.absoluteString ?? "nil"), for page: \(url.absoluteString)")
+    
+    // If the icon is too small, we don't want to cache it.
+    // It's better to show monogram or bundled icons.
+    if icon.size.width < CGFloat(FaviconLoader.Sizes.desiredMedium.rawValue) ||
+       icon.size.height < CGFloat(FaviconLoader.Sizes.desiredMedium.rawValue) {
+      return
+    }
+    
+    Task { @MainActor in
+      // Fetch the icon from the database directly
+      var favicon = try? await FaviconRenderer.loadIcon(for: url, persistent: !isPrivate)
+      
+      // If the icon couldn't be fetched, or the icon is a monogram, then render the one returned to us
+      if favicon == nil || favicon?.isMonogramImage == true {
+        favicon = await Favicon.renderImage(icon, backgroundColor: .clear, shouldScale: true)
       }
       
-      // If the icon is too small, we don't want to cache it.
-      // It's better to show monogram or bundled icons.
-      if icon.size.width < CGFloat(FaviconLoader.Sizes.desiredMedium.rawValue) ||
-         icon.size.height < CGFloat(FaviconLoader.Sizes.desiredMedium.rawValue) {
-        return
-      }
+      guard let tab = tab, let favicon = favicon else { return }
+      FaviconFetcher.updateCache(favicon, for: url, persistent: !isPrivate)
       
-      Task { @MainActor in
-        // Always fetch the favicon from the database instead of the `icon` parameter
-        // This will allow us to always get high-res icons, and only fallback to the `icon` parameter
-        // If the icon couldn't be fetched at all.
-        var favicon = try? await FaviconRenderer.loadIcon(for: url, persistent: !isPrivate)
-        if favicon == nil {
-          favicon = await Favicon.renderImage(icon, backgroundColor: .clear, shouldScale: true)
-        }
-        
-        guard let tab = tab, let favicon = favicon else { return }
-        
-        // We can only cache favicons for non-private tabs
-        FaviconFetcher.updateCache(favicon, for: url, persistent: !isPrivate)
-        
-        tab.favicon = favicon
-        TabEvent.post(.didLoadFavicon(favicon), for: tab)
-      }
-    } else {
-      if let iconUrl = iconUrl {
-        Logger.module.error("Failed fetching Favicon: \(iconUrl.absoluteString), for page: \(url.absoluteString)")
-      } else {
-        Logger.module.error("Website: \(url.absoluteString), has no Favicon")
-      }
-      
-      Task { @MainActor in
-        let favicon = try await FaviconFetcher.monogramIcon(url: url, persistent: !isPrivate)
-        FaviconFetcher.updateCache(favicon, for: url, persistent: true)
-        
-        guard let tab = tab else { return }
-        tab.favicon = favicon
-        TabEvent.post(.didLoadFavicon(nil), for: tab)
-      }
+      tab.favicon = favicon
+      TabEvent.post(.didLoadFavicon(favicon), for: tab)
     }
   }
 }
