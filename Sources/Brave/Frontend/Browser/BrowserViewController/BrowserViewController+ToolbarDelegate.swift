@@ -914,25 +914,9 @@ extension BrowserViewController: ToolbarDelegate {
 extension BrowserViewController: UIContextMenuInteractionDelegate {
   public func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
     let configuration =  UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [unowned self] _ in
-      let tab = tabManager.selectedTab
-      var actionMenus: [UIMenu?] = [
-        makePasteMenu(),
-        makeCopyMenu(isPrivateMode: tab?.isPrivate ?? true)
+      let actionMenus: [UIMenu?] = [
+        makePasteMenu(), makeCopyMenu(), makeReloadMenu()
       ]
-      
-      if let url = tab?.url, url.isWebPage() {
-        let reloadTitle = tab?.isDesktopSite == true ? Strings.appMenuViewMobileSiteTitleString : Strings.appMenuViewDesktopSiteTitleString
-        let reloadIcon = tab?.isDesktopSite == true ? "leo.smartphone" : "leo.monitor"
-        let reloadAction = UIAction(
-          title: reloadTitle,
-          image: UIImage(braveSystemNamed: reloadIcon),
-          handler: UIAction.deferredActionHandler { [weak tab] _ in
-            tab?.switchUserAgent()
-          })
-        
-        let reloadMenu = UIMenu(options: .displayInline, children: [reloadAction])
-        actionMenus.append(reloadMenu)
-      }
       
       return UIMenu(children: actionMenus.compactMap({ $0 }))
     }
@@ -942,6 +926,20 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
     }
     
     return configuration
+  }
+  
+  private func makeReloadMenu() -> UIMenu? {
+    guard let tab = tabManager.selectedTab, let url = tab.url, url.isWebPage() else { return nil }
+    let reloadTitle = tab.isDesktopSite == true ? Strings.appMenuViewMobileSiteTitleString : Strings.appMenuViewDesktopSiteTitleString
+    let reloadIcon = tab.isDesktopSite == true ? "leo.smartphone" : "leo.monitor"
+    let reloadAction = UIAction(
+      title: reloadTitle,
+      image: UIImage(braveSystemNamed: reloadIcon),
+      handler: UIAction.deferredActionHandler { [weak tab] _ in
+        tab?.switchUserAgent()
+      })
+    
+    return UIMenu(options: .displayInline, children: [reloadAction])
   }
   
   private func makePasteMenu() -> UIMenu? {
@@ -963,12 +961,13 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
     return UIMenu(options: .displayInline, children: children)
   }
   
-  private func makeCopyMenu(isPrivateMode: Bool) -> UIMenu? {
+  private func makeCopyMenu() -> UIMenu? {
+    let tab = tabManager.selectedTab
     guard let url = self.topToolbar.currentURL else { return nil }
     
     var children: [UIAction] = [
       UIAction.makeCopyAction(for: url),
-      UIAction.makeCleanCopyAction(for: url, isPrivateMode: isPrivateMode)
+      UIAction.makeCleanCopyAction(for: url, isPrivateMode: tab?.isPrivate ?? true)
     ]
     
     if #unavailable(iOS 16.0), isUsingBottomBar {
