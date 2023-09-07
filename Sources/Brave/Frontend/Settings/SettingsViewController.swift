@@ -557,6 +557,10 @@ class SettingsViewController: TableViewController {
   private func vpnSettingsRow() -> Row {
 
     let (text, color) = { () -> (String, UIColor) in
+      if Preferences.VPN.vpnReceiptStatus.value == .retryPeriod {
+        return (Strings.VPN.updateActionCellTitle, .braveErrorLabel)
+      }
+      
       switch BraveVPN.vpnState {
       case .notPurchased:
         return ("", UIColor.black)
@@ -592,7 +596,13 @@ class SettingsViewController: TableViewController {
 
         guard let vcToShow = vc else { return }
         self.navigationController?.pushViewController(vcToShow, animated: true)
-      }, image: UIImage(braveSystemNamed: "leo.product.vpn"), accessory: .disclosureIndicator,
+      },
+      image: Preferences.VPN.vpnReceiptStatus.value == .retryPeriod
+        ? UIImage(braveSystemNamed: "leo.product.vpn")
+        : UIImage(braveSystemNamed: "leo.vpn.error")?
+          .withRenderingMode(.alwaysOriginal)
+          .withTintColor(.braveErrorLabel),
+      accessory: .disclosureIndicator,
       cellClass: ColoredDetailCell.self, context: [ColoredDetailCell.colorKey: color], uuid: "vpnrow")
   }
 
