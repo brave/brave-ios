@@ -255,12 +255,23 @@ extension BrowserViewController {
   
   private func presentVPNUpdateBillingCallout(skipSafeGuards: Bool = false) {
     if !skipSafeGuards {
-      // TODO: Condition
-      return
+      // Checking subscription receipt is in retry period
+      guard let receiptStatus = Preferences.VPN.vpnReceiptStatus.value else {
+        return
+      }
+      
+      if receiptStatus != .retryPeriod {
+        return
+      }
     }
     
     presentVPNChurnPromoCallout(for: .updateBillingExpired) {
-      // TODO: Action
+      // Opens Apple's 'manage subscription' screen
+      guard let url = URL(string: "https://apps.apple.com/account/subscriptions") else { return }
+      
+      if UIApplication.shared.canOpenURL(url) {
+        UIApplication.shared.open(url, options: [:])
+      }
     }
   }
   
