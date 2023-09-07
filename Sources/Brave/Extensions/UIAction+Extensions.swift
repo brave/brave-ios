@@ -5,6 +5,7 @@
 
 import UIKit
 import Strings
+import BraveCore
 
 extension UIAction {
   static func makePasteAndGoAction(pasteCallback: @escaping (String) -> Void) -> UIAction {
@@ -44,7 +45,8 @@ extension UIAction {
       title: Strings.copyCleanLink,
       image: UIImage(systemName: "doc.on.doc"),
       handler: UIAction.deferredActionHandler { _ in
-        let cleanedURL = CleanURLService.shared.cleanup(url: url, isPrivateMode: isPrivateMode)
+        let service = URLSanitizerServiceFactory.get(privateMode: isPrivateMode)
+        let cleanedURL = service?.sanitizeURL(url) ?? url
         UIPasteboard.general.url = cleanedURL
       }
     )
