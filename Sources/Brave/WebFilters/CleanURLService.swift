@@ -16,7 +16,9 @@ class CleanURLService {
   /// Initialize this instance with a network manager
   init() {}
   
-  /// Cleanup the url using the stored matcher
+  /// Cleanup the url using brave-core's `URLSanitizerService`.
+  ///
+  /// - Note: If nothing is cleaned, the original URL is returned
   func cleanup(url: URL, isPrivateMode: Bool) -> URL {
     if isPrivateMode {
       return privateURLSanitizerService?.sanitizeURL(url) ?? url

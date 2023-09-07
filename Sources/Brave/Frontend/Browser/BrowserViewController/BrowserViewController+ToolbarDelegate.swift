@@ -928,6 +928,7 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
     return configuration
   }
   
+  /// Create the "Request Destop Site" / "Request Mobile Site" menu if the tab has a webpage loaded
   private func makeReloadMenu() -> UIMenu? {
     guard let tab = tabManager.selectedTab, let url = tab.url, url.isWebPage() else { return nil }
     let reloadTitle = tab.isDesktopSite == true ? Strings.appMenuViewMobileSiteTitleString : Strings.appMenuViewDesktopSiteTitleString
@@ -942,6 +943,7 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
     return UIMenu(options: .displayInline, children: [reloadAction])
   }
   
+  /// Create the "Paste"  and "Paste and Go" menu if there is anything on the `UIPasteboard`
   private func makePasteMenu() -> UIMenu? {
     guard UIPasteboard.general.hasStrings || UIPasteboard.general.hasURLs else { return nil }
     
@@ -961,6 +963,9 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
     return UIMenu(options: .displayInline, children: children)
   }
   
+  /// Create the "Copy Link" and "Copy Clean Link" menu if there is any URL loaded on the tab.
+  ///
+  /// - Note: "Copy Clean Link" will be included even if no cleaning is done to the url.
   private func makeCopyMenu() -> UIMenu? {
     let tab = tabManager.selectedTab
     guard let url = self.topToolbar.currentURL else { return nil }
