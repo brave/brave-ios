@@ -145,9 +145,7 @@ window.__firefox__.execute(function($) {
         
         // Farble the `item` method on the plugins array
         const originalItem = window.navigator.plugins.item
-        pluginsPrototype.item = function () {
-          let index = arguments[0]
-          
+        pluginsPrototype.item = function (index) {
           if (index < originalPluginsLength) {
             return Reflect.apply(originalItem, this, arguments)
           } else {
@@ -158,8 +156,7 @@ window.__firefox__.execute(function($) {
         
         // Farble the `namedItem` method on the plugins array
         const originalNamedItem = window.navigator.plugins.namedItem
-        pluginsPrototype.namedItem = function () {
-          let name = arguments[0]
+        pluginsPrototype.namedItem = function (name) {
           let namedPlugin = Reflect.apply(originalNamedItem, this, arguments)
           if (namedPlugin) { return namedPlugin }
           return fakePlugins.find((plugin) => plugin.name === name )
