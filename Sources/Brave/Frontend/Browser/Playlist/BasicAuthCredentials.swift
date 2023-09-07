@@ -13,13 +13,12 @@ class BasicAuthCredentialsManager: NSObject, URLSessionDataDelegate {
   
   public static let validDomains: Set<String> = [
     // Brave Search
-    "search.brave.com", "search.brave.software",
-    "search.bravesoftware.com", "safesearch.brave.com",
+    "search.brave.software", "search.bravesoftware.com",
     "safesearch.brave.software", "safesearch.bravesoftware.com",
     "search-dev-local.brave.com",
     
     // Playlist
-    "playlist.bravesoftware.com", "playlist.brave.com"
+    "playlist.bravesoftware.com"
   ]
   
   static func setCredential(origin: String, credential: URLCredential?) {
