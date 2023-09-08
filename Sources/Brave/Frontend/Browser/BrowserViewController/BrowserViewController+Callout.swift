@@ -260,7 +260,7 @@ extension BrowserViewController {
         return
       }
       
-      if receiptStatus != .retryPeriod {
+      if receiptStatus != BraveVPN.ReceiptResponse.Status.retryPeriod.rawValue {
         return
       }
     }

@@ -124,7 +124,7 @@ struct VPNMenuButton: View {
   
   private var headerView: some View {
     HStack(spacing: 14) {
-      Image(braveSystemName: retryStateActive ? "leo.vpn.error" : "leo.product.vpn")
+      Image(braveSystemName: retryStateActive ? "leo.warning.triangle-filled" : "leo.product.vpn")
         .font(.body)
         .frame(width: 32, height: 32)
         .foregroundColor(retryStateActive ? Color(.braveErrorLabel) : Color(.braveLabel))
