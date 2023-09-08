@@ -16,7 +16,7 @@ extension Preferences {
       /// to make sure vpn expiration logic will be called.
       public static let expirationDate = Option<Date?>(key: "vpn.expiration-date", default: nil)
       /// The status of vpn receipt status, used to determine retry period
-      public static let vpnReceiptStatus = Option<BraveVPN.ReceiptResponse.Status?>(key: "vpn.expiration-date", default: nil)
+      public static let vpnReceiptStatus = Option<Int?>(key: "vpn.expiration-date", default: nil)
       /// Whether free trial for the vpn expired for the user.
       public static let freeTrialUsed = Option<Bool>(key: "vpn.free-trial-used", default: false)
       /// First time after user background the app after after installing vpn, we show a notification to say that the vpn

@@ -108,8 +108,8 @@ public class BraveVPNSettingsViewController: TableViewController {
       }
     })
     
-    if Preferences.VPN.vpnReceiptStatus.value == .retryPeriod {
-      switchView.tintColor = .braveErrorLabel
+    if Preferences.VPN.vpnReceiptStatus.value == BraveVPN.ReceiptResponse.Status.retryPeriod.rawValue {
+      switchView.onTintColor = .braveErrorLabel
     }
     
     self.vpnConnectionStatusSwitch = switchView
@@ -120,7 +120,7 @@ public class BraveVPNSettingsViewController: TableViewController {
     ], uuid: vpnStatusSectionCellId)
     
     let (subscriptionStatus, statusDetailColor) = { () -> (String, UIColor) in
-      if Preferences.VPN.vpnReceiptStatus.value == .retryPeriod {
+      if Preferences.VPN.vpnReceiptStatus.value == BraveVPN.ReceiptResponse.Status.retryPeriod.rawValue {
         return (Strings.VPN.vpnActionUpdatePaymentMethodSettingsText, .braveErrorLabel)
       }
       

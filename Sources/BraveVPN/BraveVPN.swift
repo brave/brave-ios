@@ -166,7 +166,7 @@ public class BraveVPN {
         GRDSubscriptionManager.setIsPayingUser(true)
       }
       
-      Preferences.VPN.vpnReceiptStatus.value = processedReceiptDetail.status
+      Preferences.VPN.vpnReceiptStatus.value = processedReceiptDetail.status.rawValue
       
       receiptResponse?(processedReceiptDetail)
     }
@@ -283,7 +283,7 @@ public class BraveVPN {
   // MARK: - ReceiptResponse
   
   public struct ReceiptResponse {
-    public enum Status: UserDefaultsEncodable {
+    public enum Status: Int {
       case active, expired, retryPeriod
     }
     
