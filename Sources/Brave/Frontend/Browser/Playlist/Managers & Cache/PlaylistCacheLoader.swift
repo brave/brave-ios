@@ -512,7 +512,7 @@ extension PlaylistWebLoader: WKNavigationDelegate {
   // leave a 'Back to Safari' button in the status bar, which we do not want.
   fileprivate func isStoreURL(_ url: URL) -> Bool {
     if url.scheme == "http" || url.scheme == "https" {
-      if url.host == "itunes.apple.com" || url.host == "apps.apple.com" {
+      if url.host == "itunes.apple.com" || url.host == "apps.apple.com" || url.host == "appsto.re" {
         return true
       }
     }
