@@ -43,7 +43,7 @@ extension UIAction {
   static func makeCleanCopyAction(for url: URL, isPrivateMode: Bool) -> UIAction {
     return UIAction(
       title: Strings.copyCleanLink,
-      image: UIImage(systemName: "doc.on.doc"),
+      image: UIImage(braveSystemNamed: "leo.broom"),
       handler: UIAction.deferredActionHandler { _ in
         let service = URLSanitizerServiceFactory.get(privateMode: isPrivateMode)
         let cleanedURL = service?.sanitizeURL(url) ?? url
