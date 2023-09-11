@@ -201,10 +201,10 @@ struct PortfolioView: View {
         .aspectRatio(contentMode: .fit)
       Text(Strings.Wallet.portfolioEmptyStateTitle)
         .font(.headline)
-        .foregroundColor(Color(braveSystemName: .textPrimary))
+        .foregroundColor(Color(WalletV2Design.textPrimary))
       Text(Strings.Wallet.portfolioEmptyStateDescription)
         .font(.footnote)
-        .foregroundColor(Color(braveSystemName: .textSecondary))
+        .foregroundColor(Color(WalletV2Design.textSecondary))
     }
     .multilineTextAlignment(.center)
     .padding(.vertical)
@@ -326,18 +326,18 @@ struct PortfolioView: View {
         VStack(alignment: .leading) {
           Text(group.title)
             .font(.callout.weight(.semibold))
-            .foregroundColor(Color(braveSystemName: .textPrimary))
+            .foregroundColor(Color(WalletV2Design.textPrimary))
           if let description = group.description {
             Text(description)
               .font(.footnote)
-              .foregroundColor(Color(braveSystemName: .textSecondary))
+              .foregroundColor(Color(WalletV2Design.textSecondary))
           }
         }
         .multilineTextAlignment(.leading)
         Spacer()
         Text(portfolioStore.currencyFormatter.string(from: NSNumber(value: group.totalFiatValue)) ?? "")
           .font(.callout.weight(.semibold))
-          .foregroundColor(Color(braveSystemName: .textPrimary))
+          .foregroundColor(Color(WalletV2Design.textPrimary))
           .multilineTextAlignment(.trailing)
       }
       .padding(.vertical, 4)

@@ -41,10 +41,10 @@ struct BackupRecoveryPhraseView: View {
         Group {
           Text(Strings.Wallet.backupRecoveryPhraseTitle)
             .font(.title)
-            .foregroundColor(Color(braveSystemName: .textPrimary))
+            .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
           Text(Strings.Wallet.backupRecoveryPhraseSubtitle)
             .font(.subheadline)
-            .foregroundColor(Color(braveSystemName: .textSecondary))
+            .foregroundColor(Color(uiColor: WalletV2Design.textSecondary))
             .padding(.bottom, 20)
         }
         .fixedSize(horizontal: false, vertical: true)
@@ -157,10 +157,10 @@ struct BackupRecoveryPhraseView: View {
           VStack(alignment: .leading, spacing: 20) {
             Text(Strings.Wallet.backupSkipPromptTitle)
               .font(.subheadline.weight(.medium))
-              .foregroundColor(Color(braveSystemName: .textPrimary))
+              .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
             Text(Strings.Wallet.backupSkipPromptSubTitle)
               .font(.subheadline)
-              .foregroundColor(Color(braveSystemName: .textSecondary))
+              .foregroundColor(Color(uiColor: WalletV2Design.textSecondary))
           }
           .multilineTextAlignment(.leading)
           .padding(.vertical, 20)

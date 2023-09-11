@@ -18,13 +18,13 @@ struct SelectAllHeaderView<T: Identifiable>: View {
     HStack {
       Text(title)
         .font(.body.weight(.semibold))
-        .foregroundColor(Color(braveSystemName: .textPrimary))
+        .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
       Spacer()
       if showsSelectAllButton {
         Button(action: selectAll) {
           Text(selectAllButtonTitle(allSelected))
             .font(.callout.weight(.semibold))
-            .foregroundColor(Color(braveSystemName: .textInteractive))
+            .foregroundColor(Color(uiColor: WalletV2Design.textInteractive))
         }
       }
     }

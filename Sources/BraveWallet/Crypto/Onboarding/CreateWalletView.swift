@@ -152,18 +152,18 @@ private struct CreateWalletView: View {
           .font(.title)
           .padding(.bottom)
           .multilineTextAlignment(.center)
-          .foregroundColor(Color(braveSystemName: .textPrimary))
+          .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
         Text(Strings.Wallet.createWalletSubTitle)
           .font(.subheadline)
           .padding(.bottom)
           .multilineTextAlignment(.center)
-          .foregroundColor(Color(braveSystemName: .textSecondary))
+          .foregroundColor(Color(uiColor: WalletV2Design.textSecondary))
       }
       VStack(alignment: .leading, spacing: 20) {
         VStack(spacing: 30) {
           VStack(alignment: .leading, spacing: 10) {
             Text(Strings.Wallet.newPasswordPlaceholder)
-              .foregroundColor(Color(braveSystemName: .textPrimary))
+              .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
             HStack(spacing: 8) {
               SecureField(Strings.Wallet.newPasswordPlaceholder, text: $password)
                 .textContentType(.newPassword)

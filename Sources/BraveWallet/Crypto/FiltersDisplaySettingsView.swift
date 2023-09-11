@@ -366,7 +366,7 @@ struct FiltersDisplaySettingsView: View {
       Button(action: { dismiss() }) {
         Text(Strings.CancelString)
           .fontWeight(.semibold)
-          .foregroundColor(Color(braveSystemName: .textInteractive))
+          .foregroundColor(Color(uiColor: WalletV2Design.textInteractive))
           .frame(maxWidth: .infinity)
           .padding(.vertical, 4)
       }
@@ -461,11 +461,11 @@ private struct AllSelectedView: View {
   
   var body: some View {
     Text(title)
-      .foregroundColor(Color(braveSystemName: .gray50))
+      .foregroundColor(Color(uiColor: WalletV2Design.extendedGray50))
       .font(.footnote.weight(.semibold))
       .padding(.horizontal, 2)
       .padding(4)
-      .background(Color(braveSystemName: .gray20))
+      .background(Color(uiColor: WalletV2Design.extendedGray20))
       .clipShape(RoundedRectangle(cornerRadius: 6))
   }
 }
@@ -492,16 +492,16 @@ private struct FilterLabelView: View {
             Image(braveSystemName: icon.braveSystemName)
               .imageScale(.medium)
               .font(.headline)
-              .foregroundColor(Color(braveSystemName: .iconDefault))
+              .foregroundColor(Color(uiColor: WalletV2Design.iconDefault))
           }
       }
       VStack(alignment: .leading, spacing: 2) {
         Text(title)
           .font(.body.weight(.semibold))
-          .foregroundColor(Color(braveSystemName: .legacyText1))
+          .foregroundColor(Color(uiColor: WalletV2Design.text01))
         Text(description)
           .font(.footnote)
-          .foregroundColor(Color(braveSystemName: .textSecondary))
+          .foregroundColor(Color(uiColor: WalletV2Design.textSecondary))
       }
       .multilineTextAlignment(.leading)
     }
@@ -580,7 +580,7 @@ struct FilterPickerRowView<T: Equatable & Identifiable & Hashable, Content: View
           $0
         }
       })
-      .foregroundColor(Color(braveSystemName: .textInteractive))
+      .foregroundColor(Color(WalletV2Design.textInteractive))
       .transaction { transaction in
         transaction.animation = nil
         transaction.disablesAnimations = true
@@ -591,7 +591,7 @@ struct FilterPickerRowView<T: Equatable & Identifiable & Hashable, Content: View
 
 struct DividerLine: View {
   var body: some View {
-    Color(braveSystemName: .dividerSubtle)
+    Color(uiColor: WalletV2Design.dividerSubtle)
       .frame(height: 1)
   }
 }
