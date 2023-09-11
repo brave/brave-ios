@@ -847,14 +847,20 @@ extension BrowserViewController {
     
     externalAppAlertCounter += 1
 
-    if externalAppAlertCounter > 2 {
+    if externalAppAlertCounter > 1 {
       // Show confirm alert
-      let suppressSheet = UIAlertController(title: nil, message: "Prevent this page from creating additional external application alerts.", preferredStyle: .actionSheet)
-      suppressSheet.addAction(UIAlertAction(title: Strings.suppressAlertsActionTitle, style: .destructive, handler: { [weak self] _ in
+      let suppressSheet = UIAlertController(
+        title: nil,
+        message: Strings.suppressExternalApplicationAlertsTitle,
+        preferredStyle: .actionSheet)
+      
+      suppressSheet.addAction(
+        UIAlertAction(title: Strings.suppressAlertsActionTitle, style: .destructive, handler: { [weak self] _ in
         self?.isExternalAppAlertSuppressed = true
       }))
 
-      suppressSheet.addAction(UIAlertAction(title: "Show Switch App Alert", style: .cancel, handler: { _ in
+      suppressSheet.addAction(
+        UIAlertAction(title: Strings.suppressExternalApplicationShowActionTitle, style: .cancel, handler: { _ in
         showExternalSchemeAlert()
       }))
       

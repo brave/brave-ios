@@ -134,6 +134,20 @@ extension Strings {
       comment: "Action item title of long press for Opening the existing - active Tab url in a new Tab")
   public static let suppressAlertsActionTitle = NSLocalizedString("SuppressAlertsActionTitle", tableName: "BraveShared", bundle: .module, value: "Suppress Alerts", comment: "Title of alert that seeks permission from user to suppress future JS alerts")
   public static let suppressAlertsActionMessage = NSLocalizedString("SuppressAlertsActionMessage", tableName: "BraveShared", bundle: .module, value: "Prevent this page from creating additional alerts", comment: "Message body of alert that seeks permission from user to suppress future JS alerts")
+  public static let suppressExternalApplicationAlertsTitle =
+    NSLocalizedString(
+      "SuppressExternalApplicationAlertTitle",
+      tableName: "BraveShared",
+      bundle: .module,
+      value: "Prevent this page from creating additional external application alerts.",
+      comment: "Title body of alert that seeks permission from user to suppress external application alerts")
+  public static let suppressExternalApplicationShowActionTitle =
+    NSLocalizedString(
+      "SuppressExternalApplicationShowActionTitle",
+      tableName: "BraveShared",
+      bundle: .module,
+      value: "Show Switch App Alert",
+      comment: "Title of the action that allow showing switch ato the external application")
   public static let openDownloadsFolderErrorDescription =
     NSLocalizedString(
       "OpenDownloadsFolderErrorDescription",
