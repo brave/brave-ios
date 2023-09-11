@@ -42,13 +42,13 @@ struct VerifyRecoveryPhraseView: View {
         HStack(spacing: 16) {
           Text(Strings.Wallet.verifyRecoveryPhraseTitle)
             .font(.title.weight(.medium))
-            .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
+            .foregroundColor(Color(braveSystemName: .textPrimary))
             .fixedSize(horizontal: false, vertical: true)
           RecoveryPhrasePager(activeIndex: $activeCheckIndex)
         }
         Text(LocalizedStringKey(String.localizedStringWithFormat(Strings.Wallet.verifyRecoveryPhraseSubTitle, targetedRecoveryWordIndexes[activeCheckIndex] + 1)))
           .font(.subheadline)
-          .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
+          .foregroundColor(Color(braveSystemName: .textPrimary))
         .fixedSize(horizontal: false, vertical: true)
         .padding(.bottom, 40)
         VStack(alignment: .leading) {

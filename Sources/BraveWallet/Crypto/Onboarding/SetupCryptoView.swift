@@ -19,10 +19,10 @@ struct SetupCryptoView: View {
       VStack(spacing: 32) {
         VStack(spacing: 14) {
           Text(Strings.Wallet.setupCryptoTitle)
-            .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
+            .foregroundColor(Color(braveSystemName: .textPrimary))
             .font(.largeTitle)
           Text(Strings.Wallet.setupCryptoSubtitle)
-            .foregroundColor(Color(uiColor: WalletV2Design.textSecondary))
+            .foregroundColor(Color(braveSystemName: .textSecondary))
             .font(.subheadline)
         }
         .fixedSize(horizontal: false, vertical: true)
@@ -39,10 +39,10 @@ struct SetupCryptoView: View {
               VStack(alignment: .leading, spacing: 12) {
                 Text(Strings.Wallet.setupCryptoCreateNewTitle)
                   .font(.title3.weight(.medium))
-                  .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
+                  .foregroundColor(Color(braveSystemName: .textPrimary))
                 Text(Strings.Wallet.setupCryptoCreateNewSubTitle)
                   .font(.subheadline)
-                  .foregroundColor(Color(uiColor: WalletV2Design.textSecondary))
+                  .foregroundColor(Color(braveSystemName: .textSecondary))
               }
               .fixedSize(horizontal: false, vertical: true)
               .multilineTextAlignment(.leading)
@@ -65,10 +65,10 @@ struct SetupCryptoView: View {
                 Group {
                   Text(Strings.Wallet.setupCryptoRestoreTitle)
                     .font(.title3.weight(.medium))
-                    .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
+                    .foregroundColor(Color(braveSystemName: .textPrimary))
                   Text(Strings.Wallet.setupCryptoRestoreSubTitle)
                     .font(.subheadline)
-                    .foregroundColor(Color(uiColor: WalletV2Design.textSecondary))
+                    .foregroundColor(Color(braveSystemName: .textSecondary))
                 }
                 .fixedSize(horizontal: false, vertical: true)
                 .multilineTextAlignment(.leading)

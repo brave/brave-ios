@@ -30,10 +30,10 @@ struct LegalView: View {
         VStack(spacing: 8) {
           Text(Strings.Wallet.legalTitle)
             .font(.title)
-            .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
+            .foregroundColor(Color(braveSystemName: .textPrimary))
           Text(Strings.Wallet.legalDescription)
             .font(.subheadline)
-            .foregroundColor(Color(uiColor: WalletV2Design.textSecondary))
+            .foregroundColor(Color(braveSystemName: .textSecondary))
         }
         .multilineTextAlignment(.center)
         .fixedSize(horizontal: false, vertical: true)
@@ -42,7 +42,7 @@ struct LegalView: View {
           LegalCheckbox(isChecked: $isResponsibilityCheckboxChecked)
             .font(.title2)
           Text(Strings.Wallet.legalUserResponsibility)
-            .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
+            .foregroundColor(Color(braveSystemName: .textPrimary))
             .font(.subheadline)
             .frame(maxWidth: .infinity, alignment: .leading)
             .onTapGesture {
@@ -53,7 +53,7 @@ struct LegalView: View {
           LegalCheckbox(isChecked: $isTermsCheckboxChecked)
             .font(.title2)
           Text(LocalizedStringKey(String.localizedStringWithFormat(Strings.Wallet.legalTermOfUse, WalletConstants.braveWalletTermsOfUse.absoluteDisplayString)))
-            .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
+            .foregroundColor(Color(braveSystemName: .textPrimary))
             .tint(Color(.braveBlurpleTint))
             .font(.subheadline)
             .frame(maxWidth: .infinity, alignment: .leading)

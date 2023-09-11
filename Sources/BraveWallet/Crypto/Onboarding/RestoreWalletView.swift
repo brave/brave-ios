@@ -105,10 +105,10 @@ private struct RestoreWalletView: View {
         VStack(spacing: 14) {
           Text(Strings.Wallet.restoreWalletTitle)
             .font(.title)
-            .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
+            .foregroundColor(Color(braveSystemName: .textPrimary))
           Text(Strings.Wallet.restoreWalletSubtitle)
             .font(.subheadline)
-            .foregroundColor(Color(uiColor: WalletV2Design.textSecondary))
+            .foregroundColor(Color(braveSystemName: .textSecondary))
         }
         .multilineTextAlignment(.center)
         .fixedSize(horizontal: false, vertical: true)
