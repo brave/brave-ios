@@ -784,10 +784,24 @@ extension BrowserViewController {
     }
     
     var alertTitle = Strings.openExternalAppURLGenericTitle
+    
+    // Check if the current url of the caller has changed
+    if let unfragmentedURLString = tab?.url?.withoutFragment.schemelessAbsoluteString,
+        unfragmentedURLString != externalAppURLOrigin {
+      externalAppAlertCounter = 0
+      isExternalAppAlertPresented = false
+      isExternalAppAlertSuppressed = false
+    }
+    externalAppURLOrigin = tab?.url?.withoutFragment.schemelessAbsoluteString
+    
+    // Do not try to present over existing warning
+    if isExternalAppAlertPresented, isExternalAppAlertSuppressed {
+      return
+    }
 
     // We do not want certain schemes to be opened externally when called from subframes.
     // And tel / sms dialog should not be shown for non-active tabs #6687
-    if ["tel", "sms"].contains(url.scheme) {
+    if ["tel", "sms", "facetime", "facetime-audio"].contains(url.scheme) {
       if !isMainFrame || tab?.url?.host != topToolbar.currentURL?.host {
         return
       }
@@ -797,31 +811,65 @@ extension BrowserViewController {
       }
     }
     
-    // If the tab is empty when handling an external URL we should remove the tab once the user decides
-    func removeTabIfEmpty() {
+    // Handling condition when Tab is empty when handling an external URL we should remove the tab once the user decides
+    let removeTabIfEmpty = { [weak self] in
       if let tab = tab, tab.url == nil {
-        tabManager.removeTab(tab)
+        self?.tabManager.removeTab(tab)
       }
     }
     
-    view.endEditing(true)
-    let popup = AlertPopupView(
-      imageView: nil,
-      title: alertTitle,
-      message: String(format: Strings.openExternalAppURLMessage, url.relativeString),
-      titleWeight: .semibold,
-      titleSize: 21
-    )
-    popup.addButton(title: Strings.openExternalAppURLDontAllow) { () -> PopupViewDismissType in
-      removeTabIfEmpty()
-      return .flyDown
+    // Show the external sceheme invoke alert
+    let showExternalSchemeAlert = { [weak self] in
+      self?.view.endEditing(true)
+      self?.isExternalAppAlertPresented = true
+
+      let popup = AlertPopupView(
+        imageView: nil,
+        title: alertTitle,
+        message: String(format: Strings.openExternalAppURLMessage, url.relativeString),
+        titleWeight: .semibold,
+        titleSize: 21
+      )
+      popup.addButton(title: Strings.openExternalAppURLDontAllow) { () -> PopupViewDismissType in
+        removeTabIfEmpty()
+        self?.isExternalAppAlertPresented = false
+        return .flyDown
+      }
+      popup.addButton(title: Strings.openExternalAppURLAllow, type: .primary) { () -> PopupViewDismissType in
+        UIApplication.shared.open(url, options: [:], completionHandler: openedURLCompletionHandler)
+        removeTabIfEmpty()
+        self?.isExternalAppAlertPresented = false
+
+        return .flyDown
+      }
+      popup.showWithType(showType: .flyUp)
     }
-    popup.addButton(title: Strings.openExternalAppURLAllow, type: .primary) { () -> PopupViewDismissType in
-      UIApplication.shared.open(url, options: [:], completionHandler: openedURLCompletionHandler)
-      removeTabIfEmpty()
-      return .flyDown
+    
+    externalAppAlertCounter += 1
+
+    if externalAppAlertCounter > 2 {
+      // Show confirm alert
+      let suppressSheet = UIAlertController(title: nil, message: "Prevent this page from creating additional external application alerts.", preferredStyle: .actionSheet)
+      suppressSheet.addAction(UIAlertAction(title: Strings.suppressAlertsActionTitle, style: .destructive, handler: { [weak self] _ in
+        self?.isExternalAppAlertSuppressed = true
+      }))
+
+      suppressSheet.addAction(UIAlertAction(title: "Show Switch App Alert", style: .cancel, handler: { _ in
+        showExternalSchemeAlert()
+      }))
+      
+      if let tab = tabManager.selectedTab, let webView = tab.webView {
+        if UIDevice.current.userInterfaceIdiom == .pad, let popoverController = suppressSheet.popoverPresentationController {
+          popoverController.sourceView = webView
+          popoverController.sourceRect = CGRect(x: webView.bounds.midX, y: webView.bounds.midY, width: 0, height: 0)
+          popoverController.permittedArrowDirections = []
+        }
+      }
+      
+      present(suppressSheet, animated: true)
+    } else {
+      showExternalSchemeAlert()
     }
-    popup.showWithType(showType: .flyUp)
   }
 }
 

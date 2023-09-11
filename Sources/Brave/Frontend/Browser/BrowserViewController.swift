@@ -266,6 +266,12 @@ public class BrowserViewController: UIViewController {
   
   var processAddressBarTask: Task<(), Never>?
   var topToolbarDidPressReloadTask: Task<(), Never>?
+  
+  /// Boolean tracking custom url-scheme alert presented
+  var isExternalAppAlertPresented = false
+  var externalAppAlertCounter = 0
+  var isExternalAppAlertSuppressed = false
+  var externalAppURLOrigin: String?
 
   public init(
     windowId: UUID,
