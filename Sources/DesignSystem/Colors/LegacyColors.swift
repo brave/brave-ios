@@ -8,6 +8,9 @@ enum LegacyDesignSystemColor: String {
   case background01
   case background02
   case background03
+  
+  case interactive05
+  case interactive06
 
   case errorBackground = "error-background"
   case errorBorder = "error-border"
@@ -87,10 +90,10 @@ extension UIColor {
     UIColor(braveSystemName: .legacyInteractive1)
   }
   public static var braveLighterBlurple: UIColor {
-    UIColor(braveSystemName: .legacyInteractive6)
+    LegacyDesignSystemColor.interactive06.color
   }
   public static var braveBlurple: UIColor {
-    UIColor(braveSystemName: .legacyInteractive5)
+    LegacyDesignSystemColor.interactive05.color
   }
   public static var braveDarkerBlurple: UIColor {
     UIColor(braveSystemName: .legacyInteractive4)

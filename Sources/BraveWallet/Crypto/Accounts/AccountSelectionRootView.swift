@@ -52,7 +52,7 @@ struct AccountSelectionRootView: View {
         }
       }
     }
-    .listBackgroundColor(Color(braveSystemName: .containerBackground))
+    .listBackgroundColor(Color(uiColor: WalletV2Design.containerBackground))
     .navigationTitle(navigationTitle)
     .navigationBarTitleDisplayMode(.inline)
   }

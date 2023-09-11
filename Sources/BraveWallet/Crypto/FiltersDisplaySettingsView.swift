@@ -191,7 +191,7 @@ struct FiltersDisplaySettingsView: View {
         }
         .padding(.horizontal)
       }
-      .background(Color(braveSystemName: .containerBackground))
+      .background(Color(uiColor: WalletV2Design.containerBackground))
       .safeAreaInset(edge: .bottom, content: {
         saveChangesContainer
       })
@@ -374,7 +374,7 @@ struct FiltersDisplaySettingsView: View {
     .padding(.horizontal)
     .padding(.vertical, 14)
     .background(
-      Color(braveSystemName: .containerBackground)
+      Color(uiColor: WalletV2Design.containerBackground)
         .ignoresSafeArea()
     )
     .shadow(color: Color.black.opacity(0.04), radius: 16, x: 0, y: -8)
@@ -485,7 +485,7 @@ private struct FilterLabelView: View {
   var body: some View {
     HStack {
       if let icon {
-        Color(braveSystemName: .containerHighlight)
+        Color(uiColor: WalletV2Design.containerHighlight)
           .clipShape(Circle())
           .frame(width: icon.iconContainerSize, height: icon.iconContainerSize)
           .overlay {
