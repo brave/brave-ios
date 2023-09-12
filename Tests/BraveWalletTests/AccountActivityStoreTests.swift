@@ -442,7 +442,7 @@ class AccountActivityStoreTests: XCTestCase {
     )
     
     let mockAssetManager = TestableWalletUserAssetManager()
-    mockAssetManager._getAllVisibleAssetsInNetworkAssets = { _ in
+    mockAssetManager._getAllUserAssetsInNetworkAssetsByVisibility = { _, _ in
       [
         NetworkAssets(
           network: .mockFilecoinMainnet,
