@@ -340,7 +340,7 @@ public class PortfolioStore: ObservableObject {
       let filters = self.filters
       let selectedAccounts = filters.accounts.filter(\.isSelected).map(\.model)
       let selectedNetworks = filters.networks.filter(\.isSelected).map(\.model)
-      let allVisibleUserAssets = assetManager.getAllVisibleAssetsInNetworkAssets(networks: selectedNetworks)
+      let allVisibleUserAssets = assetManager.getAllUserAssetsInNetworkAssets(networks: selectedNetworks, visible: true)
       // update assets on display immediately with empty values. Issue #5567
       self.assetGroups = buildAssetGroupViewModels(
         groupBy: filters.groupBy,

@@ -212,7 +212,7 @@ import Preferences
     mockAssetManager._getAllUserAssetsInNetworkAssets = { _ in
       self.allUserAssetsInNetworkAssets
     }
-    mockAssetManager._getAllVisibleAssetsInNetworkAssets = { networks in
+    mockAssetManager._getAllUserAssetsInNetworkAssetsByVisibility = { networks, _ in
       var result: [NetworkAssets] = []
       for network in networks {
         let visibleTokens = self.allUserAssets.filter {
