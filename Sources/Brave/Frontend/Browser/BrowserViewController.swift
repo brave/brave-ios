@@ -2778,6 +2778,13 @@ extension BrowserViewController: TabDelegate {
     handleIPFSSchemeURL(url, visitType: .unknown)
   }
 
+  func didReloadTab(_ tab: Tab) {
+    // Resetting External Alert Properties
+    externalAppAlertCounter = 0
+    isExternalAppAlertPresented = false
+    isExternalAppAlertSuppressed = false
+  }
+  
   @MainActor
   private func isPendingRequestAvailable() async -> Bool {
     let privateMode = privateBrowsingManager.isPrivateBrowsing
