@@ -1,6 +1,6 @@
 ![Build](https://github.com/brave/brave-ios/workflows/Build/badge.svg?branch=development)
 
-Brave for iOS 🦁
+Brave
 ===============
 
 Download on the [App Store](https://apps.apple.com/app/brave-web-browser/id1052879175).
@@ -10,7 +10,7 @@ This branch (development)
 
 This branch is for mainline development that will ship in the next release.
 
-This branch currently supports iOS 15+, and is written in Swift 5.
+This branch currently supports iOS 15+ and is written in Swift 5.
 
 Please make sure you aim your pull requests in the right direction.
 
