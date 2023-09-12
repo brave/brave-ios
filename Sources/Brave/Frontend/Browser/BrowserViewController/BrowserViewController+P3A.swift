@@ -216,7 +216,6 @@ extension BrowserViewController {
       UmaHistogramRecordValueToBucket(
         "Brave.Toolbar.ForwardNavigationAction",
         buckets: [
-          0,
           .r(0..<1),
           .r(1..<3),
           .r(3..<5),
