@@ -200,7 +200,7 @@ extension BrowserViewController {
     UmaHistogramEnumeration("Brave.Rewards.AdTypesEnabled", sample: answer)
   }
   
-  private func recordNavigationActionP3A(isNavigationActionForward: Bool) {
+  func recordNavigationActionP3A(isNavigationActionForward: Bool) {
     var navigationActionStorage = P3ATimedStorage<Int>.navigationActionPerformedStorage
     var forwardNavigationActionStorage = P3ATimedStorage<Int>.forwardNavigationActionPerformed
     
@@ -214,7 +214,7 @@ extension BrowserViewController {
     if newNavigationActionStorage > 0 {
       let navigationForwardPercent = Int((Double(forwardNavigationActionStorage.maximumDaysCombinedValue) / Double(newNavigationActionStorage)) * 100.0)
       UmaHistogramRecordValueToBucket(
-        "Brave.General.ForwardNavigationAction",
+        "Brave.Toolbar.ForwardNavigationAction",
         buckets: [
           0,
           .r(0..<1),
@@ -229,7 +229,6 @@ extension BrowserViewController {
     }
   }
 }
-
 
 extension P3AFeatureUsage {
   fileprivate static let braveVPNUsage: Self = .init(
