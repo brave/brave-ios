@@ -345,7 +345,7 @@ struct NFTView: View {
   
   private func isHiddenNFT(_ nft: BraveWallet.BlockchainToken) -> Bool {
     if nftStore.displayType == .spam {
-      return true
+      return false
     } else {
       return !nft.visible
     }
