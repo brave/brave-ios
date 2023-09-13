@@ -30,9 +30,6 @@ if (window.isSecureContext) {
     }));
   }
   
-  var EventEmitter = require('events');
-  var BraveWeb3ProviderEventEmitter = new EventEmitter();
-  
   const provider = {value: {}};
   $Object.defineProperty(window, 'ethereum', provider);
   $Object.defineProperty(window, 'braveEthereum', provider);
@@ -127,22 +124,6 @@ if (window.isSecureContext) {
         }
       }),
       writable: true, // https://github.com/brave/brave-browser/issues/25078
-    },
-    on: {
-      value: BraveWeb3ProviderEventEmitter.on,
-      writable: false,
-    },
-    emit: {
-      value: BraveWeb3ProviderEventEmitter.emit,
-      writable: false,
-    },
-    removeListener: {
-      value: BraveWeb3ProviderEventEmitter.removeListener,
-      writable: false,
-    },
-    removeAllListeners: {
-      value: BraveWeb3ProviderEventEmitter.removeAllListeners,
-      writable: false,
     },
   });
   
