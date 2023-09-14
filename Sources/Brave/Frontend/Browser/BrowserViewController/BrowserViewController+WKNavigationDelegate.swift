@@ -1018,11 +1018,25 @@ extension BrowserViewController: WKUIDelegate {
           actions.append(openNewPrivateWindowAction)
         }
 
-        let copyAction = UIAction.makeCopyAction(for: url)
+        let copyAction = UIAction(
+          title: Strings.copyLinkActionTitle,
+          image: UIImage(systemName: "doc.on.doc"),
+          handler: UIAction.deferredActionHandler { _ in
+            UIPasteboard.general.url = url as URL
+          }
+        )
         copyAction.accessibilityLabel = "linkContextMenu.copyLink"
         actions.append(copyAction)
         
-        let copyCleanLinkAction = UIAction.makeCleanCopyAction(for: url, isPrivateMode: currentTab.isPrivate)
+        let copyCleanLinkAction = UIAction(
+          title: Strings.copyCleanLink,
+          image: UIImage(braveSystemNamed: "leo.broom"),
+          handler: UIAction.deferredActionHandler { _ in
+            let service = URLSanitizerServiceFactory.get(privateMode: currentTab.isPrivate)
+            let cleanedURL = service?.sanitizeURL(url) ?? url
+            UIPasteboard.general.url = cleanedURL
+          }
+        )
         copyCleanLinkAction.accessibilityLabel = "linkContextMenu.copyCleanLink"
         actions.append(copyCleanLinkAction)
 

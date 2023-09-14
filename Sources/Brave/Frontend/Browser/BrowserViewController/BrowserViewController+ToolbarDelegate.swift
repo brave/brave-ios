@@ -948,12 +948,22 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
     guard UIPasteboard.general.hasStrings || UIPasteboard.general.hasURLs else { return nil }
     
     var children: [UIAction] = [
-      UIAction.makePasteAndGoAction(pasteCallback: { pasteboardContents in
-        self.topToolbar(self.topToolbar, didSubmitText: pasteboardContents)
-      }),
-      UIAction.makePasteAction(pasteCallback: { pasteboardContents in
-        self.topToolbar.enterOverlayMode(pasteboardContents, pasted: true, search: true)
-      })
+      UIAction(
+        identifier: .pasteAndGo,
+        handler: UIAction.deferredActionHandler { _ in
+          if let pasteboardContents = UIPasteboard.general.string {
+            self.topToolbar(self.topToolbar, didSubmitText: pasteboardContents)
+          }
+        }
+      ),
+      UIAction(
+        identifier: .paste,
+        handler: UIAction.deferredActionHandler { _ in
+          if let pasteboardContents = UIPasteboard.general.string {
+            self.topToolbar.enterOverlayMode(pasteboardContents, pasted: true, search: true)
+          }
+        }
+      )
     ]
     
     if #unavailable(iOS 16.0), isUsingBottomBar {
@@ -971,8 +981,22 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
     guard let url = self.topToolbar.currentURL else { return nil }
     
     var children: [UIAction] = [
-      UIAction.makeCopyAction(for: url),
-      UIAction.makeCleanCopyAction(for: url, isPrivateMode: tab?.isPrivate ?? true)
+      UIAction(
+        title: Strings.copyLinkActionTitle,
+        image: UIImage(systemName: "doc.on.doc"),
+        handler: UIAction.deferredActionHandler { _ in
+          UIPasteboard.general.url = url as URL
+        }
+      ),
+      UIAction(
+        title: Strings.copyCleanLink,
+        image: UIImage(braveSystemNamed: "leo.broom"),
+        handler: UIAction.deferredActionHandler { _ in
+          let service = URLSanitizerServiceFactory.get(privateMode: tab?.isPrivate ?? true)
+          let cleanedURL = service?.sanitizeURL(url) ?? url
+          UIPasteboard.general.url = cleanedURL
+        }
+      )
     ]
     
     if #unavailable(iOS 16.0), isUsingBottomBar {
