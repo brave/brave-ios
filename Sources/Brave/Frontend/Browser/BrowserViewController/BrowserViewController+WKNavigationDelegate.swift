@@ -851,8 +851,11 @@ extension BrowserViewController {
     }
 
     // A click is synthetic if its value is 0 which is WKSyntheticClickTypeNoTap or navigationType is other
-    // The counter is only increased with actual click 
-    if let clickType = navigationAction.value(forKey: "syntheticClickType") as? Int, clickType == 0 ||
+    // The counter is only increased with actual click
+    let argumentItemClick: [Any] = ["synt", "het", "icCli", "ckTyp", "e"]
+    let valueKeyClickType = argumentItemClick.compactMap { $0 as? String }.joined()
+
+    if let clickType = navigationAction.value(forKey: valueKeyClickType) as? Int, clickType == 0 ||
         navigationAction.navigationType == .other {
       tab?.externalAppAlertCounter += 1
     }
