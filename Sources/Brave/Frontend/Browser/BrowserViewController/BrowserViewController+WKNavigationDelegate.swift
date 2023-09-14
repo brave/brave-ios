@@ -850,7 +850,12 @@ extension BrowserViewController {
       popup.showWithType(showType: .flyUp)
     }
 
-    tab?.externalAppAlertCounter += 1
+    // A click is synthetic if its value is 0 which is WKSyntheticClickTypeNoTap or navigationType is other
+    // The counter is only increased with actual click 
+    if let clickType = navigationAction.value(forKey: "syntheticClickType") as? Int, clickType == 0 ||
+        navigationAction.navigationType == .other {
+      tab?.externalAppAlertCounter += 1
+    }
     showExternalSchemeAlert(isSuppressActive: tab?.externalAppAlertCounter ?? 0 > 2)
   }
 }
