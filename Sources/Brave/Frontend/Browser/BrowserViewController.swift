@@ -102,10 +102,10 @@ public class BrowserViewController: UIViewController {
   var readerModeBar: ReaderModeBarView?
   var readerModeCache: ReaderModeCache
   
-  let statusBarOverlay: UIView = {
+  private(set) lazy var statusBarOverlay: UIView = {
     // Temporary work around for covering the non-clipped web view content
     let statusBarOverlay = UIView()
-    statusBarOverlay.backgroundColor = Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
+    statusBarOverlay.backgroundColor = privateBrowsingManager.browserColors.chromeBackground
     return statusBarOverlay
   }()
   
@@ -899,9 +899,12 @@ public class BrowserViewController: UIViewController {
     privateModeCancellable = privateBrowsingManager
       .$isPrivateBrowsing
       .removeDuplicates()
+      .receive(on: RunLoop.main)
       .sink(receiveValue: { [weak self] isPrivateBrowsing in
-        self?.updateStatusBarOverlayColor()
-        self?.bottomBarKeyboardBackground.backgroundColor = self?.topToolbar.backgroundColor
+        guard let self = self else { return }
+        self.updateStatusBarOverlayColor()
+        self.bottomBarKeyboardBackground.backgroundColor = self.topToolbar.backgroundColor
+        self.collapsedURLBarView.browserColors = self.privateBrowsingManager.browserColors
       })
     
     appReviewCancelable = AppReviewManager.shared
@@ -917,14 +920,6 @@ public class BrowserViewController: UIViewController {
           AppReviewManager.shared.handleAppReview(for: .revised, using: self)
         }
       })
-    
-    Preferences.General.nightModeEnabled.objectWillChange
-      .receive(on: RunLoop.main)
-      .sink { [weak self] _ in
-        self?.updateStatusBarOverlayColor()
-        self?.bottomBarKeyboardBackground.backgroundColor = self?.topToolbar.backgroundColor
-      }
-      .store(in: &cancellables)
     
     Preferences.General.isUsingBottomBar.objectWillChange
       .receive(on: RunLoop.main)
@@ -1388,7 +1383,8 @@ public class BrowserViewController: UIViewController {
       activeNewTabPageViewController = ntpController
 
       addChild(ntpController)
-      view.insertSubview(ntpController.view, belowSubview: header)
+      let subview = isUsingBottomBar ? header : statusBarOverlay
+      view.insertSubview(ntpController.view, belowSubview: subview)
       ntpController.didMove(toParent: self)
 
       ntpController.view.snp.makeConstraints {
@@ -2323,11 +2319,7 @@ public class BrowserViewController: UIViewController {
     defer { setNeedsStatusBarAppearanceUpdate() }
     guard isUsingBottomBar, let tab = tabManager.selectedTab, tab.url.map(InternalURL.isValid) == false,
           let color = tab.webView?.sampledPageTopColor else {
-      if privateBrowsingManager.isPrivateBrowsing {
-        statusBarOverlay.backgroundColor = .privateModeBackground
-      } else {
-        statusBarOverlay.backgroundColor = Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
-      }
+      statusBarOverlay.backgroundColor = privateBrowsingManager.browserColors.chromeBackground
       return
     }
     statusBarOverlay.backgroundColor = color
