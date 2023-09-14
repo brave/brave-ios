@@ -369,15 +369,29 @@ if (!window.__firefox__) {
     return result;
   };
   
+  $.dispatchEvent = function(event) {
+    let originalDispatchEvent = window.dispatchEvent(event);
+    return originalDispatchEvent;
+  }
+
+  $.addEventListener = function(type, listener, optionsOrUseCapture) {
+    let originalAddEventListener = window.addEventListener(type, listener, optionsOrUseCapture);
+    return originalAddEventListener;
+  }
+  
   // Start securing functions before any other code can use them
   $($.deepFreeze);
   $($.extensiveFreeze);
   $($.postNativeMessage);
+  $($.dispatchEvent);
+  $($.addEventListener);
   $($);
 
   $.deepFreeze($.deepFreeze);
   $.deepFreeze($.extensiveFreeze);
   $.deepFreeze($.postNativeMessage);
+  $.deepFreeze($.dispatchEvent);
+  $.deepFreeze($.addEventListener);
   $.deepFreeze($);
   
   for (const value of secureObjects) {

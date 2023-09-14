@@ -143,9 +143,9 @@ if (window.isSecureContext) {
     const event = $Object.freeze(new CustomEvent("eip6963:announceProvider", {
       detail: $Object.freeze({ info, provider }),
     }));
-    window.dispatchEvent(event);
+    $.dispatchEvent(event);
   }
-  window.addEventListener(
+  $.addEventListener(
     "eip6963:requestProvider",
     (event) => {
       announceProvider();
