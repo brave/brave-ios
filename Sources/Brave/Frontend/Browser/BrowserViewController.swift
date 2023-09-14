@@ -266,12 +266,6 @@ public class BrowserViewController: UIViewController {
   
   var processAddressBarTask: Task<(), Never>?
   var topToolbarDidPressReloadTask: Task<(), Never>?
-  
-  /// Boolean tracking custom url-scheme alert presented
-  var isExternalAppAlertPresented = false
-  var externalAppAlertCounter = 0
-  var isExternalAppAlertSuppressed = false
-  var externalAppURLOrigin: String?
 
   public init(
     windowId: UUID,
@@ -2780,9 +2774,9 @@ extension BrowserViewController: TabDelegate {
 
   func didReloadTab(_ tab: Tab) {
     // Resetting External Alert Properties
-    externalAppAlertCounter = 0
-    isExternalAppAlertPresented = false
-    isExternalAppAlertSuppressed = false
+    tab.externalAppAlertCounter = 0
+    tab.isExternalAppAlertPresented = false
+    tab.isExternalAppAlertSuppressed = false
   }
   
   @MainActor

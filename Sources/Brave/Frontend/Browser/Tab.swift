@@ -80,6 +80,12 @@ class Tab: NSObject {
   var isPrivate: Bool {
     return type.isPrivate
   }
+  
+  /// Boolean tracking custom url-scheme alert presented
+  var isExternalAppAlertPresented = false
+  var externalAppAlertCounter = 0
+  var isExternalAppAlertSuppressed = false
+  var externalAppURLOrigin: String?
 
   var secureContentState: TabSecureContentState = .unknown
   var sslPinningError: Error?
