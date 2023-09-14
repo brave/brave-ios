@@ -85,7 +85,7 @@ class Tab: NSObject {
   var isExternalAppAlertPresented = false
   var externalAppAlertCounter = 0
   var isExternalAppAlertSuppressed = false
-  var externalAppURLOrigin: String?
+  var externalAppURLDomain: String?
 
   var secureContentState: TabSecureContentState = .unknown
   var sslPinningError: Error?

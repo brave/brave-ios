@@ -786,12 +786,12 @@ extension BrowserViewController {
     var alertTitle = Strings.openExternalAppURLGenericTitle
     
     // Check if the current url of the caller has changed
-    if let unfragmentedURLString = tab?.url?.schemelessAbsoluteString,
-       unfragmentedURLString != tab?.externalAppURLOrigin {
+    if let domain = tab?.url?.baseDomain,
+       domain != tab?.externalAppURLDomain {
       tab?.externalAppAlertCounter = 0
       tab?.isExternalAppAlertSuppressed = false
     }
-    tab?.externalAppURLOrigin = tab?.url?.schemelessAbsoluteString
+    tab?.externalAppURLDomain = tab?.url?.baseDomain
     
     // Do not try to present over existing warning
     if tab?.isExternalAppAlertPresented == true || tab?.isExternalAppAlertSuppressed == true {
