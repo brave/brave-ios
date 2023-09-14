@@ -872,8 +872,17 @@ public class BrowserViewController: UIViewController {
       }
     }
 
-    if !Preferences.DefaultBrowserIntro.defaultBrowserNotificationScheduled.value {
+    // Schedule Default Browser Local Notification
+    // If notification is not already scheduled or
+    // an external URL opened in Brave (which indicates Brave is set as default)
+    if !Preferences.DefaultBrowserIntro.defaultBrowserNotificationScheduled.value,
+        Preferences.DefaultBrowserIntro.defaultBrowserNotificationShouldBeShown.value {
       scheduleDefaultBrowserNotification()
+    }
+    
+    // Remove pending notification if default browser is already set
+    if !Preferences.DefaultBrowserIntro.defaultBrowserNotificationShouldBeShown.value {
+      cancelScheduleDefaultBrowserNotification()
     }
 
     privateModeCancellable = privateBrowsingManager
@@ -943,7 +952,7 @@ public class BrowserViewController: UIViewController {
 
         let content = UNMutableNotificationContent().then {
           $0.title = Strings.DefaultBrowserCallout.notificationTitle
-          $0.body = String(format: Strings.DefaultBrowserCallout.notificationBody, String(ProcessInfo().operatingSystemVersion.majorVersion))
+          $0.body = Strings.DefaultBrowserCallout.notificationBody
         }
 
         let timeToShow = AppConstants.buildChannel.isPublic ? 2.hours : 2.minutes
@@ -964,6 +973,11 @@ public class BrowserViewController: UIViewController {
         }
       }
     }
+  }
+  
+  private func cancelScheduleDefaultBrowserNotification() {
+    let center = UNUserNotificationCenter.current()
+    center.removePendingNotificationRequests(withIdentifiers: [Self.defaultBrowserNotificationId])
   }
   
   private func executeAfterSetup(_ block: @escaping () -> Void) {
@@ -3168,8 +3182,10 @@ extension BrowserViewController {
   }
 
   public func handleNavigationPath(path: NavigationPath) {
-    // Remove Default Browser Callout if an external url is triggered
+    // Remove Default Browser Callout - Do not show scheduled notification
+    // in case an external url is triggered
     Preferences.General.defaultBrowserCalloutDismissed.value = true
+    Preferences.DefaultBrowserIntro.defaultBrowserNotificationShouldBeShown.value = false
     
     executeAfterSetup {
       NavigationPath.handle(nav: path, with: self)
