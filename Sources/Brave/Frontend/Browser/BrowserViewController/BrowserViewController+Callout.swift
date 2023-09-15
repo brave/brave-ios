@@ -267,7 +267,7 @@ extension BrowserViewController {
     
     presentVPNChurnPromoCallout(for: .updateBillingExpired) {
       // Opens Apple's 'manage subscription' screen
-      guard let url = URL(string: "https://apps.apple.com/account/subscriptions") else { return }
+      guard let url = URL.apple.manageSubscriptions else { return }
       
       if UIApplication.shared.canOpenURL(url) {
         UIApplication.shared.open(url, options: [:])
