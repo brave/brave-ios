@@ -86,7 +86,7 @@ class TransactionsActivityStore: ObservableObject {
       let allTransactions = await txService.allTransactions(
         networksForCoin: networksForCoin, for: allKeyrings
       ).filter { $0.txStatus != .rejected }
-      let userVisibleTokens = assetManager.getAllUserAssetsInNetworkAssets(networks: allNetworksAllCoins, visible: true).flatMap(\.tokens)
+      let userAssets = assetManager.getAllUserAssetsInNetworkAssets(networks: allNetworksAllCoins, includingSpam: true).flatMap(\.tokens)
       let allTokens = await blockchainRegistry.allTokens(
         in: allNetworksAllCoins
       ).flatMap(\.tokens)
@@ -97,7 +97,7 @@ class TransactionsActivityStore: ObservableObject {
         transactions: allTransactions,
         networksForCoin: networksForCoin,
         accountInfos: allAccountInfos,
-        userVisibleTokens: userVisibleTokens,
+        userAssets: userAssets,
         allTokens: allTokens,
         assetRatios: assetPricesCache,
         solEstimatedTxFees: solEstimatedTxFeesCache
@@ -109,15 +109,15 @@ class TransactionsActivityStore: ObservableObject {
         await updateSolEstimatedTxFeesCache(solTransactions)
       }
 
-      let allVisibleTokenAssetRatioIds = userVisibleTokens.map(\.assetRatioId)
-      await updateAssetPricesCache(assetRatioIds: allVisibleTokenAssetRatioIds)
+      let allUserAssetsAssetRatioIds = userAssets.map(\.assetRatioId)
+      await updateAssetPricesCache(assetRatioIds: allUserAssetsAssetRatioIds)
 
       guard !Task.isCancelled else { return }
       self.transactionSummaries = self.transactionSummaries(
         transactions: allTransactions,
         networksForCoin: networksForCoin,
         accountInfos: allAccountInfos,
-        userVisibleTokens: userVisibleTokens,
+        userAssets: userAssets,
         allTokens: allTokens,
         assetRatios: assetPricesCache,
         solEstimatedTxFees: solEstimatedTxFeesCache
@@ -129,7 +129,7 @@ class TransactionsActivityStore: ObservableObject {
     transactions: [BraveWallet.TransactionInfo],
     networksForCoin: [BraveWallet.CoinType: [BraveWallet.NetworkInfo]],
     accountInfos: [BraveWallet.AccountInfo],
-    userVisibleTokens: [BraveWallet.BlockchainToken],
+    userAssets: [BraveWallet.BlockchainToken],
     allTokens: [BraveWallet.BlockchainToken],
     assetRatios: [String: Double],
     solEstimatedTxFees: [String: UInt64]
@@ -142,7 +142,7 @@ class TransactionsActivityStore: ObservableObject {
         from: transaction,
         network: network,
         accountInfos: accountInfos,
-        visibleTokens: userVisibleTokens,
+        userAssets: userAssets,
         allTokens: allTokens,
         assetRatios: assetRatios,
         solEstimatedTxFee: solEstimatedTxFees[transaction.id],

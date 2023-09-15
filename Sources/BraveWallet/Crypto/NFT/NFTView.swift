@@ -30,8 +30,8 @@ struct NFTView: View {
       Text(nftStore.displayType.emptyTitle)
         .font(.headline.weight(.semibold))
         .foregroundColor(Color(.braveLabel))
-      if let descroption = nftStore.displayType.emptyDescription {
-        Text(descroption)
+      if let description = nftStore.displayType.emptyDescription {
+        Text(description)
           .font(.subheadline.weight(.semibold))
           .foregroundColor(Color(.secondaryLabel))
       }
@@ -217,12 +217,12 @@ struct NFTView: View {
           }
           .contextMenu {
             Button(action: {
-              nftStore.updateNFTStatus(nft.token, visible: isHiddenNFT(nft.token), spamStatus: false)
+              nftStore.updateNFTStatus(nft.token, visible: isHiddenNFT(nft.token), isSpam: false)
             }) {
               Label(isHiddenNFT(nft.token) ? Strings.Wallet.nftUnhide : Strings.recentSearchHide, braveSystemImage: isHiddenNFT(nft.token) ? "leo.eye.on" : "leo.eye.off")
             }
             Button(action: {
-              nftStore.updateNFTStatus(nft.token, visible: isSpamNFT(nft.token), spamStatus: !isSpamNFT(nft.token))
+              nftStore.updateNFTStatus(nft.token, visible: isSpamNFT(nft.token), isSpam: !isSpamNFT(nft.token))
             }) {
               Label(isSpamNFT(nft.token) ? Strings.Wallet.nftUnspam : Strings.Wallet.nftMoveToSpam, braveSystemImage: "leo.disable.outline")
             }

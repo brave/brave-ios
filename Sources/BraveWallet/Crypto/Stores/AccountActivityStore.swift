@@ -12,8 +12,8 @@ class AccountActivityStore: ObservableObject {
   /// selected account changes (ex. when removing an account).
   let observeAccountUpdates: Bool
   private(set) var account: BraveWallet.AccountInfo
-  @Published private(set) var userVisibleAssets: [AssetViewModel] = []
-  @Published private(set) var userVisibleNFTs: [NFTAssetViewModel] = []
+  @Published private(set) var userAssets: [AssetViewModel] = []
+  @Published private(set) var userNFTs: [NFTAssetViewModel] = []
   @Published var transactionSummaries: [TransactionSummary] = []
   @Published private(set) var currencyCode: String = CurrencyCode.usd.code {
     didSet {
@@ -87,14 +87,14 @@ class AccountActivityStore: ObservableObject {
         let tokens: [BraveWallet.BlockchainToken]
         let sortOrder: Int
       }
-      let allVisibleUserAssets = assetManager.getAllUserAssetsInNetworkAssets(networks: networksForAccount, visible: true)
+      let allUserAssets = assetManager.getAllUserAssetsInNetworkAssets(networks: networksForAccount, includingSpam: true)
       let allTokens = await blockchainRegistry.allTokens(in: networksForAccountCoin).flatMap(\.tokens)
-      var updatedUserVisibleAssets: [AssetViewModel] = []
-      var updatedUserVisibleNFTs: [NFTAssetViewModel] = []
-      for networkAssets in allVisibleUserAssets {
+      var updatedUserAssets: [AssetViewModel] = []
+      var updatedUserNFTs: [NFTAssetViewModel] = []
+      for networkAssets in allUserAssets {
         for token in networkAssets.tokens {
           if token.isErc721 || token.isNft {
-            updatedUserVisibleNFTs.append(
+            updatedUserNFTs.append(
               NFTAssetViewModel(
                 token: token,
                 network: networkAssets.network,
@@ -102,7 +102,7 @@ class AccountActivityStore: ObservableObject {
               )
             )
           } else {
-            updatedUserVisibleAssets.append(
+            updatedUserAssets.append(
               AssetViewModel(
                 groupType: .none,
                 token: token,
@@ -115,12 +115,12 @@ class AccountActivityStore: ObservableObject {
           }
         }
       }
-      self.userVisibleAssets = updatedUserVisibleAssets
-      self.userVisibleNFTs = updatedUserVisibleNFTs
+      self.userAssets = updatedUserAssets
+      self.userNFTs = updatedUserNFTs
       
       let keyringForAccount = await keyringService.keyringInfo(account.keyringId)
       typealias TokenNetworkAccounts = (token: BraveWallet.BlockchainToken, network: BraveWallet.NetworkInfo, accounts: [BraveWallet.AccountInfo])
-      let allTokenNetworkAccounts = allVisibleUserAssets.flatMap { networkAssets in
+      let allTokenNetworkAccounts = allUserAssets.flatMap { networkAssets in
         networkAssets.tokens.map { token in
           TokenNetworkAccounts(
             token: token,
@@ -147,30 +147,30 @@ class AccountActivityStore: ObservableObject {
         })
       })
       
-      // fetch price for every visible token
-      let allVisibleTokens = allVisibleUserAssets.flatMap(\.tokens)
-      let allVisibleTokenAssetRatioIds = allVisibleTokens.map(\.assetRatioId)
+      // fetch price for every user asset
+      let allUserAssetsInToken = allUserAssets.flatMap(\.tokens)
+      let allUserAssetsAssetRatioIds = allUserAssetsInToken.map(\.assetRatioId)
       let prices: [String: String] = await assetRatioService.fetchPrices(
-        for: allVisibleTokenAssetRatioIds,
+        for: allUserAssetsAssetRatioIds,
         toAssets: [currencyFormatter.currencyCode],
         timeframe: .oneDay
       )
       
       // fetch NFTs metadata
       let allNFTMetadata = await rpcService.fetchNFTMetadata(
-        tokens: userVisibleNFTs
+        tokens: userNFTs
           .map(\.token)
           .filter({ $0.isErc721 || $0.isNft }),
         ipfsApi: ipfsApi
       )
       
       guard !Task.isCancelled else { return }
-      updatedUserVisibleAssets.removeAll()
-      updatedUserVisibleNFTs.removeAll()
-      for networkAssets in allVisibleUserAssets {
+      updatedUserAssets.removeAll()
+      updatedUserNFTs.removeAll()
+      for networkAssets in allUserAssets {
         for token in networkAssets.tokens {
           if token.isErc721 || token.isNft {
-            updatedUserVisibleNFTs.append(
+            updatedUserNFTs.append(
               NFTAssetViewModel(
                 token: token,
                 network: networkAssets.network,
@@ -179,7 +179,7 @@ class AccountActivityStore: ObservableObject {
               )
             )
           } else {
-            updatedUserVisibleAssets.append(
+            updatedUserAssets.append(
               AssetViewModel(
                 groupType: .none,
                 token: token,
@@ -192,17 +192,17 @@ class AccountActivityStore: ObservableObject {
           }
         }
       }
-      self.userVisibleAssets = updatedUserVisibleAssets
-      self.userVisibleNFTs = updatedUserVisibleNFTs
+      self.userAssets = updatedUserAssets
+      self.userNFTs = updatedUserNFTs
       
-      let assetRatios = self.userVisibleAssets.reduce(into: [String: Double](), {
+      let assetRatios = self.userAssets.reduce(into: [String: Double](), {
         $0[$1.token.assetRatioId.lowercased()] = Double($1.price)
       })
       
       self.transactionSummaries = await fetchTransactionSummarys(
         networksForAccountCoin: networksForAccountCoin,
         accountInfos: keyringForAccount.accountInfos,
-        userVisibleTokens: userVisibleAssets.map(\.token),
+        userAssets: userAssets.map(\.token),
         allTokens: allTokens,
         assetRatios: assetRatios
       )
@@ -212,7 +212,7 @@ class AccountActivityStore: ObservableObject {
   @MainActor private func fetchTransactionSummarys(
     networksForAccountCoin: [BraveWallet.NetworkInfo],
     accountInfos: [BraveWallet.AccountInfo],
-    userVisibleTokens: [BraveWallet.BlockchainToken],
+    userAssets: [BraveWallet.BlockchainToken],
     allTokens: [BraveWallet.BlockchainToken],
     assetRatios: [String: Double]
   ) async -> [TransactionSummary] {
@@ -224,7 +224,7 @@ class AccountActivityStore: ObservableObject {
     let unknownTokenContractAddresses = transactions
       .flatMap { $0.tokenContractAddresses }
       .filter { contractAddress in
-        !userVisibleTokens.contains(where: { $0.contractAddress.caseInsensitiveCompare(contractAddress) == .orderedSame })
+        !userAssets.contains(where: { $0.contractAddress.caseInsensitiveCompare(contractAddress) == .orderedSame })
         && !allTokens.contains(where: { $0.contractAddress.caseInsensitiveCompare(contractAddress) == .orderedSame })
         && !tokenInfoCache.keys.contains(where: { $0.caseInsensitiveCompare(contractAddress) == .orderedSame })
       }
@@ -245,7 +245,7 @@ class AccountActivityStore: ObservableObject {
           from: transaction,
           network: network,
           accountInfos: accountInfos,
-          visibleTokens: userVisibleTokens,
+          userAssets: userAssets,
           allTokens: allTokens,
           assetRatios: assetRatios,
           solEstimatedTxFee: solEstimatedTxFees[transaction.id],

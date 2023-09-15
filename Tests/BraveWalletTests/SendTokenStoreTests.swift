@@ -105,7 +105,7 @@ class SendTokenStoreTests: XCTestCase {
     let solTxManagerProxy = BraveWallet.TestSolanaTxManagerProxy()
     
     let mockAssetManager = TestableWalletUserAssetManager()
-    mockAssetManager._getAllUserAssetsInNetworkAssets = { _ in
+    mockAssetManager._getAllUserAssetsInNetworkAssetsByVisibility = { _, _ in
       userAssets.map { (network, tokens) in
         NetworkAssets(network: network, tokens: tokens, sortOrder: 0)
       }
@@ -419,7 +419,7 @@ class SendTokenStoreTests: XCTestCase {
     walletService._userAssets = { $2([.previewToken]) }
     
     let mockAssetManager = TestableWalletUserAssetManager()
-    mockAssetManager._getAllUserAssetsInNetworkAssets = { _ in
+    mockAssetManager._getAllUserAssetsInNetworkAssets = { _, _ in
       [NetworkAssets(network: .mockMainnet, tokens: [.previewToken], sortOrder: 0)]
     }
 

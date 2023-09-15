@@ -13,7 +13,7 @@ public class AssetStore: ObservableObject, Equatable {
   @Published var token: BraveWallet.BlockchainToken
   @Published var isVisible: Bool {
     didSet {
-      assetManager.updateUserAsset(for: token, visible: isVisible, spamStatus: false, completion: nil)
+      assetManager.updateUserAsset(for: token, visible: isVisible, isSpam: false, completion: nil)
     }
   }
   var network: BraveWallet.NetworkInfo
@@ -97,7 +97,7 @@ public class UserAssetsStore: ObservableObject {
         }
       }
       let networks: [BraveWallet.NetworkInfo] = self.networkFilters.filter(\.isSelected).map(\.model)
-      let allUserAssets = assetManager.getAllUserAssetsInNetworkAssets(networks: networks)
+      let allUserAssets = assetManager.getAllUserAssetsInNetworkAssets(networks: networks, includingSpam: true)
       var allTokens = await self.blockchainRegistry.allTokens(in: networks)
       // Filter `allTokens` to remove any tokens existing in `allUserAssets`. This is possible for ERC721 tokens in the registry without a `tokenId`, which requires the user to add as a custom token
       let allUserTokens = allUserAssets.flatMap(\.tokens)
@@ -193,7 +193,7 @@ public class UserAssetsStore: ObservableObject {
   
   @MainActor func allAssets() async -> [AssetViewModel] {
     let allNetworks = await rpcService.allNetworksForSupportedCoins()
-    let allUserAssets = assetManager.getAllUserAssetsInNetworkAssets(networks: allNetworks)
+    let allUserAssets = assetManager.getAllUserAssetsInNetworkAssets(networks: allNetworks, includingSpam: true)
     // Filter `allTokens` to remove any tokens existing in `allUserAssets`. This is possible for ERC721 tokens in the registry without a `tokenId`, which requires the user to add as a custom token
     let allUserTokens = allUserAssets.flatMap(\.tokens)
     let allBlockchainTokens = await blockchainRegistry.allTokens(in: allNetworks)
@@ -222,7 +222,7 @@ public class UserAssetsStore: ObservableObject {
   
   @MainActor func allNFTMetadata() async -> [String: NFTMetadata] {
     let allNetworks = await rpcService.allNetworksForSupportedCoins()
-    let allUserAssets = assetManager.getAllUserAssetsInNetworkAssets(networks: allNetworks)
+    let allUserAssets = assetManager.getAllUserAssetsInNetworkAssets(networks: allNetworks, includingSpam: true)
     // Filter `allTokens` to remove any tokens existing in `allUserAssets`. This is possible for ERC721 tokens in the registry without a `tokenId`, which requires the user to add as a custom token
     let allUserTokens = allUserAssets.flatMap(\.tokens)
     

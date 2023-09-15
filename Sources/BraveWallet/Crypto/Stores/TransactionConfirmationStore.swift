@@ -208,8 +208,8 @@ public class TransactionConfirmationStore: ObservableObject {
     let transactionNetworks: [BraveWallet.NetworkInfo] = Set(allTxs.map(\.chainId))
       .compactMap { chainId in allNetworks.first(where: { $0.chainId == chainId }) }
     for network in transactionNetworks {
-      let userVisibleTokens = assetManager.getAllUserAssetsInNetworkAssets(networks: [network]).flatMap { $0.tokens }
-      await fetchAssetRatios(for: userVisibleTokens)
+      let userAssets = assetManager.getAllUserAssetsInNetworkAssets(networks: [network], includingSpam: true).flatMap { $0.tokens }
+      await fetchAssetRatios(for: userAssets)
     }
     await fetchUnknownTokens(for: unapprovedTxs)
     await fetchSolEstimatedTxFees(for: unapprovedTxs)
@@ -238,7 +238,7 @@ public class TransactionConfirmationStore: ObservableObject {
         return
       }
       let allTokens = await blockchainRegistry.allTokens(network.chainId, coin: coin) + tokenInfoCache.map(\.value)
-      let userVisibleTokens = assetManager.getAllUserAssetsInNetworkAssets(networks: [network]).flatMap { $0.tokens }
+      let userAssets = assetManager.getAllUserAssetsInNetworkAssets(networks: [network], includingSpam: true).flatMap { $0.tokens }
       let solEstimatedTxFee: UInt64? = solEstimatedTxFeeCache[transaction.id]
       
       if transaction.isEIP1559Transaction {
@@ -248,7 +248,7 @@ public class TransactionConfirmationStore: ObservableObject {
       guard let parsedTransaction = transaction.parsedTransaction(
         network: network,
         accountInfos: keyring.accountInfos,
-        visibleTokens: userVisibleTokens,
+        userAssets: userAssets,
         allTokens: allTokens,
         assetRatios: assetRatios,
         solEstimatedTxFee: solEstimatedTxFee,
@@ -362,11 +362,11 @@ public class TransactionConfirmationStore: ObservableObject {
     guard let network = allNetworks.first(where: { $0.chainId == BraveWallet.MainnetChainId }) else {
       return
     }
-    let userVisibleTokens = assetManager.getAllUserAssetsInNetworkAssets(networks: [network]).flatMap { $0.tokens }
+    let userAssets = assetManager.getAllUserAssetsInNetworkAssets(networks: [network], includingSpam: true).flatMap { $0.tokens }
     let allTokens = await blockchainRegistry.allTokens(network.chainId, coin: network.coin)
     let unknownTokenContractAddresses = mainnetTransactions.flatMap(\.tokenContractAddresses)
       .filter { contractAddress in
-        !userVisibleTokens.contains(where: { $0.contractAddress(in: network).caseInsensitiveCompare(contractAddress) == .orderedSame })
+        !userAssets.contains(where: { $0.contractAddress(in: network).caseInsensitiveCompare(contractAddress) == .orderedSame })
         && !allTokens.contains(where: { $0.contractAddress(in: network).caseInsensitiveCompare(contractAddress) == .orderedSame })
         && !tokenInfoCache.keys.contains(where: { $0.caseInsensitiveCompare(contractAddress) == .orderedSame })
       }
