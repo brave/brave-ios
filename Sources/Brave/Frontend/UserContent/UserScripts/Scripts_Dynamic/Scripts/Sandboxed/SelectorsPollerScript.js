@@ -792,8 +792,6 @@ window.__firefox__.execute(function($) {
       try {
         return element.matches(selector)
       } catch (error) {
-        console.error(`Invalid selector '${selector}'`)
-        
         // Remove the culprit from everywhere so it doesn't cause errors
         CC.hiddenSelectors.delete(selector)
         CC.unhiddenSelectors.add(selector)
