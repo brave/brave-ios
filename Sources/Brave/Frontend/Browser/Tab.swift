@@ -80,12 +80,6 @@ class Tab: NSObject {
   var isPrivate: Bool {
     return type.isPrivate
   }
-  
-  /// Boolean tracking custom url-scheme alert presented
-  var isExternalAppAlertPresented = false
-  var externalAppAlertCounter = 0
-  var isExternalAppAlertSuppressed = false
-  var externalAppURLDomain: String?
 
   var secureContentState: TabSecureContentState = .unknown
   var sslPinningError: Error?
@@ -314,6 +308,19 @@ class Tab: NSObject {
       
       self.setScript(script: .nightMode, enabled: isNightModeEnabled)
     }
+  }
+  
+  /// Boolean tracking custom url-scheme alert presented
+  var isExternalAppAlertPresented = false
+  var externalAppAlertCounter = 0
+  var isExternalAppAlertSuppressed = false
+  var externalAppURLDomain: String?
+  
+  func resetExternalAlertProperties() {
+    externalAppAlertCounter = 0
+    isExternalAppAlertPresented = false
+    isExternalAppAlertSuppressed = false
+    externalAppURLDomain = nil
   }
 
   init(configuration: WKWebViewConfiguration, id: UUID = UUID(), type: TabType = .regular, tabGeneratorAPI: BraveTabGeneratorAPI? = nil) {

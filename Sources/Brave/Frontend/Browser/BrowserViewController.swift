@@ -1599,6 +1599,7 @@ public class BrowserViewController: UIViewController {
       return true
     } else if let selectedTab = tabManager.selectedTab, selectedTab.canGoBack {
       selectedTab.goBack()
+      resetExternalAlertProperties(selectedTab)
       return true
     }
     return false
@@ -2774,9 +2775,7 @@ extension BrowserViewController: TabDelegate {
 
   func didReloadTab(_ tab: Tab) {
     // Resetting External Alert Properties
-    tab.externalAppAlertCounter = 0
-    tab.isExternalAppAlertPresented = false
-    tab.isExternalAppAlertSuppressed = false
+    resetExternalAlertProperties(tab)
   }
   
   @MainActor
@@ -2796,6 +2795,12 @@ extension BrowserViewController: TabDelegate {
       return WalletProviderPermissionRequestsManager.shared.hasPendingRequest(for: selectedTabOrigin, coinType: .eth)
     }
     return false
+  }
+  
+  func resetExternalAlertProperties(_ tab: Tab?) {
+    if let tab = tab {
+      tab.resetExternalAlertProperties()
+    }
   }
 }
 
