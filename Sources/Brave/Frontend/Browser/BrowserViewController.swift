@@ -3184,8 +3184,12 @@ extension BrowserViewController {
   public func handleNavigationPath(path: NavigationPath) {
     // Remove Default Browser Callout - Do not show scheduled notification
     // in case an external url is triggered
-    Preferences.General.defaultBrowserCalloutDismissed.value = true
-    Preferences.DefaultBrowserIntro.defaultBrowserNotificationShouldBeShown.value = false
+    if case .url(let navigatedURL, _) = path {
+      if navigatedURL?.isWebPage(includeDataURIs: false) == true {
+        Preferences.General.defaultBrowserCalloutDismissed.value = true
+        Preferences.DefaultBrowserIntro.defaultBrowserNotificationShouldBeShown.value = false
+      }
+    }
     
     executeAfterSetup {
       NavigationPath.handle(nav: path, with: self)
