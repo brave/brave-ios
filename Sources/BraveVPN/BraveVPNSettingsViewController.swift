@@ -23,8 +23,6 @@ public class BraveVPNSettingsViewController: TableViewController {
   @available(*, unavailable)
   required init(coder: NSCoder) { fatalError() }
 
-  private let manageSubcriptionURL = URL(string: "https://apps.apple.com/account/subscriptions")
-
   // Cell/section tags so we can update them dynamically.
   private let serverSectionId = "server"
   private let hostCellId = "host"
@@ -141,8 +139,8 @@ public class BraveVPNSettingsViewController: TableViewController {
                        context: [ColoredDetailCell.colorKey: statusDetailColor]),
                    Row(text: Strings.VPN.settingsSubscriptionExpiration, detailText: expiration),
                    Row(text: Strings.VPN.settingsManageSubscription,
-                       selection: { [unowned self] in
-                         guard let url = self.manageSubcriptionURL else { return }
+                       selection: {
+                         guard let url = URL.apple.manageSubscriptions else { return }
                            if UIApplication.shared.canOpenURL(url) {
                              // Opens Apple's 'manage subscription' screen.
                              UIApplication.shared.open(url, options: [:])
