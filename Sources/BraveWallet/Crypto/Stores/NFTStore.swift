@@ -7,7 +7,7 @@ import Foundation
 import BraveCore
 import Preferences
 
-struct NFTAssetViewModel: Identifiable, Equatable {
+struct NFTViewModel: Identifiable, Equatable {
   var token: BraveWallet.BlockchainToken
   var network: BraveWallet.NetworkInfo
   /// Balance for the NFT for each account address. The key is the account address.
@@ -17,15 +17,22 @@ struct NFTAssetViewModel: Identifiable, Equatable {
   public var id: String {
     token.id + network.chainId
   }
+}
+
+struct NFTGroupViewModel: WalletAssetGroupViewModel, Equatable, Identifiable {
+  typealias ViewModel = NFTViewModel
   
-  static func == (lhs: NFTAssetViewModel, rhs: NFTAssetViewModel) -> Bool {
-    lhs.id == rhs.id
+  var groupType: AssetGroupType
+  var assets: [NFTViewModel]
+  
+  var id: String {
+    "\(groupType.id) \(title)"
   }
 }
 
 public class NFTStore: ObservableObject {
   /// The NFTs grouped by enum `NFTDisplayType` displayed in `NFTView`
-  var displayNFTs: [NFTAssetViewModel] {
+  var displayNFTs: [NFTViewModel] {
     switch displayType {
     case .visible:
       return userVisibleNFTs
@@ -113,9 +120,9 @@ public class NFTStore: ObservableObject {
   }
 
   @Published var displayType: NFTDisplayType = .visible
-  @Published private(set) var userVisibleNFTs: [NFTAssetViewModel] = []
-  @Published private(set) var userHiddenNFTs: [NFTAssetViewModel] = []
-  @Published private(set) var userSpamNFTs: [NFTAssetViewModel] = []
+  @Published private(set) var userVisibleNFTs: [NFTViewModel] = []
+  @Published private(set) var userHiddenNFTs: [NFTViewModel] = []
+  @Published private(set) var userSpamNFTs: [NFTViewModel] = []
   
   private var simpleHashSpamNFTs: [NetworkAssets] = []
   
@@ -292,7 +299,7 @@ public class NFTStore: ObservableObject {
   
   func updateNFTMetadataCache(for token: BraveWallet.BlockchainToken, metadata: NFTMetadata) {
     metadataCache[token.id] = metadata
-    var targetList: [NFTAssetViewModel]?
+    var targetList: [NFTViewModel]?
     switch displayType {
     case .visible:
       targetList = userVisibleNFTs
@@ -317,11 +324,11 @@ public class NFTStore: ObservableObject {
   
   private func buildAssetViewModels(
     allUserAssets: [NetworkAssets]
-  ) -> [NFTAssetViewModel] {
+  ) -> [NFTViewModel] {
     allUserAssets.flatMap { networkAssets in
       networkAssets.tokens.compactMap { token in
         guard token.isErc721 || token.isNft else { return nil }
-        return NFTAssetViewModel(
+        return NFTViewModel(
           token: token,
           network: networkAssets.network,
           balanceForAccounts: nftBalancesCache[token.id] ?? [:],
@@ -461,7 +468,7 @@ extension NFTStore: PreferencesObserver {
   }
 }
 
-private extension Array where Element == NFTAssetViewModel {
+private extension Array where Element == NFTViewModel {
   /// Optionally filters out NFTs not belonging to the given `selectedAccounts`.
   func optionallyFilterUnownedNFTs(
     isHidingUnownedNFTs: Bool,

@@ -16,7 +16,7 @@ struct NFTView: View {
   
   @State private var isPresentingFiltersDisplaySettings: Bool = false
   @State private var isPresentingEditUserAssets: Bool = false
-  @State private var selectedNFTViewModel: NFTAssetViewModel?
+  @State private var selectedNFTViewModel: NFTViewModel?
   @State private var isShowingNFTDiscoveryAlert: Bool = false
   @State private var isShowingAddCustomNFT: Bool = false
   @State private var isNFTDiscoveryEnabled: Bool = false
@@ -69,7 +69,7 @@ struct NFTView: View {
   
   private let nftGrids = [GridItem(.adaptive(minimum: 120), spacing: 16, alignment: .top)]
   
-  @ViewBuilder private func nftLogo(_ nftViewModel: NFTAssetViewModel) -> some View {
+  @ViewBuilder private func nftLogo(_ nftViewModel: NFTViewModel) -> some View {
     if let image = nftViewModel.network.nativeTokenLogoImage, nftStore.filters.isShowingNFTNetworkLogo {
       Image(uiImage: image)
         .resizable()
@@ -78,7 +78,7 @@ struct NFTView: View {
     }
   }
   
-  @ViewBuilder private func nftImage(_ nftViewModel: NFTAssetViewModel) -> some View {
+  @ViewBuilder private func nftImage(_ nftViewModel: NFTViewModel) -> some View {
     Group {
       if let urlString = nftViewModel.nftMetadata?.imageURLString {
         NFTImageView(urlString: urlString) {
@@ -92,7 +92,7 @@ struct NFTView: View {
     .cornerRadius(4)
   }
   
-  @ViewBuilder private func noImageView(_ nftViewModel: NFTAssetViewModel) -> some View {
+  @ViewBuilder private func noImageView(_ nftViewModel: NFTViewModel) -> some View {
     Blockie(address: nftViewModel.token.contractAddress, shape: .rectangle)
       .overlay(
         Text(nftViewModel.token.symbol.first?.uppercased() ?? "")

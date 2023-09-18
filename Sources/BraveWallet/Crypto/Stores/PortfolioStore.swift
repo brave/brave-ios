@@ -26,10 +26,13 @@ public enum AssetGroupType: Equatable, Identifiable {
   }
 }
 
-public struct AssetGroupViewModel: Identifiable, Equatable {
-  let groupType: AssetGroupType
-  let assets: [AssetViewModel]
-  
+protocol WalletAssetGroupViewModel {
+  associatedtype ViewModel
+  var groupType: AssetGroupType { get }
+  var assets: [ViewModel] { get }
+}
+
+extension WalletAssetGroupViewModel {
   var title: String {
     switch groupType {
     case .none:
@@ -48,6 +51,18 @@ public struct AssetGroupViewModel: Identifiable, Equatable {
       return account.address.truncatedAddress
     }
   }
+}
+
+public struct AssetGroupViewModel: WalletAssetGroupViewModel, Equatable, Identifiable {
+  typealias ViewModel = AssetViewModel
+
+  public var groupType: AssetGroupType
+  public var assets: [AssetViewModel]
+  
+  public var id: String {
+    "\(groupType.id) \(title)"
+  }
+  
   var totalFiatValue: Double {
     assets.reduce(0) { partialResult, asset in
       let balance: Double
@@ -61,7 +76,6 @@ public struct AssetGroupViewModel: Identifiable, Equatable {
       return partialResult + assetValue
     }
   }
-  public var id: String { "\(groupType.id) \(title)" }
 }
 
 public struct AssetViewModel: Identifiable, Equatable {

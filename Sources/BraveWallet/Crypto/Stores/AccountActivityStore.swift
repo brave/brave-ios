@@ -13,7 +13,7 @@ class AccountActivityStore: ObservableObject {
   let observeAccountUpdates: Bool
   private(set) var account: BraveWallet.AccountInfo
   @Published private(set) var userAssets: [AssetViewModel] = []
-  @Published private(set) var userNFTs: [NFTAssetViewModel] = []
+  @Published private(set) var userNFTs: [NFTViewModel] = []
   @Published var transactionSummaries: [TransactionSummary] = []
   @Published private(set) var currencyCode: String = CurrencyCode.usd.code {
     didSet {
@@ -90,12 +90,12 @@ class AccountActivityStore: ObservableObject {
       let allUserAssets = assetManager.getAllUserAssetsInNetworkAssets(networks: networksForAccount, includingSpam: true)
       let allTokens = await blockchainRegistry.allTokens(in: networksForAccountCoin).flatMap(\.tokens)
       var updatedUserAssets: [AssetViewModel] = []
-      var updatedUserNFTs: [NFTAssetViewModel] = []
+      var updatedUserNFTs: [NFTViewModel] = []
       for networkAssets in allUserAssets {
         for token in networkAssets.tokens {
           if token.isErc721 || token.isNft {
             updatedUserNFTs.append(
-              NFTAssetViewModel(
+              NFTViewModel(
                 token: token,
                 network: networkAssets.network,
                 balanceForAccounts: [:]
@@ -171,7 +171,7 @@ class AccountActivityStore: ObservableObject {
         for token in networkAssets.tokens {
           if token.isErc721 || token.isNft {
             updatedUserNFTs.append(
-              NFTAssetViewModel(
+              NFTViewModel(
                 token: token,
                 network: networkAssets.network,
                 balanceForAccounts: [account.address: Int(totalBalances[token.assetBalanceId] ?? 0)],
