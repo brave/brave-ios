@@ -370,11 +370,13 @@ if (!window.__firefox__) {
   };
   
   $.dispatchEvent = function(event) {
+    delete window.dispatchEvent;
     let originalDispatchEvent = window.dispatchEvent(event);
     return originalDispatchEvent;
   }
 
   $.addEventListener = function(type, listener, optionsOrUseCapture) {
+    delete window.addEventListener;
     let originalAddEventListener = window.addEventListener(type, listener, optionsOrUseCapture);
     return originalAddEventListener;
   }
