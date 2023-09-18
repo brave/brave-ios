@@ -798,16 +798,14 @@ extension BrowserViewController {
       return
     }
 
-    // We do not want certain schemes to be opened externally when called from subframes.
-    // And tel / sms dialog should not be shown for non-active tabs #6687
-    if ["tel", "sms", "facetime", "facetime-audio"].contains(url.scheme) {
-      if !isMainFrame || tab?.url?.host != topToolbar.currentURL?.host {
-        return
-      }
-        
-      if let displayHost = tab?.url?.withoutWWW.host {
-        alertTitle = String(format: Strings.openExternalAppURLTitle, displayHost)
-      }
+    // We do not schemes to be opened externally when called from subframes.
+    // And external dialog should not be shown for non-active tabs #6687 - #7835
+    if !isMainFrame || tab?.url?.host != topToolbar.currentURL?.host {
+      return
+    }
+      
+    if let displayHost = tab?.url?.withoutWWW.host {
+      alertTitle = String(format: Strings.openExternalAppURLTitle, displayHost)
     }
     
     // Handling condition when Tab is empty when handling an external URL we should remove the tab once the user decides
@@ -819,6 +817,9 @@ extension BrowserViewController {
     
     // Show the external sceheme invoke alert
     func showExternalSchemeAlert(isSuppressActive: Bool) {
+      // Check if active controller is bvc otherwise do not show show external sceheme alerts
+      guard shouldShowExternalSchemeAlert() else { return }
+      
       view.endEditing(true)
       tab?.isExternalAppAlertPresented = true
 
@@ -848,6 +849,32 @@ extension BrowserViewController {
         return .flyDown
       }
       popup.showWithType(showType: .flyUp)
+    }
+    
+    func shouldShowExternalSchemeAlert() -> Bool {
+      guard let rootVC = currentScene?.browserViewController else {
+        return false
+      }
+      
+      func topViewController(startingFrom viewController: UIViewController) -> UIViewController {
+        var top = viewController
+        if let navigationController = top as? UINavigationController,
+          let vc = navigationController.visibleViewController {
+          return topViewController(startingFrom: vc)
+        }
+        if let tabController = top as? UITabBarController,
+          let vc = tabController.selectedViewController {
+          return topViewController(startingFrom: vc)
+        }
+        while let next = top.presentedViewController {
+          top = next
+        }
+        return top
+      }
+      
+      let isTopController = self == topViewController(startingFrom: rootVC)
+      let isTopWindow = view.window?.isKeyWindow == true
+      return isTopController && isTopWindow
     }
 
     tab?.externalAppAlertCounter += 1
