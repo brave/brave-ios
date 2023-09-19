@@ -205,7 +205,6 @@ struct WalletPanelView: View {
   }
   
   @State private var ethPermittedAccounts: [String] = []
-  @State private var solConnectedAddresses: Set<String> = .init()
   @State private var isConnectHidden: Bool = false
   
   enum ConnectionStatus {
@@ -238,7 +237,7 @@ struct WalletPanelView: View {
       if !allowSolProviderAccess.value {
         return .blocked
       } else {
-        return solConnectedAddresses.contains(selectedAccount.address) ? .connected : .disconnected
+        return tabDappStore.solConnectedAddresses.contains(selectedAccount.address) ? .connected : .disconnected
       }
     case .fil, .btc:
       return .blocked
@@ -255,8 +254,6 @@ struct WalletPanelView: View {
         presentWalletWithContext(.editSiteConnection(origin, handler: { accounts in
           if keyringStore.selectedAccount.coin == .eth {
             ethPermittedAccounts = accounts
-          } else if keyringStore.selectedAccount.coin == .sol {
-            solConnectedAddresses = Set(accounts)
           }
           isConnectHidden = isConnectButtonHidden()
         }))
@@ -500,9 +497,6 @@ struct WalletPanelView: View {
         presentWalletWithContext(.pendingRequests)
       }
     }
-    .onChange(of: tabDappStore.solConnectedAddresses) { newValue in
-      solConnectedAddresses = newValue
-    }
     .onChange(of: keyringStore.selectedAccount) { _ in
       isConnectHidden = isConnectButtonHidden()
     }
@@ -512,9 +506,6 @@ struct WalletPanelView: View {
           if request.coinType == .eth {
             ethPermittedAccounts = accounts
           } else if request.coinType == .sol {
-            // User might be prompted with only non-connected accounts, but have other accounts connected.
-            // If they cancel the request, `accounts` would be empty despite having connected accounts.
-            solConnectedAddresses = tabDappStore.solConnectedAddresses
             isConnectHidden = false
           }
           tabDappStore.latestPendingPermissionRequest = nil
@@ -529,9 +520,6 @@ struct WalletPanelView: View {
           if request.coinType == .eth {
             ethPermittedAccounts = accounts
           } else if request.coinType == .sol {
-            // User might be prompted with only non-connected accounts, but have other accounts connected.
-            // If they cancel the request, `accounts` would be empty despite having connected accounts.
-            solConnectedAddresses = tabDappStore.solConnectedAddresses
             isConnectHidden = false
           }
         }))
@@ -544,9 +532,7 @@ struct WalletPanelView: View {
       if let url = origin.url, let accounts = Domain.walletPermissions(forUrl: url, coin: .eth) {
         ethPermittedAccounts = accounts
       }
-      
-      solConnectedAddresses = tabDappStore.solConnectedAddresses
-      
+            
       isConnectHidden = isConnectButtonHidden()
       
       accountActivityStore.update()
