@@ -51,6 +51,12 @@ public class BraveVPN {
       }
     }
     
+    print("\nVPN Test Initialize ===================================================\n ")
+
+    print("VPN Test Initialize - HasExpired: \(hasExpired)")
+   
+    print("\nVPN Test Initialize ===================================================\n ")
+    
     if let customCredential = customCredential {
       if hasExpired == true {
         clearConfiguration()
@@ -151,11 +157,29 @@ public class BraveVPN {
       let receiptResponseItem = GRDIAPReceiptResponse(withReceiptResponse: response)
       let processedReceiptDetail = BraveVPN.processReceiptResponse(receiptResponseItem: receiptResponseItem)
 
+      print("\nVPN Test Verify Receipt Data ===================================================\n ")
+
+      print("VPN Test Verify Receipt Data - Receipt Detail: \(processedReceiptDetail)")
+
+      print("\nVPN Test Verify Receipt Data ===================================================\n ")
+
       switch processedReceiptDetail.status {
       case .expired:
+        print("\nVPN Test Verify Receipt Data ===================================================\n ")
+
+        print("VPN Test Verify Receipt Data - Receipt Expired: \(processedReceiptDetail.status)")
+
+        print("\nVPN Test Verify Receipt Data ===================================================\n ")
+        
         Preferences.VPN.expirationDate.value = Date(timeIntervalSince1970: 1)
         logAndStoreError("VPN Subscription LineItems are empty subscription expired", printToConsole: false)
       case .active, .retryPeriod:
+        print("\nVPN Test Verify Receipt Data ===================================================\n ")
+
+        print("VPN Test Verify Receipt Data - Receipt Active - Retry Period: \(processedReceiptDetail.status)")
+
+        print("\nVPN Test Verify Receipt Data ===================================================\n ")
+        
         if let expirationDate = processedReceiptDetail.expiryDate {
           Preferences.VPN.expirationDate.value = expirationDate
         }
@@ -190,12 +214,38 @@ public class BraveVPN {
     // 0 is for turned off renewal, 1 is subscription renewal
     let autoRenewEnabled = metadata.autoRenewStatus == 1
 
-    return ReceiptResponse(
+    let response = ReceiptResponse(
       status: receiptStatus,
       expiryReason: expirationIntent,
       expiryDate: newestReceiptLineItem.expiresDate,
       isInTrialPeriod: newestReceiptLineItem.isTrialPeriod,
       autoRenewEnabled: autoRenewEnabled)
+    
+    print("\nVPN Test ===================================================\n ")
+
+    print("VPN Test Response: \(response)")
+    
+    print("\nVPN Test ===================================================\n ")
+
+    print("VPN Test newestReceiptLineItem: \(newestReceiptLineItem)")
+   
+    print("\nVPN Test ===================================================\n ")
+
+    print("VPN Test lineItemMetaData: \(String(describing: lineItemMetaData))")
+   
+    print("\nVPN Test ===================================================\n ")
+    
+    print("VPN Test right now: \(Date())")
+   
+    print("\nVPN Test ===================================================\n ")
+    
+    let interval = Date() - newestReceiptLineItem.expiresDate
+    
+    print("VPN Test subscription time left: \(String(describing: interval.minute))")
+   
+    print("\nVPN Test ===================================================\n ")
+    
+    return response
   }
 
   // MARK: - STATE
@@ -249,7 +299,10 @@ public class BraveVPN {
   /// Whether the vpn subscription has expired.
   /// Returns nil if there has been no subscription yet (user never bought the vpn).
   private static var hasExpired: Bool? {
-    guard let expirationDate = Preferences.VPN.expirationDate.value else { return nil }
+    guard let expirationDate = Preferences.VPN.expirationDate.value else {
+      print("Why expiration date is empty \(String(describing: Preferences.VPN.expirationDate.value))")
+      return nil
+    }
 
     return expirationDate < Date()
   }
@@ -638,5 +691,17 @@ public class BraveVPN {
   public static func migrateV1Credentials() {
     // Moving Brave VPN v1 users to v2 type of credentials.
     GRDCredentialManager.migrateKeychainItemsToGRDCredential()
+  }
+}
+
+extension Date {
+  static func -(recent: Date, previous: Date) -> (month: Int?, day: Int?, hour: Int?, minute: Int?, second: Int?) {
+    let day = Calendar.current.dateComponents([.day], from: previous, to: recent).day
+    let month = Calendar.current.dateComponents([.month], from: previous, to: recent).month
+    let hour = Calendar.current.dateComponents([.hour], from: previous, to: recent).hour
+    let minute = Calendar.current.dateComponents([.minute], from: previous, to: recent).minute
+    let second = Calendar.current.dateComponents([.second], from: previous, to: recent).second
+
+    return (month: month, day: day, hour: hour, minute: minute, second: second)
   }
 }
