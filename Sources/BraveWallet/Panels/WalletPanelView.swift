@@ -512,7 +512,9 @@ struct WalletPanelView: View {
           if request.coinType == .eth {
             ethPermittedAccounts = accounts
           } else if request.coinType == .sol {
-            solConnectedAddresses = Set(accounts)
+            // User might be prompted with only non-connected accounts, but have other accounts connected.
+            // If they cancel the request, `accounts` would be empty despite having connected accounts.
+            solConnectedAddresses = tabDappStore.solConnectedAddresses
             isConnectHidden = false
           }
           tabDappStore.latestPendingPermissionRequest = nil
@@ -527,7 +529,9 @@ struct WalletPanelView: View {
           if request.coinType == .eth {
             ethPermittedAccounts = accounts
           } else if request.coinType == .sol {
-            solConnectedAddresses = Set(accounts)
+            // User might be prompted with only non-connected accounts, but have other accounts connected.
+            // If they cancel the request, `accounts` would be empty despite having connected accounts.
+            solConnectedAddresses = tabDappStore.solConnectedAddresses
             isConnectHidden = false
           }
         }))
