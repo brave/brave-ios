@@ -33,6 +33,7 @@ class BuyTokenStoreTests: XCTestCase {
     blockchainRegistry._onRampCurrencies = { $0(mockOnRampCurrencies) }
     
     let keyringService = BraveWallet.TestKeyringService()
+    keyringService._addObserver = { _ in }
     keyringService._allAccounts = { completion in
       completion(.init(
         accounts: [.previewAccount],

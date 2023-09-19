@@ -92,6 +92,7 @@ public class BuyTokenStore: ObservableObject {
     }
     
     self.rpcService.add(self)
+    self.keyringService.add(self)
     
     Task {
       await updateInfo()
@@ -236,6 +237,44 @@ extension BuyTokenStore: BraveWalletJsonRpcServiceObserver {
   }
   
   public func onIsEip1559Changed(_ chainId: String, isEip1559: Bool) {
+  }
+}
+
+extension BuyTokenStore: BraveWalletKeyringServiceObserver {
+  public func keyringCreated(_ keyringId: BraveWallet.KeyringId) {
+  }
+  
+  public func keyringRestored(_ keyringId: BraveWallet.KeyringId) {
+  }
+  
+  public func keyringReset() {
+  }
+  
+  public func locked() {
+  }
+  
+  public func unlocked() {
+  }
+  
+  public func backedUp() {
+  }
+  
+  public func accountsChanged() {
+  }
+  
+  public func accountsAdded(_ addedAccounts: [BraveWallet.AccountInfo]) {
+  }
+  
+  public func autoLockMinutesChanged() {
+  }
+  
+  public func selectedWalletAccountChanged(_ account: BraveWallet.AccountInfo) {
+    Task { @MainActor in
+      await updateInfo()
+    }
+  }
+  
+  public func selectedDappAccountChanged(_ coin: BraveWallet.CoinType, account: BraveWallet.AccountInfo?) {
   }
 }
 
