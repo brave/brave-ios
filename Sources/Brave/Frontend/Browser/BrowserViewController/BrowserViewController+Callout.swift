@@ -30,35 +30,11 @@ extension BrowserViewController {
    - VPN Link Receipt
   */
   func presentFullScreenCallouts() {
-    for type in FullScreenCalloutType.allCases {
-      presentScreenCallout(for: type)
-    }
+    presentScreenCallout(for: .blockCookieConsentNotices)
   }
   
   private func presentScreenCallout(for type: FullScreenCalloutType, skipSafeGuards: Bool = false) {
-    // Check the type custom callout can be shown
-    guard shouldShowCallout(calloutType: type, skipSafeGuards: skipSafeGuards) else {
-      return
-    }
-    
-    switch type {
-    case .p3a:
-      presentP3AScreenCallout()
-    case .vpnUpdateBilling:
-      presentVPNUpdateBillingCallout(skipSafeGuards: skipSafeGuards)
-    case .bottomBar:
-      presentBottomBarCallout(skipSafeGuards: skipSafeGuards)
-    case .defaultBrowser:
-      presentDefaultBrowserScreenCallout()
-    case .rewards:
-      presentBraveRewardsScreenCallout(skipSafeGuards: skipSafeGuards)
-    case .blockCookieConsentNotices:
-      presentCookieNotificationBlockingCallout(skipSafeGuards: skipSafeGuards)
-    case .vpnPromotion:
-      presentVPNPromotionCallout(skipSafeGuards: skipSafeGuards)
-    case .vpnLinkReceipt:
-      presentVPNLinkReceiptCallout(skipSafeGuards: skipSafeGuards)
-    }
+   presentVPNUpdateBillingCallout(skipSafeGuards: skipSafeGuards)
   }
   
   // MARK: Conditional Callout Methods
@@ -259,6 +235,12 @@ extension BrowserViewController {
       guard let receiptStatus = Preferences.VPN.vpnReceiptStatus.value else {
         return
       }
+      
+      print("\nVPN Test Callout ===================================================\n ")
+
+      print("VPN Test CalloutReceipt - Receipt Status: \(receiptStatus)")
+     
+      print("\nVPN Test Callout ===================================================\n ")
       
       if receiptStatus != BraveVPN.ReceiptResponse.Status.retryPeriod.rawValue {
         return
