@@ -15,6 +15,9 @@ extension Preferences {
       /// In case of receipt expiration this date might be set to some old date(like year 1970)
       /// to make sure vpn expiration logic will be called.
       public static let expirationDate = Option<Date?>(key: "vpn.expiration-date", default: nil)
+      /// When the current subscription plan expires, the subscription goes in grace period
+      ///  the service should continue if subscription is grace period
+      public static let gracePeriodExpirationDate = Option<Date?>(key: "vpn.grace.expiration-date", default: nil)
       /// The status of vpn receipt status, used to determine retry period
       public static let vpnReceiptStatus = Option<Int?>(key: "vpn.receipt-status", default: nil)
       /// Whether free trial for the vpn expired for the user.

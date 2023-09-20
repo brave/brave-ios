@@ -238,7 +238,7 @@ extension BrowserViewController {
       
       print("\nVPN Test Callout ===================================================\n ")
 
-      print("VPN Test CalloutReceipt - Receipt Status: \(receiptStatus)")
+      print("VPN Test Callout - Receipt Status: \(receiptStatus)")
      
       print("\nVPN Test Callout ===================================================\n ")
       
