@@ -247,14 +247,18 @@ extension BrowserViewController {
       }
     }
     
-    presentVPNChurnPromoCallout(for: .updateBillingExpired) {
-      // Opens Apple's 'manage subscription' screen
-      guard let url = URL.apple.manageSubscriptions else { return }
-      
-      if UIApplication.shared.canOpenURL(url) {
-        UIApplication.shared.open(url, options: [:])
+#if compiler(>=5.8)
+    if #available(iOS 16.4, *) {
+      presentVPNChurnPromoCallout(for: .updateBillingExpired) {
+        // Opens Apple's 'manage subscription' screen
+        guard let url = URL.apple.manageSubscriptions else { return }
+        
+        if UIApplication.shared.canOpenURL(url) {
+          UIApplication.shared.open(url, options: [:])
+        }
       }
     }
+#endif
   }
   
   // MARK: Helper Methods for Presentation
