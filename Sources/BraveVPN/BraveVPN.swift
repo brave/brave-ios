@@ -50,13 +50,7 @@ public class BraveVPN {
         }
       }
     }
-    
-    print("\nVPN Test Initialize ===================================================\n ")
 
-    print("VPN Test Initialize - HasExpired: \(hasExpired)")
-   
-    print("\nVPN Test Initialize ===================================================\n ")
-    
     if let customCredential = customCredential {
       if hasExpired == true {
         clearConfiguration()
@@ -157,30 +151,12 @@ public class BraveVPN {
       let receiptResponseItem = GRDIAPReceiptResponse(withReceiptResponse: response)
       let processedReceiptDetail = BraveVPN.processReceiptResponse(receiptResponseItem: receiptResponseItem)
 
-      print("\nVPN Test Verify Receipt Data ===================================================\n ")
-
-      print("VPN Test Verify Receipt Data - Receipt Detail: \(processedReceiptDetail)")
-
-      print("\nVPN Test Verify Receipt Data ===================================================\n ")
-
       switch processedReceiptDetail.status {
       case .expired:
-        print("\nVPN Test Verify Receipt Data ===================================================\n ")
-
-        print("VPN Test Verify Receipt Data - Receipt Expired: \(processedReceiptDetail.status)")
-
-        print("\nVPN Test Verify Receipt Data ===================================================\n ")
-        
         Preferences.VPN.expirationDate.value = Date(timeIntervalSince1970: 1)
         Preferences.VPN.originalTransactionId.value = nil
         logAndStoreError("VPN Subscription LineItems are empty subscription expired", printToConsole: false)
       case .active, .retryPeriod:
-        print("\nVPN Test Verify Receipt Data ===================================================\n ")
-
-        print("VPN Test Verify Receipt Data - Receipt Active - Retry Period: \(processedReceiptDetail.status)")
-
-        print("\nVPN Test Verify Receipt Data ===================================================\n ")
-        
         if let expirationDate = processedReceiptDetail.expiryDate {
           Preferences.VPN.expirationDate.value = expirationDate
         }
@@ -203,26 +179,6 @@ public class BraveVPN {
   
   public static func processReceiptResponse(receiptResponseItem: GRDIAPReceiptResponse) -> ReceiptResponse {
     guard let newestReceiptLineItem = receiptResponseItem.lineItems.sorted(by: { $0.expiresDate > $1.expiresDate }).first else {
-      print("\nVPN Test Process ===================================================\n ")
-
-      print("VPN Test Process - No proper expiry date")
-      
-      print("VPN Test Process - Number of line items - \(receiptResponseItem.lineItems.count)")
-      
-      print("\nVPN Test Process ===================================================\n ")
-      
-      let allLineItemMetaData = receiptResponseItem.lineItemsMetadata
-      
-      print("\nVPN Test Process ===================================================\n ")
-      
-      print("VPN Test Process - LineItemMetaData Bunch \(allLineItemMetaData)")
-      
-      print("VPN Test Process - LineItemMetaData Bunch \(allLineItemMetaData.first?.gracePeriodExpiresDate)")
-      
-      print("VPN Test Process - LineItemMetaData Bunch \(allLineItemMetaData.count)")
-      
-      print("\nVPN Test Process ===================================================\n ")
-      
       if let originalTransactionId = Preferences.VPN.originalTransactionId.value {
         let lineItemMetaDataForOriginalId =  receiptResponseItem.lineItemsMetadata.first(
           where: { Int($0.originalTransactionId) ?? 00 == originalTransactionId })
@@ -249,12 +205,7 @@ public class BraveVPN {
     Preferences.VPN.originalTransactionId.value = newestReceiptLineItem.originalTransactionId
     
     guard let metadata = lineItemMetaData else {
-      print("\nVPN Test Process ===================================================\n ")
-
-      print("VPN Test Process - No meta data active subscription")
-      
-      print("\nVPN Test Process ===================================================\n ")
-      
+      logAndStoreError("No line item meta data - can not happen")
       return ReceiptResponse(status: .active)
     }
 
@@ -271,30 +222,6 @@ public class BraveVPN {
       graceExpiryDate: metadata.gracePeriodExpiresDate,
       isInTrialPeriod: newestReceiptLineItem.isTrialPeriod,
       autoRenewEnabled: autoRenewEnabled)
-    
-    print("\nVPN Test Process ===================================================\n ")
-
-    print("VPN Test Process - Receipt Response: \(response)")
-    
-    print("\nVPN Test Process ===================================================\n ")
-
-    print("VPN Test Process - NewestReceiptLineItem: \(newestReceiptLineItem)")
-   
-    print("\nVPN Test Process ===================================================\n ")
-
-    print("VPN Test Process - LineItemMetaData: \(String(describing: lineItemMetaData))")
-   
-    print("\nVPN Test Process ===================================================\n ")
-    
-    print("VPN Test Process - Right now: \(Date())")
-   
-    print("\nVPN Test Process ===================================================\n ")
-    
-    let interval =  newestReceiptLineItem.expiresDate - Date()
-    
-    print("VPN Test Process - Subscription time left: \(String(describing: interval.minute))")
-   
-    print("\nVPN Test Process ===================================================\n ")
     
     return response
   }
@@ -749,17 +676,5 @@ public class BraveVPN {
   public static func migrateV1Credentials() {
     // Moving Brave VPN v1 users to v2 type of credentials.
     GRDCredentialManager.migrateKeychainItemsToGRDCredential()
-  }
-}
-
-extension Date {
-  static func -(recent: Date, previous: Date) -> (month: Int?, day: Int?, hour: Int?, minute: Int?, second: Int?) {
-    let day = Calendar.current.dateComponents([.day], from: previous, to: recent).day
-    let month = Calendar.current.dateComponents([.month], from: previous, to: recent).month
-    let hour = Calendar.current.dateComponents([.hour], from: previous, to: recent).hour
-    let minute = Calendar.current.dateComponents([.minute], from: previous, to: recent).minute
-    let second = Calendar.current.dateComponents([.second], from: previous, to: recent).second
-
-    return (month: month, day: day, hour: hour, minute: minute, second: second)
   }
 }

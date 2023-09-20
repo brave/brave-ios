@@ -260,12 +260,6 @@ extension BrowserViewController {
         return
       }
       
-      print("\nVPN Test Callout ===================================================\n ")
-
-      print("VPN Test Callout - Receipt Status: \(receiptStatus)")
-     
-      print("\nVPN Test Callout ===================================================\n ")
-      
       if receiptStatus != BraveVPN.ReceiptResponse.Status.retryPeriod.rawValue {
         return
       }
