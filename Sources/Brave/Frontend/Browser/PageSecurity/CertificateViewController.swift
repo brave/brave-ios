@@ -11,7 +11,43 @@ import Shared
 import BraveShared
 import CertificateUtilities
 
-private struct CertificateTitleView: View {
+private struct CertificateKeyValueView: View, Hashable {
+  let title: String
+  let value: String?
+
+  var body: some View {
+    HStack(spacing: 12.0) {
+      Text(title)
+        .font(.system(.caption, design: .monospaced))
+      Spacer()
+      if let value = value, !value.isEmpty {
+        Text(value)
+          .fixedSize(horizontal: false, vertical: true)
+          .font(.system(.caption, design: .monospaced).weight(.medium))
+          .multilineTextAlignment(.trailing)
+      }
+    }
+  }
+}
+
+private struct CertificateSectionView<ContentView>: View where ContentView: View & Hashable {
+  let title: String
+  let values: [ContentView]
+
+  var body: some View {
+    Section(
+      header: Text(title)
+        .font(.system(.caption, design: .monospaced))
+    ) {
+
+      ForEach(values, id: \.self) {
+        $0.listRowBackground(Color(.secondaryBraveGroupedBackground))
+      }
+    }
+  }
+}
+
+struct CertificateTitleView: View {
   let isRootCertificate: Bool
   let commonName: String
   let evaluationError: String?
@@ -50,140 +86,84 @@ private struct CertificateTitleView: View {
   }
 }
 
-private struct CertificateKeyValueView: View, Hashable {
-  let title: String
-  let value: String?
-
-  var body: some View {
-    HStack(spacing: 12.0) {
-      Text(title)
-        .font(.system(.caption, design: .monospaced))
-      Spacer()
-      if let value = value, !value.isEmpty {
-        Text(value)
-          .fixedSize(horizontal: false, vertical: true)
-          .font(.system(.caption, design: .monospaced).weight(.medium))
-          .multilineTextAlignment(.trailing)
-      }
-    }
-  }
-}
-
-private struct CertificateSectionView<ContentView>: View where ContentView: View & Hashable {
-  let title: String
-  let values: [ContentView]
-
-  var body: some View {
-    Section(
-      header: Text(title)
-        .font(.system(.caption, design: .monospaced))
-    ) {
-
-      ForEach(values, id: \.self) {
-        $0.listRowBackground(Color(.secondaryBraveGroupedBackground))
-      }
-    }
-  }
-}
-
-private struct CertificateView: View {
+struct CertificateListView: View {
   let model: BraveCertificateModel
   let evaluationError: String?
 
   var body: some View {
-    VStack(spacing: 0.0) {
-      CertificateTitleView(
-        isRootCertificate: model.isRootCertificate,
-        commonName: model.subjectName.commonName,
-        evaluationError: evaluationError
-      )
-      .padding()
-      .frame(maxWidth: .infinity, alignment: .center)
-      .background(Color(.secondaryBraveGroupedBackground))
-      
-      Divider()
-        .shadow(color: Color.black.opacity(0.1),
-                radius: 5.0)
+    List {
+      // Subject name
+      CertificateSectionView(title: Strings.CertificateViewer.subjectNameTitle, values: subjectNameViews())
 
-      List {
-        content
-      }
-      .listStyle(InsetGroupedListStyle())
-      .listBackgroundColor(Color(UIColor.braveGroupedBackground))
+      // Issuer name
+      CertificateSectionView(
+        title: Strings.CertificateViewer.issuerNameTitle,
+        values: issuerNameViews())
+
+      // Common info
+      CertificateSectionView(
+        title: Strings.CertificateViewer.commonInfoTitle,
+        values: [
+          // Serial number
+          CertificateKeyValueView(
+            title: Strings.CertificateViewer.serialNumberTitle,
+            value: formattedSerialNumber),
+
+          // Version
+          CertificateKeyValueView(
+            title: Strings.CertificateViewer.versionNumberTitle,
+            value: "\(model.version)"),
+
+          // Signature Algorithm
+
+          CertificateKeyValueView(
+            title: Strings.CertificateViewer.signatureAlgorithmTitle,
+            value: "\(signatureAlgorithmDescription) (\(model.signature.absoluteObjectIdentifier.isEmpty ? BraveCertificateUtils.oid_to_absolute_oid(oid: model.signature.objectIdentifier) : model.signature.absoluteObjectIdentifier))"),
+
+          // Signature Algorithm Parameters
+          signatureParametersView(),
+        ])
+
+      // Validity info
+      CertificateSectionView(
+        title: Strings.CertificateViewer.validityDatesTitle,
+        values: [
+          // Not Valid Before
+          CertificateKeyValueView(
+            title: Strings.CertificateViewer.notValidBeforeTitle,
+            value: BraveCertificateUtils.formatDate(model.notValidBefore)),
+
+          // Not Valid After
+          CertificateKeyValueView(
+            title: Strings.CertificateViewer.notValidAfterTitle,
+            value: BraveCertificateUtils.formatDate(model.notValidAfter)),
+        ])
+
+      // Public Key Info
+      CertificateSectionView(
+        title: Strings.CertificateViewer.publicKeyInfoTitle,
+        values: publicKeyInfoViews())
+
+      // Signature
+      CertificateSectionView(
+        title: Strings.CertificateViewer.signatureTitle,
+        values: [
+          CertificateKeyValueView(
+            title: Strings.CertificateViewer.signatureTitle,
+            value: formattedSignature())
+        ])
+
+      // Fingerprints
+      CertificateSectionView(
+        title: Strings.CertificateViewer.fingerPrintsTitle,
+        values: fingerprintViews())
     }
-  }
-
-  @ViewBuilder
-  private var content: some View {
-    // Subject name
-    CertificateSectionView(title: Strings.CertificateViewer.subjectNameTitle, values: subjectNameViews())
-
-    // Issuer name
-    CertificateSectionView(
-      title: Strings.CertificateViewer.issuerNameTitle,
-      values: issuerNameViews())
-
-    // Common info
-    CertificateSectionView(
-      title: Strings.CertificateViewer.commonInfoTitle,
-      values: [
-        // Serial number
-        CertificateKeyValueView(
-          title: Strings.CertificateViewer.serialNumberTitle,
-          value: formattedSerialNumber),
-
-        // Version
-        CertificateKeyValueView(
-          title: Strings.CertificateViewer.versionNumberTitle,
-          value: "\(model.version)"),
-
-        // Signature Algorithm
-
-        CertificateKeyValueView(
-          title: Strings.CertificateViewer.signatureAlgorithmTitle,
-          value: "\(signatureAlgorithmDescription) (\(model.signature.absoluteObjectIdentifier.isEmpty ? BraveCertificateUtils.oid_to_absolute_oid(oid: model.signature.objectIdentifier) : model.signature.absoluteObjectIdentifier))"),
-
-        // Signature Algorithm Parameters
-        signatureParametersView(),
-      ])
-
-    // Validity info
-    CertificateSectionView(
-      title: Strings.CertificateViewer.validityDatesTitle,
-      values: [
-        // Not Valid Before
-        CertificateKeyValueView(
-          title: Strings.CertificateViewer.notValidBeforeTitle,
-          value: BraveCertificateUtils.formatDate(model.notValidBefore)),
-
-        // Not Valid After
-        CertificateKeyValueView(
-          title: Strings.CertificateViewer.notValidAfterTitle,
-          value: BraveCertificateUtils.formatDate(model.notValidAfter)),
-      ])
-
-    // Public Key Info
-    CertificateSectionView(
-      title: Strings.CertificateViewer.publicKeyInfoTitle,
-      values: publicKeyInfoViews())
-
-    // Signature
-    CertificateSectionView(
-      title: Strings.CertificateViewer.signatureTitle,
-      values: [
-        CertificateKeyValueView(
-          title: Strings.CertificateViewer.signatureTitle,
-          value: formattedSignature())
-      ])
-
-    // Fingerprints
-    CertificateSectionView(
-      title: Strings.CertificateViewer.fingerPrintsTitle,
-      values: fingerprintViews())
+    .listStyle(InsetGroupedListStyle())
+    .listBackgroundColor(Color(UIColor.braveGroupedBackground))
   }
 }
 
-extension CertificateView {
+extension CertificateListView {
   private var signatureAlgorithmDescription: String {
     // TODO: Export Enum for this.
     if model.signature.algorithm == "ECDSA" {
@@ -331,6 +311,33 @@ extension CertificateView {
   private struct KeyValue {
     let key: String
     let value: String
+  }
+}
+
+struct CertificateView: View {
+  let model: BraveCertificateModel
+  let evaluationError: String?
+  
+  var body: some View {
+    VStack(spacing: 0.0) {
+      CertificateTitleView(
+        isRootCertificate: model.isRootCertificate,
+        commonName: model.subjectName.commonName,
+        evaluationError: evaluationError
+      )
+      .padding()
+      .frame(maxWidth: .infinity, alignment: .center)
+      .background(Color(.secondaryBraveGroupedBackground))
+      
+      Divider()
+        .shadow(color: Color.black.opacity(0.1),
+                radius: 5.0)
+      
+      CertificateListView(
+        model: model,
+        evaluationError: evaluationError
+      )
+    }
   }
 }
 

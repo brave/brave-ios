@@ -75,47 +75,61 @@ extension BrowserViewController: TopToolbarDelegate {
       return nil
     }
     
-    guard let trust = webView.serverTrust ?? getServerTrustForErrorPage() else {
-      return
-    }
-    
-    let host = webView.url?.host
+    let title = webView.title
+    let url = webView.url
+    let host = url?.host
+    let hasSecureContentOnly = webView.hasOnlySecureContent
 
     Task.detached {
-      let serverCertificates: [SecCertificate] = SecTrustCopyCertificateChain(trust) as? [SecCertificate] ?? []
+      let trust = await webView.serverTrust ?? getServerTrustForErrorPage()
+      let serverCertificates: [SecCertificate]
+      let certificateModels: [BraveCertificateModel]
+      var errorDescription: String?
       
-      // TODO: Instead of showing only the first cert in the chain,
-      // have a UI that allows users to select any certificate in the chain (similar to Desktop browsers)
-      if let serverCertificate = serverCertificates.first,
-         let certificate = BraveCertificateModel(certificate: serverCertificate) {
-        
-        var errorDescription: String?
-        
+      if let trust = trust {
+        serverCertificates = SecTrustCopyCertificateChain(trust) as? [SecCertificate] ?? []
+        certificateModels = serverCertificates.compactMap({ BraveCertificateModel(certificate: $0) })
         do {
           try await BraveCertificateUtils.evaluateTrust(trust, for: host)
         } catch {
+          errorDescription = error.localizedDescription
           Logger.module.error("\(error.localizedDescription)")
 
           // Remove the common-name from the first part of the error message
           // This is because the certificate viewer already displays it.
           // If it doesn't match, it won't be removed, so this is fine.
-          errorDescription = error.localizedDescription
-          if let range = errorDescription?.range(of: "“\(certificate.subjectName.commonName)” ") ??
-              errorDescription?.range(of: "\"\(certificate.subjectName.commonName)\" ") {
-            errorDescription = errorDescription?.replacingCharacters(in: range, with: "").capitalizeFirstLetter
+          if let leafCertificate = certificateModels.first,
+             let range = errorDescription?.range(of: "“\(leafCertificate.subjectName.commonName)” ") ??
+                 errorDescription?.range(of: "\"\(leafCertificate.subjectName.commonName)\" ") {
+              errorDescription = errorDescription?.replacingCharacters(in: range, with: "").capitalizeFirstLetter
           }
+        }
+      } else {
+        serverCertificates = []
+        certificateModels = []
+      }
+      
+      await MainActor.run { [errorDescription] in
+        if #available(iOS 16.0, *) {
+          // System components sit on top so we want to dismiss it
+          webView.findInteraction?.dismissFindNavigator()
         }
         
-        await MainActor.run { [errorDescription] in
-          if #available(iOS 16.0, *) {
-            // System components sit on top so we want to dismiss it
-            webView.findInteraction?.dismissFindNavigator()
-          }
-          let certificateViewController = CertificateViewController(certificate: certificate, evaluationError: errorDescription)
-          let popover = PopoverController(contentController: certificateViewController, contentSizeBehavior: .autoLayout(.phoneBounds))
-          popover.addsConvenientDismissalMargins = true
-          popover.present(from: self.topToolbar.locationView.lockImageView.imageView!, on: self)
-        }
+        // Leaf certificate's common name
+        let commonName = certificateModels.first?.subjectName.commonName ?? 
+                         host ??
+                         url?.absoluteString ??
+                         title ??
+                         "Current Page"
+        
+        let pageSecurityViewController = PageSecurityViewController(commonName: commonName, 
+                                                                    hasSecureContentOnly: hasSecureContentOnly,
+                                                                    certificates: certificateModels,
+                                                                    evaluationError: errorDescription ?? "")
+        
+        let popover = PopoverController(contentController: pageSecurityViewController, contentSizeBehavior: .preferredContentSize)
+        popover.addsConvenientDismissalMargins = true
+        popover.present(from: self.topToolbar.locationView.lockImageView.imageView!, on: self)
       }
     }
   }
