@@ -33,6 +33,7 @@ protocol TopToolbarDelegate: AnyObject {
   func topToolbarDidPressStop(_ urlBar: TopToolbarView)
   func topToolbarDidPressReload(_ urlBar: TopToolbarView)
   func topToolbarDidPressQrCodeButton(_ urlBar: TopToolbarView)
+  func topToolbarDidPressBrowserMenu(_ urlBar: TopToolbarView)
   func topToolbarDidPressLockImageView(_ urlBar: TopToolbarView)
   func topToolbarDidTapWalletButton(_ urlBar: TopToolbarView)
 }
@@ -730,6 +731,10 @@ extension TopToolbarView: TabLocationViewDelegate {
       overlayText = URLFormatter.formatURL(url.absoluteString, formatTypes: [], unescapeOptions: [])
     }
     enterOverlayMode(overlayText, pasted: false, search: isSearchQuery)
+  }
+  
+  func tabLocationViewDidTapBrowserMenu(_ tabLocationView: TabLocationView) {
+    delegate?.topToolbarDidPressBrowserMenu(self)
   }
 
   func tabLocationViewDidTapLockImageView(_ tabLocationView: TabLocationView) {

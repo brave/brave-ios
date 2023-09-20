@@ -2613,6 +2613,7 @@ extension BrowserViewController: TabDelegate {
       Web3NameServiceScriptHandler(tab: tab),
       Web3IPFSScriptHandler(tab: tab),
       YoutubeQualityScriptHandler(tab: tab),
+      BraveTranslateScriptHandler(tab: tab),
       
       tab.contentBlocker,
       tab.requestBlockingContentHelper,

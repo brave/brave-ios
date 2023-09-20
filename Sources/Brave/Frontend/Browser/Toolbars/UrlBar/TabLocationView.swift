@@ -16,6 +16,7 @@ protocol TabLocationViewDelegate {
   func tabLocationViewDidBeginDragInteraction(_ tabLocationView: TabLocationView)
   func tabLocationViewDidTapPlaylist(_ tabLocationView: TabLocationView)
   func tabLocationViewDidTapPlaylistMenuAction(_ tabLocationView: TabLocationView, action: PlaylistURLBarButton.MenuAction)
+  func tabLocationViewDidTapBrowserMenu(_ tabLocationView: TabLocationView)
   func tabLocationViewDidTapLockImageView(_ tabLocationView: TabLocationView)
   func tabLocationViewDidTapReload(_ tabLocationView: TabLocationView)
   func tabLocationViewDidTapStop(_ tabLocationView: TabLocationView)
@@ -67,10 +68,13 @@ class TabLocationView: UIView {
 
   private func updateLockImageView() {
     lockImageView.isHidden = false
+    translateButton.isHidden = false
+    translateButton.setImage(UIImage(braveSystemNamed: "leo.browser.menu", compatibleWith: nil), for: .normal)
     
     switch secureContentState {
     case .localHost:
       lockImageView.isHidden = true
+      translateButton.isHidden = true
     case .insecure:
       lockImageView.setImage(UIImage(braveSystemNamed: "leo.info.filled")?
         .withRenderingMode(.alwaysOriginal)
@@ -145,6 +149,18 @@ class TabLocationView: UIView {
 
     return urlTextField
   }()
+  
+  private(set) lazy var translateButton = ToolbarButton().then {
+    $0.setImage(UIImage(braveSystemNamed: "leo.browser.menu", compatibleWith: nil), for: .normal)
+    $0.isHidden = true
+    $0.tintColor = .braveLabel
+    $0.isAccessibilityElement = true
+    $0.imageView?.contentMode = .center
+    $0.contentHorizontalAlignment = .center
+    $0.accessibilityLabel = Strings.tabToolbarLockImageAccessibilityLabel
+    $0.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+    $0.addTarget(self, action: #selector(didTapBrowserMenu), for: .touchUpInside)
+  }
 
   private(set) lazy var lockImageView = ToolbarButton().then {
     $0.setImage(UIImage(braveSystemNamed: "brave.lock.alt", compatibleWith: nil), for: .normal)
@@ -266,7 +282,7 @@ class TabLocationView: UIView {
     
     urlTextField.setContentHuggingPriority(.defaultLow, for: .horizontal)
 
-    let subviews = [lockImageView, urlTextField, tabOptionsStackView]
+    let subviews = [translateButton, lockImageView, urlTextField, tabOptionsStackView]
     contentView = UIStackView(arrangedSubviews: subviews)
     contentView.layoutMargins = UIEdgeInsets(top: 2, left: TabLocationViewUX.spacing, bottom: 2, right: 0)
     contentView.isLayoutMarginsRelativeArrangement = true
@@ -311,7 +327,7 @@ class TabLocationView: UIView {
   
   override var accessibilityElements: [Any]? {
     get {
-      return [lockImageView, urlTextField, readerModeButton, playlistButton, reloadButton, shieldsButton].filter { !$0.isHidden }
+      return [translateButton, lockImageView, urlTextField, readerModeButton, playlistButton, reloadButton, shieldsButton].filter { !$0.isHidden }
     }
     set {
       super.accessibilityElements = newValue
@@ -320,6 +336,11 @@ class TabLocationView: UIView {
   
   private func updateForTraitCollection() {
     let clampedTraitCollection = traitCollection.clampingSizeCategory(maximum: .accessibilityLarge)
+    translateButton.setPreferredSymbolConfiguration(
+      .init(pointSize: UIFont.preferredFont(forTextStyle: .body, compatibleWith: clampedTraitCollection).pointSize, weight: .heavy, scale: .small),
+      forImageIn: .normal
+    )
+    
     lockImageView.setPreferredSymbolConfiguration(
       .init(pointSize: UIFont.preferredFont(forTextStyle: .body, compatibleWith: clampedTraitCollection).pointSize, weight: .heavy, scale: .small),
       forImageIn: .normal
@@ -368,6 +389,12 @@ class TabLocationView: UIView {
   }
   
   // MARK: Tap Actions
+  
+  @objc func didTapBrowserMenu() {
+    if !loading {
+      delegate?.tabLocationViewDidTapBrowserMenu(self)
+    }
+  }
   
   @objc func didTapLockImageView() {
     if !loading {
@@ -447,6 +474,10 @@ extension TabLocationView {
   override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
     if lockImageView.frame.insetBy(dx: -10, dy: -30).contains(point) {
       return lockImageView
+    }
+    
+    if translateButton.frame.insetBy(dx: -10, dy: -30).contains(point) {
+      return translateButton
     }
     return super.hitTest(point, with: event)
   }

@@ -55,6 +55,35 @@ extension BrowserViewController: TopToolbarDelegate {
     }
     present(container, animated: true)
   }
+  
+  func topToolbarDidPressBrowserMenu(_ urlBar: TopToolbarView) {
+    guard let tab = tabManager.selectedTab else {
+      return
+    }
+    
+    guard let scriptHandler = tab.getContentScript(name: BraveTranslateScriptHandler.scriptName) as? BraveTranslateScriptHandler else {
+      return
+    }
+    
+    Task { @MainActor in
+      let (currentLanguage, pageLanguage) = try await scriptHandler.getLanguageInfo()
+      if currentLanguage == pageLanguage {
+        let alert = UIAlertController(title: "Brave Translate", message: "Current Language is the same as Page Language", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Okay", style: .default, handler: nil))
+        self.present(alert, animated: true)
+      } else {
+        let pageLanguageName = Locale.current.localizedString(forLanguageCode: pageLanguage) ?? pageLanguage
+        let currentLanguageName = Locale.current.localizedString(forLanguageCode: currentLanguage) ?? currentLanguage
+        
+        let alert = UIAlertController(title: "Brave Translate", message: "Would you like to translate the page from: \(pageLanguageName) to \(currentLanguageName)?", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Translate", style: .default, handler: { _ in
+          scriptHandler.activateScript(from: pageLanguage, to: currentLanguage)
+        }))
+        alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: nil))
+        self.present(alert, animated: true)
+      }
+    }
+  }
 
   func topToolbarDidPressLockImageView(_ urlBar: TopToolbarView) {
     guard let webView = tabManager.selectedTab?.webView else {
