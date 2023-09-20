@@ -184,6 +184,10 @@ public class BraveVPN {
           Preferences.VPN.expirationDate.value = expirationDate
         }
         
+        if let gracePeriodExpirationDate = processedReceiptDetail.graceExpiryDate {
+          Preferences.VPN.gracePeriodExpirationDate.value = gracePeriodExpirationDate
+        }
+        
         Preferences.VPN.freeTrialUsed.value = !processedReceiptDetail.isInTrialPeriod
 
         populateRegionDataIfNecessary()
@@ -198,6 +202,14 @@ public class BraveVPN {
   
   public static func processReceiptResponse(receiptResponseItem: GRDIAPReceiptResponse) -> ReceiptResponse {
     guard let newestReceiptLineItem = receiptResponseItem.lineItems.sorted(by: { $0.expiresDate > $1.expiresDate }).first else {
+      print("\nVPN Test Process ===================================================\n ")
+
+      print("VPN Test Process - No proper expiry date")
+      
+      print("VPN Test Process - Number of line items - \(receiptResponseItem.lineItems.count)")
+      
+      print("\nVPN Test Process ===================================================\n ")
+      
       return ReceiptResponse(status: .expired)
     }
 
@@ -205,6 +217,12 @@ public class BraveVPN {
       where: { Int($0.originalTransactionId) ?? 00 == newestReceiptLineItem.originalTransactionId })
 
     guard let metadata = lineItemMetaData else {
+      print("\nVPN Test Process ===================================================\n ")
+
+      print("VPN Test Process - No meta data active subscription")
+      
+      print("\nVPN Test Process ===================================================\n ")
+      
       return ReceiptResponse(status: .active)
     }
 
@@ -218,32 +236,33 @@ public class BraveVPN {
       status: receiptStatus,
       expiryReason: expirationIntent,
       expiryDate: newestReceiptLineItem.expiresDate,
+      graceExpiryDate: metadata.gracePeriodExpiresDate,
       isInTrialPeriod: newestReceiptLineItem.isTrialPeriod,
       autoRenewEnabled: autoRenewEnabled)
     
-    print("\nVPN Test ===================================================\n ")
+    print("\nVPN Test Process ===================================================\n ")
 
-    print("VPN Test Response: \(response)")
+    print("VPN Test Process - Receipt Response: \(response)")
     
-    print("\nVPN Test ===================================================\n ")
+    print("\nVPN Test Process ===================================================\n ")
 
-    print("VPN Test newestReceiptLineItem: \(newestReceiptLineItem)")
+    print("VPN Test Process - NewestReceiptLineItem: \(newestReceiptLineItem)")
    
-    print("\nVPN Test ===================================================\n ")
+    print("\nVPN Test Process ===================================================\n ")
 
-    print("VPN Test lineItemMetaData: \(String(describing: lineItemMetaData))")
+    print("VPN Test Process - LineItemMetaData: \(String(describing: lineItemMetaData))")
    
-    print("\nVPN Test ===================================================\n ")
+    print("\nVPN Test Process ===================================================\n ")
     
-    print("VPN Test right now: \(Date())")
+    print("VPN Test Process - Right now: \(Date())")
    
-    print("\nVPN Test ===================================================\n ")
+    print("\nVPN Test Process ===================================================\n ")
     
-    let interval = Date() - newestReceiptLineItem.expiresDate
+    let interval =  newestReceiptLineItem.expiresDate - Date()
     
-    print("VPN Test subscription time left: \(String(describing: interval.minute))")
+    print("VPN Test Process - Subscription time left: \(String(describing: interval.minute))")
    
-    print("\nVPN Test ===================================================\n ")
+    print("\nVPN Test Process ===================================================\n ")
     
     return response
   }
@@ -299,12 +318,17 @@ public class BraveVPN {
   /// Whether the vpn subscription has expired.
   /// Returns nil if there has been no subscription yet (user never bought the vpn).
   private static var hasExpired: Bool? {
-    guard let expirationDate = Preferences.VPN.expirationDate.value else {
-      print("Why expiration date is empty \(String(describing: Preferences.VPN.expirationDate.value))")
-      return nil
-    }
+    guard let expirationDate = Preferences.VPN.expirationDate.value else { return nil }
 
-    return expirationDate < Date()
+    if expirationDate < Date() {
+      if let gracePeriodExpirationDate = Preferences.VPN.gracePeriodExpirationDate.value {
+        return gracePeriodExpirationDate < Date()
+      }
+      
+      return true
+    }
+    
+    return false
   }
 
   /// Location of last used server for the vpn configuration.
@@ -347,6 +371,7 @@ public class BraveVPN {
     var status: Status
     var expiryReason: ExpirationIntent = .none
     var expiryDate: Date?
+    var graceExpiryDate: Date?
 
     var isInTrialPeriod: Bool = false
     var autoRenewEnabled: Bool = false
@@ -490,6 +515,7 @@ public class BraveVPN {
     
     if includeExpirationDate {
       Preferences.VPN.expirationDate.reset()
+      Preferences.VPN.gracePeriodExpirationDate.reset()
     }
   }
 
