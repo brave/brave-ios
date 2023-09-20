@@ -30,11 +30,35 @@ extension BrowserViewController {
    - VPN Link Receipt
   */
   func presentFullScreenCallouts() {
-    presentScreenCallout(for: .blockCookieConsentNotices)
+    for type in FullScreenCalloutType.allCases {
+      presentScreenCallout(for: type)
+    }
   }
   
   private func presentScreenCallout(for type: FullScreenCalloutType, skipSafeGuards: Bool = false) {
-   presentVPNUpdateBillingCallout(skipSafeGuards: skipSafeGuards)
+    // Check the type custom callout can be shown
+    guard shouldShowCallout(calloutType: type, skipSafeGuards: skipSafeGuards) else {
+      return
+    }
+    
+    switch type {
+    case .p3a:
+      presentP3AScreenCallout()
+    case .vpnUpdateBilling:
+      presentVPNUpdateBillingCallout(skipSafeGuards: skipSafeGuards)
+    case .bottomBar:
+      presentBottomBarCallout(skipSafeGuards: skipSafeGuards)
+    case .defaultBrowser:
+      presentDefaultBrowserScreenCallout()
+    case .rewards:
+      presentBraveRewardsScreenCallout(skipSafeGuards: skipSafeGuards)
+    case .blockCookieConsentNotices:
+      presentCookieNotificationBlockingCallout(skipSafeGuards: skipSafeGuards)
+    case .vpnPromotion:
+      presentVPNPromotionCallout(skipSafeGuards: skipSafeGuards)
+    case .vpnLinkReceipt:
+      presentVPNLinkReceiptCallout(skipSafeGuards: skipSafeGuards)
+    }
   }
   
   // MARK: Conditional Callout Methods
