@@ -12,6 +12,7 @@ import SwiftUI
 import BraveVPN
 import Onboarding
 import SafariServices
+import StoreKit
 
 // MARK: - Callouts
 
@@ -264,9 +265,27 @@ extension BrowserViewController {
         return
       }
     }
+
     
 #if compiler(>=5.8)
-    if #available(iOS 16.4, *) {
+      if #available(iOS 16.4, *) {
+        Task { @MainActor in
+          for await message in StoreKit.Message.messages {
+            guard let windowScene = currentScene else {
+              return
+            }
+            
+            try? message.display(in: windowScene)
+          }
+        }
+      } else {
+        presentVPNChurnBilling()
+      }
+#else
+    presentVPNChurnBilling()
+#endif
+    
+    func presentVPNChurnBilling() {
       presentVPNChurnPromoCallout(for: .updateBillingExpired) {
         // Opens Apple's 'manage subscription' screen
         guard let url = URL.apple.manageSubscriptions else { return }
@@ -276,7 +295,6 @@ extension BrowserViewController {
         }
       }
     }
-#endif
   }
   
   // MARK: Helper Methods for Presentation

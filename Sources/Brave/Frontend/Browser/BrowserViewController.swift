@@ -1101,12 +1101,8 @@ public class BrowserViewController: UIViewController {
     }
   }
 
-  private func checkCrashRestorationOrSetupTabs() {
-    if crashedLastSession {
-      showRestoreTabsAlert()
-    } else {
-      setupTabs()
-    }
+  private func checkCrashRestorationOrSetupTabs() { 
+    setupTabs()
   }
 
   fileprivate func showRestoreTabsAlert() {
