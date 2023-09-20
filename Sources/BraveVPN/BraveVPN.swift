@@ -172,6 +172,7 @@ public class BraveVPN {
         print("\nVPN Test Verify Receipt Data ===================================================\n ")
         
         Preferences.VPN.expirationDate.value = Date(timeIntervalSince1970: 1)
+        Preferences.VPN.originalTransactionId.value = nil
         logAndStoreError("VPN Subscription LineItems are empty subscription expired", printToConsole: false)
       case .active, .retryPeriod:
         print("\nVPN Test Verify Receipt Data ===================================================\n ")
@@ -210,12 +211,43 @@ public class BraveVPN {
       
       print("\nVPN Test Process ===================================================\n ")
       
+      let allLineItemMetaData = receiptResponseItem.lineItemsMetadata
+      
+      print("\nVPN Test Process ===================================================\n ")
+      
+      print("VPN Test Process - LineItemMetaData Bunch \(allLineItemMetaData)")
+      
+      print("VPN Test Process - LineItemMetaData Bunch \(allLineItemMetaData.first?.gracePeriodExpiresDate)")
+      
+      print("VPN Test Process - LineItemMetaData Bunch \(allLineItemMetaData.count)")
+      
+      print("\nVPN Test Process ===================================================\n ")
+      
+      if let originalTransactionId = Preferences.VPN.originalTransactionId.value {
+        let lineItemMetaDataForOriginalId =  receiptResponseItem.lineItemsMetadata.first(
+          where: { Int($0.originalTransactionId) ?? 00 == originalTransactionId })
+        
+        if let metaData = lineItemMetaDataForOriginalId, metaData.gracePeriodExpiresDate > Date() {
+          let response = ReceiptResponse(
+            status: .retryPeriod,
+            expiryReason: ReceiptResponse.ExpirationIntent(rawValue: Int(metaData.expirationIntent)) ?? .none,
+            graceExpiryDate: metaData.gracePeriodExpiresDate,
+            isInTrialPeriod: false,
+            autoRenewEnabled: false)
+          
+          return response
+        }
+      }
+
       return ReceiptResponse(status: .expired)
     }
 
     let lineItemMetaData =  receiptResponseItem.lineItemsMetadata.first(
       where: { Int($0.originalTransactionId) ?? 00 == newestReceiptLineItem.originalTransactionId })
 
+    // Original transaction id of last active subscription in order to detect grace period
+    Preferences.VPN.originalTransactionId.value = newestReceiptLineItem.originalTransactionId
+    
     guard let metadata = lineItemMetaData else {
       print("\nVPN Test Process ===================================================\n ")
 
