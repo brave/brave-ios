@@ -39,7 +39,7 @@ extension View {
     isShowingConfirmation: Binding<Bool>,
     isShowingAddAccount: Binding<Bool>,
     onConfirmAddAccount: @escaping () -> Void,
-    onCancelAddAccount: @escaping () -> Void,
+    onCancelAddAccount: (() -> Void)?,
     onAddAccountDismissed: @escaping () -> Void
   ) -> some View {
     self.background(
@@ -52,7 +52,7 @@ extension View {
               onConfirmAddAccount()
             }),
             secondaryButton: .cancel(Text(Strings.no), action: {
-              onCancelAddAccount()
+              onCancelAddAccount?()
             })
           )
         }

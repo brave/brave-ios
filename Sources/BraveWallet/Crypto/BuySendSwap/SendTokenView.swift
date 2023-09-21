@@ -294,7 +294,7 @@ struct SendTokenView: View {
         }
       }
     }
-    .task { @MainActor in
+    .task {
       if !didAutoShowSelectAccountToken {
         isShowingSelectAccountTokenView = true
         didAutoShowSelectAccountToken = true

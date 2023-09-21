@@ -314,7 +314,7 @@ struct AssetDetailView: View {
       isShowingConfirmation: $isPresentingAddAccountConfirmation,
       isShowingAddAccount: $isPresentingAddAccount,
       onConfirmAddAccount: { isPresentingAddAccount = true },
-      onCancelAddAccount: {},
+      onCancelAddAccount: nil,
       onAddAccountDismissed: {
         Task { @MainActor in
           if await assetDetailStore.handleDismissAddAccount() {

@@ -362,7 +362,7 @@ class AssetDetailStore: ObservableObject {
   
   /// Should be called after dismissing create account. Returns true if an account was created
   @MainActor func handleDismissAddAccount() async -> Bool {
-    if await keyringService.isKeyringAvailable(for: assetDetailToken.coin) {
+    if await keyringService.isAccountAvailable(for: assetDetailToken.coin, chainId: assetDetailToken.chainId) {
       self.update()
       return true
     } else {
