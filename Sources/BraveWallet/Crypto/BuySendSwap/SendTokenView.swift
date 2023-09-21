@@ -19,9 +19,6 @@ struct SendTokenView: View {
   @State private var isShowingError = false
   @State private var didAutoShowSelectAccountToken = false
   @State private var isShowingSelectAccountTokenView: Bool = false
-  @State private var isPresentingAddAccount: Bool = false
-  @State private var isPresentingAddAccountConfirmation: Bool = false
-  @State private var accountCreationCoinAndToken: (BraveWallet.CoinType, BraveWallet.BlockchainToken)?
 
   @ScaledMetric private var length: CGFloat = 16.0
   
@@ -286,33 +283,6 @@ struct SendTokenView: View {
           .navigationBarTitleDisplayMode(.inline)
         }
       }
-      .addAccount(
-        keyringStore: keyringStore,
-        networkStore: networkStore,
-        accountCoin: accountCreationCoinAndToken?.0 ?? .fil,
-        isShowingConfirmation: Binding(
-          get: { accountCreationCoinAndToken != nil },
-          set: { _ in }
-        ),
-        isShowingAddAccount: $isPresentingAddAccount,
-        onConfirmAddAccount: { isPresentingAddAccount = true },
-        onCancelAddAccount: { presentationMode.dismiss() },
-        onAddAccountDismissed: {
-          Task { @MainActor in
-            if let coinAndToken = accountCreationCoinAndToken {
-              if await !sendTokenStore.handleDismissAddAccount(coinAndToken.0, coinAndToken.1) {
-                presentationMode.dismiss()
-              } else {
-                if !didAutoShowSelectAccountToken {
-                  isShowingSelectAccountTokenView = true
-                  didAutoShowSelectAccountToken = true
-                }
-              }
-              accountCreationCoinAndToken = nil
-            }
-          }
-        }
-      )
       .navigationTitle(Strings.Wallet.send)
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
@@ -325,17 +295,12 @@ struct SendTokenView: View {
       }
     }
     .task { @MainActor in
-      if let (coin, prefilledToken) = await sendTokenStore.checkPrefilledTokenCoinKeyring() {
-        isPresentingAddAccountConfirmation = true
-        accountCreationCoinAndToken = (coin, prefilledToken)
-      } else {
-        if !didAutoShowSelectAccountToken {
-          isShowingSelectAccountTokenView = true
-          didAutoShowSelectAccountToken = true
-        }
-        sendTokenStore.update()
-        await sendTokenStore.selectTokenStore.update()
+      if !didAutoShowSelectAccountToken {
+        isShowingSelectAccountTokenView = true
+        didAutoShowSelectAccountToken = true
       }
+      sendTokenStore.update()
+      await sendTokenStore.selectTokenStore.update()
     }
     .navigationViewStyle(.stack)
   }
