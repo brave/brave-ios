@@ -238,6 +238,25 @@ public class SendTokenStore: ObservableObject {
     }
     self.prefilledToken = nil
   }
+  
+  /// Check if prefilled token's coin type has associated keyring created.
+  @MainActor func checkPrefilledTokenCoinKeyring() async -> (BraveWallet.CoinType, BraveWallet.BlockchainToken)? {
+    guard let prefilledToken = self.prefilledToken else { return nil }
+    return await keyringService.checkTokenCoinTypeKeyring(token: prefilledToken)
+  }
+  
+  /// Should be called after dismissing create account. Returns true if an account was created
+  @MainActor func handleDismissAddAccount(_ coin: BraveWallet.CoinType, _ prefilledToken: BraveWallet.BlockchainToken) async -> Bool {
+    let keyrings = await keyringService.keyrings(for: [coin])
+    if keyrings.first(where: { $0.isKeyringCreated }) == nil {
+      return false
+    } else {
+      self.prefilledToken = prefilledToken
+      self.update()
+      await self.selectTokenStore.update()
+      return true
+    }
+  }
 
   /// Cancellable for the last running `update()` Task.
   private var updateTask: Task<(), Never>?

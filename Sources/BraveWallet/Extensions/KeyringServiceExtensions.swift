@@ -63,4 +63,16 @@ extension BraveWalletKeyringService {
     )
     return allKeyrings
   }
+  
+  /// Check if prefilled token's coin type has associated keyring has been created.
+  /// Return a tuple of token's coin type and token itself if there is no keyring has been created has the same coin type as the givin token
+  /// Return nil if there is a keyring has been created has the same coin type as the given token
+  @MainActor func checkTokenCoinTypeKeyring(token: BraveWallet.BlockchainToken) async -> (BraveWallet.CoinType, BraveWallet.BlockchainToken)? {
+    let keyrings = await keyrings(for: [token.coin])
+    if keyrings.first(where: { $0.isKeyringCreated }) == nil {
+      return (token.coin, token)
+    } else {
+      return nil
+    }
+  }
 }
