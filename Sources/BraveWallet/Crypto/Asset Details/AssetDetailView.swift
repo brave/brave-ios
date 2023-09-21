@@ -310,7 +310,7 @@ struct AssetDetailView: View {
     .addAccount(
       keyringStore: keyringStore,
       networkStore: networkStore,
-      accountCoin: assetDetailStore.assetDetailToken.coin,
+      accountNetwork: networkStore.network(for: assetDetailStore.assetDetailToken),
       isShowingConfirmation: $isPresentingAddAccountConfirmation,
       isShowingAddAccount: $isPresentingAddAccount,
       onConfirmAddAccount: { isPresentingAddAccount = true },

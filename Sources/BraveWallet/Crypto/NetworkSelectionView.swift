@@ -56,7 +56,7 @@ struct NetworkSelectionView: View {
     .addAccount(
       keyringStore: keyringStore,
       networkStore: networkStore,
-      accountCoin: store.nextNetwork?.coin,
+      accountNetwork: store.nextNetwork,
       isShowingConfirmation: $store.isPresentingNextNetworkAlert,
       isShowingAddAccount: $store.isPresentingAddAccount,
       onConfirmAddAccount: {

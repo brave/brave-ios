@@ -35,7 +35,7 @@ extension View {
   func addAccount(
     keyringStore: KeyringStore,
     networkStore: NetworkStore,
-    accountCoin: BraveWallet.CoinType?,
+    accountNetwork: BraveWallet.NetworkInfo?,
     isShowingConfirmation: Binding<Bool>,
     isShowingAddAccount: Binding<Bool>,
     onConfirmAddAccount: @escaping () -> Void,
@@ -46,7 +46,7 @@ extension View {
       Color.clear
         .alert(isPresented: isShowingConfirmation) {
           Alert(
-            title: Text(String.localizedStringWithFormat(Strings.Wallet.createAccountAlertTitle, accountCoin?.localizedTitle ?? "")),
+            title: Text(String.localizedStringWithFormat(Strings.Wallet.createAccountAlertTitle, accountNetwork?.shortChainName ?? "")),
             message: Text(Strings.Wallet.createAccountAlertMessage),
             primaryButton: .default(Text(Strings.yes), action: {
               onConfirmAddAccount()
@@ -66,7 +66,8 @@ extension View {
             AddAccountView(
               keyringStore: keyringStore,
               networkStore: networkStore,
-              preSelectedCoin: accountCoin
+              preSelectedCoin: accountNetwork?.coin,
+              preSelectedFilecoinNetwork: accountNetwork
             )
           }
           .navigationViewStyle(.stack)

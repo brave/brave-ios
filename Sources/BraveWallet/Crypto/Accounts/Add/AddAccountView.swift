@@ -29,6 +29,7 @@ struct AddAccountView: View {
   private var allFilNetworks: [BraveWallet.NetworkInfo]
   
   var preSelectedCoin: BraveWallet.CoinType?
+  var preSelectedFilecoinNetwork: BraveWallet.NetworkInfo?
   var onCreate: (() -> Void)?
   var onDismiss: (() -> Void)?
   
@@ -36,6 +37,7 @@ struct AddAccountView: View {
     keyringStore: KeyringStore,
     networkStore: NetworkStore,
     preSelectedCoin: BraveWallet.CoinType? = nil,
+    preSelectedFilecoinNetwork: BraveWallet.NetworkInfo? = nil,
     onCreate: (() -> Void)? = nil,
     onDismiss: (() -> Void)? = nil
   ) {
@@ -44,7 +46,13 @@ struct AddAccountView: View {
     self.preSelectedCoin = preSelectedCoin
     self.onCreate = onCreate
     self.onDismiss = onDismiss
-    _filNetwork = .init(initialValue: self.allFilNetworks.first ?? .init())
+    if let preSelectedFilecoinNetwork, preSelectedFilecoinNetwork.coin == .fil { // make sure the prefilled
+      // network is a Filecoin network
+      self.preSelectedFilecoinNetwork = preSelectedFilecoinNetwork
+      _filNetwork = .init(initialValue: preSelectedFilecoinNetwork)
+    } else {
+      _filNetwork = .init(initialValue: self.allFilNetworks.first ?? .init())
+    }
   }
 
   private func addAccount(for coin: BraveWallet.CoinType) {
@@ -114,6 +122,7 @@ struct AddAccountView: View {
           Text(Strings.Wallet.transactionDetailsNetworkTitle)
             .foregroundColor(Color(.braveLabel))
         }
+        .disabled(preSelectedFilecoinNetwork != nil)
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
       }
       accountNameSection

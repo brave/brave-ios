@@ -272,6 +272,10 @@ public class NetworkStore: ObservableObject {
   func customNetworkNativeAssetMigration(_ network: BraveWallet.NetworkInfo, completion: (() -> Void)? = nil) {
     assetManager.addUserAsset(network.nativeToken, completion: completion)
   }
+  
+  func network(for token: BraveWallet.BlockchainToken) -> BraveWallet.NetworkInfo {
+    return allChains.first { $0.chainId == token.chainId } ?? customChains.first { $0.chainId == token.chainId } ?? allChains.first ?? .init()
+  }
 }
 
 extension NetworkStore: BraveWalletJsonRpcServiceObserver {
