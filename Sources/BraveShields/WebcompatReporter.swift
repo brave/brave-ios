@@ -34,6 +34,13 @@ public class WebcompatReporter {
       return fullUrl.normalizedHost() != nil ? fullUrl.domainURL.absoluteString : fullUrl.baseDomain
     }
     
+    var cleanedURL: URL? {
+      var components = URLComponents(url: fullUrl, resolvingAgainstBaseURL: false)
+      components?.fragment = nil
+      components?.queryItems = nil
+      return components?.url
+    }
+    
     public init(
       fullUrl: URL, additionalDetails: String? = nil, contactInfo: String? = nil,
       areShieldsEnabled: Bool, adBlockLevel: ShieldLevel, fingerprintProtectionLevel: ShieldLevel,
@@ -87,8 +94,14 @@ public class WebcompatReporter {
         ))
       }
       
+      guard let cleanedURL = report.cleanedURL else {
+        throw EncodingError.invalidValue(CodingKeys.domain, EncodingError.Context(
+          codingPath: encoder.codingPath, debugDescription: "Cannot strip fragments or query params"
+        ))
+      }
+      
       var container: KeyedEncodingContainer<CodingKeys> = encoder.container(keyedBy: CodingKeys.self)
-      try container.encode(report.fullUrl.absoluteString, forKey: .url)
+      try container.encode(cleanedURL.absoluteString, forKey: .url)
       try container.encode(domain, forKey: .domain)
       try container.encodeIfPresent(report.additionalDetails, forKey: .additionalDetails)
       try container.encodeIfPresent(report.contactInfo, forKey: .contactInfo)
