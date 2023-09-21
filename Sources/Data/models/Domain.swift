@@ -45,7 +45,7 @@ public final class Domain: NSManagedObject, CRUD {
   ///
   /// This only takes into consideration certain domains that are always aggressive.
   @MainActor public var blockAdsAndTrackingLevel: ShieldLevel {
-    guard isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true) else { return .disabled }
+    guard isShieldExpected(.AdblockAndTp, considerAllShieldsOption: false) else { return .disabled }
     let globalLevel = ShieldPreferences.blockAdsAndTrackingLevel
     
     switch globalLevel {
@@ -65,7 +65,7 @@ public final class Domain: NSManagedObject, CRUD {
   }
   
   @MainActor public var finterprintProtectionLevel: ShieldLevel {
-    guard isShieldExpected(.FpProtection, considerAllShieldsOption: true) else { return .disabled }
+    guard isShieldExpected(.FpProtection, considerAllShieldsOption: false) else { return .disabled }
     return .standard
   }
   

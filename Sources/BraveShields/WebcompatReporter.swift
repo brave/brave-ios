@@ -70,7 +70,7 @@ public class WebcompatReporter {
       case apiKey = "api_key"
       
       case fpBlockSetting
-      case adBlockSettings
+      case adBlockSetting
       case adBlockLists
       case shieldsEnabled
       case languages
@@ -111,7 +111,7 @@ public class WebcompatReporter {
       try container.encode(report.isVPNEnabled, forKey: .braveVPNEnabled)
       try container.encode(report.adBlockListTitles.joined(separator: ","), forKey: .adBlockLists)
       try container.encode(report.fingerprintProtectionLevel.reportLabel, forKey: .fpBlockSetting)
-      try container.encode(report.adBlockLevel.reportLabel, forKey: .adBlockSettings)
+      try container.encode(report.adBlockLevel.reportLabel, forKey: .adBlockSetting)
       try container.encode(apiKey, forKey: .apiKey)
     }
   }
@@ -161,6 +161,7 @@ public class WebcompatReporter {
       let encoder = JSONEncoder()
       var request = URLRequest(url: endpoint)
       request.httpMethod = "POST"
+      request.addValue("application/json", forHTTPHeaderField: "Content-Type")
       request.httpBody = try encoder.encode(payload)
       
       if let userAgent = userAgent {
