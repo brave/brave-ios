@@ -327,7 +327,7 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
   @objc private func tappedSubmitReportingButton() {
     if let url = url {
       Task { @MainActor in
-        let domain = Domain.getOrCreate(forUrl: url, persistent: false)
+        let domain = Domain.getOrCreate(forUrl: url, persistent: !tab.isPrivate)
         
         let report = WebcompatReporter.Report(
           fullUrl: url,
@@ -336,7 +336,7 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
           fingerprintProtectionLevel: domain.finterprintProtectionLevel,
           adBlockListTitles: FilterListStorage.shared.filterLists.compactMap({ filterList -> String? in
             guard filterList.isEnabled else { return nil }
-            return filterList.entry.componentId
+            return filterList.entry.title
           }),
           isVPNEnabled: BraveVPN.isConnected
         )
