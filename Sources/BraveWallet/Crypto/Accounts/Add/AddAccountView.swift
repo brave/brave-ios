@@ -56,7 +56,7 @@ struct AddAccountView: View {
   }
 
   private func addAccount(for coin: BraveWallet.CoinType) {
-    let accountName = name.isEmpty ? defaultAccountName(for: coin, isPrimary: privateKey.isEmpty) : name
+    let accountName = name.isEmpty ? defaultAccountName(for: coin, chainId: filNetwork.chainId, isPrimary: privateKey.isEmpty) : name
     guard accountName.isValidAccountName else { return }
     
     if privateKey.isEmpty {
@@ -112,16 +112,28 @@ struct AddAccountView: View {
   @ViewBuilder private var addAccountView: some View {
     List {
       if (selectedCoin == .fil || preSelectedCoin == .fil) && !allFilNetworks.isEmpty {
-        Picker(selection: $filNetwork) {
-          ForEach(allFilNetworks) { network in
-            Text(network.chainName)
-              .foregroundColor(Color(.secondaryBraveLabel))
-              .tag(network)
+        Menu(content: {
+          Picker(selection: $filNetwork) {
+            ForEach(allFilNetworks) { network in
+              Text(network.chainName)
+                .foregroundColor(Color(.secondaryBraveLabel))
+                .tag(network)
+            }
+          } label: {
+            EmptyView()
           }
-        } label: {
-          Text(Strings.Wallet.transactionDetailsNetworkTitle)
-            .foregroundColor(Color(.braveLabel))
-        }
+        }, label: {
+          HStack {
+            Text(Strings.Wallet.transactionDetailsNetworkTitle)
+              .foregroundColor(Color(.braveLabel))
+            Spacer()
+            Group {
+              Text(filNetwork.chainName)
+              Image(systemName: "chevron.up.chevron.down")
+            }
+            .foregroundColor(Color(.secondaryBraveLabel))
+          }
+        })
         .disabled(preSelectedFilecoinNetwork != nil)
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
       }
@@ -335,8 +347,9 @@ struct AddAccountView: View {
     }
   }
   
-  private func defaultAccountName(for coin: BraveWallet.CoinType, isPrimary: Bool) -> String {
-    let keyringInfo = keyringStore.allKeyrings.first { $0.coin == coin }
+  private func defaultAccountName(for coin: BraveWallet.CoinType, chainId: String, isPrimary: Bool) -> String {
+    let keyringId = BraveWallet.KeyringId.keyringId(for: coin, on: chainId)
+    let keyringInfo = keyringStore.allKeyrings.first { $0.id == keyringId }
     if isPrimary {
       return String.localizedStringWithFormat(coin.defaultAccountName, (keyringInfo?.accountInfos.filter(\.isPrimary).count ?? 0) + 1)
     } else {
