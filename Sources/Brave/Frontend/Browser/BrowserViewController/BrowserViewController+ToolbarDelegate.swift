@@ -1,7 +1,7 @@
-// Copyright 2021 The Brave Authors. All rights reserved.
+// Copyright 2023 The Brave Authors. All rights reserved.
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 import BraveShared
 import BraveUI
@@ -17,6 +17,8 @@ import BraveWallet
 import Preferences
 import CertificateUtilities
 import AVFoundation
+import BraveVPN
+import BraveShields
 
 // MARK: - TopToolbarDelegate
 
@@ -505,9 +507,79 @@ extension BrowserViewController: TopToolbarDelegate {
         self.present(container, animated: true)
       }
     }
+    
+    shields.showSubmitReportView = { [weak self] shieldsViewController in
+      shieldsViewController.dismiss(animated: true) {
+        guard let url = shieldsViewController.tab.url else { return }
+        self?.showSubmitReportView(for: url)
+      }
+    }
+    
     let container = PopoverNavigationController(rootViewController: shields)
     let popover = PopoverController(contentController: container, contentSizeBehavior: .preferredContentSize)
     popover.present(from: topToolbar.locationView.shieldsButton, on: self)
+  }
+  
+  private func showSubmitReportView(for url: URL) {
+    // Strip fragments and query params from url
+    var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+    components?.fragment = nil
+    components?.queryItems = nil
+    guard let cleanedURL = components?.url else { return }
+    
+    let viewController = UIHostingController(rootView: SubmitReportView(
+      url: cleanedURL,
+      submit: { [weak self] url, additionalDetails, contactInfo in
+        guard let self = self else { return }
+        let popover = PopoverController(
+          contentController: SubmitReportSuccessViewController(), 
+          contentSizeBehavior: .preferredContentSize
+        )
+        
+        let domain = Domain.getOrCreate(forUrl: url, persistent: !privateBrowsingManager.isPrivateBrowsing)
+        
+        let report = WebcompatReporter.Report(
+          cleanedURL: url,
+          additionalDetails: additionalDetails,
+          contactInfo: contactInfo,
+          areShieldsEnabled: !domain.areAllShieldsOff,
+          adBlockLevel: domain.blockAdsAndTrackingLevel,
+          fingerprintProtectionLevel: domain.finterprintProtectionLevel,
+          adBlockListTitles: FilterListStorage.shared.filterLists.compactMap({ return $0.isEnabled ? $0.entry.title : nil }),
+          isVPNEnabled: BraveVPN.isConnected
+        )
+        
+        popover.present(from: topToolbar.locationView.shieldsButton, on: self)
+        
+        Task { [weak self] in
+          await WebcompatReporter.send(report: report)
+          self?.delayDismiss(popover: popover)
+        }
+      }
+    ))
+    
+    viewController.modalPresentationStyle = .popover
+
+    if let popover = viewController.popoverPresentationController {
+      popover.sourceView = topToolbar.locationView.shieldsButton
+      popover.sourceRect = topToolbar.locationView.shieldsButton.bounds
+      
+      let sheet = popover.adaptiveSheetPresentationController
+      sheet.largestUndimmedDetentIdentifier = .medium
+      sheet.prefersEdgeAttachedInCompactHeight = true
+      sheet.widthFollowsPreferredContentSizeWhenEdgeAttached = true
+      
+      // Allows the user to reference the sheet
+      sheet.detents = [.medium(), .large()]
+    }
+    navigationController?.present(viewController, animated: true)
+  }
+  
+  private func delayDismiss(popover: PopoverController) {
+    Timer.scheduledTimer(withTimeInterval: 4, repeats: false) { _ in
+      guard !popover.isBeingDismissed else { return }
+      popover.dismissPopover()
+    }
   }
 
   // TODO: This logic should be fully abstracted away and share logic from current MenuViewController
