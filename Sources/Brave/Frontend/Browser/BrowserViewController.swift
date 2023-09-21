@@ -722,6 +722,7 @@ public class BrowserViewController: UIViewController {
       webViewContainer.alpha = 0
       activeNewTabPageViewController?.view.alpha = 0
       favoritesController?.view.alpha = 0
+      searchController?.view.alpha = 0
       header.contentView.alpha = 0
       presentedViewController?.popoverPresentationController?.containerView?.alpha = 0
       presentedViewController?.view.alpha = 0
@@ -753,6 +754,7 @@ public class BrowserViewController: UIViewController {
         self.header.contentView.alpha = 1
         self.activeNewTabPageViewController?.view.alpha = 1
         self.favoritesController?.view.alpha = 1
+        self.searchController?.view.alpha = 1
         self.presentedViewController?.popoverPresentationController?.containerView?.alpha = 1
         self.presentedViewController?.view.alpha = 1
         self.view.backgroundColor = .clear
