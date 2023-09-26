@@ -54,14 +54,12 @@ extension BraveHistoryAPI {
     }
   }
   
-  func deleteAll(includeScreenTimeHistory: Bool = true, completion: @escaping () -> Void) {
+  func deleteAll(completion: @escaping () -> Void) {
     var screenTimeHistory: STWebHistory?
-    if includeScreenTimeHistory {
-      do {
-        screenTimeHistory = try STWebHistory(bundleIdentifier: Bundle.main.bundleIdentifier!)
-      } catch {
-        assertionFailure("STWebHistory could not be initialized: \(error)")
-      }
+    do {
+      screenTimeHistory = try STWebHistory(bundleIdentifier: Bundle.main.bundleIdentifier!)
+    } catch {
+      assertionFailure("STWebHistory could not be initialized: \(error)")
     }
     
     DispatchQueue.main.async {
