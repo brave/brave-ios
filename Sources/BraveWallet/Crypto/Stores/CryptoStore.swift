@@ -116,6 +116,11 @@ public class CryptoStore: ObservableObject {
   private var isUpdatingUserAssets: Bool = false
   private var autoDiscoveredAssets: [BraveWallet.BlockchainToken] = []
   
+  private var keyringServiceObserver: KeyringServiceObserver?
+  private var walletServiceObserver: WalletServiceObserver?
+  private var txServiceObserver: TxServiceObserver?
+  private var rpcServiceObserver: JsonRpcServiceObserver?
+  
   public init(
     keyringService: BraveWalletKeyringService,
     rpcService: BraveWalletJsonRpcService,
@@ -185,10 +190,104 @@ public class CryptoStore: ObservableObject {
       walletService: walletService
     )
     
-    self.keyringService.add(self)
-    self.txService.add(self)
-    self.rpcService.add(self)
-    self.walletService.add(self)
+    self.keyringServiceObserver = KeyringServiceObserver(
+      keyringService: keyringService,
+      _keyringReset: { [weak self] in
+        WalletProviderPermissionRequestsManager.shared.cancelAllPendingRequests(for: [.eth, .sol])
+        WalletProviderAccountCreationRequestManager.shared.cancelAllPendingRequests(coins: [.eth, .sol])
+        self?.rejectAllPendingWebpageRequests()
+      },
+      _keyringCreated: { _ in
+        // 1. We don't need to rely on this observer method to migrate user visible assets
+        // when user creates a new wallet, since in this case `CryptoStore` has not yet been initialized
+        // 2. We don't need to rely on this observer method to migrate user visible assets
+        // when user creates or imports a new account with a new keyring since any new
+        // supported coin type / keyring will be migrated inside `CryptoStore`'s init()
+      }, 
+      _keyringRestored: { [weak self] _ in
+        // This observer method will only get called when user restore a wallet
+        // from the lock screen
+        // We will need to
+        // 1. reset wallet user asset migration flag
+        // 2. wipe user assets local storage
+        // 3. migrate user assets with new keyring
+        guard let self else { return }
+        guard !self.isUpdatingUserAssets else { return }
+        self.isUpdatingUserAssets = true
+        Preferences.Wallet.migrateCoreToWalletUserAssetCompleted.reset()
+        WalletUserAssetGroup.removeAllGroup() {
+          self.userAssetManager.migrateUserAssets(completion: {
+            self.updateAssets()
+            self.isUpdatingUserAssets = false
+          })
+        }
+      },
+      _locked: { [weak self] in
+        self?.isPresentingPendingRequest = false
+      }
+    )
+    self.walletServiceObserver = WalletServiceObserver(
+      walletService: walletService,
+      _onNetworkListChanged: { [weak self] in
+        self?.updateAssets()
+      },
+      _onDiscoverAssetsCompleted: { [weak self] discoveredAssets in
+        // Failsafe incase two CryptoStore's are initialized (see brave-ios #7804) and asset
+        // migration is slow. Makes sure auto-discovered assets during asset migration to
+        // CoreData are added after.
+        guard let self else { return }
+        if !self.isUpdatingUserAssets {
+          let tokens = discoveredAssets.map { $0.symbol }.joined(separator: ",")
+          for asset in discoveredAssets {
+            self.userAssetManager.addUserAsset(asset, completion: nil)
+          }
+          if !discoveredAssets.isEmpty {
+            self.updateAssets()
+          }
+        } else {
+          self.autoDiscoveredAssets.append(contentsOf: discoveredAssets)
+        }
+      }
+    )
+    self.txServiceObserver = TxServiceObserver(
+      txService: txService,
+      _onNewUnapprovedTx: { [weak self] _ in
+        self?.prepare()
+      },
+      _onTransactionStatusChanged: { [weak self] _ in
+        self?.prepare()
+      }, 
+      _onTxServiceReset: { [weak self] in
+        self?.prepare()
+      }
+    )
+    self.rpcServiceObserver = JsonRpcServiceObserver(
+      rpcService: rpcService,
+      _chainChangedEvent: { [weak self] _, _, _ in
+        // if user had just changed networks, there is a potential race condition
+        // blocking presenting pendingRequest here, as Network Selection might still be on screen
+        // by delaying here instead of at present we only delay after chain changes (#6750)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+          self?.prepare()
+        }
+      },
+      _onAddEthereumChainRequestCompleted: { chainId, error in
+        Task { @MainActor in
+          if let addNetworkDappRequestCompletion = self.addNetworkDappRequestCompletion[chainId] {
+            if error.isEmpty {
+              let allNetworks = await rpcService.allNetworks(.eth)
+              if let network = allNetworks.first(where: { $0.chainId == chainId }) {
+                self.userAssetManager.addUserAsset(network.nativeToken) { [weak self] in
+                  self?.updateAssets()
+                }
+              }
+            }
+            addNetworkDappRequestCompletion(error.isEmpty ? nil : error)
+            self.addNetworkDappRequestCompletion[chainId] = nil
+          }
+        }
+      }
+    )
     
     Preferences.Wallet.migrateCoreToWalletUserAssetCompleted.observe(from: self)
     
@@ -197,6 +296,14 @@ public class CryptoStore: ObservableObject {
       self?.isUpdatingUserAssets = false
       self?.updateAssets()
     }
+  }
+  
+  // A manual tear-down that nil all the wallet service observer classes 
+  func tearDown() {
+    keyringServiceObserver = nil
+    walletServiceObserver = nil
+    txServiceObserver = nil
+    rpcServiceObserver = nil
   }
   
   private var buyTokenStore: BuyTokenStore?
@@ -544,144 +651,6 @@ public class CryptoStore: ObservableObject {
         handleWebpageRequestResponse(.decrypt(approved: false, requestId: $0.requestId))
       }
     }
-  }
-}
-
-extension CryptoStore: BraveWalletTxServiceObserver {
-  public func onNewUnapprovedTx(_ txInfo: BraveWallet.TransactionInfo) {
-    prepare()
-  }
-  public func onUnapprovedTxUpdated(_ txInfo: BraveWallet.TransactionInfo) {
-    prepare()
-  }
-  public func onTransactionStatusChanged(_ txInfo: BraveWallet.TransactionInfo) {
-    prepare()
-  }
-  public func onTxServiceReset() {
-    prepare()
-  }
-}
-
-extension CryptoStore: BraveWalletKeyringServiceObserver {
-  public func keyringReset() {
-    WalletProviderPermissionRequestsManager.shared.cancelAllPendingRequests(for: [.eth, .sol])
-    WalletProviderAccountCreationRequestManager.shared.cancelAllPendingRequests(coins: [.eth, .sol])
-    rejectAllPendingWebpageRequests()
-  }
-  public func keyringCreated(_ keyringId: BraveWallet.KeyringId) {
-    // 1. We don't need to rely on this observer method to migrate user visible assets
-    // when user creates a new wallet, since in this case `CryptoStore` has not yet been initialized
-    // 2. We don't need to rely on this observer method to migrate user visible assets
-    // when user creates or imports a new account with a new keyring since any new
-    // supported coin type / keyring will be migrated inside `CryptoStore`'s init()
-  }
-  public func keyringRestored(_ keyringId: BraveWallet.KeyringId) {
-    // This observer method will only get called when user restore a wallet
-    // from the lock screen
-    // We will need to
-    // 1. reset wallet user asset migration flag
-    // 2. wipe user assets local storage
-    // 3. migrate user assets with new keyring
-    guard !isUpdatingUserAssets else { return }
-    isUpdatingUserAssets = true
-    Preferences.Wallet.migrateCoreToWalletUserAssetCompleted.reset()
-    WalletUserAssetGroup.removeAllGroup() { [weak self] in
-      self?.userAssetManager.migrateUserAssets(completion: {
-        self?.updateAssets()
-        self?.isUpdatingUserAssets = false
-      })
-    }
-  }
-  public func locked() {
-    isPresentingPendingRequest = false
-  }
-  public func unlocked() {
-  }
-  public func backedUp() {
-  }
-  public func accountsChanged() {
-  }
-  public func autoLockMinutesChanged() {
-  }
-  public func selectedWalletAccountChanged(_ account: BraveWallet.AccountInfo) {
-  }
-  public func selectedDappAccountChanged(_ coin: BraveWallet.CoinType, account: BraveWallet.AccountInfo?) {
-  }
-  public func accountsAdded(_ addedAccounts: [BraveWallet.AccountInfo]) {
-  }
-}
-
-extension CryptoStore: BraveWalletJsonRpcServiceObserver {
-  public func chainChangedEvent(_ chainId: String, coin: BraveWallet.CoinType, origin: URLOrigin?) {
-    // if user had just changed networks, there is a potential race condition
-    // blocking presenting pendingRequest here, as Network Selection might still be on screen
-    // by delaying here instead of at present we only delay after chain changes (#6750)
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-      self?.prepare()
-    }
-  }
-  
-  public func onAddEthereumChainRequestCompleted(_ chainId: String, error: String) {
-    Task { @MainActor in
-      if let addNetworkDappRequestCompletion = addNetworkDappRequestCompletion[chainId] {
-        if error.isEmpty {
-          let allNetworks = await rpcService.allNetworks(.eth)
-          if let network = allNetworks.first(where: { $0.chainId == chainId }) {
-            userAssetManager.addUserAsset(network.nativeToken) { [weak self] in
-              self?.updateAssets()
-            }
-          }
-        }
-        addNetworkDappRequestCompletion(error.isEmpty ? nil : error)
-        self.addNetworkDappRequestCompletion[chainId] = nil
-      }
-    }
-  }
-  
-  public func onIsEip1559Changed(_ chainId: String, isEip1559: Bool) {
-  }
-}
-
-extension CryptoStore: BraveWalletBraveWalletServiceObserver {
-  public func onActiveOriginChanged(_ originInfo: BraveWallet.OriginInfo) {
-  }
-  
-  public func onDefaultEthereumWalletChanged(_ wallet: BraveWallet.DefaultWallet) {
-  }
-  
-  public func onDefaultSolanaWalletChanged(_ wallet: BraveWallet.DefaultWallet) {
-  }
-  
-  public func onDefaultBaseCurrencyChanged(_ currency: String) {
-  }
-  
-  public func onDefaultBaseCryptocurrencyChanged(_ cryptocurrency: String) {
-  }
-  
-  public func onNetworkListChanged() {
-    updateAssets()
-  }
-  
-  public func onDiscoverAssetsStarted() {
-  }
-  
-  public func onDiscoverAssetsCompleted(_ discoveredAssets: [BraveWallet.BlockchainToken]) {
-    // Failsafe incase two CryptoStore's are initialized (see brave-ios #7804) and asset
-    // migration is slow. Makes sure auto-discovered assets during asset migration to
-    // CoreData are added after.
-    if !isUpdatingUserAssets {
-      for asset in discoveredAssets {
-        userAssetManager.addUserAsset(asset, completion: nil)
-      }
-      if !discoveredAssets.isEmpty {
-        updateAssets()
-      }
-    } else {
-      autoDiscoveredAssets.append(contentsOf: discoveredAssets)
-    }
-  }
-  
-  public func onResetWallet() {
   }
 }
 

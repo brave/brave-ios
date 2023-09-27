@@ -74,6 +74,7 @@ public class WalletStore {
       .sink { [weak self] isDefaultKeyringCreated in
         guard let self = self else { return }
         if !isDefaultKeyringCreated, self.cryptoStore != nil {
+          self.cryptoStore?.tearDown()
           self.cryptoStore = nil
         } else if isDefaultKeyringCreated, self.cryptoStore == nil {
           self.cryptoStore = CryptoStore(
