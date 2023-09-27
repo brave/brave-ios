@@ -341,7 +341,7 @@ class PlaylistWebLoader: UIView {
       
       guard let webView = tab.webView,
             let browserViewController = self.currentScene?.browserViewController else {
-        continuation.resume(returning: nil)
+        self.handler?(nil)
         return
       }
       
