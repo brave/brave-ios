@@ -1412,19 +1412,7 @@ extension BrowserViewController: WKUIDelegate {
     if Preferences.Shields.autoRedirectTrackingURLs.value,
        let currentURL = tab.webView?.url,
        currentURL.baseDomain != requestURL.baseDomain {
-      let redirectChain = DebouncingService.shared
-        .redirectChain(for: requestURL)
-        .contiguousUntil { _, rule in
-          return rule.preferences.allSatisfy { pref in
-            switch pref {
-            case .deAmpEnabled:
-              return Preferences.Shields.autoRedirectAMPPages.value
-            }
-          }
-        }
-      
-      // Once we check the redirect chain only need the last (final) url from our redirect chain
-      if let redirectURL = redirectChain.last?.url {
+      if let redirectURL = DebounceServiceFactory.get(privateMode: tab.isPrivate)?.debounce(requestURL) {
         // For now we only allow the `Referer`. The browser will add other headers during navigation.
         var modifiedRequest = URLRequest(url: redirectURL)
         
