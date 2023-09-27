@@ -80,6 +80,15 @@ struct PortfolioHeaderView: View {
   private var balanceAndPriceChanges: some View {
     VStack(spacing: 12) {
       Text(balance)
+        .frame(maxWidth: .infinity)
+        .opacity(selectedBalance == nil ? 1 : 0)
+        .overlay(
+          Group {
+            if let dataPoint = selectedBalance {
+              Text(dataPoint.formattedPrice)
+            }
+          }
+        )
         .font(.largeTitle.weight(.medium))
         .multilineTextAlignment(.center)
       
