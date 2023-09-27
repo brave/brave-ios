@@ -250,7 +250,7 @@ class SwapStoreTests: XCTestCase {
     swapService._priceQuote = { $1(.init(), nil, "") }
     swapService._transactionPayload = { $1(.init(), nil, "") }
     let txService = BraveWallet.TestTxService()
-    txService._addUnapprovedTransaction = { $4(true, "tx-meta-id", "") }
+    txService._addUnapprovedTransaction = { $2(true, "tx-meta-id", "") }
     let walletService = BraveWallet.TestBraveWalletService()
     let mockAssetManager = TestableWalletUserAssetManager()
     mockAssetManager._getAllUserAssetsInNetworkAssets = { _ in
@@ -453,7 +453,7 @@ class SwapStoreTests: XCTestCase {
   @MainActor func testSwapERC20EIP1559Transaction() async {
     let (keyringService, blockchainRegistry, rpcService, swapService, txService, walletService, ethTxManagerProxy, solTxManagerProxy, mockAssetManager) = setupServices()
     var submittedTxData: BraveWallet.TxDataUnion?
-    txService._addUnapprovedTransaction = { txData, _, _, _, completion in
+    txService._addUnapprovedTransaction = { txData, _, completion in
       submittedTxData = txData
       completion(true, "tx-meta-id", "")
     }
@@ -483,7 +483,7 @@ class SwapStoreTests: XCTestCase {
     // Celo Mainnet / `.mockCelo` is not EIP1559
     let (keyringService, blockchainRegistry, rpcService, swapService, txService, walletService, ethTxManagerProxy, solTxManagerProxy, mockAssetManager) = setupServices(network: .mockCelo)
     var submittedTxData: BraveWallet.TxDataUnion?
-    txService._addUnapprovedTransaction = { txData, _, _, _, completion in
+    txService._addUnapprovedTransaction = { txData, _, completion in
       submittedTxData = txData
       completion(true, "tx-meta-id", "")
     }
@@ -513,7 +513,7 @@ class SwapStoreTests: XCTestCase {
   @MainActor func testSwapETHSwapEIP1559Transaction() async {
     let (keyringService, blockchainRegistry, rpcService, swapService, txService, walletService, ethTxManagerProxy, solTxManagerProxy, mockAssetManager) = setupServices()
     var submittedTxData: BraveWallet.TxDataUnion?
-    txService._addUnapprovedTransaction = { txData, _, _, _, completion in
+    txService._addUnapprovedTransaction = { txData, _, completion in
       submittedTxData = txData
       completion(true, "tx-meta-id", "")
     }
@@ -544,7 +544,7 @@ class SwapStoreTests: XCTestCase {
     // Celo Mainnet / `.mockCelo` is not EIP1559
     let (keyringService, blockchainRegistry, rpcService, swapService, txService, walletService, ethTxManagerProxy, solTxManagerProxy, mockAssetManager) = setupServices(network: .mockCelo)
     var submittedTxData: BraveWallet.TxDataUnion?
-    txService._addUnapprovedTransaction = { txData, _, _, _, completion in
+    txService._addUnapprovedTransaction = { txData, _, completion in
       submittedTxData = txData
       completion(true, "tx-meta-id", "")
     }
@@ -593,7 +593,7 @@ class SwapStoreTests: XCTestCase {
       completion(.init(), .success, "")
     }
     var submittedTxData: BraveWallet.TxDataUnion?
-    txService._addUnapprovedTransaction = { txData, _, _, _, completion in
+    txService._addUnapprovedTransaction = { txData, _, completion in
       submittedTxData = txData
       completion(true, "tx-meta-id", "")
     }
