@@ -11,11 +11,11 @@ import CoreData
 
 public protocol WalletUserAssetManagerType: AnyObject {
   /// Return all visible or all invisible user assets in form of `NetworkAssets`
-  func getAllUserAssetsInNetworkAssets(networks: [BraveWallet.NetworkInfo], visible: Bool) -> [NetworkAssets]
+  func getAllUserAssetsInNetworkAssetsByVisibility(networks: [BraveWallet.NetworkInfo], visible: Bool) -> [NetworkAssets]
   /// Return all user assets in form of `NetworkAssets`
-  func getAllUserAssetsInNetworkAssets(networks: [BraveWallet.NetworkInfo]) -> [NetworkAssets]
+  func getAllUserAssetsInNetworkAssets(networks: [BraveWallet.NetworkInfo], includingSpam: Bool) -> [NetworkAssets]
   /// Return all spam or non-spam user assets in form of `NetworkAssets`
-  func getAllUserNFTs(networks: [BraveWallet.NetworkInfo], spamStatus: Bool) -> [NetworkAssets]
+  func getAllUserNFTs(networks: [BraveWallet.NetworkInfo], isSpam: Bool) -> [NetworkAssets]
   /// Return a `WalletUserAsset` with a given `BraveWallet.BlockchainToken`
   func getUserAsset(_ asset: BraveWallet.BlockchainToken) -> WalletUserAsset?
   /// Add a `WalletUserAsset` representation of the given
@@ -27,7 +27,7 @@ public protocol WalletUserAssetManagerType: AnyObject {
   /// Remove an entire `WalletUserAssetGroup` with a given `groupId`
   func removeGroup(for groupId: String, completion: (() -> Void)?)
   /// Update a `WalletUserAsset`'s visible and spam status
-  func updateUserAsset(for asset: BraveWallet.BlockchainToken, visible: Bool, spamStatus: Bool, completion: (() -> Void)?)
+  func updateUserAsset(for asset: BraveWallet.BlockchainToken, visible: Bool, isSpam: Bool, completion: (() -> Void)?)
 }
 
 public class WalletUserAssetManager: WalletUserAssetManagerType {
@@ -43,15 +43,20 @@ public class WalletUserAssetManager: WalletUserAssetManagerType {
     self.walletService = walletService
   }
   
-  /// Return all user's assets (no spam) stored in CoreData
-  public func getAllUserAssetsInNetworkAssets(networks: [BraveWallet.NetworkInfo]) -> [NetworkAssets] {
+  /// Return all user's assets stored in CoreData
+  public func getAllUserAssetsInNetworkAssets(networks: [BraveWallet.NetworkInfo], includingSpam: Bool) -> [NetworkAssets] {
     var allUserAssets: [NetworkAssets] = []
     for (index, network) in networks.enumerated() {
       let groupId = network.walletUserAssetGroupId
-      if let walletUserAssets = WalletUserAssetGroup.getGroup(groupId: groupId)?.walletUserAssets?.filter({ $0.isSpam == false }) {
+      if let walletUserAssets = WalletUserAssetGroup.getGroup(groupId: groupId)?.walletUserAssets?.filter({
+        if !includingSpam {
+          return $0.isSpam == false
+        }
+        return true
+      }) {
         let networkAsset = NetworkAssets(
           network: network,
-          tokens: walletUserAssets.map({ $0.blockchainToken }),
+          tokens: walletUserAssets.map(\.blockchainToken),
           sortOrder: index
         )
         allUserAssets.append(networkAsset)
@@ -62,7 +67,7 @@ public class WalletUserAssetManager: WalletUserAssetManagerType {
   
   /// Return either all visible or invisible user's assets (no spam) stored in CoreData based on
   /// the given `visible` value
-  public func getAllUserAssetsInNetworkAssets(networks: [BraveWallet.NetworkInfo], visible: Bool) -> [NetworkAssets] {
+  public func getAllUserAssetsInNetworkAssetsByVisibility(networks: [BraveWallet.NetworkInfo], visible: Bool) -> [NetworkAssets] {
     var allVisibleUserAssets: [NetworkAssets] = []
     for (index, network) in networks.enumerated() {
       let groupId = network.walletUserAssetGroupId
@@ -79,11 +84,11 @@ public class WalletUserAssetManager: WalletUserAssetManagerType {
   }
   
   /// Return all user NFTs stored in CoreData with the given `isSpam` status
-  public func getAllUserNFTs(networks: [BraveWallet.NetworkInfo], spamStatus: Bool) -> [NetworkAssets] {
+  public func getAllUserNFTs(networks: [BraveWallet.NetworkInfo], isSpam: Bool) -> [NetworkAssets] {
     var allUserSpamAssets: [NetworkAssets] = []
     for (index, network) in networks.enumerated() {
       let groupId = network.walletUserAssetGroupId
-      if let walletUserAssets = WalletUserAssetGroup.getGroup(groupId: groupId)?.walletUserAssets?.filter({ $0.isSpam == spamStatus && ($0.isERC721 || $0.isNFT) }) { // Even though users can only spam/unspam NFTs, but we put the NFT filter here to make sure only NFTs are returned
+      if let walletUserAssets = WalletUserAssetGroup.getGroup(groupId: groupId)?.walletUserAssets?.filter({ $0.isSpam == isSpam && ($0.isERC721 || $0.isNFT) }) { // Even though users can only spam/unspam NFTs, but we put the NFT filter here to make sure only NFTs are returned
         let networkAsset = NetworkAssets(
           network: network,
           tokens: walletUserAssets.map({ $0.blockchainToken }),
@@ -114,13 +119,13 @@ public class WalletUserAssetManager: WalletUserAssetManagerType {
   public func updateUserAsset(
     for asset: BraveWallet.BlockchainToken,
     visible: Bool,
-    spamStatus: Bool,
+    isSpam: Bool,
     completion: (() -> Void)?
   ) {
     WalletUserAsset.updateUserAsset(
       for: asset,
       visible: visible,
-      spamStatus: spamStatus,
+      isSpam: isSpam,
       completion: completion
     )
   }
@@ -177,28 +182,28 @@ public class WalletUserAssetManager: WalletUserAssetManagerType {
 #if DEBUG
 public class TestableWalletUserAssetManager: WalletUserAssetManagerType {
   public var _getAllUserAssetsInNetworkAssetsByVisibility: ((_ networks: [BraveWallet.NetworkInfo], _ visible: Bool) -> [NetworkAssets])?
-  public var _getAllUserAssetsInNetworkAssets: ((_ networks: [BraveWallet.NetworkInfo]) -> [NetworkAssets])?
+  public var _getAllUserAssetsInNetworkAssets: ((_ networks: [BraveWallet.NetworkInfo], _ includingSpam: Bool) -> [NetworkAssets])?
   public var _getAllUserNFTs: ((_ networks: [BraveWallet.NetworkInfo], _ spamStatus: Bool) -> [NetworkAssets])?
   
   public init() {}
   
-  public func getAllUserAssetsInNetworkAssets(networks: [BraveWallet.NetworkInfo]) -> [NetworkAssets] {
+  public func getAllUserAssetsInNetworkAssets(networks: [BraveWallet.NetworkInfo], includingSpam: Bool) -> [NetworkAssets] {
     let defaultAssets: [NetworkAssets] = [
       NetworkAssets(network: .mockMainnet, tokens: [.previewToken], sortOrder: 0),
       NetworkAssets(network: .mockGoerli, tokens: [.previewToken], sortOrder: 1)
     ]
     let chainIds = networks.map { $0.chainId }
-    return _getAllUserAssetsInNetworkAssets?(networks) ?? defaultAssets.filter({
+    return _getAllUserAssetsInNetworkAssets?(networks, includingSpam) ?? defaultAssets.filter({
       chainIds.contains($0.network.chainId)
     })
   }
   
-  public func getAllUserAssetsInNetworkAssets(networks: [BraveWallet.NetworkInfo], visible: Bool) -> [NetworkAssets] {
+  public func getAllUserAssetsInNetworkAssetsByVisibility(networks: [BraveWallet.NetworkInfo], visible: Bool) -> [NetworkAssets] {
     _getAllUserAssetsInNetworkAssetsByVisibility?(networks, visible) ?? []
   }
   
-  public func getAllUserNFTs(networks: [BraveWallet.NetworkInfo], spamStatus: Bool) -> [NetworkAssets] {
-    _getAllUserNFTs?(networks, spamStatus) ?? []
+  public func getAllUserNFTs(networks: [BraveWallet.NetworkInfo], isSpam: Bool) -> [NetworkAssets] {
+    _getAllUserNFTs?(networks, isSpam) ?? []
   }
   
   public func getUserAsset(_ asset: BraveWallet.BlockchainToken) -> WalletUserAsset? {
@@ -217,7 +222,7 @@ public class TestableWalletUserAssetManager: WalletUserAssetManagerType {
   public func updateUserAsset(
     for asset: BraveWallet.BlockchainToken,
     visible: Bool,
-    spamStatus: Bool,
+    isSpam: Bool,
     completion: (() -> Void)?
   ) {
   }

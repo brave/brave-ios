@@ -35,19 +35,19 @@ extension BraveWalletBraveWalletService {
       for account in selectedAccounts {
         let networks = selectedNetworks
           .filter { $0.coin == account.coin }
-          .map { $0.chainId }
+          .map(\.chainId)
         group.addTask { @MainActor in
-          let (spams, _) = await self.simpleHashSpamNfTs(account.address, chainIds: networks, coin: account.coin, cursor: nil)
-          return spams
+          let (spamNFTs, _) = await self.simpleHashSpamNfTs(account.address, chainIds: networks, coin: account.coin, cursor: nil)
+          return spamNFTs
         }
       }
-      var networkSpams: [NetworkAssets] = []
-      let allSpams = await group.reduce([BraveWallet.BlockchainToken](), { $0 + $1 })
+      var networkSpamNFTs: [NetworkAssets] = []
+      let allSpamNFTs = await group.reduce([BraveWallet.BlockchainToken](), { $0 + $1 })
       for (index, network) in selectedNetworks.enumerated() {
-        let spamsOnNetwork = allSpams.filter { $0.chainId == network.chainId }
-        networkSpams.append(NetworkAssets(network: network, tokens: spamsOnNetwork, sortOrder: index))
+        let spamNFTsOnNetwork = allSpamNFTs.filter { $0.chainId == network.chainId }
+        networkSpamNFTs.append(NetworkAssets(network: network, tokens: spamNFTsOnNetwork, sortOrder: index))
       }
-      return networkSpams
+      return networkSpamNFTs
     })
   }
 }

@@ -358,24 +358,24 @@ class NFTStoreTests: XCTestCase {
     )
     
     // test that `update()` will assign new value to `userInvisibleNFTs` publisher
-    let userInvisibleNFTsException = expectation(description: "update-userInvisibleNFTs")
-    store.$userInvisibleNFTs
+    let userHiddenNFTsException = expectation(description: "update-userInvisibleNFTs")
+    store.$userHiddenNFTs
       .dropFirst()
       .collect(3)
-      .sink { userInvisibleNFTs in
-        defer { userInvisibleNFTsException.fulfill() }
-        XCTAssertEqual(userInvisibleNFTs.count, 3) // empty nfts, populated w/ balance nfts, populated w/ metadata
-        guard let lastUpdatedInvisibleNFTs = userInvisibleNFTs.last else {
+      .sink { userHiddenNFTs in
+        defer { userHiddenNFTsException.fulfill() }
+        XCTAssertEqual(userHiddenNFTs.count, 3) // empty nfts, populated w/ balance nfts, populated w/ metadata
+        guard let lastUpdatedHiddenNFTs = userHiddenNFTs.last else {
           XCTFail("Unexpected test result")
           return
         }
-        XCTAssertEqual(lastUpdatedInvisibleNFTs.count, 1)
-        XCTAssertEqual(lastUpdatedInvisibleNFTs[safe: 0]?.token.symbol, mockEthUserAssets[safe: 4]?.symbol)
-        XCTAssertEqual(lastUpdatedInvisibleNFTs[safe: 0]?.nftMetadata?.imageURLString, self.mockERC721Metadata.imageURLString)
-        XCTAssertEqual(lastUpdatedInvisibleNFTs[safe: 0]?.nftMetadata?.name, self.mockERC721Metadata.name)
+        XCTAssertEqual(lastUpdatedHiddenNFTs.count, 1)
+        XCTAssertEqual(lastUpdatedHiddenNFTs[safe: 0]?.token.symbol, mockEthUserAssets[safe: 4]?.symbol)
+        XCTAssertEqual(lastUpdatedHiddenNFTs[safe: 0]?.nftMetadata?.imageURLString, self.mockERC721Metadata.imageURLString)
+        XCTAssertEqual(lastUpdatedHiddenNFTs[safe: 0]?.nftMetadata?.name, self.mockERC721Metadata.name)
       }.store(in: &cancellables)
     store.update()
-    await fulfillment(of: [userInvisibleNFTsException], timeout: 1)
+    await fulfillment(of: [userHiddenNFTsException], timeout: 1)
     cancellables.removeAll()
   }
   

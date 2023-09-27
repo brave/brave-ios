@@ -40,7 +40,7 @@ class WalletUserAssetTests: CoreDataTestCase {
     XCTAssertFalse(userAsset.isSpam)
     
     backgroundSaveAndWaitForExpectation {
-      WalletUserAsset.updateUserAsset(for: asset, visible: false, spamStatus: true)
+      WalletUserAsset.updateUserAsset(for: asset, visible: false, isSpam: true)
     }
     
     DataController.viewContext.refreshAllObjects()
@@ -57,7 +57,7 @@ class WalletUserAssetTests: CoreDataTestCase {
     createAndWait(asset: asset3)
     
     backgroundSaveAndWaitForExpectation {
-      WalletUserAsset.updateUserAsset(for: asset2, visible: false, spamStatus: false)
+      WalletUserAsset.updateUserAsset(for: asset2, visible: false, isSpam: false)
     }
     
     DataController.viewContext.refreshAllObjects()
