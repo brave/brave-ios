@@ -133,12 +133,12 @@ class NFTStoreTests: XCTestCase {
       [
         NetworkAssets(
           network: .mockMainnet,
-          tokens: mockEthUserAssets.filter({ $0.visible == visible }),
+          tokens: mockEthUserAssets.filter({ $0.visible == visible && $0.isSpam == false }),
           sortOrder: 0
         ),
         NetworkAssets(
           network: .mockSolana,
-          tokens: mockSolUserAssets.filter({ $0.visible == visible }),
+          tokens: mockSolUserAssets.filter({ $0.visible == visible && $0.isSpam == false }),
           sortOrder: 1
         )
       ].filter { networkAsset in networks.contains(where: { $0 == networkAsset.network }) }
@@ -197,31 +197,32 @@ class NFTStoreTests: XCTestCase {
       userAssetManager: mockAssetManager
     )
     
-    // test that `update()` will assign new value to `userVisibleNFTs` publisher
+    // test that `update()` will assign new value to `userNFTs` publisher
     let userVisibleNFTsException = expectation(description: "update-userVisibleNFTs")
-    XCTAssertTrue(store.userVisibleNFTs.isEmpty)  // Initial state
-    store.$userVisibleNFTs
+    XCTAssertTrue(store.userNFTs.isEmpty)  // Initial state
+    store.$userNFTs
       .dropFirst()
       .collect(3)
-      .sink { userVisibleNFTs in
+      .sink { userNFTs in
         defer { userVisibleNFTsException.fulfill() }
-        XCTAssertEqual(userVisibleNFTs.count, 3) // empty nfts, populated w/ balance nfts, populated w/ metadata
-        guard let lastUpdatedVisibleNFTs = userVisibleNFTs.last else {
+        XCTAssertEqual(userNFTs.count, 3) // empty nfts, populated w/ balance nfts, populated w/ metadata
+        guard let lastUpdatedUserNFTs = userNFTs.last else {
           XCTFail("Unexpected test result")
           return
         }
-        XCTAssertEqual(lastUpdatedVisibleNFTs.count, 3)
-        XCTAssertEqual(lastUpdatedVisibleNFTs[safe: 0]?.token.symbol, mockEthUserAssets[safe: 2]?.symbol)
-        XCTAssertEqual(lastUpdatedVisibleNFTs[safe: 0]?.nftMetadata?.imageURLString, self.mockERC721Metadata.imageURLString)
-        XCTAssertEqual(lastUpdatedVisibleNFTs[safe: 0]?.nftMetadata?.name, self.mockERC721Metadata.name)
-        XCTAssertEqual(lastUpdatedVisibleNFTs[safe: 0]?.nftMetadata?.description, self.mockERC721Metadata.description)
-        XCTAssertEqual(lastUpdatedVisibleNFTs[safe: 1]?.token.symbol, mockEthUserAssets[safe: 3]?.symbol)
-        XCTAssertNil(lastUpdatedVisibleNFTs[safe: 1]?.nftMetadata)
+        let visibleNFTs = lastUpdatedUserNFTs.filter(\.token.visible)
+        XCTAssertEqual(visibleNFTs.count, 3)
+        XCTAssertEqual(visibleNFTs[safe: 0]?.token.symbol, mockEthUserAssets[safe: 2]?.symbol)
+        XCTAssertEqual(visibleNFTs[safe: 0]?.nftMetadata?.imageURLString, self.mockERC721Metadata.imageURLString)
+        XCTAssertEqual(visibleNFTs[safe: 0]?.nftMetadata?.name, self.mockERC721Metadata.name)
+        XCTAssertEqual(visibleNFTs[safe: 0]?.nftMetadata?.description, self.mockERC721Metadata.description)
+        XCTAssertEqual(visibleNFTs[safe: 1]?.token.symbol, mockEthUserAssets[safe: 3]?.symbol)
+        XCTAssertNil(visibleNFTs[safe: 1]?.nftMetadata)
         
-        XCTAssertEqual(lastUpdatedVisibleNFTs[safe: 2]?.token.symbol, mockSolUserAssets[safe: 2]?.symbol)
-        XCTAssertEqual(lastUpdatedVisibleNFTs[safe: 2]?.nftMetadata?.imageURLString, self.mockSolMetadata.imageURLString)
-        XCTAssertEqual(lastUpdatedVisibleNFTs[safe: 2]?.nftMetadata?.name, self.mockSolMetadata.name)
-        XCTAssertEqual(lastUpdatedVisibleNFTs[safe: 2]?.nftMetadata?.description, self.mockSolMetadata.description)
+        XCTAssertEqual(visibleNFTs[safe: 2]?.token.symbol, mockSolUserAssets[safe: 2]?.symbol)
+        XCTAssertEqual(visibleNFTs[safe: 2]?.nftMetadata?.imageURLString, self.mockSolMetadata.imageURLString)
+        XCTAssertEqual(visibleNFTs[safe: 2]?.nftMetadata?.name, self.mockSolMetadata.name)
+        XCTAssertEqual(visibleNFTs[safe: 2]?.nftMetadata?.description, self.mockSolMetadata.description)
       }.store(in: &cancellables)
     
     store.update()
@@ -232,19 +233,20 @@ class NFTStoreTests: XCTestCase {
     
     // MARK: Network Filter Test
     let networksExpectation = expectation(description: "update-networks")
-    store.$userVisibleNFTs
+    store.$userNFTs
       .dropFirst()
       .collect(2)
-      .sink { userVisibleNFTs in
+      .sink { userNFTs in
         defer { networksExpectation.fulfill() }
-        XCTAssertEqual(userVisibleNFTs.count, 2) // empty nfts, populated nfts
-        guard let lastUpdatedVisibleNFTs = userVisibleNFTs.last else {
+        XCTAssertEqual(userNFTs.count, 2) // empty nfts, populated nfts
+        guard let lastUpdatedUserNFTs = userNFTs.last else {
           XCTFail("Unexpected test result")
           return
         }
-        XCTAssertEqual(lastUpdatedVisibleNFTs.count, 2)
-        XCTAssertEqual(lastUpdatedVisibleNFTs[safe: 0]?.token.symbol, mockEthUserAssets[safe: 2]?.symbol)
-        XCTAssertEqual(lastUpdatedVisibleNFTs[safe: 1]?.token.symbol, mockEthUserAssets[safe: 3]?.symbol)
+        let visibleNFTs = lastUpdatedUserNFTs.filter(\.token.visible)
+        XCTAssertEqual(visibleNFTs.count, 2)
+        XCTAssertEqual(visibleNFTs[safe: 0]?.token.symbol, mockEthUserAssets[safe: 2]?.symbol)
+        XCTAssertEqual(visibleNFTs[safe: 1]?.token.symbol, mockEthUserAssets[safe: 3]?.symbol)
         // solana NFT hidden
       }.store(in: &cancellables)
     store.saveFilters(.init(
@@ -263,19 +265,20 @@ class NFTStoreTests: XCTestCase {
     
     // MARK: Hiding Unowned Filter Test
     let hidingUnownedExpectation = expectation(description: "update-hidingUnowned")
-    store.$userVisibleNFTs
+    store.$userNFTs
       .dropFirst()
       .collect(3)
-      .sink { userVisibleNFTs in
+      .sink { userNFTs in
         defer { hidingUnownedExpectation.fulfill() }
-        XCTAssertEqual(userVisibleNFTs.count, 3) // empty nfts, populated w/ balance nfts, populated w/ metadata
-        guard let lastUpdatedVisibleNFTs = userVisibleNFTs.last else {
+        XCTAssertEqual(userNFTs.count, 3) // empty nfts, populated w/ balance nfts, populated w/ metadata
+        guard let lastUpdatedUserNFTs = userNFTs.last else {
           XCTFail("Unexpected test result")
           return
         }
-        XCTAssertEqual(lastUpdatedVisibleNFTs.count, 2)
-        XCTAssertEqual(lastUpdatedVisibleNFTs[safe: 0]?.token.symbol, mockEthUserAssets[safe: 2]?.symbol)
-        XCTAssertEqual(lastUpdatedVisibleNFTs[safe: 1]?.token.symbol, mockSolUserAssets[safe: 2]?.symbol)
+        let visibleNFTs = lastUpdatedUserNFTs.filter(\.token.visible)
+        XCTAssertEqual(visibleNFTs.count, 2)
+        XCTAssertEqual(visibleNFTs[safe: 0]?.token.symbol, mockEthUserAssets[safe: 2]?.symbol)
+        XCTAssertEqual(visibleNFTs[safe: 1]?.token.symbol, mockSolUserAssets[safe: 2]?.symbol)
       }.store(in: &cancellables)
     store.saveFilters(.init(
       groupBy: defaultFilters.groupBy,
@@ -291,18 +294,19 @@ class NFTStoreTests: XCTestCase {
     
     // MARK: Accounts Filter Test
     let accountsExpectation = expectation(description: "update-accounts")
-    store.$userVisibleNFTs
+    store.$userNFTs
       .dropFirst()
       .collect(2)
-      .sink { userVisibleNFTs in
+      .sink { userNFTs in
         defer { accountsExpectation.fulfill() }
-        XCTAssertEqual(userVisibleNFTs.count, 2) // empty nfts, populated nfts
-        guard let lastUpdatedVisibleNFTs = userVisibleNFTs.last else {
+        XCTAssertEqual(userNFTs.count, 2) // empty nfts, populated nfts
+        guard let lastUpdatedNFTs = userNFTs.last else {
           XCTFail("Unexpected test result")
           return
         }
-        XCTAssertEqual(lastUpdatedVisibleNFTs.count, 1)
-        XCTAssertEqual(lastUpdatedVisibleNFTs[safe: 0]?.token.symbol, mockEthUserAssets[safe: 2]?.symbol)
+        let visibleNFTs = lastUpdatedNFTs.filter(\.token.visible)
+        XCTAssertEqual(visibleNFTs.count, 1)
+        XCTAssertEqual(visibleNFTs[safe: 0]?.token.symbol, mockEthUserAssets[safe: 2]?.symbol)
       }.store(in: &cancellables)
     store.saveFilters(.init(
       groupBy: defaultFilters.groupBy,
@@ -359,20 +363,21 @@ class NFTStoreTests: XCTestCase {
     
     // test that `update()` will assign new value to `userInvisibleNFTs` publisher
     let userHiddenNFTsException = expectation(description: "update-userInvisibleNFTs")
-    store.$userHiddenNFTs
+    store.$userNFTs
       .dropFirst()
       .collect(3)
-      .sink { userHiddenNFTs in
+      .sink { userNFTs in
         defer { userHiddenNFTsException.fulfill() }
-        XCTAssertEqual(userHiddenNFTs.count, 3) // empty nfts, populated w/ balance nfts, populated w/ metadata
-        guard let lastUpdatedHiddenNFTs = userHiddenNFTs.last else {
+        XCTAssertEqual(userNFTs.count, 3) // empty nfts, populated w/ balance nfts, populated w/ metadata
+        guard let lastUpdatedNFTs = userNFTs.last else {
           XCTFail("Unexpected test result")
           return
         }
-        XCTAssertEqual(lastUpdatedHiddenNFTs.count, 1)
-        XCTAssertEqual(lastUpdatedHiddenNFTs[safe: 0]?.token.symbol, mockEthUserAssets[safe: 4]?.symbol)
-        XCTAssertEqual(lastUpdatedHiddenNFTs[safe: 0]?.nftMetadata?.imageURLString, self.mockERC721Metadata.imageURLString)
-        XCTAssertEqual(lastUpdatedHiddenNFTs[safe: 0]?.nftMetadata?.name, self.mockERC721Metadata.name)
+        let hiddenNFTs = lastUpdatedNFTs.filter { !$0.token.visible && !$0.token.isSpam }
+        XCTAssertEqual(hiddenNFTs.count, 1)
+        XCTAssertEqual(hiddenNFTs[safe: 0]?.token.symbol, mockEthUserAssets[safe: 4]?.symbol)
+        XCTAssertEqual(hiddenNFTs[safe: 0]?.nftMetadata?.imageURLString, self.mockERC721Metadata.imageURLString)
+        XCTAssertEqual(hiddenNFTs[safe: 0]?.nftMetadata?.name, self.mockERC721Metadata.name)
       }.store(in: &cancellables)
     store.update()
     await fulfillment(of: [userHiddenNFTsException], timeout: 1)
@@ -417,22 +422,23 @@ class NFTStoreTests: XCTestCase {
       userAssetManager: mockAssetManager
     )
 
-    // test that `update()` will assign new value to `userSpamNFTs` publisher
+    // test that `update()` will assign new value to `userNFTs` publisher
     let userSpamNFTsException = expectation(description: "update-userInvisibleNFTs1")
-    store.$userSpamNFTs
+    store.$userNFTs
       .dropFirst()
       .collect(3)
-      .sink { userSpamNFTs in
+      .sink { userNFTs in
         defer { userSpamNFTsException.fulfill() }
-        XCTAssertEqual(userSpamNFTs.count, 3) // empty nfts, populated w/ balance nfts, populated w/ metadata
-        guard let lastUpdatedSpamNFTs = userSpamNFTs.last else {
+        XCTAssertEqual(userNFTs.count, 3) // empty nfts, populated w/ balance nfts, populated w/ metadata
+        guard let lastUpdatedUserNFTs = userNFTs.last else {
           XCTFail("Unexpected test result")
           return
         }
-        XCTAssertEqual(lastUpdatedSpamNFTs.count, 1)
-        XCTAssertEqual(lastUpdatedSpamNFTs[safe: 0]?.token.symbol, self.spamEthNFT.symbol)
-        XCTAssertEqual(lastUpdatedSpamNFTs[safe: 0]?.nftMetadata?.imageURLString, self.mockERC721Metadata.imageURLString)
-        XCTAssertEqual(lastUpdatedSpamNFTs[safe: 0]?.nftMetadata?.name, self.mockERC721Metadata.name)
+        let spamNFTs = lastUpdatedUserNFTs.filter(\.token.isSpam)
+        XCTAssertEqual(spamNFTs.count, 1)
+        XCTAssertEqual(spamNFTs[safe: 0]?.token.symbol, self.spamEthNFT.symbol)
+        XCTAssertEqual(spamNFTs[safe: 0]?.nftMetadata?.imageURLString, self.mockERC721Metadata.imageURLString)
+        XCTAssertEqual(spamNFTs[safe: 0]?.nftMetadata?.name, self.mockERC721Metadata.name)
       }.store(in: &cancellables)
 
     store.update()
@@ -478,25 +484,26 @@ class NFTStoreTests: XCTestCase {
       userAssetManager: mockAssetManager
     )
     
-    // test that `update()` will assign new value to `userSpamNFTs` publisher
+    // test that `update()` will assign new value to `userNFTs` publisher
     let userSpamNFTsException = expectation(description: "update-userSpamNFTsException2")
-    store.$userSpamNFTs
+    store.$userNFTs
       .dropFirst()
       .collect(3)
-      .sink { userSpamNFTs in
+      .sink { userNFTs in
         defer { userSpamNFTsException.fulfill() }
-        XCTAssertEqual(userSpamNFTs.count, 3) // empty nfts, populated w/ balance nfts, populated w/ metadata
-        guard let lastUpdatedSpamNFTs = userSpamNFTs.last else {
+        XCTAssertEqual(userNFTs.count, 3) // empty nfts, populated w/ balance nfts, populated w/ metadata
+        guard let lastUpdatedUserNFTs = userNFTs.last else {
           XCTFail("Unexpected test result")
           return
         }
-        XCTAssertEqual(lastUpdatedSpamNFTs.count, 2)
-        XCTAssertEqual(lastUpdatedSpamNFTs[safe: 0]?.token.symbol, BraveWallet.BlockchainToken.mockSolanaNFTToken.symbol)
-        XCTAssertEqual(lastUpdatedSpamNFTs[safe: 0]?.nftMetadata?.imageURLString, self.mockSolMetadata.imageURLString)
-        XCTAssertEqual(lastUpdatedSpamNFTs[safe: 0]?.nftMetadata?.name, self.mockSolMetadata.name)
-        XCTAssertEqual(lastUpdatedSpamNFTs[safe: 1]?.token.symbol, self.spamEthNFT.symbol)
-        XCTAssertEqual(lastUpdatedSpamNFTs[safe: 1]?.nftMetadata?.imageURLString, self.mockERC721Metadata.imageURLString)
-        XCTAssertEqual(lastUpdatedSpamNFTs[safe: 1]?.nftMetadata?.name, self.mockERC721Metadata.name)
+        let spamNFTs = lastUpdatedUserNFTs.filter(\.token.isSpam)
+        XCTAssertEqual(spamNFTs.count, 2)
+        XCTAssertEqual(spamNFTs[safe: 0]?.token.symbol, BraveWallet.BlockchainToken.mockSolanaNFTToken.symbol)
+        XCTAssertEqual(spamNFTs[safe: 0]?.nftMetadata?.imageURLString, self.mockSolMetadata.imageURLString)
+        XCTAssertEqual(spamNFTs[safe: 0]?.nftMetadata?.name, self.mockSolMetadata.name)
+        XCTAssertEqual(spamNFTs[safe: 1]?.token.symbol, self.spamEthNFT.symbol)
+        XCTAssertEqual(spamNFTs[safe: 1]?.nftMetadata?.imageURLString, self.mockERC721Metadata.imageURLString)
+        XCTAssertEqual(spamNFTs[safe: 1]?.nftMetadata?.name, self.mockERC721Metadata.name)
       }.store(in: &cancellables)
     
     store.update()
@@ -545,20 +552,21 @@ class NFTStoreTests: XCTestCase {
     
     // test that `update()` will assign new value to `userSpamNFTs` publisher
     let userSpamNFTsException = expectation(description: "update-userSpamNFTsException2")
-    store.$userSpamNFTs
+    store.$userNFTs
       .dropFirst()
       .collect(3)
-      .sink { userSpamNFTs in
+      .sink { userNFTs in
         defer { userSpamNFTsException.fulfill() }
-        XCTAssertEqual(userSpamNFTs.count, 3) // empty nfts, populated w/ balance nfts, populated w/ metadata
-        guard let lastUpdatedSpamNFTs = userSpamNFTs.last else {
+        XCTAssertEqual(userNFTs.count, 3) // empty nfts, populated w/ balance nfts, populated w/ metadata
+        guard let lastUpdatedUserNFTs = userNFTs.last else {
           XCTFail("Unexpected test result")
           return
         }
-        XCTAssertEqual(lastUpdatedSpamNFTs.count, 1)
-        XCTAssertEqual(lastUpdatedSpamNFTs[safe: 0]?.token.symbol, self.spamEthNFT.symbol)
-        XCTAssertEqual(lastUpdatedSpamNFTs[safe: 0]?.nftMetadata?.imageURLString, self.mockERC721Metadata.imageURLString)
-        XCTAssertEqual(lastUpdatedSpamNFTs[safe: 0]?.nftMetadata?.name, self.mockERC721Metadata.name)
+        let spamNFTs = lastUpdatedUserNFTs.filter(\.token.isSpam)
+        XCTAssertEqual(spamNFTs.count, 1)
+        XCTAssertEqual(spamNFTs[safe: 0]?.token.symbol, self.spamEthNFT.symbol)
+        XCTAssertEqual(spamNFTs[safe: 0]?.nftMetadata?.imageURLString, self.mockERC721Metadata.imageURLString)
+        XCTAssertEqual(spamNFTs[safe: 0]?.nftMetadata?.name, self.mockERC721Metadata.name)
       }.store(in: &cancellables)
     
     store.update()

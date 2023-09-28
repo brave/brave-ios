@@ -74,7 +74,7 @@ public class WalletUserAssetManager: WalletUserAssetManagerType {
       if let walletUserAssets = WalletUserAssetGroup.getGroup(groupId: groupId)?.walletUserAssets?.filter({ $0.visible == visible && $0.isSpam == false }) {
         let networkAsset = NetworkAssets(
           network: network,
-          tokens: walletUserAssets.map({ $0.blockchainToken }),
+          tokens: walletUserAssets.map(\.blockchainToken),
           sortOrder: index
         )
         allVisibleUserAssets.append(networkAsset)
@@ -91,7 +91,7 @@ public class WalletUserAssetManager: WalletUserAssetManagerType {
       if let walletUserAssets = WalletUserAssetGroup.getGroup(groupId: groupId)?.walletUserAssets?.filter({ $0.isSpam == isSpam && ($0.isERC721 || $0.isNFT) }) { // Even though users can only spam/unspam NFTs, but we put the NFT filter here to make sure only NFTs are returned
         let networkAsset = NetworkAssets(
           network: network,
-          tokens: walletUserAssets.map({ $0.blockchainToken }),
+          tokens: walletUserAssets.map(\.blockchainToken),
           sortOrder: index
         )
         allUserSpamAssets.append(networkAsset)
