@@ -80,8 +80,7 @@ struct PortfolioSegmentedControl: View {
             Spacer()
           }
         }
-        .preference(key: SizePreferenceKey.self, value: geometryProxy.size)
-        .onPreferenceChange(SizePreferenceKey.self) { size in
+        .readSize { size in
           if location == .zero {
             let newX = selected == .assets ? geometryProxy.size.width / 4 : geometryProxy.size.width / 4 * 3
             location = CGPoint(
@@ -163,7 +162,20 @@ struct PortfolioSegmentedControl: View {
   }
 }
 
+// https://www.fivestars.blog/articles/swiftui-share-layout-information/
 struct SizePreferenceKey: PreferenceKey {
   static var defaultValue: CGSize = .zero
   static func reduce(value: inout CGSize, nextValue: () -> CGSize) {}
+}
+
+extension View {
+  func readSize(onChange: @escaping (CGSize) -> Void) -> some View {
+    background(
+      GeometryReader { geometryProxy in
+        Color.clear
+          .preference(key: SizePreferenceKey.self, value: geometryProxy.size)
+      }
+    )
+    .onPreferenceChange(SizePreferenceKey.self, perform: onChange)
+  }
 }
