@@ -58,6 +58,7 @@ class SettingsViewController: TableViewController {
   private let syncAPI: BraveSyncAPI
   private let syncProfileServices: BraveSyncProfileServiceIOS
   private let p3aUtilities: BraveP3AUtils
+  private let deAmpPrefs: DeAmpPrefs
   private let attributionManager: AttributionManager
   private let keyringStore: KeyringStore?
   private let cryptoStore: CryptoStore?
@@ -88,6 +89,7 @@ class SettingsViewController: TableViewController {
     self.syncAPI = braveCore.syncAPI
     self.syncProfileServices = braveCore.syncProfileService
     self.p3aUtilities = braveCore.p3aUtils
+    self.deAmpPrefs = braveCore.deAmpPrefs
     self.attributionManager = attributionManager
     self.keyringStore = keyringStore
     self.cryptoStore = cryptoStore
@@ -242,12 +244,13 @@ class SettingsViewController: TableViewController {
         Row(
           text: Strings.braveShieldsAndPrivacy,
           selection: { [unowned self] in
-            let controller = UIHostingController(rootView: AdvancedShieldsSettingsView(
+            let controller = UIHostingController(rootView: AdvancedShieldsSettingsView(settings: AdvancedShieldsSettings(
               profile: self.profile,
               tabManager: self.tabManager,
               feedDataSource: self.feedDataSource,
               historyAPI: self.historyAPI,
               p3aUtilities: self.p3aUtilities,
+              deAmpPrefs: deAmpPrefs,
               clearDataCallback: { [weak self] isLoading, isHistoryCleared in
                 guard let view = self?.navigationController?.view, view.window != nil else {
                   assertionFailure()
@@ -270,7 +273,7 @@ class SettingsViewController: TableViewController {
                   clearBrowserHistoryActivity.becomeCurrent()
                 }
               }
-            ))
+            )))
             
             controller.rootView.openURLAction = { [unowned self] url in
               self.settingsDelegate?.settingsOpenURLInNewTab(url)

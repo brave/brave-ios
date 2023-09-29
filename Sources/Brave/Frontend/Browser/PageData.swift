@@ -71,7 +71,7 @@ struct PageData {
   }
   
   /// Return all the user script types for this page. The number of script types grows as more frames are loaded.
-  @MainActor func makeUserScriptTypes(domain: Domain) async -> Set<UserScriptType> {
+  @MainActor func makeUserScriptTypes(domain: Domain, isDeAmpEnabled: Bool) async -> Set<UserScriptType> {
     var userScriptTypes: Set<UserScriptType> = [
       .siteStateListener, .gpc(ShieldPreferences.enableGPC.value)
     ]
@@ -101,21 +101,21 @@ struct PageData {
       }
     }
     
-    let allEngineScriptTypes = await makeAllEngineScripts(for: domain)
+    let allEngineScriptTypes = await makeAllEngineScripts(for: domain, isDeAmpEnabled: isDeAmpEnabled)
     return userScriptTypes.union(allEngineScriptTypes)
   }
   
-  func makeMainFrameEngineScriptTypes(domain: Domain) async -> Set<UserScriptType> {
-    return await adBlockStats.makeEngineScriptTypes(frameURL: mainFrameURL, isMainFrame: true, domain: domain)
+  func makeMainFrameEngineScriptTypes(domain: Domain, isDeAmpEnabled: Bool) async -> Set<UserScriptType> {
+    return await adBlockStats.makeEngineScriptTypes(frameURL: mainFrameURL, isMainFrame: true, isDeAmpEnabled: isDeAmpEnabled, domain: domain)
   }
   
-  func makeAllEngineScripts(for domain: Domain) async -> Set<UserScriptType> {
+  func makeAllEngineScripts(for domain: Domain, isDeAmpEnabled: Bool) async -> Set<UserScriptType> {
     // Add engine scripts for the main frame
-    async let engineScripts = adBlockStats.makeEngineScriptTypes(frameURL: mainFrameURL, isMainFrame: true, domain: domain)
+    async let engineScripts = adBlockStats.makeEngineScriptTypes(frameURL: mainFrameURL, isMainFrame: true, isDeAmpEnabled: isDeAmpEnabled, domain: domain)
     
     // Add engine scripts for all of the known sub-frames
     async let additionalScriptTypes = allSubframeURLs.asyncConcurrentCompactMap({ frameURL in
-      return await self.adBlockStats.makeEngineScriptTypes(frameURL: frameURL, isMainFrame: false, domain: domain)
+      return await self.adBlockStats.makeEngineScriptTypes(frameURL: frameURL, isMainFrame: false, isDeAmpEnabled: isDeAmpEnabled, domain: domain)
     }).reduce(Set<UserScriptType>(), { partialResult, scriptTypes in
       return partialResult.union(scriptTypes)
     })

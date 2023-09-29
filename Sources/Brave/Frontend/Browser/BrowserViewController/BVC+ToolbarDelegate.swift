@@ -397,12 +397,13 @@ extension BrowserViewController: TopToolbarDelegate {
     shields.showGlobalShieldsSettings = { [unowned self] vc in
       vc.dismiss(animated: true) {
         weak var spinner: SpinnerView?
-        let controller = UIHostingController(rootView: AdvancedShieldsSettingsView(
+        let controller = UIHostingController(rootView: AdvancedShieldsSettingsView(settings: AdvancedShieldsSettings(
           profile: self.profile,
           tabManager: self.tabManager,
           feedDataSource: self.feedDataSource,
           historyAPI: self.braveCore.historyAPI,
           p3aUtilities: self.braveCore.p3aUtils,
+          deAmpPrefs: self.braveCore.deAmpPrefs,
           clearDataCallback: { [weak self] isLoading, isHistoryCleared in
             guard let view = self?.navigationController?.view, view.window != nil else {
               assertionFailure()
@@ -425,7 +426,7 @@ extension BrowserViewController: TopToolbarDelegate {
               clearBrowserHistoryActivity.becomeCurrent()
             }
           }
-        ))
+        )))
         
         controller.rootView.openURLAction = { [unowned self] url in
           openDestinationURL(url)

@@ -167,7 +167,7 @@ public class CachedAdBlockEngine {
   }
   
   /// This returns all the user script types for the given frame
-  @MainActor func makeEngineScriptTypes(frameURL: URL, isMainFrame: Bool, domain: Domain, index: Int) async throws -> Set<UserScriptType> {
+  @MainActor func makeEngineScriptTypes(frameURL: URL, isMainFrame: Bool, domain: Domain, isDeAmpEnabled: Bool, index: Int) async throws -> Set<UserScriptType> {
     if let userScriptTypes = cachedFrameScriptTypes.getElement(frameURL) {
       return userScriptTypes
     }
@@ -178,7 +178,7 @@ public class CachedAdBlockEngine {
     if let source = try await cosmeticFilterModel(forFrameURL: frameURL)?.injectedScript, !source.isEmpty {
       let configuration = UserScriptType.EngineScriptConfiguration(
         frameURL: frameURL, isMainFrame: isMainFrame, source: source, order: index,
-        isDeAMPEnabled: Preferences.Shields.autoRedirectAMPPages.value
+        isDeAMPEnabled: isDeAmpEnabled
       )
       
       userScriptTypes.insert(.engineScript(configuration))

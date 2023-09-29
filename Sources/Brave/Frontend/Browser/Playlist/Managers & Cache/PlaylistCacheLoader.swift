@@ -35,7 +35,7 @@ class LivePlaylistWebLoader: UIView, PlaylistWebLoader {
       $0.ignoresViewportScaleLimits = true
     }, type: .private
   ).then {
-    $0.createWebview()
+    $0.createWebview(includeDeAmpScript: false)
     $0.setScript(script: .playlistMediaSource, enabled: true)
     $0.webView?.scrollView.layer.masksToBounds = true
   }
@@ -319,7 +319,7 @@ extension LivePlaylistWebLoader: WKNavigationDelegate {
       if let requestURL = navigationAction.request.url,
          let targetFrame = navigationAction.targetFrame {
         tab.currentPageData?.addSubframeURL(forRequestURL: requestURL, isForMainFrame: targetFrame.isMainFrame)
-        let scriptTypes = await tab.currentPageData?.makeUserScriptTypes(domain: domainForMainFrame) ?? []
+        let scriptTypes = await tab.currentPageData?.makeUserScriptTypes(domain: domainForMainFrame, isDeAmpEnabled: false) ?? []
         tab.setCustomUserScript(scripts: scriptTypes)
       }
     }
@@ -374,7 +374,7 @@ extension LivePlaylistWebLoader: WKNavigationDelegate {
     if let responseURL = responseURL,
        tab.currentPageData?.upgradeFrameURL(forResponseURL: responseURL, isForMainFrame: navigationResponse.isForMainFrame) == true,
        let domain = tab.currentPageData?.domain(persistent: false) {
-      let scriptTypes = await tab.currentPageData?.makeUserScriptTypes(domain: domain) ?? []
+      let scriptTypes = await tab.currentPageData?.makeUserScriptTypes(domain: domain, isDeAmpEnabled: false) ?? []
       tab.setCustomUserScript(scripts: scriptTypes)
     }
 

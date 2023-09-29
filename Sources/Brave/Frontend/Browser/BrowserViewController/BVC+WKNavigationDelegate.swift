@@ -289,7 +289,7 @@ extension BrowserViewController: WKNavigationDelegate {
         tab?.setScripts(scripts: [
           // Add de-amp script
           // The user script manager will take care to not reload scripts if this value doesn't change
-          .deAmp: Preferences.Shields.autoRedirectAMPPages.value,
+          .deAmp: tabManager.deAmpPrefs.isDeAmpEnabled,
           
           // Add request blocking script
           // This script will block certian `xhr` and `window.fetch()` requests
@@ -306,7 +306,7 @@ extension BrowserViewController: WKNavigationDelegate {
       // Check if custom user scripts must be added to or removed from the web view.
       if let targetFrame = navigationAction.targetFrame {
         tab?.currentPageData?.addSubframeURL(forRequestURL: requestURL, isForMainFrame: targetFrame.isMainFrame)
-        let scriptTypes = await tab?.currentPageData?.makeUserScriptTypes(domain: domainForMainFrame) ?? []
+        let scriptTypes = await tab?.currentPageData?.makeUserScriptTypes(domain: domainForMainFrame, isDeAmpEnabled: tabManager.deAmpPrefs.isDeAmpEnabled) ?? []
         tab?.setCustomUserScript(scripts: scriptTypes)
       }
     }
@@ -502,7 +502,7 @@ extension BrowserViewController: WKNavigationDelegate {
     if let responseURL = responseURL,
        let domain = tab?.currentPageData?.domain(persistent: !isPrivateBrowsing),
        tab?.currentPageData?.upgradeFrameURL(forResponseURL: responseURL, isForMainFrame: navigationResponse.isForMainFrame) == true {
-      let scriptTypes = await tab?.currentPageData?.makeUserScriptTypes(domain: domain) ?? []
+      let scriptTypes = await tab?.currentPageData?.makeUserScriptTypes(domain: domain, isDeAmpEnabled: tabManager.deAmpPrefs.isDeAmpEnabled) ?? []
       tab?.setCustomUserScript(scripts: scriptTypes)
     }
 
