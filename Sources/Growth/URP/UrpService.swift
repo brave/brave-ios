@@ -12,10 +12,6 @@ enum UrpError {
   case networkError, downloadIdNotFound, ipNotFound, endpointError
 }
 
-enum AdCampaignError {
-  case networkError, endpointError
-}
-
 /// Api endpoints for user referral program.
 struct UrpService {
   private struct ParamKeys {
@@ -83,14 +79,41 @@ struct UrpService {
     }
   }
   
-  func adCampaignLookup(adAttributionToken: String, completion: @escaping (Int?, AdCampaignError?) -> Void) {
-    guard var endPoint = URL(string: adServicesURL) else {
-      completion(nil, .endpointError)
+  func adCampaignTokenLookup(adAttributionToken: String, completion: @escaping ((Bool?, Int?)?, Error?) -> Void) {
+    guard let endPoint = URL(string: adServicesURL) else {
+      completion(nil, nil)
       UrpLog.log("AdServicesURLString can not be resolved: \(adServicesURL)")
       
       return
     }
     
+    let attributionDataToken = adAttributionToken.data(using: .utf8)
+    
+    // Request is created with token fetched from Ad Services
+    sessionManager.adServicesAttributionApiRequest(endPoint: endPoint, rawData: attributionDataToken) { response in
+      switch response {
+      case .success(let data):
+        if let data = data as? Data {
+          Logger.module.debug("Ad Attribution response: \(String(data: data, encoding: .utf8) ?? "nil")")
+        }
+        
+        UrpLog.log("Ad Attribution responsee: \(data)")
+
+        if let dataResponseJSON = data as? [String: Any] {
+          if let attribution = dataResponseJSON["attribution"] as? Bool, 
+              let campaignId = dataResponseJSON["campaignId"] as? Int {
+            completion((attribution, campaignId), nil)
+          }
+        }
+        
+        completion(nil, nil)
+      case .failure(let error):
+        Logger.module.error("Ad Attribution response: \(error.localizedDescription)")
+        UrpLog.log("Ad Attribution response: \(error.localizedDescription)")
+
+        completion(nil, error)
+      }
+    }
   }
 
   func checkIfAuthorizedForGrant(with downloadId: String, completion: @escaping (Bool?, UrpError?) -> Void) {
@@ -131,7 +154,7 @@ extension URLSession {
   }
   
   // Apple ad service attricution request requires plain text encoding with post method and passing token as rawdata
-  func adServicesAttributionApiRequest(endPoint: URL, rawData: Data, completion: @escaping (Result<Any, Error>) -> Void) {
+  func adServicesAttributionApiRequest(endPoint: URL, rawData: Data?, completion: @escaping (Result<Any, Error>) -> Void) {
     request(endPoint, method: .post, rawData: rawData, encoding: .textPlain) { response in
       completion(response)
     }

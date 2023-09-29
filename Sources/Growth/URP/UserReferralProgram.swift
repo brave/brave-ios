@@ -118,6 +118,15 @@ public class UserReferralProgram {
     //  and not use the passed in referral code.
     service.referralCodeLookup(refCode: refCode, completion: referralBlock)
   }
+  
+  func adCampaignLookup(token: String, completion: @escaping ((Bool?, Int?)?, Error?) -> Void) {
+
+    // TODO: Implement 5 sec delay 3 attempt
+    
+    service.adCampaignTokenLookup(adAttributionToken: token) { response, error in
+      completion(response, error)
+    }
+  }
 
   private func initRetryPingConnection(numberOfTimes: Int32) {
     if AppConstants.buildChannel.isPublic {

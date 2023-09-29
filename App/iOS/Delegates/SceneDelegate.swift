@@ -536,6 +536,9 @@ extension BrowserViewController {
     // Case 2: User Referral on Brave side
     if Preferences.URP.referralLookupOutstanding.value == true {
       
+      // TODO: Implement Ad Token Looup Check
+//      urp.service.adCampaignTokenLookup(adAttributionToken: <#T##String#>, completion: <#T##((Bool?, Int?)?, Error?) -> Void#>)
+
 
       urp.referralLookup(refCode: UserReferralProgram.getReferralCode()) { referralCode, offerUrl in
         // Attempting to send ping after first urp lookup.
