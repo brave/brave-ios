@@ -48,7 +48,7 @@ struct NFTMetadata: Codable, Equatable {
   }
 }
 
-class NFTDetailStore: ObservableObject {
+class NFTDetailStore: ObservableObject, WalletSubStore {
   private let rpcService: BraveWalletJsonRpcService
   private let ipfsApi: IpfsAPI
   let nft: BraveWallet.BlockchainToken
@@ -66,6 +66,9 @@ class NFTDetailStore: ObservableObject {
     self.ipfsApi = ipfsApi
     self.nft = nft
     self.nftMetadata = nftMetadata?.httpfyIpfsUrl(ipfsApi: ipfsApi)
+  }
+  
+  func tearDown() {
   }
   
   func update() {

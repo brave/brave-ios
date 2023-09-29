@@ -9,7 +9,7 @@ import Combine
 import Data
 import Preferences
 
-public class AssetStore: ObservableObject, Equatable {
+public class AssetStore: ObservableObject, Equatable, WalletSubStore {
   @Published var token: BraveWallet.BlockchainToken
   @Published var isVisible: Bool {
     didSet {
@@ -40,6 +40,9 @@ public class AssetStore: ObservableObject, Equatable {
     self.isCustomToken = isCustomToken
     self.isVisible = isVisible
   }
+  
+  func tearDown() {
+  }
 
   public static func == (lhs: AssetStore, rhs: AssetStore) -> Bool {
     lhs.token == rhs.token && lhs.isVisible == rhs.isVisible
@@ -50,7 +53,7 @@ public class AssetStore: ObservableObject, Equatable {
   }
 }
 
-public class UserAssetsStore: ObservableObject {
+public class UserAssetsStore: ObservableObject, WalletSubStore {
   @Published private(set) var assetStores: [AssetStore] = []
   @Published var isSearchingToken: Bool = false
   @Published var networkFilters: [Selectable<BraveWallet.NetworkInfo>] = [] {
@@ -64,16 +67,20 @@ public class UserAssetsStore: ObservableObject {
   private let rpcService: BraveWalletJsonRpcService
   private let keyringService: BraveWalletKeyringService
   private let assetRatioService: BraveWalletAssetRatioService
+  private let walletService: BraveWalletBraveWalletService
   private let ipfsApi: IpfsAPI
   private let assetManager: WalletUserAssetManagerType
   private var allTokens: [BraveWallet.BlockchainToken] = []
   private var timer: Timer?
+  private var keyringServiceObserver: KeyringServiceObserver?
+  private var walletServiceObserver: WalletServiceObserver?
 
   public init(
     blockchainRegistry: BraveWalletBlockchainRegistry,
     rpcService: BraveWalletJsonRpcService,
     keyringService: BraveWalletKeyringService,
     assetRatioService: BraveWalletAssetRatioService,
+    walletService: BraveWalletBraveWalletService,
     ipfsApi: IpfsAPI,
     userAssetManager: WalletUserAssetManagerType
   ) {
@@ -81,11 +88,36 @@ public class UserAssetsStore: ObservableObject {
     self.rpcService = rpcService
     self.keyringService = keyringService
     self.assetRatioService = assetRatioService
+    self.walletService = walletService
     self.ipfsApi = ipfsApi
     self.assetManager = userAssetManager
-    self.keyringService.add(self)
+    self.keyringServiceObserver = KeyringServiceObserver(
+      keyringService: keyringService,
+      _keyringCreated: { [weak self] _ in
+        self?.update()
+      }
+    )
+    self.walletServiceObserver = WalletServiceObserver(
+      walletService: walletService,
+      _onNetworkListChanged: { [weak self] in
+        guard let strongSelf = self else { return }
+        Task { @MainActor [weak strongSelf] in
+          guard let self = strongSelf else { return }
+          // A network was added or removed, update our network filters for the change.
+          self.networkFilters = await rpcService.allNetworksForSupportedCoins().map { network in
+            let existingSelectionValue = self.networkFilters.first(where: { $0.model.chainId == network.chainId})?.isSelected
+            return .init(isSelected: existingSelectionValue ?? true, model: network)
+          }
+        }
+      }
+    )
     
     Preferences.Wallet.showTestNetworks.observe(from: self)
+  }
+  
+  func tearDown() {
+    keyringServiceObserver = nil
+    walletServiceObserver = nil
   }
   
   func update() {
@@ -232,70 +264,6 @@ public class UserAssetsStore: ObservableObject {
       ipfsApi: ipfsApi
     )
   }
-}
-
-extension UserAssetsStore: BraveWalletKeyringServiceObserver {
-  public func keyringCreated(_ keyringId: BraveWallet.KeyringId) {
-    update()
-  }
-  
-  public func keyringRestored(_ keyringId: BraveWallet.KeyringId) {
-  }
-  
-  public func keyringReset() {
-  }
-  
-  public func locked() {
-  }
-  
-  public func unlocked() {
-  }
-  
-  public func backedUp() {
-  }
-  
-  public func accountsChanged() {
-  }
-  
-  public func autoLockMinutesChanged() {
-  }
-  
-  public func selectedWalletAccountChanged(_ account: BraveWallet.AccountInfo) {
-  }
-  
-  public func selectedDappAccountChanged(_ coin: BraveWallet.CoinType, account: BraveWallet.AccountInfo?) {
-  }
-  
-  public func accountsAdded(_ addedAccounts: [BraveWallet.AccountInfo]) {
-  }
-}
-
-extension UserAssetsStore: BraveWalletBraveWalletServiceObserver {
-  public func onActiveOriginChanged(_ originInfo: BraveWallet.OriginInfo) { }
-  
-  public func onDefaultEthereumWalletChanged(_ wallet: BraveWallet.DefaultWallet) { }
-  
-  public func onDefaultSolanaWalletChanged(_ wallet: BraveWallet.DefaultWallet) { }
-  
-  public func onDefaultBaseCurrencyChanged(_ currency: String) { }
-  
-  public func onDefaultBaseCryptocurrencyChanged(_ cryptocurrency: String) { }
-  
-  public func onNetworkListChanged() {
-    Task { @MainActor in
-      // A network was added or removed, update our network filters for the change.
-      self.networkFilters = await self.rpcService.allNetworksForSupportedCoins().map { network in
-        let existingSelectionValue = self.networkFilters.first(where: { $0.model.chainId == network.chainId})?.isSelected
-        return .init(isSelected: existingSelectionValue ?? true, model: network)
-      }
-    }
-  }
-  
-  public func onDiscoverAssetsStarted() { }
-  
-  public func onDiscoverAssetsCompleted(_ discoveredAssets: [BraveWallet.BlockchainToken]) { }
-  
-  public func onResetWallet() { }
 }
 
 extension UserAssetsStore: PreferencesObserver {

@@ -9,7 +9,7 @@ import OrderedCollections
 import Combine
 
 /// A store contains data for buying tokens
-public class BuyTokenStore: ObservableObject {
+public class BuyTokenStore: ObservableObject, WalletSubStore {
   /// The current selected token to buy. Default with nil value.
   @Published var selectedBuyToken: BraveWallet.BlockchainToken?
   /// The supported currencies for purchasing
@@ -56,6 +56,8 @@ public class BuyTokenStore: ObservableObject {
   private var selectedNetwork: BraveWallet.NetworkInfo = .init()
   private(set) var orderedSupportedBuyOptions: OrderedSet<BraveWallet.OnRampProvider> = []
   private var prefilledToken: BraveWallet.BlockchainToken?
+  private var rpcServiceObserver: JsonRpcServiceObserver?
+  private var keyringServiceObserver: KeyringServiceObserver?
   
   /// A map between chain id and gas token's symbol
   static let gasTokens: [String: [String]] = [
@@ -91,12 +93,27 @@ public class BuyTokenStore: ObservableObject {
       $0[$1] = []
     }
     
-    self.rpcService.add(self)
-    self.keyringService.add(self)
+    self.rpcServiceObserver = JsonRpcServiceObserver(
+      rpcService: rpcService
+    )
+    self.keyringServiceObserver = KeyringServiceObserver(
+      keyringService: keyringService,
+      _selectedWalletAccountChanged: { [weak self] _ in
+        guard let strongSelf = self else { return }
+        Task { @MainActor [weak strongSelf] in
+          await strongSelf?.updateInfo()
+        }
+      }
+    )
     
     Task {
       await updateInfo()
     }
+  }
+  
+  func tearDown() {
+    rpcServiceObserver = nil
+    keyringServiceObserver = nil
   }
   
   @MainActor private func validatePrefilledToken(on network: BraveWallet.NetworkInfo) async {
@@ -223,58 +240,6 @@ public class BuyTokenStore: ObservableObject {
     } else if let firstCurrency = supportedCurrencies.first {
       selectedCurrency = firstCurrency
     }
-  }
-}
-
-extension BuyTokenStore: BraveWalletJsonRpcServiceObserver {
-  public func chainChangedEvent(_ chainId: String, coin: BraveWallet.CoinType, origin: URLOrigin?) {
-    Task {
-      await updateInfo()
-    }
-  }
-  
-  public func onAddEthereumChainRequestCompleted(_ chainId: String, error: String) {
-  }
-  
-  public func onIsEip1559Changed(_ chainId: String, isEip1559: Bool) {
-  }
-}
-
-extension BuyTokenStore: BraveWalletKeyringServiceObserver {
-  public func keyringCreated(_ keyringId: BraveWallet.KeyringId) {
-  }
-  
-  public func keyringRestored(_ keyringId: BraveWallet.KeyringId) {
-  }
-  
-  public func keyringReset() {
-  }
-  
-  public func locked() {
-  }
-  
-  public func unlocked() {
-  }
-  
-  public func backedUp() {
-  }
-  
-  public func accountsChanged() {
-  }
-  
-  public func accountsAdded(_ addedAccounts: [BraveWallet.AccountInfo]) {
-  }
-  
-  public func autoLockMinutesChanged() {
-  }
-  
-  public func selectedWalletAccountChanged(_ account: BraveWallet.AccountInfo) {
-    Task { @MainActor in
-      await updateInfo()
-    }
-  }
-  
-  public func selectedDappAccountChanged(_ coin: BraveWallet.CoinType, account: BraveWallet.AccountInfo?) {
   }
 }
 

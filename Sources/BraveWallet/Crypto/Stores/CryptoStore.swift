@@ -57,7 +57,7 @@ enum WebpageRequestResponse: Equatable {
   case signAllTransactions(approved: Bool, id: Int32)
 }
 
-public class CryptoStore: ObservableObject {
+public class CryptoStore: ObservableObject, WalletSubStore {
   public let networkStore: NetworkStore
   public let portfolioStore: PortfolioStore
   let nftStore: NFTStore
@@ -211,14 +211,15 @@ public class CryptoStore: ObservableObject {
         // 1. reset wallet user asset migration flag
         // 2. wipe user assets local storage
         // 3. migrate user assets with new keyring
-        guard let self else { return }
-        guard !self.isUpdatingUserAssets else { return }
-        self.isUpdatingUserAssets = true
+        guard let strongSelf = self else { return }
+        guard !strongSelf.isUpdatingUserAssets else { return }
+        strongSelf.isUpdatingUserAssets = true
         Preferences.Wallet.migrateCoreToWalletUserAssetCompleted.reset()
-        WalletUserAssetGroup.removeAllGroup() {
-          self.userAssetManager.migrateUserAssets(completion: {
-            self.updateAssets()
-            self.isUpdatingUserAssets = false
+        WalletUserAssetGroup.removeAllGroup() { [weak strongSelf] in
+          guard let self = strongSelf else { return }
+          self.userAssetManager.migrateUserAssets(completion: { [weak self] in
+            self?.updateAssets()
+            self?.isUpdatingUserAssets = false
           })
         }
       },
@@ -237,7 +238,6 @@ public class CryptoStore: ObservableObject {
         // CoreData are added after.
         guard let self else { return }
         if !self.isUpdatingUserAssets {
-          let tokens = discoveredAssets.map { $0.symbol }.joined(separator: ",")
           for asset in discoveredAssets {
             self.userAssetManager.addUserAsset(asset, completion: nil)
           }
@@ -271,8 +271,10 @@ public class CryptoStore: ObservableObject {
           self?.prepare()
         }
       },
-      _onAddEthereumChainRequestCompleted: { chainId, error in
-        Task { @MainActor in
+      _onAddEthereumChainRequestCompleted: { [weak self] chainId, error in
+        guard let strongSelf = self else { return }
+        Task { @MainActor [weak strongSelf] in
+          guard let self = strongSelf else { return }
           if let addNetworkDappRequestCompletion = self.addNetworkDappRequestCompletion[chainId] {
             if error.isEmpty {
               let allNetworks = await rpcService.allNetworks(.eth)
@@ -304,6 +306,21 @@ public class CryptoStore: ObservableObject {
     walletServiceObserver = nil
     txServiceObserver = nil
     rpcServiceObserver = nil
+    
+    // sub-stores
+    networkStore.tearDown()
+    portfolioStore.tearDown()
+    nftStore.tearDown()
+    transactionsActivityStore.tearDown()
+    marketStore.tearDown()
+    settingsStore.tearDown()
+    accountActivityStore?.tearDown()
+    assetDetailStore?.tearDown()
+    nftDetailStore?.tearDown()
+    confirmationStore?.tearDown()
+    buyTokenStore?.tearDown()
+    sendTokenStore?.tearDown()
+    swapTokenStore?.tearDown()
   }
   
   private var buyTokenStore: BuyTokenStore?

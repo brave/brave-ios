@@ -10,7 +10,7 @@ import Strings
 import Combine
 
 /// A store contains data for swap tokens
-public class SwapTokenStore: ObservableObject {
+public class SwapTokenStore: ObservableObject, WalletSubStore {
   /// All  tokens for searching use
   @Published var allTokens: [BraveWallet.BlockchainToken] = []
   /// The current selected token to swap from. Default with nil value.
@@ -129,6 +129,8 @@ public class SwapTokenStore: ObservableObject {
   private var prefilledToken: BraveWallet.BlockchainToken?
   /// The JupiterQuote currently being displayed for Solana swap. The quote needs preserved to create the swap transaction.
   private var jupiterQuote: BraveWallet.JupiterQuote?
+  private var keyringServiceObserver: KeyringServiceObserver?
+  private var rpcServiceObserver: JsonRpcServiceObserver?
 
   enum SwapParamsBase {
     // calculating based on sell asset amount
@@ -173,8 +175,53 @@ public class SwapTokenStore: ObservableObject {
     self.assetManager = userAssetManager
     self.prefilledToken = prefilledToken
 
-    self.keyringService.add(self)
-    self.rpcService.add(self)
+    self.keyringServiceObserver = KeyringServiceObserver(
+      keyringService: keyringService,
+      _selectedWalletAccountChanged: { [weak self] account in
+        guard let strongSelf = self else { return }
+        Task { @MainActor [weak strongSelf] in
+          guard let self = strongSelf else { return }
+          let network = await rpcService.network(account.coin, origin: nil)
+          let isSwapSupported = await swapService.isSwapSupported(network.chainId)
+          guard isSwapSupported else {
+            self.accountInfo = account
+            return
+          }
+          
+          self.selectedFromToken = nil
+          self.selectedToToken = nil
+          self.prepare(with: account) { [weak self] in
+            self?.fetchPriceQuote(base: .perSellAsset)
+          }
+        }
+      }
+    )
+    self.rpcServiceObserver = JsonRpcServiceObserver(
+      rpcService: rpcService,
+      _chainChangedEvent: { [weak self] chainId, coin, origin in
+        guard let strongSelf = self else { return }
+        Task { @MainActor [weak strongSelf] in
+          let isSwapSupported = await swapService.isSwapSupported(chainId)
+          guard isSwapSupported else { return }
+          guard let _ = await walletService.ensureSelectedAccount(forChain: coin, chainId: chainId),
+                let selectedAccount = await keyringService.allAccounts().selectedAccount else {
+            assertionFailure("selectedAccount should never be nil.")
+            return
+          }
+          guard let self = strongSelf else { return }
+          self.selectedFromToken = nil
+          self.selectedToToken = nil
+          self.prepare(with: selectedAccount) { [weak self] in
+            self?.fetchPriceQuote(base: .perSellAsset)
+          }
+        }
+      }
+    )
+  }
+  
+  func tearDown() {
+    keyringServiceObserver = nil
+    rpcServiceObserver = nil
   }
 
   private func fetchTokenBalance(
@@ -892,78 +939,4 @@ public class SwapTokenStore: ObservableObject {
     selectedFromToken = .previewToken
   }
   #endif
-}
-
-extension SwapTokenStore: BraveWalletKeyringServiceObserver {
-  public func keyringReset() {
-  }
-
-  public func keyringCreated(_ keyringId: BraveWallet.KeyringId) {
-  }
-
-  public func keyringRestored(_ keyringId: BraveWallet.KeyringId) {
-  }
-
-  public func locked() {
-  }
-
-  public func unlocked() {
-  }
-
-  public func backedUp() {
-  }
-
-  public func accountsChanged() {
-  }
-
-  public func autoLockMinutesChanged() {
-  }
-
-  public func selectedWalletAccountChanged(_ account: BraveWallet.AccountInfo) {
-    Task { @MainActor in
-      let network = await rpcService.network(account.coin, origin: nil)
-      let isSwapSupported = await swapService.isSwapSupported(network.chainId)
-      guard isSwapSupported else {
-        accountInfo = account
-        return
-      }
-      
-      selectedFromToken = nil
-      selectedToToken = nil
-      prepare(with: account) { [self] in
-        fetchPriceQuote(base: .perSellAsset)
-      }
-    }
-  }
-  
-  public func selectedDappAccountChanged(_ coin: BraveWallet.CoinType, account: BraveWallet.AccountInfo?) {
-  }
-  
-  public func accountsAdded(_ addedAccounts: [BraveWallet.AccountInfo]) {
-  }
-}
-
-extension SwapTokenStore: BraveWalletJsonRpcServiceObserver {
-  public func chainChangedEvent(_ chainId: String, coin: BraveWallet.CoinType, origin: URLOrigin?) {
-    Task { @MainActor in
-      let isSwapSupported = await swapService.isSwapSupported(chainId)
-      guard isSwapSupported else { return }
-      guard let _ = await walletService.ensureSelectedAccount(forChain: coin, chainId: chainId),
-        let selectedAccount = await keyringService.allAccounts().selectedAccount else {
-        assertionFailure("selectedAccount should never be nil.")
-        return
-      }
-      selectedFromToken = nil
-      selectedToToken = nil
-      prepare(with: selectedAccount) { [self] in
-        fetchPriceQuote(base: .perSellAsset)
-      }
-    }
-  }
-
-  public func onAddEthereumChainRequestCompleted(_ chainId: String, error: String) {
-  }
-
-  public func onIsEip1559Changed(_ chainId: String, isEip1559: Bool) {
-  }
 }

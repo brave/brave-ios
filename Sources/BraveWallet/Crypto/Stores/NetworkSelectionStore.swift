@@ -7,7 +7,7 @@ import BraveCore
 import BraveShared
 import SwiftUI
 
-class NetworkSelectionStore: ObservableObject {
+class NetworkSelectionStore: ObservableObject, WalletSubStore {
   
   enum Mode: Equatable {
     case select(isForOrigin: Bool)
@@ -32,6 +32,9 @@ class NetworkSelectionStore: ObservableObject {
   ) {
     self.mode = mode
     self.networkStore = networkStore
+  }
+  
+  func tearDown() {
   }
   
   @MainActor func selectNetwork(_ network: BraveWallet.NetworkInfo) async -> Bool {

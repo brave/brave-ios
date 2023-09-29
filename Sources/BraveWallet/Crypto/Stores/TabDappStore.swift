@@ -7,7 +7,7 @@ import Foundation
 import Combine
 
 /// This Store will be created for each Tab
-public class TabDappStore: ObservableObject {
+public class TabDappStore: ObservableObject, WalletSubStore {
   /// A set of solana account addresses that are currently connected to the dapp
   @Published public var solConnectedAddresses: Set<String> = .init()
   /// The latest pending dapp permission request. A permission request will be created right after
@@ -16,4 +16,6 @@ public class TabDappStore: ObservableObject {
   @Published public var latestPendingPermissionRequest: WebpagePermissionRequest?
   
   public init() {}
+  
+  public func tearDown() {}
 }

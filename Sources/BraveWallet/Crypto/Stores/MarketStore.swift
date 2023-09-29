@@ -14,7 +14,7 @@ struct CoinViewModel: Identifiable {
   var priceChangePercentage24h: String
 }
 
-public class MarketStore: ObservableObject {
+public class MarketStore: ObservableObject, WalletSubStore {
   /// Avalaible coins in market
   @Published var coins: [BraveWallet.CoinMarket] = []
   /// Currency code for prices
@@ -50,6 +50,9 @@ public class MarketStore: ObservableObject {
     self.blockchainRegistry = blockchainRegistry
     self.rpcService = rpcService
     self.walletService = walletService
+  }
+  
+  func tearDown() {
   }
   
   private var updateTask: Task<Void, Never>?

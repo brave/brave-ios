@@ -6,7 +6,7 @@
 import SwiftUI
 import BraveCore
 
-class TransactionDetailsStore: ObservableObject {
+class TransactionDetailsStore: ObservableObject, WalletSubStore {
   
   let transaction: BraveWallet.TransactionInfo
   @Published private(set) var parsedTransaction: ParsedTransaction?
@@ -62,6 +62,9 @@ class TransactionDetailsStore: ObservableObject {
     walletService.defaultBaseCurrency { [self] currencyCode in
       self.currencyCode = currencyCode
     }
+  }
+  
+  func tearDown() {
   }
   
   func update() {

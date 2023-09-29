@@ -105,3 +105,7 @@ public class WalletStore {
       }
   }
 }
+
+protocol WalletSubStore: AnyObject {
+  func tearDown()
+}

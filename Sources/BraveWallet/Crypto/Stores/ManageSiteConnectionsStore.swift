@@ -29,7 +29,7 @@ extension Array where Element == SiteConnection {
   }
 }
 
-class ManageSiteConnectionsStore: ObservableObject {
+class ManageSiteConnectionsStore: ObservableObject, WalletSubStore {
   @Published var siteConnections: [SiteConnection] = []
   
   var keyringStore: KeyringStore
@@ -37,6 +37,8 @@ class ManageSiteConnectionsStore: ObservableObject {
   init(keyringStore: KeyringStore) {
     self.keyringStore = keyringStore
   }
+  
+  func tearDown() {}
   
   /// Fetch all site connections with 1+ accounts connected
   func fetchSiteConnections() {
