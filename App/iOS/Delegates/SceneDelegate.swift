@@ -531,9 +531,13 @@ extension SceneDelegate: UIViewControllerRestoration {
 
 extension BrowserViewController {
   func handleReferralLookup(_ urp: UserReferralProgram) {
-
+    // Referral lookup preference is checking for both cases
+    // Case 1: AppStore Search Ad impression
+    // Case 2: User Referral on Brave side
     if Preferences.URP.referralLookupOutstanding.value == true {
-      urp.referralLookup() { referralCode, offerUrl in
+      
+
+      urp.referralLookup(refCode: UserReferralProgram.getReferralCode()) { referralCode, offerUrl in
         // Attempting to send ping after first urp lookup.
         // This way we can grab the referral code if it exists, see issue #2586.
         AppState.shared.dau.sendPingToServer()

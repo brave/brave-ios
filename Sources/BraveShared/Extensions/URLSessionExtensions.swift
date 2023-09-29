@@ -11,7 +11,8 @@ extension URLSession {
   public func request(
     _ url: URL,
     method: HTTPMethod = .get,
-    parameters: [String: Any],
+    headers: [String: String] = [:],
+    parameters: [String: Any] = [:],
     encoding: ParameterEncoding = .query,
     _ completion: @escaping (Result<Any, Error>) -> Void
   ) -> URLSessionDataTask! {
@@ -19,6 +20,7 @@ extension URLSession {
       let request = try buildRequest(
         url,
         method: method,
+        headers: headers,
         parameters: parameters,
         encoding: encoding)
 

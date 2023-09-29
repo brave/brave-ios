@@ -76,6 +76,10 @@ struct UrpService {
       }
     }
   }
+  
+  func adCampaignLookup(adAttributionToken: String, completion: @escaping (Int?, Error?) -> Void) {
+    
+  }
 
   func checkIfAuthorizedForGrant(with downloadId: String, completion: @escaping (Bool?, UrpError?) -> Void) {
     guard var endPoint = URL(string: host) else {
@@ -111,6 +115,12 @@ extension URLSession {
   func urpApiRequest(endPoint: URL, params: [String: String], completion: @escaping (Result<Any, Error>) -> Void) {
 
     self.request(endPoint, method: .put, parameters: params, encoding: .json) { response in
+      completion(response)
+    }
+  }
+  
+  func adServicesAttributionApiRequest(endPoint: URL, headers: [String: String] = [:], completion: @escaping (Result<Any, Error>) -> Void) {
+    request(endPoint, method: .post, headers: headers, encoding: .json) { response in
       completion(response)
     }
   }

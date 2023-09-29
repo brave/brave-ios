@@ -55,7 +55,7 @@ public class UserReferralProgram {
   }
 
   /// Looks for referral and returns its landing page if possible.
-  public func referralLookup(completion: @escaping (_ refCode: String?, _ offerUrl: String?) -> Void) {
+  public func referralLookup(refCode: String? = nil, completion: @escaping (_ refCode: String?, _ offerUrl: String?) -> Void) {
     UrpLog.log("first run referral lookup")
 
     let referralBlock: (ReferralData?, UrpError?) -> Void = { [weak self] referral, error in
@@ -75,7 +75,7 @@ public class UserReferralProgram {
             withTimeInterval: self.referralLookupRetry.retryTimeInterval,
             repeats: true
           ) { [weak self] _ in
-            self?.referralLookup() { refCode, offerUrl in
+            self?.referralLookup(refCode: refCode) { refCode, offerUrl in
               completion(refCode, offerUrl)
             }
           }
@@ -114,7 +114,7 @@ public class UserReferralProgram {
 
     // Since ref-code method may not be repeatable (e.g. clipboard was cleared), this should be retrieved from prefs,
     //  and not use the passed in referral code.
-    service.referralCodeLookup(refCode: UserReferralProgram.getReferralCode(), completion: referralBlock)
+    service.referralCodeLookup(refCode: refCode, completion: referralBlock)
   }
 
   private func initRetryPingConnection(numberOfTimes: Int32) {
