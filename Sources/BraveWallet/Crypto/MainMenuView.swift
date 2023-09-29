@@ -28,10 +28,7 @@ struct MainMenuView: View {
       LazyVStack(spacing: 0) {
         Button(action: {
           presentationMode.dismiss()
-          // wait for view to dismiss so entire Wallet does not dismiss
-          DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            keyringStore.lock()
-          }
+          keyringStore.lock()
         }) {
           MenuRowView(
             iconBraveSystemName: "leo.lock",
