@@ -13,6 +13,7 @@ extension URLSession {
     method: HTTPMethod = .get,
     headers: [String: String] = [:],
     parameters: [String: Any] = [:],
+    rawData: Data? = nil,
     encoding: ParameterEncoding = .query,
     _ completion: @escaping (Result<Any, Error>) -> Void
   ) -> URLSessionDataTask! {
@@ -22,6 +23,7 @@ extension URLSession {
         method: method,
         headers: headers,
         parameters: parameters,
+        rawData: rawData,
         encoding: encoding)
 
       let task = self.dataTask(with: request) { data, response, error in
@@ -58,6 +60,7 @@ extension URLSession {
   }
 
   public enum ParameterEncoding {
+    case textPlain
     case json
     case query
   }
@@ -65,8 +68,9 @@ extension URLSession {
   private func buildRequest(
     _ url: URL,
     method: HTTPMethod,
-    headers: [String: String] = [:],
+    headers: [String: String],
     parameters: [String: Any],
+    rawData: Data?,
     encoding: ParameterEncoding
   ) throws -> URLRequest {
 
@@ -74,6 +78,10 @@ extension URLSession {
     request.httpMethod = method.rawValue
     headers.forEach({ request.setValue($0.value, forHTTPHeaderField: $0.key) })
     switch encoding {
+    case .textPlain:
+      request.setValue("text/plain", forHTTPHeaderField: "Content-Type")
+      request.httpBody = rawData
+      
     case .json:
       request.setValue("application/json", forHTTPHeaderField: "Content-Type")
       request.httpBody = try JSONSerialization.data(withJSONObject: parameters, options: .prettyPrinted)

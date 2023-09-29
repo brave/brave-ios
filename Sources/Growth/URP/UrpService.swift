@@ -12,6 +12,10 @@ enum UrpError {
   case networkError, downloadIdNotFound, ipNotFound, endpointError
 }
 
+enum AdCampaignError {
+  case networkError, endpointError
+}
+
 /// Api endpoints for user referral program.
 struct UrpService {
   private struct ParamKeys {
@@ -21,14 +25,16 @@ struct UrpService {
     static let downLoadId = "download_id"
   }
 
-  let host: String
+  private let host: String
+  private let adServicesURL: String
   private let apiKey: String
-  let sessionManager: URLSession
+  private let sessionManager: URLSession
   private let certificateEvaluator: PinningCertificateEvaluator
 
-  init?(host: String, apiKey: String) {
+  init?(host: String, apiKey: String, adServicesURL: String) {
     self.host = host
     self.apiKey = apiKey
+    self.adServicesURL = adServicesURL
 
     guard let hostUrl = URL(string: host), let normalizedHost = hostUrl.normalizedHost() else { return nil }
 
@@ -77,7 +83,13 @@ struct UrpService {
     }
   }
   
-  func adCampaignLookup(adAttributionToken: String, completion: @escaping (Int?, Error?) -> Void) {
+  func adCampaignLookup(adAttributionToken: String, completion: @escaping (Int?, AdCampaignError?) -> Void) {
+    guard var endPoint = URL(string: adServicesURL) else {
+      completion(nil, .endpointError)
+      UrpLog.log("AdServicesURLString can not be resolved: \(adServicesURL)")
+      
+      return
+    }
     
   }
 
@@ -113,14 +125,14 @@ struct UrpService {
 extension URLSession {
   /// All requests to referral api use PUT method, accept and receive json.
   func urpApiRequest(endPoint: URL, params: [String: String], completion: @escaping (Result<Any, Error>) -> Void) {
-
-    self.request(endPoint, method: .put, parameters: params, encoding: .json) { response in
+    request(endPoint, method: .put, parameters: params, encoding: .json) { response in
       completion(response)
     }
   }
   
-  func adServicesAttributionApiRequest(endPoint: URL, headers: [String: String] = [:], completion: @escaping (Result<Any, Error>) -> Void) {
-    request(endPoint, method: .post, headers: headers, encoding: .json) { response in
+  // Apple ad service attricution request requires plain text encoding with post method and passing token as rawdata
+  func adServicesAttributionApiRequest(endPoint: URL, rawData: Data, completion: @escaping (Result<Any, Error>) -> Void) {
+    request(endPoint, method: .post, rawData: rawData, encoding: .textPlain) { response in
       completion(response)
     }
   }

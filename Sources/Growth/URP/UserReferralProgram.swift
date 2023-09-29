@@ -20,6 +20,8 @@ public class UserReferralProgram {
     static let staging = "https://laptop-updates.bravesoftware.com"
     static let prod = "https://laptop-updates.brave.com"
   }
+  
+  let adServicesURLString = "https://api-adservices.apple.com/api/v1/"
 
   // In case of network problems when looking for referrral code
   // we retry the call few times while the app is still alive.
@@ -47,7 +49,7 @@ public class UserReferralProgram {
       return nil
     }
 
-    guard let urpService = UrpService(host: host, apiKey: apiKey) else { return nil }
+    guard let urpService = UrpService(host: host, apiKey: apiKey, adServicesURL: adServicesURLString) else { return nil }
 
     UrpLog.log("URP init, host: \(host)")
 
