@@ -17,8 +17,6 @@ import BraveWallet
 import Preferences
 import CertificateUtilities
 import AVFoundation
-import BraveVPN
-import BraveShields
 
 // MARK: - TopToolbarDelegate
 
@@ -528,34 +526,7 @@ extension BrowserViewController: TopToolbarDelegate {
     guard let cleanedURL = components?.url else { return }
     
     let viewController = UIHostingController(rootView: SubmitReportView(
-      url: cleanedURL,
-      submit: { [weak self] url, additionalDetails, contactInfo in
-        guard let self = self else { return }
-        let popover = PopoverController(
-          contentController: SubmitReportSuccessViewController(), 
-          contentSizeBehavior: .preferredContentSize
-        )
-        
-        let domain = Domain.getOrCreate(forUrl: url, persistent: !privateBrowsingManager.isPrivateBrowsing)
-        
-        let report = WebcompatReporter.Report(
-          cleanedURL: url,
-          additionalDetails: additionalDetails,
-          contactInfo: contactInfo,
-          areShieldsEnabled: !domain.areAllShieldsOff,
-          adBlockLevel: domain.blockAdsAndTrackingLevel,
-          fingerprintProtectionLevel: domain.finterprintProtectionLevel,
-          adBlockListTitles: FilterListStorage.shared.filterLists.compactMap({ return $0.isEnabled ? $0.entry.title : nil }),
-          isVPNEnabled: BraveVPN.isConnected
-        )
-        
-        popover.present(from: topToolbar.locationView.shieldsButton, on: self)
-        
-        Task { [weak self] in
-          await WebcompatReporter.send(report: report)
-          self?.delayDismiss(popover: popover)
-        }
-      }
+      url: cleanedURL, isPrivateBrowsing: privateBrowsingManager.isPrivateBrowsing
     ))
     
     viewController.modalPresentationStyle = .popover
@@ -573,13 +544,6 @@ extension BrowserViewController: TopToolbarDelegate {
       sheet.detents = [.medium(), .large()]
     }
     navigationController?.present(viewController, animated: true)
-  }
-  
-  private func delayDismiss(popover: PopoverController) {
-    Timer.scheduledTimer(withTimeInterval: 4, repeats: false) { _ in
-      guard !popover.isBeingDismissed else { return }
-      popover.dismissPopover()
-    }
   }
 
   // TODO: This logic should be fully abstracted away and share logic from current MenuViewController

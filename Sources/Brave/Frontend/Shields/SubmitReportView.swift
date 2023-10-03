@@ -7,14 +7,19 @@ import SwiftUI
 import Strings
 import BraveUI
 import DesignSystem
+import BraveShields
+import BraveVPN
+import Data
 
 struct SubmitReportView: View {
   @Environment(\.dismiss) private var dismiss: DismissAction
   let url: URL
-  let submit: (URL, String, String) -> Void
+  let isPrivateBrowsing: Bool
   
   @State private var additionalDetails = ""
   @State private var contactDetails = ""
+  @State private var isSubmittingReport = false
+  @State private var isSubmitted = false
   
   private var scrollContent: some View {
     ScrollView {
@@ -51,12 +56,50 @@ struct SubmitReportView: View {
         Button(Strings.cancelButtonTitle) {
           dismiss()
         }
+        .disabled(isSubmittingReport)
       }
+      
       ToolbarItem(placement: .confirmationAction) {
-        Button(Strings.Shields.reportBrokenSubmitButtonTitle, action: {
-          dismiss()
-          didTapSubmit()
-        })
+        if isSubmitted {
+          Button(Strings.close, action: {
+            dismiss()
+          })
+        } else {
+          Button(Strings.Shields.reportBrokenSubmitButtonTitle, action: {
+            withAnimation {
+              isSubmittingReport = true
+            }
+            
+            Task { @MainActor in
+              await createAndSubmitReport()
+              
+              withAnimation {
+                isSubmitted = true
+              }
+              
+              try await Task.sleep(seconds: 4)
+              dismiss()
+            }
+          }).disabled(isSubmittingReport)
+        }
+      }
+    }
+    .overlay {
+      if isSubmittingReport {
+        ProgressView()
+          .progressViewStyle(.braveCircular(size: .normal, tint: .braveBlurpleTint))
+          .frame(maxWidth: .infinity, maxHeight: .infinity)
+          .background(Color(.braveBackground).opacity(0.5).ignoresSafeArea())
+          .animation(.easeInOut, value: isSubmittingReport)
+      }
+    }
+    .overlay {
+      if isSubmitted {
+        SubmitReportSuccessView()
+          .progressViewStyle(.braveCircular(size: .normal, tint: .braveBlurpleTint))
+          .frame(maxWidth: .infinity, maxHeight: .infinity)
+          .background(Color(.braveBackground).ignoresSafeArea())
+          .animation(.easeIn, value: isSubmitted)
       }
     }
   }
@@ -82,16 +125,29 @@ struct SubmitReportView: View {
     }
   }
   
-  func didTapSubmit() {
-    submit(url, additionalDetails, contactDetails)
+  @MainActor func createAndSubmitReport() async {
+    let domain = Domain.getOrCreate(forUrl: url, persistent: !isPrivateBrowsing)
+    
+    let report = WebcompatReporter.Report(
+      cleanedURL: url,
+      additionalDetails: additionalDetails,
+      contactInfo: contactDetails,
+      areShieldsEnabled: !domain.areAllShieldsOff,
+      adBlockLevel: domain.blockAdsAndTrackingLevel,
+      fingerprintProtectionLevel: domain.finterprintProtectionLevel,
+      adBlockListTitles: FilterListStorage.shared.filterLists.compactMap({ return $0.isEnabled ? $0.entry.title : nil }),
+      isVPNEnabled: BraveVPN.isConnected
+    )
+    
+    await WebcompatReporter.send(report: report)
   }
 }
 
 #if swift(>=5.9)
 #Preview {
   SubmitReportView(
-    url: URL(string: "https://brave.com/privacy-features")!) { _, _, _ in
-      // Do nothing
-    }
+    url: URL(string: "https://brave.com/privacy-features")!,
+    isPrivateBrowsing: false
+  )
 }
 #endif
