@@ -13,8 +13,9 @@ struct SubmitReportSuccessView: View {
   var body: some View {
     VStack(alignment: .center, spacing: 16) {
       Image(braveSystemName: "leo.check.circle-outline")
-        .font(.title)
-        .foregroundStyle(Color(braveSystemName: .textTertiary))
+        .resizable()
+        .frame(width: 48, height: 48)
+        .foregroundStyle(Color(braveSystemName: .systemfeedbackSuccessIcon))
       
       Text(Strings.Shields.siteReportedTitle)
         .multilineTextAlignment(.center)
@@ -27,7 +28,7 @@ struct SubmitReportSuccessView: View {
         .lineLimit(3)
         .foregroundStyle(Color(braveSystemName: .textTertiary))
     }
-    .padding()
+    .padding(32)
   }
 }
 

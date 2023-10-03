@@ -295,6 +295,12 @@ extension BrowserViewController {
               }
             }
           }
+          
+          MenuItemButton(icon: Image(braveSystemName: "leo.warning.triangle-outline"), title: Strings.Shields.reportABrokenSite) {
+            browserViewController.dismiss(animated: true) {
+              browserViewController.showSubmitReportView(for: tabURL)
+            }
+          }
         }
       }
     }

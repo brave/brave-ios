@@ -518,7 +518,7 @@ extension BrowserViewController: TopToolbarDelegate {
     popover.present(from: topToolbar.locationView.shieldsButton, on: self)
   }
   
-  private func showSubmitReportView(for url: URL) {
+  func showSubmitReportView(for url: URL) {
     // Strip fragments and query params from url
     var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
     components?.fragment = nil
