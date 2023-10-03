@@ -109,3 +109,8 @@ public class WalletStore {
 protocol WalletSubStore: AnyObject {
   func tearDown()
 }
+
+extension WalletSubStore {
+  func tearDown() {
+  }
+}

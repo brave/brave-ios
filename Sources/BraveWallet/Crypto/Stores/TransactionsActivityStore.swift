@@ -86,12 +86,10 @@ class TransactionsActivityStore: ObservableObject, WalletSubStore {
     self.walletServiceObserver = WalletServiceObserver(
       walletService: walletService,
       _onNetworkListChanged: { [weak self] in
-        guard let strongSelf = self else { return }
-        Task { @MainActor [weak strongSelf] in
-          guard let self = strongSelf else { return }
+        Task { @MainActor [self] in
           // A network was added or removed, update our network filters for the change.
-          self.networkFilters = await rpcService.allNetworksForSupportedCoins().map { network in
-            let existingSelectionValue = self.networkFilters.first(where: { $0.model.chainId == network.chainId})?.isSelected
+          self?.networkFilters = await rpcService.allNetworksForSupportedCoins().map { network in
+            let existingSelectionValue = self?.networkFilters.first(where: { $0.model.chainId == network.chainId})?.isSelected
             return .init(isSelected: existingSelectionValue ?? true, model: network)
           }
         }

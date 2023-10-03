@@ -94,14 +94,18 @@ public class BuyTokenStore: ObservableObject, WalletSubStore {
     }
     
     self.rpcServiceObserver = JsonRpcServiceObserver(
-      rpcService: rpcService
+      rpcService: rpcService,
+      _chainChangedEvent: { [weak self] _, _, _ in
+        Task { [self] in
+          await self?.updateInfo()
+        }
+      }
     )
     self.keyringServiceObserver = KeyringServiceObserver(
       keyringService: keyringService,
       _selectedWalletAccountChanged: { [weak self] _ in
-        guard let strongSelf = self else { return }
-        Task { @MainActor [weak strongSelf] in
-          await strongSelf?.updateInfo()
+        Task { @MainActor [self] in
+          await self?.updateInfo()
         }
       }
     )

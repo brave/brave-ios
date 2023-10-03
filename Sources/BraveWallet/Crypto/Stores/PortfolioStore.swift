@@ -327,10 +327,9 @@ public class PortfolioStore: ObservableObject, WalletSubStore {
         }
       },
       _accountsChanged: { [weak self] in
-        guard let strongSelf = self else { return }
-        Task { @MainActor [weak strongSelf] in
+        Task { @MainActor [self] in
           // An account was added or removed, `update()` will update `allAccounts`.
-          strongSelf?.update()
+          self?.update()
         }
       }
     )
@@ -340,10 +339,9 @@ public class PortfolioStore: ObservableObject, WalletSubStore {
         self?.currencyCode = currency
       },
       _onNetworkListChanged: { [weak self] in
-        guard let strongSelf = self else { return }
-        Task { @MainActor [weak strongSelf] in
+        Task { @MainActor [self] in
           // A network was added or removed, `update()` will update `allNetworks`.
-          strongSelf?.update()
+          self?.update()
         }
       },
       _onDiscoverAssetsStarted: { [weak self] in

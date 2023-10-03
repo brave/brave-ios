@@ -64,9 +64,6 @@ class TransactionDetailsStore: ObservableObject, WalletSubStore {
     }
   }
   
-  func tearDown() {
-  }
-  
   func update() {
     Task { @MainActor in
       let coin = transaction.coin

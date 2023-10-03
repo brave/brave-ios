@@ -101,9 +101,8 @@ public class SettingsStore: ObservableObject, WalletSubStore {
     self.keyringServiceObserver = KeyringServiceObserver(
       keyringService: keyringService,
       _autoLockMinutesChanged: { [weak self] in
-        guard let strongSelf = self else { return }
-        keyringService.autoLockMinutes { [weak strongSelf] minutes in
-          strongSelf?.autoLockInterval = .init(value: minutes)
+        keyringService.autoLockMinutes { minutes in
+          self?.autoLockInterval = .init(value: minutes)
         }
       }
     )

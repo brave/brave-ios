@@ -170,48 +170,44 @@ public class TransactionConfirmationStore: ObservableObject, WalletSubStore {
         // won't have any new unapproved tx being added if you on tx confirmation panel
       },
       _onUnapprovedTxUpdated: { [weak self] txInfo in
-        guard let strongSelf = self else { return }
-        Task { @MainActor [weak strongSelf] in
-          guard let self = strongSelf else { return }
+        Task { @MainActor [self] in
           // refresh the unapproved transaction list, as well as tx details UI
           // first update `allTxs` with the new updated txInfo(txStatus)
-          if let index = self.allTxs.firstIndex(where: { $0.id == txInfo.id }) {
-            self.allTxs[index] = txInfo
+          if let index = self?.allTxs.firstIndex(where: { $0.id == txInfo.id }) {
+            self?.allTxs[index] = txInfo
           }
           
           // update details UI if the current active tx is updated
-          if self.activeTransactionId == txInfo.id {
-            self.updateTransaction(with: txInfo)
-            self.activeTxStatus = txInfo.txStatus
+          if self?.activeTransactionId == txInfo.id {
+            self?.updateTransaction(with: txInfo)
+            self?.activeTxStatus = txInfo.txStatus
           }
           
           // if somehow the current active transaction no longer exists
           // set the first `.unapproved` tx as the new `activeTransactionId`
-          if !self.unapprovedTxs.contains(where: { $0.id == self.activeTransactionId }) {
-            self.activeTransactionId = self.unapprovedTxs.first?.id ?? ""
+          if let unapprovedTxs = self?.unapprovedTxs, !unapprovedTxs.contains(where: { $0.id == self?.activeTransactionId }) {
+            self?.activeTransactionId = self?.unapprovedTxs.first?.id ?? ""
           }
         }
       },
       _onTransactionStatusChanged: { [weak self] txInfo in
-        guard let strongSelf = self else { return }
-        Task { @MainActor [weak strongSelf] in
-          guard let self = strongSelf else { return }
+        Task { @MainActor [self] in
           // once we come here. it means user either rejects or confirms a transaction
           
           // first update `allTxs` with the new updated txInfo(txStatus)
-          if let index = self.allTxs.firstIndex(where: { $0.id == txInfo.id }) {
-            self.allTxs[index] = txInfo
+          if let index = self?.allTxs.firstIndex(where: { $0.id == txInfo.id }) {
+            self?.allTxs[index] = txInfo
           }
           
           // only update the `activeTransactionId` if the current active transaction status
           // becomes `.rejected`/`.dropped`
-          if self.activeTransactionId == txInfo.id, txInfo.txStatus == .rejected || txInfo.txStatus == .dropped {
-            let indexOfChangedTx = self.unapprovedTxs.firstIndex(where: { $0.id == txInfo.id }) ?? 0
+          if self?.activeTransactionId == txInfo.id, txInfo.txStatus == .rejected || txInfo.txStatus == .dropped {
+            let indexOfChangedTx = self?.unapprovedTxs.firstIndex(where: { $0.id == txInfo.id }) ?? 0
             let newIndex = indexOfChangedTx > 0 ? indexOfChangedTx - 1 : 0
-            self.activeTransactionId = self.unapprovedTxs[safe: newIndex]?.id ?? self.unapprovedTxs.first?.id ?? ""
+            self?.activeTransactionId = self?.unapprovedTxs[safe: newIndex]?.id ?? self?.unapprovedTxs.first?.id ?? ""
           } else {
-            if self.activeTransactionId == txInfo.id {
-              self.activeTxStatus = txInfo.txStatus
+            if self?.activeTransactionId == txInfo.id {
+              self?.activeTxStatus = txInfo.txStatus
             }
           }
         }

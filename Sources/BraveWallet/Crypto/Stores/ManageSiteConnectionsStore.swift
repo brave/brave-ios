@@ -38,8 +38,6 @@ class ManageSiteConnectionsStore: ObservableObject, WalletSubStore {
     self.keyringStore = keyringStore
   }
   
-  func tearDown() {}
-  
   /// Fetch all site connections with 1+ accounts connected
   func fetchSiteConnections() {
     var connections = [SiteConnection]()

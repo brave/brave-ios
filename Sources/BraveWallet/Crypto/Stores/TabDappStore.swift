@@ -16,6 +16,4 @@ public class TabDappStore: ObservableObject, WalletSubStore {
   @Published public var latestPendingPermissionRequest: WebpagePermissionRequest?
   
   public init() {}
-  
-  public func tearDown() {}
 }

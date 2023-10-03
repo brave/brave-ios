@@ -254,6 +254,9 @@ public class CryptoStore: ObservableObject, WalletSubStore {
       _onNewUnapprovedTx: { [weak self] _ in
         self?.prepare()
       },
+      _onUnapprovedTxUpdated: { [weak self] _ in
+        self?.prepare()
+      }, 
       _onTransactionStatusChanged: { [weak self] _ in
         self?.prepare()
       }, 
@@ -272,20 +275,18 @@ public class CryptoStore: ObservableObject, WalletSubStore {
         }
       },
       _onAddEthereumChainRequestCompleted: { [weak self] chainId, error in
-        guard let strongSelf = self else { return }
-        Task { @MainActor [weak strongSelf] in
-          guard let self = strongSelf else { return }
-          if let addNetworkDappRequestCompletion = self.addNetworkDappRequestCompletion[chainId] {
+        Task { @MainActor [self] in
+          if let addNetworkDappRequestCompletion = self?.addNetworkDappRequestCompletion[chainId] {
             if error.isEmpty {
               let allNetworks = await rpcService.allNetworks(.eth)
               if let network = allNetworks.first(where: { $0.chainId == chainId }) {
-                self.userAssetManager.addUserAsset(network.nativeToken) { [weak self] in
+                self?.userAssetManager.addUserAsset(network.nativeToken) {
                   self?.updateAssets()
                 }
               }
             }
             addNetworkDappRequestCompletion(error.isEmpty ? nil : error)
-            self.addNetworkDappRequestCompletion[chainId] = nil
+            self?.addNetworkDappRequestCompletion[chainId] = nil
           }
         }
       }
@@ -314,6 +315,7 @@ public class CryptoStore: ObservableObject, WalletSubStore {
     transactionsActivityStore.tearDown()
     marketStore.tearDown()
     settingsStore.tearDown()
+    
     accountActivityStore?.tearDown()
     assetDetailStore?.tearDown()
     nftDetailStore?.tearDown()
@@ -406,6 +408,7 @@ public class CryptoStore: ObservableObject, WalletSubStore {
   
   func closeAssetDetailStore(for assetDetailType: AssetDetailType) {
     if let store = assetDetailStore, store.assetDetailType.id == assetDetailType.id {
+      assetDetailStore?.tearDown()
       assetDetailStore = nil
     }
   }
@@ -439,11 +442,15 @@ public class CryptoStore: ObservableObject, WalletSubStore {
   
   func closeAccountActivityStore(for account: BraveWallet.AccountInfo) {
     if let store = accountActivityStore, store.account.address == account.address {
+      accountActivityStore?.tearDown()
       accountActivityStore = nil
     }
   }
   
   func closeBSSStores() {
+    buyTokenStore?.tearDown()
+    sendTokenStore?.tearDown()
+    swapTokenStore?.tearDown()
     buyTokenStore = nil
     sendTokenStore = nil
     swapTokenStore = nil
@@ -467,6 +474,10 @@ public class CryptoStore: ObservableObject, WalletSubStore {
     )
     confirmationStore = store
     return store
+  }
+  func closeConfirmationStore() {
+    confirmationStore?.tearDown()
+    confirmationStore = nil
   }
   
   public private(set) lazy var settingsStore = SettingsStore(
@@ -494,6 +505,7 @@ public class CryptoStore: ObservableObject, WalletSubStore {
   
   func closeNFTDetailStore(for nft: BraveWallet.BlockchainToken) {
     if let store = nftDetailStore, store.nft.id == nft.id {
+      nftDetailStore?.tearDown()
       nftDetailStore = nil
     }
   }

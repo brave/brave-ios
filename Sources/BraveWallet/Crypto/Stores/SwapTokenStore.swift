@@ -178,19 +178,17 @@ public class SwapTokenStore: ObservableObject, WalletSubStore {
     self.keyringServiceObserver = KeyringServiceObserver(
       keyringService: keyringService,
       _selectedWalletAccountChanged: { [weak self] account in
-        guard let strongSelf = self else { return }
-        Task { @MainActor [weak strongSelf] in
-          guard let self = strongSelf else { return }
+        Task { @MainActor [self] in
           let network = await rpcService.network(account.coin, origin: nil)
           let isSwapSupported = await swapService.isSwapSupported(network.chainId)
           guard isSwapSupported else {
-            self.accountInfo = account
+            self?.accountInfo = account
             return
           }
           
-          self.selectedFromToken = nil
-          self.selectedToToken = nil
-          self.prepare(with: account) { [weak self] in
+          self?.selectedFromToken = nil
+          self?.selectedToToken = nil
+          self?.prepare(with: account) {
             self?.fetchPriceQuote(base: .perSellAsset)
           }
         }
@@ -199,8 +197,7 @@ public class SwapTokenStore: ObservableObject, WalletSubStore {
     self.rpcServiceObserver = JsonRpcServiceObserver(
       rpcService: rpcService,
       _chainChangedEvent: { [weak self] chainId, coin, origin in
-        guard let strongSelf = self else { return }
-        Task { @MainActor [weak strongSelf] in
+        Task { @MainActor [self] in
           let isSwapSupported = await swapService.isSwapSupported(chainId)
           guard isSwapSupported else { return }
           guard let _ = await walletService.ensureSelectedAccount(forChain: coin, chainId: chainId),
@@ -208,10 +205,10 @@ public class SwapTokenStore: ObservableObject, WalletSubStore {
             assertionFailure("selectedAccount should never be nil.")
             return
           }
-          guard let self = strongSelf else { return }
-          self.selectedFromToken = nil
-          self.selectedToToken = nil
-          self.prepare(with: selectedAccount) { [weak self] in
+          
+          self?.selectedFromToken = nil
+          self?.selectedToToken = nil
+          self?.prepare(with: selectedAccount) {
             self?.fetchPriceQuote(base: .perSellAsset)
           }
         }

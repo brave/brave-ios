@@ -34,9 +34,6 @@ class NetworkSelectionStore: ObservableObject, WalletSubStore {
     self.networkStore = networkStore
   }
   
-  func tearDown() {
-  }
-  
   @MainActor func selectNetwork(_ network: BraveWallet.NetworkInfo) async -> Bool {
     switch mode {
     case let .select(isForOrigin):

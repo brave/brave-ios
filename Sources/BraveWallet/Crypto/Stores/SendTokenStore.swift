@@ -210,6 +210,8 @@ public class SendTokenStore: ObservableObject, WalletSubStore {
   func tearDown() {
     keyringServiceObserver = nil
     rpcServiceObserver = nil
+    
+    selectTokenStore.tearDown()
   }
   
   func suggestedAmountTapped(_ amount: ShortcutAmountGrid.Amount) {

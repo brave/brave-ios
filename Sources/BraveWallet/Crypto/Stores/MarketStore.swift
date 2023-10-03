@@ -52,9 +52,6 @@ public class MarketStore: ObservableObject, WalletSubStore {
     self.walletService = walletService
   }
   
-  func tearDown() {
-  }
-  
   private var updateTask: Task<Void, Never>?
   func update() {
     isLoading = true

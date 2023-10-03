@@ -151,7 +151,6 @@ class WalletServiceObserver: BraveWalletBraveWalletServiceObserver {
   }
   
   func onResetWallet() {
-    
     _onResetWallet?()
   }
 }

@@ -68,9 +68,6 @@ class NFTDetailStore: ObservableObject, WalletSubStore {
     self.nftMetadata = nftMetadata?.httpfyIpfsUrl(ipfsApi: ipfsApi)
   }
   
-  func tearDown() {
-  }
-  
   func update() {
     Task { @MainActor in
       let allNetworks = await rpcService.allNetworks(nft.coin)

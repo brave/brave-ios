@@ -71,14 +71,12 @@ class AccountActivityStore: ObservableObject, WalletSubStore {
     self.keyringServiceObserver = KeyringServiceObserver(
       keyringService: keyringService,
       _selectedWalletAccountChanged: { [weak self] account in
-        guard let self else { return }
-        guard self.observeAccountUpdates else { return }
+        guard let self, self.observeAccountUpdates else { return }
         self.account = account
         self.update()
       },
       _selectedDappAccountChanged: { [weak self] _, account in
-        guard let self else { return }
-        guard self.observeAccountUpdates, let account else { return }
+        guard let self, self.observeAccountUpdates, let account else { return }
         self.account = account
         self.update()
       }
