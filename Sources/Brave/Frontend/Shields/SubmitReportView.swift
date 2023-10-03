@@ -108,23 +108,10 @@ struct SubmitReportView: View {
   }
   
   var body: some View {
-    if #available(iOS 17.0, *) {
-      NavigationStack {
-        #if swift(>=5.9)
-        scrollContent
-          .toolbarTitleDisplayMode(.inline)
-        #else
-        scrollContent
-        #endif
-      }
-    } else if #available(iOS 16.0, *) {
-      NavigationStack {
-        scrollContent
-      }
-    } else {
-      NavigationView {
-        scrollContent
-      }
+    NavigationView {
+      scrollContent
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationViewStyle(.stack)
     }
   }
   
