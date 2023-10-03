@@ -69,10 +69,8 @@ class TransactionsActivityStore: ObservableObject {
   func update() {
     updateTask?.cancel()
     updateTask = Task { @MainActor in
-      let allKeyrings = await self.keyringService.keyrings(
-        for: WalletConstants.supportedCoinTypes()
-      )
-      let allAccountInfos = allKeyrings.flatMap(\.accountInfos)
+      let allAccounts = await keyringService.allAccounts()
+      let allAccountInfos = allAccounts.accounts
       // setup network filters if not currently setup
       if self.networkFilters.isEmpty {
         self.networkFilters = await self.rpcService.allNetworksForSupportedCoins().map {
@@ -84,7 +82,7 @@ class TransactionsActivityStore: ObservableObject {
       let allNetworksAllCoins = networksForCoin.values.flatMap { $0 }
       
       let allTransactions = await txService.allTransactions(
-        networksForCoin: networksForCoin, for: allKeyrings
+        networksForCoin: networksForCoin, for: allAccountInfos
       ).filter { $0.txStatus != .rejected }
       let userVisibleTokens = assetManager.getAllVisibleAssetsInNetworkAssets(networks: allNetworksAllCoins).flatMap(\.tokens)
       let allTokens = await blockchainRegistry.allTokens(
@@ -188,7 +186,7 @@ class TransactionsActivityStore: ObservableObject {
 extension TransactionsActivityStore: BraveWalletKeyringServiceObserver {
   func keyringCreated(_ keyringId: BraveWallet.KeyringId) { }
   
-  func keyringRestored(_ keyringId: BraveWallet.KeyringId) { }
+  func walletRestored() { }
   
   func keyringReset() { }
   

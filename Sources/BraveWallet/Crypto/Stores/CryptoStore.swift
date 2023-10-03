@@ -423,13 +423,13 @@ public class CryptoStore: ObservableObject {
 
   @MainActor
   func fetchPendingTransactions() async -> [BraveWallet.TransactionInfo] {
-    let allKeyrings = await keyringService.keyrings(for: WalletConstants.supportedCoinTypes())
+    let allAccounts = await keyringService.allAccounts().accounts
     var allNetworksForCoin: [BraveWallet.CoinType: [BraveWallet.NetworkInfo]] = [:]
     for coin in WalletConstants.supportedCoinTypes() {
       let allNetworks = await rpcService.allNetworks(coin)
       allNetworksForCoin[coin] = allNetworks
     }
-    return await txService.pendingTransactions(networksForCoin: allNetworksForCoin, for: allKeyrings)
+    return await txService.pendingTransactions(networksForCoin: allNetworksForCoin, for: allAccounts)
   }
 
   @MainActor
@@ -583,7 +583,7 @@ extension CryptoStore: BraveWalletKeyringServiceObserver {
     // when user creates or imports a new account with a new keyring since any new
     // supported coin type / keyring will be migrated inside `CryptoStore`'s init()
   }
-  public func keyringRestored(_ keyringId: BraveWallet.KeyringId) {
+  public func walletRestored() {
     // This observer method will only get called when user restore a wallet
     // from the lock screen
     // We will need to

@@ -75,8 +75,6 @@ class TransactionDetailsStore: ObservableObject {
         return
       }
       self.network = network
-      let keringId = BraveWallet.KeyringId.keyringId(for: coin, on: transaction.chainId)
-      let keyring = await keyringService.keyringInfo(keringId)
       var allTokens: [BraveWallet.BlockchainToken] = await blockchainRegistry.allTokens(network.chainId, coin: network.coin) + tokenInfoCache.map(\.value)
       let userVisibleTokens: [BraveWallet.BlockchainToken] = assetManager.getAllUserAssetsInNetworkAssets(networks: [network]).flatMap { $0.tokens }
       let unknownTokenContractAddresses = transaction.tokenContractAddresses
@@ -105,9 +103,10 @@ class TransactionDetailsStore: ObservableObject {
       if transaction.coin == .sol {
         (solEstimatedTxFee, _, _) = await solanaTxManagerProxy.estimatedTxFee(network.chainId, txMetaId: transaction.id)
       }
+      let allAccounts = await keyringService.allAccounts().accounts
       guard let parsedTransaction = transaction.parsedTransaction(
         network: network,
-        accountInfos: keyring.accountInfos,
+        accountInfos: allAccounts,
         visibleTokens: userVisibleTokens,
         allTokens: allTokens,
         assetRatios: assetRatios,

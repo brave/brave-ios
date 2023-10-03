@@ -118,7 +118,6 @@ class AccountActivityStore: ObservableObject {
       self.userVisibleAssets = updatedUserVisibleAssets
       self.userVisibleNFTs = updatedUserVisibleNFTs
       
-      let keyringForAccount = await keyringService.keyringInfo(account.keyringId)
       typealias TokenNetworkAccounts = (token: BraveWallet.BlockchainToken, network: BraveWallet.NetworkInfo, accounts: [BraveWallet.AccountInfo])
       let allTokenNetworkAccounts = allVisibleUserAssets.flatMap { networkAssets in
         networkAssets.tokens.map { token in
@@ -199,9 +198,10 @@ class AccountActivityStore: ObservableObject {
         $0[$1.token.assetRatioId.lowercased()] = Double($1.price)
       })
       
+      let allAccountsForCoin = await keyringService.allAccounts().accounts.filter { $0.coin == account.coin }
       self.transactionSummaries = await fetchTransactionSummarys(
         networksForAccountCoin: networksForAccountCoin,
-        accountInfos: keyringForAccount.accountInfos,
+        accountInfos: allAccountsForCoin,
         userVisibleTokens: userVisibleAssets.map(\.token),
         allTokens: allTokens,
         assetRatios: assetRatios
@@ -278,7 +278,7 @@ extension AccountActivityStore: BraveWalletKeyringServiceObserver {
   func keyringCreated(_ keyringId: BraveWallet.KeyringId) {
   }
 
-  func keyringRestored(_ keyringId: BraveWallet.KeyringId) {
+  func walletRestored() {
   }
   
   func keyringReset() {

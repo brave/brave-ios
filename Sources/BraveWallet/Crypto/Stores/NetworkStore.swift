@@ -109,9 +109,9 @@ public class NetworkStore: ObservableObject {
     _ network: BraveWallet.NetworkInfo,
     isForOrigin: Bool
   ) async -> SetSelectedChainError? {
-    let keyringId = BraveWallet.KeyringId.keyringId(for: network.coin, on: network.chainId)
-    let keyringInfo = await keyringService.keyringInfo(keyringId)
-    if keyringInfo.accountInfos.isEmpty {
+    let allAccounts = await keyringService.allAccounts()
+    let allAccountsForNetworkCoin = allAccounts.accounts.filter { $0.coin == network.coin }
+    if allAccountsForNetworkCoin.isEmpty {
       // Need to prompt user to create new account via alert
       return .selectedChainHasNoAccounts
     } else {
@@ -121,7 +121,7 @@ public class NetworkStore: ObservableObject {
         self.defaultSelectedChainId = network.chainId
       }
       
-      let currentlySelectedCoin = await keyringService.allAccounts().selectedAccount?.coin ?? .eth
+      let currentlySelectedCoin = allAccounts.selectedAccount?.coin ?? .eth
       let rpcServiceNetwork = await rpcService.network(currentlySelectedCoin, origin: isForOrigin ? origin : nil)
       guard rpcServiceNetwork.chainId != network.chainId else {
         if !isForOrigin { // `isSwapSupported` is for the `defaultSelectedChain`
@@ -332,7 +332,7 @@ extension NetworkStore: BraveWalletKeyringServiceObserver {
   public func keyringCreated(_ keyringId: BraveWallet.KeyringId) {
   }
   
-  public func keyringRestored(_ keyringId: BraveWallet.KeyringId) {
+  public func walletRestored() {
   }
   
   public func keyringReset() {

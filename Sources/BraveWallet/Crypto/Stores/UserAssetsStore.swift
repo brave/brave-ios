@@ -239,7 +239,7 @@ extension UserAssetsStore: BraveWalletKeyringServiceObserver {
     update()
   }
   
-  public func keyringRestored(_ keyringId: BraveWallet.KeyringId) {
+  public func walletRestored() {
   }
   
   public func keyringReset() {

@@ -254,7 +254,7 @@ extension NFTStore: BraveWalletKeyringServiceObserver {
   }
   public func keyringCreated(_ keyringId: BraveWallet.KeyringId) {
   }
-  public func keyringRestored(_ keyringId: BraveWallet.KeyringId) {
+  public func walletRestored() {
   }
   public func locked() {
   }
