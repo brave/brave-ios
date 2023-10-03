@@ -57,6 +57,8 @@ struct SubmitReportView: View {
           dismiss()
         }
         .disabled(isSubmittingReport)
+        .hidden(isHidden: isSubmitted)
+        .animation(.smooth.speed(0.2), value: isSubmitted)
       }
       
       ToolbarItem(placement: .confirmationAction) {
