@@ -1,6 +1,5 @@
 # Changelog
 
-
 ## [1.52](https://github.com/brave/brave-ios/releases/tag/v1.52)
 
 ### Web3
