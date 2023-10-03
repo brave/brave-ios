@@ -40,6 +40,7 @@ struct SubmitReportView: View {
             Strings.Shields.reportBrokenContactMe,
             text: $contactDetails, prompt: Text(Strings.Shields.reportBrokenContactMeSuggestions)
           )
+          .textContentType(.emailAddress)
           .textFieldStyle(BraveTextFieldStyle())
           .autocorrectionDisabled()
           .textInputAutocapitalization(.never)
