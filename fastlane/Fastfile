@@ -37,7 +37,7 @@ platform :ios do
     run_tests(
       project: "App/Client.xcodeproj",
       scheme: "Debug",
-      device: "iPhone 14 (17.0)",
+      device: "iPhone 14 (17.4)",
       code_coverage: true,
       ensure_devices_found: true,
       skip_testing: [
@@ -72,7 +72,7 @@ platform :ios do
     run_tests(
       project: "App/Client.xcodeproj",
       scheme: "Debug",
-      device: "iPad (10th generation) (17.0)",
+      device: "iPad (10th generation) (17.4)",
       code_coverage: true,
       ensure_devices_found: true,
       skip_testing: [
