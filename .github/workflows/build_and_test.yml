@@ -6,6 +6,7 @@ on:
       - development
       - beta
   pull_request:
+    types: [ labeled ]
 
 jobs:
   test:
@@ -42,7 +43,7 @@ jobs:
 
   test_latest_os:
     if: ${{ github.event_name == 'pull_request' && github.event.action == 'labeled' && github.event.label.name == 'CI/latest_os' }}
-    name: Run tests
+    name: Run latest OS tests
     runs-on: macOS-13
     env:
         # The XCode version to use. If you want to update it please refer to this document:
