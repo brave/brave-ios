@@ -43,15 +43,9 @@ jobs:
 
   test_latest_os:
      if: >-
-      (github.event_name == 'pull_request' && 
-       github.event.action == 'labeled' && 
-       github.event.label.name == 'CI/latest_os') || 
-      (github.event_name == 'pull_request' && 
-       github.event.action == 'opened' && 
-       contains(github.event.pull_request.labels.*.name, 'CI/latest_os')) || 
-      (github.event_name == 'pull_request' && 
-       github.event.action == 'synchronize' && 
-       contains(github.event.pull_request.labels.*.name, 'CI/latest_os'))
+      (github.event_name == 'pull_request' && github.event.action == 'labeled' && github.event.label.name == 'CI/latest_os') || 
+      (github.event_name == 'pull_request' && github.event.action == 'opened' && contains(github.event.pull_request.labels.*.name, 'CI/latest_os')) || 
+      (github.event_name == 'pull_request' && github.event.action == 'synchronize' && contains(github.event.pull_request.labels.*.name, 'CI/latest_os'))
     name: Run latest OS tests
     runs-on: macOS-13
     env:
