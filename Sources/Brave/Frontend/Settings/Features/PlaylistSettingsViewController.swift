@@ -13,11 +13,8 @@ import Playlist
 
 // MARK: - PlayListSide
 
-enum PlayListSide: String, CaseIterable, RepresentableOptionType {
-  case left
-  case right
-
-  var displayString: String {
+extension PlayListSide: RepresentableOptionType {
+  public var displayString: String {
     switch self {
     case .left:
       return Strings.PlayList.playlistSidebarLocationOptionLeft
@@ -29,12 +26,8 @@ enum PlayListSide: String, CaseIterable, RepresentableOptionType {
 
 // MARK: - PlayListDownloadType
 
-enum PlayListDownloadType: String, CaseIterable, RepresentableOptionType {
-  case on
-  case off
-  case wifi
-
-  var displayString: String {
+extension PlayListDownloadType: RepresentableOptionType {
+  public var displayString: String {
     switch self {
     case .on:
       return Strings.PlayList.playlistAutoSaveOptionOn
