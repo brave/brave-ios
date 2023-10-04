@@ -311,6 +311,7 @@ var package = Package(
         .copy("Resources/ad-block-resources/resources.json"),
         .copy("Resources/filter-rules/cdbbhgbmjhfnhnmgeddbliobbofkgdhe.txt"),
         .copy("Resources/filter-rules/cffkpbalmllkdoenhmdmpbkajipdjfam.dat"),
+        .copy("Resources/filter-rules/list.txt"),
         .copy("Resources/html/index.html"),
         .copy("Resources/scripts/farbling-tests.js"),
         .copy("Resources/scripts/request-blocking-tests.js"),
@@ -445,6 +446,8 @@ var braveTarget: PackageDescription.Target = .target(
     .copy("WebFilters/ContentBlocker/Lists/block-cookies.json"),
     .copy("WebFilters/ContentBlocker/Lists/block-trackers.json"),
     .copy("WebFilters/ShieldStats/Adblock/Resources/ABPFilterParserData.dat"),
+    .copy("WebFilters/Debug/Resources/FilterLists/list.txt"),
+    .copy("WebFilters/Debug/Resources/resources.json"),
   ],
   plugins: ["LoggerPlugin"]
 )

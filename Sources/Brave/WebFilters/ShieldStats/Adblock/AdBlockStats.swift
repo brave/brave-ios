@@ -25,7 +25,7 @@ public actor AdBlockStats {
   public static let shared = AdBlockStats()
   
   /// An object containing the basic information to allow us to compile an engine
-  public struct LazyFilterListInfo {
+  public struct LazyFilterListInfo: Hashable {
     let filterListInfo: CachedAdBlockEngine.FilterListInfo
     let isAlwaysAggressive: Bool
   }
