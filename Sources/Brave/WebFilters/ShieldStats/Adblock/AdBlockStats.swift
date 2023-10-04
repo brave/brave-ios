@@ -25,7 +25,7 @@ public actor AdBlockStats {
   public static let shared = AdBlockStats()
   
   /// An object containing the basic information to allow us to compile an engine
-  struct LazyFilterListInfo {
+  struct LazyFilterListInfo: Hashable {
     let filterListInfo: CachedAdBlockEngine.FilterListInfo
     let isAlwaysAggressive: Bool
   }
@@ -78,11 +78,11 @@ public actor AdBlockStats {
   /// - Note: This method will ensure syncronous compilation
   public func compile(
     filterListInfo: CachedAdBlockEngine.FilterListInfo, resourcesInfo: CachedAdBlockEngine.ResourcesInfo, 
-    isAlwaysAggressive: Bool, ignoreMaximum: Bool = false
+    isAlwaysAggressive: Bool, force: Bool = false, ignoreMaximum: Bool = false
   ) async {
     await currentCompileTask?.value
     
-    guard needsCompilation(for: filterListInfo, resourcesInfo: resourcesInfo) else {
+    guard force || needsCompilation(for: filterListInfo, resourcesInfo: resourcesInfo) else {
       // Ensure we only compile if we need to. This prevents two lazy loads from recompiling
       return
     }
@@ -105,6 +105,22 @@ public actor AdBlockStats {
     }
     
     await currentCompileTask?.value
+  }
+  
+  /// Create and add an engine from the given resources.
+  /// If an engine already exists for the given source, it will be replaced.
+  ///
+  /// - Warning: This method will **not**  ensure syncronous compilation. Use this sparingly.
+  public func compileAsync(
+    filterListInfo: CachedAdBlockEngine.FilterListInfo, resourcesInfo: CachedAdBlockEngine.ResourcesInfo, isAlwaysAggressive: Bool
+  ) async throws {    
+    try await Task.detached {
+      let engine = try CachedAdBlockEngine.compile(
+        filterListInfo: filterListInfo, resourcesInfo: resourcesInfo, isAlwaysAggressive: isAlwaysAggressive
+      )
+      
+      await self.add(engine: engine)
+    }.value
   }
   
   /// Add a new engine to the list.
