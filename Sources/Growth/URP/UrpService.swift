@@ -7,6 +7,7 @@ import BraveShared
 import CertificateUtilities
 import SwiftyJSON
 import os.log
+import Combine
 
 enum UrpError {
   case networkError, downloadIdNotFound, ipNotFound, endpointError
@@ -79,7 +80,7 @@ struct UrpService {
     }
   }
   
-  func adCampaignTokenLookup(adAttributionToken: String, completion: @escaping ((Bool?, Int?)?, Error?) -> Void) {
+  func adCampaignTokenLookupQueue(adAttributionToken: String, completion: @escaping ((Bool?, Int?)?, Error?) -> Void) {
     guard let endPoint = URL(string: adServicesURL) else {
       completion(nil, nil)
       UrpLog.log("AdServicesURLString can not be resolved: \(adServicesURL)")
@@ -157,6 +158,15 @@ extension URLSession {
   func adServicesAttributionApiRequest(endPoint: URL, rawData: Data?, completion: @escaping (Result<Any, Error>) -> Void) {
     request(endPoint, method: .post, rawData: rawData, encoding: .textPlain) { response in
       completion(response)
+    }
+  }
+  
+  // Apple ad service attricution request requires plain text encoding with post method and passing token as rawdata
+  func adServicesAttributionApiRequesta(endPoint: URL, rawData: Data?) async throws -> (Data, URLResponse) {
+    do {
+      return try await request(endPoint, method: .post, rawData: rawData, encoding: .textPlain)
+    } catch {
+      throw error
     }
   }
 }

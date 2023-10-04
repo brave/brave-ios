@@ -5,6 +5,7 @@
 import Foundation
 import Shared
 import os.log
+import Combine
 
 extension URLSession {
   @discardableResult
@@ -46,6 +47,61 @@ extension URLSession {
     } catch {
       Logger.module.error("\(error.localizedDescription)")
       return nil
+    }
+  }
+  
+  public func request(
+    _ url: URL,
+    method: HTTPMethod = .get,
+    headers: [String: String] = [:],
+    parameters: [String: Any] = [:],
+    rawData: Data? = nil,
+    encoding: ParameterEncoding = .query
+  ) -> AnyPublisher<Any, Error> {
+    do {
+      let request = try buildRequest(
+        url,
+        method: method,
+        headers: headers,
+        parameters: parameters,
+        rawData: rawData,
+        encoding: encoding)
+      
+      return dataTaskPublisher(for: request)
+        .tryMap({ data, response in
+          try JSONSerialization.jsonObject(with: data, options: .mutableLeaves)
+        })
+        .mapError({ $0 as Error })
+        .receive(on: DispatchQueue.main)
+        .eraseToAnyPublisher()
+    } catch {
+      Logger.module.error("\(error.localizedDescription)")
+      return Fail(error: error).eraseToAnyPublisher()
+    }
+  }
+  
+  public func request(
+    _ url: URL,
+    method: HTTPMethod = .get,
+    headers: [String: String] = [:],
+    parameters: [String: Any] = [:],
+    rawData: Data? = nil,
+    encoding: ParameterEncoding = .query
+  ) async throws -> (Data, URLResponse) {
+    
+    do {
+      let request = try buildRequest(
+        url,
+        method: method,
+        headers: headers,
+        parameters: parameters,
+        rawData: rawData,
+        encoding: encoding)
+      
+      return try await data(for: request)
+    } catch {     
+      Logger.module.error("\(error.localizedDescription)")
+      throw error
     }
   }
 }

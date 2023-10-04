@@ -123,7 +123,7 @@ public class UserReferralProgram {
 
     // TODO: Implement 5 sec delay 3 attempt
     
-    service.adCampaignTokenLookup(adAttributionToken: token) { response, error in
+    service.adCampaignTokenLookupQueue(adAttributionToken: token) { response, error in
       completion(response, error)
     }
   }
