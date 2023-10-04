@@ -2206,6 +2206,10 @@ public class BrowserViewController: UIViewController {
 
       activities.append(addSearchEngineActivity)
     }
+    
+    activities.append(ReportWebCompatibilityIssueActivity() { [weak self] in
+      self?.showSubmitReportView(for: url)
+    })
 
     return activities
   }

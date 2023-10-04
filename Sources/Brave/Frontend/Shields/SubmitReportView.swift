@@ -47,7 +47,6 @@ struct SubmitReportView: View {
         }
       }
       .padding()
-      .foregroundStyle(Color(braveSystemName: .textSecondary))
     }
     .background(Color(.braveBackground))
     .foregroundStyle(Color(braveSystemName: .textSecondary))
@@ -59,7 +58,6 @@ struct SubmitReportView: View {
         }
         .disabled(isSubmittingReport)
         .hidden(isHidden: isSubmitted)
-        .animation(.smooth.speed(0.2), value: isSubmitted)
       }
       
       ToolbarItem(placement: .confirmationAction) {
@@ -69,16 +67,11 @@ struct SubmitReportView: View {
           })
         } else {
           Button(Strings.Shields.reportBrokenSubmitButtonTitle, action: {
-            withAnimation {
-              isSubmittingReport = true
-            }
+            isSubmittingReport = true
             
             Task { @MainActor in
               await createAndSubmitReport()
-              
-              withAnimation {
-                isSubmitted = true
-              }
+              isSubmitted = true
               
               try await Task.sleep(seconds: 4)
               dismiss()
@@ -93,26 +86,24 @@ struct SubmitReportView: View {
           .progressViewStyle(.braveCircular(size: .normal, tint: .braveBlurpleTint))
           .frame(maxWidth: .infinity, maxHeight: .infinity)
           .background(Color(.braveBackground).opacity(0.5).ignoresSafeArea())
-          .animation(.easeInOut, value: isSubmittingReport)
+          .transition(.opacity.animation(.default))
       }
     }
     .overlay {
       if isSubmitted {
         SubmitReportSuccessView()
-          .progressViewStyle(.braveCircular(size: .normal, tint: .braveBlurpleTint))
           .frame(maxWidth: .infinity, maxHeight: .infinity)
           .background(Color(.braveBackground).ignoresSafeArea())
-          .animation(.easeIn, value: isSubmitted)
+          .transition(.opacity.animation(.default))
       }
     }
   }
   
   var body: some View {
     NavigationView {
-      scrollContent
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationViewStyle(.stack)
+      scrollContent.navigationBarTitleDisplayMode(.inline)
     }
+    .navigationViewStyle(.stack)
   }
   
   @MainActor func createAndSubmitReport() async {
