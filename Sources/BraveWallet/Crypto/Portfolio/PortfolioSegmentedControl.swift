@@ -30,6 +30,7 @@ struct PortfolioSegmentedControl: View {
   @Binding var selected: SelectedContent
   @State private var viewSize: CGSize = .zero
   @State private var location: CGPoint = .zero
+  @GestureState private var isDragGestureActive: Bool = false
   
   var body: some View {
     GeometryReader { geometryProxy in
@@ -93,6 +94,16 @@ struct PortfolioSegmentedControl: View {
     }
     .frame(height: 40)
     .gesture(dragGesture)
+    .onChange(of: isDragGestureActive) { isDragGestureActive in
+      if !isDragGestureActive { // cancellation of gesture, ex while scrolling
+        var newX = location.x
+        if newX < viewSize.width / 2 {
+          select(.assets)
+        } else {
+          select(.nfts)
+        }
+      }
+    }
     .osAvailabilityModifiers {
       if #available(iOS 16, *) {
         $0.simultaneousGesture(tapGesture)
@@ -114,6 +125,9 @@ struct PortfolioSegmentedControl: View {
   
   private var dragGesture: some Gesture {
     DragGesture()
+      .updating($isDragGestureActive) { value, state, transaction in
+        state = true
+      }
       .onChanged { value in
         var newX = value.location.x
         if newX < viewSize.width / 4 {
