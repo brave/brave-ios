@@ -110,7 +110,7 @@ final class CachedAdBlockEngineTests: XCTestCase {
   func testPerformance() throws {
     // Given
     // Ad block data and an engine manager
-    let sampleFilterListURL = Bundle.module.url(forResource: "cdbbhgbmjhfnhnmgeddbliobbofkgdhe", withExtension: "txt")!
+    let sampleFilterListURL = Bundle.module.url(forResource: "list", withExtension: "txt")!
     let resourcesInfo = CachedAdBlockEngine.ResourcesInfo(
       localFileURL: Bundle.module.url(forResource: "resources", withExtension: "json")!, version: "bundled"
     )
@@ -124,26 +124,29 @@ final class CachedAdBlockEngineTests: XCTestCase {
       let exp = expectation(description: "Finished")
 
       Task {
-        let uuid = UUID().uuidString
-        
-        let filterListInfo = CachedAdBlockEngine.FilterListInfo(
-          source: .filterList(componentId: uuid),
-          localFileURL: sampleFilterListURL,
-          version: "bundled", fileType: .text
-        )
-        
-        do {
-          _ = try await CachedAdBlockEngine.compile(
-            filterListInfo: filterListInfo, resourcesInfo: resourcesInfo, isAlwaysAggressive: false
+        await (0..<200).asyncConcurrentForEach { _ in
+          let uuid = UUID().uuidString
+          
+          let filterListInfo = CachedAdBlockEngine.FilterListInfo(
+            source: .filterList(componentId: uuid),
+            localFileURL: sampleFilterListURL,
+            version: "bundled", fileType: .text
           )
-        } catch {
-          XCTFail(error.localizedDescription)
+          
+          do {
+            _ = try await CachedAdBlockEngine.compile(
+              filterListInfo: filterListInfo, resourcesInfo: resourcesInfo, isAlwaysAggressive: false
+            )
+            print("COMPILED")
+          } catch {
+            XCTFail(error.localizedDescription)
+          }
         }
         
         exp.fulfill()
       }
       
-      wait(for: [exp], timeout: 20)
+      wait(for: [exp], timeout: 200)
     }
   }
 }
