@@ -110,7 +110,7 @@ final class CachedAdBlockEngineTests: XCTestCase {
   func testPerformance() throws {
     // Given
     // Ad block data and an engine manager
-    let sampleFilterListURL = Bundle.module.url(forResource: "cdbbhgbmjhfnhnmgeddbliobbofkgdhe", withExtension: "txt")!
+    let sampleFilterListURL = Bundle.module.url(forResource: "list", withExtension: "txt")!
     let resourcesInfo = CachedAdBlockEngine.ResourcesInfo(
       localFileURL: Bundle.module.url(forResource: "resources", withExtension: "json")!, version: "bundled"
     )

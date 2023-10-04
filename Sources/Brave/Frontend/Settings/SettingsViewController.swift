@@ -740,6 +740,17 @@ class SettingsViewController: TableViewController {
             self.navigationController?.pushViewController(vc, animated: true)
           }, accessory: .disclosureIndicator),
         Row(
+          text: "Test engines",
+          selection: { [unowned self] in
+            if #available(iOS 16.0, *) {
+              let controller = UIHostingController(rootView: TestAdblockEnginesView())
+              self.navigationController?.pushViewController(controller, animated: true)
+            } else {
+              // Fallback on earlier versions
+              
+            }
+          }, accessory: .disclosureIndicator, cellClass: MultilineSubtitleCell.self),
+        Row(
           text: "Adblock Debug",
           selection: { [unowned self] in
             let vc = AdblockDebugMenuTableViewController(style: .grouped)
