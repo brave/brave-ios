@@ -1,16 +1,16 @@
-name: Build
+name: Test all
 
 on: 
-  push:
-    branches:
-      - development
-      - beta
   pull_request:
+    types: [ labeled, opened, synchronize ]
 
 jobs:
-  test:
-    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && !contains(github.event.pull_request.labels.*.name, 'CI/skip')) }}
-    name: Run tests
+  test_all:
+    if: >-
+      (github.event_name == 'pull_request' && github.event.action == 'labeled' && github.event.label.name == 'CI/test_all') || 
+      (github.event_name == 'pull_request' && github.event.action == 'opened' && contains(github.event.pull_request.labels.*.name, 'CI/test_all')) || 
+      (github.event_name == 'pull_request' && github.event.action == 'synchronize' && contains(github.event.pull_request.labels.*.name, 'CI/test_all'))
+    name: Test all supported major platform versions
     runs-on: macOS-13
     env:
         # The XCode version to use. If you want to update it please refer to this document:
@@ -38,4 +38,4 @@ jobs:
       - name: Run tests
         run: |
           set -o pipefail
-          fastlane ios test
+          fastlane ios test test_all:true
