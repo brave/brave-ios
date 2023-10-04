@@ -19,7 +19,7 @@ extension BrowserViewController: PlaylistScriptHandlerDelegate, PlaylistFolderSh
   static var didShowStorageFullWarning = false
   func createPlaylistPopover(item: PlaylistInfo, tab: Tab?) -> PopoverController {
     
-    let folderName = PlaylistItem.getItem(uuid: item.tagId)?.playlistFolder?.title ?? Strings.PlaylistFolders.playlistSavedFolderTitle
+    let folderName = PlaylistItem.getItem(uuid: item.tagId)?.playlistFolder?.title ?? Strings.Playlist.defaultPlaylistTitle
 
     return PopoverController(
       content: PlaylistPopoverView(folderName: folderName) { [weak self] action in

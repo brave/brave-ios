@@ -7,8 +7,8 @@ import Foundation
 import Strings
 
 extension Strings {
-  struct Playlist {
-    static let defaultPlaylistTitle = NSLocalizedString(
+  public struct Playlist {
+    public static let defaultPlaylistTitle = NSLocalizedString(
       "playlist.defaultPlaylistTitle",
       bundle: .module,
       value: "Play Later",

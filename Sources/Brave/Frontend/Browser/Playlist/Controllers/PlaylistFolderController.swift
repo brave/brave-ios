@@ -202,7 +202,7 @@ extension PlaylistFolderController: UITableViewDataSource {
       let itemCount = savedFolder?.playlistItems?.count ?? 0
 
       cell.imageView?.image = folderIcon
-      cell.textLabel?.text = Strings.PlaylistFolders.playlistSavedFolderTitle
+      cell.textLabel?.text = Strings.Playlist.defaultPlaylistTitle
       cell.detailTextLabel?.text = "\(itemCount == 1 ? Strings.PlaylistFolders.playlistFolderSubtitleItemSingleCount : String.localizedStringWithFormat(Strings.PlaylistFolders.playlistFolderSubtitleItemCount, itemCount))"
       cell.detailTextLabel?.textColor = .secondaryBraveLabel
       cell.accessoryType = .disclosureIndicator
