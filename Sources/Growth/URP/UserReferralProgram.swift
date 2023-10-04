@@ -7,6 +7,8 @@ import Shared
 import Preferences
 import WebKit
 import os.log
+import iAd
+import AdServices
 
 public class UserReferralProgram {
 
@@ -119,12 +121,30 @@ public class UserReferralProgram {
     service.referralCodeLookup(refCode: refCode, completion: referralBlock)
   }
   
-  func adCampaignLookup(token: String, completion: @escaping ((Bool?, Int?)?, Error?) -> Void) {
-
-    // TODO: Implement 5 sec delay 3 attempt
-    
-    service.adCampaignTokenLookupQueue(adAttributionToken: token) { response, error in
+  public func adCampaignLookup1(token: String, completion: @escaping ((Bool?, Int?)?, Error?) -> Void) {
+    service.adCampaignTokenLookupQueue1(adAttributionToken: token) { response, error in
       completion(response, error)
+    }
+  }
+  
+  public func adCampaignLookup2(completion: @escaping ((Bool?, Int?)?, Error?) -> Void) {
+    // Fetching ad attibution token
+    do {
+      let adAttributionToken = try AAAttribution.attributionToken()
+      
+      Task { @MainActor in
+        do {
+          let result = try await service.adCampaignTokenLookupQueue2(adAttributionToken: adAttributionToken)
+          completion((result.0, result.1), nil)
+        } catch {
+          Logger.module.info("Could not retrieve ad campaign attibution from ad services")
+          completion(nil, error)
+        }
+      }
+    } catch {
+      Logger.module.info("Couldnt fetch attribute tokens with error: \(error)")
+      completion(nil, error)
+      return
     }
   }
 

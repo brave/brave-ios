@@ -87,7 +87,7 @@ extension URLSession {
     parameters: [String: Any] = [:],
     rawData: Data? = nil,
     encoding: ParameterEncoding = .query
-  ) async throws -> (Data, URLResponse) {
+  ) async throws -> (Any, URLResponse) {
     
     do {
       let request = try buildRequest(

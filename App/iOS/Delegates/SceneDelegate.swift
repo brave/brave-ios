@@ -535,29 +535,39 @@ extension BrowserViewController {
     // Case 1: AppStore Search Ad impression
     // Case 2: User Referral on Brave side
     if Preferences.URP.referralLookupOutstanding.value == true {
-      
-      // TODO: Implement Ad Token Looup Check
-      // urp.service.adCampaignTokenLookup
-
-      urp.referralLookup(refCode: UserReferralProgram.getReferralCode()) { referralCode, offerUrl in
-        // Attempting to send ping after first urp lookup.
-        // This way we can grab the referral code if it exists, see issue #2586.
-        AppState.shared.dau.sendPingToServer()
-        if let code = referralCode {
-          let retryTime = AppConstants.buildChannel.isPublic ? 1.days : 10.minutes
-          let retryDeadline = Date() + retryTime
-
-          Preferences.NewTabPage.superReferrerThemeRetryDeadline.value = retryDeadline
-          
-          // TODO: Set the code in core somehow if we want to support Super Referrals again
-          //       then call updateSponsoredImageComponentIfNeeded
+      urp.adCampaignLookup2() { [weak self] response, error in
+        var referralCode = UserReferralProgram.getReferralCode()
+        
+        if error == nil, response?.0 == true, let campaignId = response?.1 {
+          referralCode = String(campaignId)
         }
-
-        guard let url = offerUrl?.asURL else { return }
-        self.openReferralLink(url: url)
+        
+        self?.performProgramReferralLookup(urp, refCode: referralCode)
+        
+        // TODO: Add Referral sequence
       }
     } else {
       urp.pingIfEnoughTimePassed()
+    }
+  }
+  
+  private func performProgramReferralLookup(_ urp: UserReferralProgram, refCode: String?) {
+    urp.referralLookup(refCode: UserReferralProgram.getReferralCode()) { referralCode, offerUrl in
+      // Attempting to send ping after first urp lookup.
+      // This way we can grab the referral code if it exists, see issue #2586.
+      AppState.shared.dau.sendPingToServer()
+      if let code = referralCode {
+        let retryTime = AppConstants.buildChannel.isPublic ? 1.days : 10.minutes
+        let retryDeadline = Date() + retryTime
+
+        Preferences.NewTabPage.superReferrerThemeRetryDeadline.value = retryDeadline
+        
+        // TODO: Set the code in core somehow if we want to support Super Referrals again
+        //       then call updateSponsoredImageComponentIfNeeded
+      }
+
+      guard let url = offerUrl?.asURL else { return }
+      self.openReferralLink(url: url)
     }
   }
 }

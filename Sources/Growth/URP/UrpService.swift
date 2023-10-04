@@ -80,7 +80,7 @@ struct UrpService {
     }
   }
   
-  func adCampaignTokenLookupQueue(adAttributionToken: String, completion: @escaping ((Bool?, Int?)?, Error?) -> Void) {
+  func adCampaignTokenLookupQueue1(adAttributionToken: String, completion: @escaping ((Bool?, Int?)?, Error?) -> Void) {
     guard let endPoint = URL(string: adServicesURL) else {
       completion(nil, nil)
       UrpLog.log("AdServicesURLString can not be resolved: \(adServicesURL)")
@@ -91,7 +91,7 @@ struct UrpService {
     let attributionDataToken = adAttributionToken.data(using: .utf8)
     
     // Request is created with token fetched from Ad Services
-    sessionManager.adServicesAttributionApiRequest(endPoint: endPoint, rawData: attributionDataToken) { response in
+    sessionManager.adServicesAttributionApiRequest1(endPoint: endPoint, rawData: attributionDataToken) { response in
       switch response {
       case .success(let data):
         if let data = data as? Data {
@@ -115,6 +115,28 @@ struct UrpService {
         completion(nil, error)
       }
     }
+  }
+  
+  @MainActor func adCampaignTokenLookupQueue2(adAttributionToken: String) async throws -> (Bool?, Int?) {
+    guard let endPoint = URL(string: adServicesURL) else {
+      UrpLog.log("AdServicesURLString can not be resolved: \(adServicesURL)")
+      throw URLError(.badURL)
+    }
+    
+    let attributionDataToken = adAttributionToken.data(using: .utf8)
+    
+    let (data, _) = try await sessionManager.adServicesAttributionApiRequest2(endPoint: endPoint, rawData: attributionDataToken)
+    
+    UrpLog.log("Ad Attribution response: \(data)")
+
+    if let dataResponseJSON = data as? [String: Any] {
+      if let attribution = dataResponseJSON["attribution"] as? Bool,
+          let campaignId = dataResponseJSON["campaignId"] as? Int {
+        return (attribution, campaignId)
+      }
+    }
+
+    return (nil, nil)
   }
 
   func checkIfAuthorizedForGrant(with downloadId: String, completion: @escaping (Bool?, UrpError?) -> Void) {
@@ -155,18 +177,19 @@ extension URLSession {
   }
   
   // Apple ad service attricution request requires plain text encoding with post method and passing token as rawdata
-  func adServicesAttributionApiRequest(endPoint: URL, rawData: Data?, completion: @escaping (Result<Any, Error>) -> Void) {
+  func adServicesAttributionApiRequest1(endPoint: URL, rawData: Data?, completion: @escaping (Result<Any, Error>) -> Void) {
     request(endPoint, method: .post, rawData: rawData, encoding: .textPlain) { response in
       completion(response)
     }
   }
   
   // Apple ad service attricution request requires plain text encoding with post method and passing token as rawdata
-  func adServicesAttributionApiRequesta(endPoint: URL, rawData: Data?) async throws -> (Data, URLResponse) {
-    do {
-      return try await request(endPoint, method: .post, rawData: rawData, encoding: .textPlain)
-    } catch {
-      throw error
-    }
+  func adServicesAttributionApiRequest2(endPoint: URL, rawData: Data?) async throws -> (Any, URLResponse) {
+    // According to attributiontoken API docs
+    // An error reponse can occur API call is done too quickly after receiving a valid token.
+    // A best practice is to initiate retries at intervals of 5 seconds, with a maximum of three attempts.
+    return try await Task.retry(retryCount: 3, retryDelay: 5) {
+      return try await self.request(endPoint, method: .post, rawData: rawData, encoding: .textPlain)
+    }.value
   }
 }
