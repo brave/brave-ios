@@ -13,6 +13,7 @@ import Shared
 import BraveShared
 import os.log
 import Growth
+import Playlist
 
 private enum Section: Int, CaseIterable {
   case savedItems

@@ -9,6 +9,7 @@ import Shared
 import BraveShared
 import Preferences
 import BraveUI
+import Playlist
 
 // MARK: - PlayListSide
 
@@ -200,6 +201,7 @@ class PlaylistSettingsViewController: TableViewController {
                 UIAlertAction(
                   title: Strings.PlayList.playlistResetAlertTitle, style: .default,
                   handler: { _ in
+                    PlaylistCarplayManager.shared.destroyPiP()
                     PlaylistManager.shared.deleteAllItems(cacheOnly: false)
                   }))
               alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))

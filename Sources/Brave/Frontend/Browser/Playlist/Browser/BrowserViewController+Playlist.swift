@@ -13,6 +13,7 @@ import UIKit
 import Growth
 import os.log
 import Onboarding
+import Playlist
 
 extension BrowserViewController: PlaylistScriptHandlerDelegate, PlaylistFolderSharingScriptHandlerDelegate {
   static var didShowStorageFullWarning = false
