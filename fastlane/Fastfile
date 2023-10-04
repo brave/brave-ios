@@ -8,8 +8,6 @@ default_platform :ios
 
 CONFIG_PATH = "../App/Configuration"
 LOCAL_PATH = "#{CONFIG_PATH}/Local"
-DEFAULT_IOS_SIMULATOR_VERSION = "16.4"
-LATEST_IOS_SIMULATOR_VERSION = "17.0"
 
 platform :ios do
   before_all do |lane, options|
@@ -40,7 +38,7 @@ platform :ios do
     run_tests(
       project: "App/Client.xcodeproj",
       scheme: "Debug",
-      devices: options[:test_all] ? ["iPhone 14 (16.4)", "iPhone 14 (17.0)"] : ["iPhone 14 (16.4)"]
+      devices: options[:test_all] ? ["iPhone 14 (16.4)", "iPhone 14 (17.0)"] : ["iPhone 14 (16.4)"],
       code_coverage: true,
       ensure_devices_found: true,
       skip_testing: [
@@ -75,7 +73,7 @@ platform :ios do
     run_tests(
       project: "App/Client.xcodeproj",
       scheme: "Debug",
-      devices: options[:test_all] ? ["iPad (10th generation) (16.4)", "iPad (10th generation) (17.0)"] : ["iPad (10th generation) (16.4)"]
+      devices: options[:test_all] ? ["iPad (10th generation) (16.4)", "iPad (10th generation) (17.0)"] : ["iPad (10th generation) (16.4)"],
       code_coverage: true,
       ensure_devices_found: true,
       skip_testing: [
