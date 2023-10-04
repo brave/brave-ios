@@ -229,13 +229,11 @@ public class CryptoStore: ObservableObject, WalletObserverStore {
         // 1. reset wallet user asset migration flag
         // 2. wipe user assets local storage
         // 3. migrate user assets with new keyring
-        guard let strongSelf = self else { return }
-        guard !strongSelf.isUpdatingUserAssets else { return }
-        strongSelf.isUpdatingUserAssets = true
+        guard let isUpdatingUserAssets = self?.isUpdatingUserAssets, !isUpdatingUserAssets else { return }
+        self?.isUpdatingUserAssets = true
         Preferences.Wallet.migrateCoreToWalletUserAssetCompleted.reset()
-        WalletUserAssetGroup.removeAllGroup() { [weak strongSelf] in
-          guard let self = strongSelf else { return }
-          self.userAssetManager.migrateUserAssets(completion: { [weak self] in
+        WalletUserAssetGroup.removeAllGroup() {
+          self?.userAssetManager.migrateUserAssets(completion: {
             self?.updateAssets()
             self?.isUpdatingUserAssets = false
           })
@@ -411,6 +409,15 @@ public class CryptoStore: ObservableObject, WalletObserverStore {
     return store
   }
   
+  func closeBSSStores() {
+    buyTokenStore?.tearDown()
+    sendTokenStore?.tearDown()
+    swapTokenStore?.tearDown()
+    buyTokenStore = nil
+    sendTokenStore = nil
+    swapTokenStore = nil
+  }
+  
   private var assetDetailStore: AssetDetailStore?
   func assetDetailStore(for assetDetailType: AssetDetailType) -> AssetDetailStore {
     if let store = assetDetailStore, store.assetDetailType.id == assetDetailType.id {
@@ -473,15 +480,6 @@ public class CryptoStore: ObservableObject, WalletObserverStore {
     }
   }
   
-  func closeBSSStores() {
-    buyTokenStore?.tearDown()
-    sendTokenStore?.tearDown()
-    swapTokenStore?.tearDown()
-    buyTokenStore = nil
-    sendTokenStore = nil
-    swapTokenStore = nil
-  }
-  
   private var confirmationStore: TransactionConfirmationStore?
   func openConfirmationStore() -> TransactionConfirmationStore {
     if let store = confirmationStore {
@@ -501,18 +499,11 @@ public class CryptoStore: ObservableObject, WalletObserverStore {
     confirmationStore = store
     return store
   }
+  
   func closeConfirmationStore() {
     confirmationStore?.tearDown()
     confirmationStore = nil
   }
-  
-  public private(set) lazy var settingsStore = SettingsStore(
-    keyringService: keyringService,
-    walletService: walletService,
-    rpcService: rpcService,
-    txService: txService,
-    ipfsApi: ipfsApi
-  )
   
   private var nftDetailStore: NFTDetailStore?
   func nftDetailStore(for nft: BraveWallet.BlockchainToken, nftMetadata: NFTMetadata?) -> NFTDetailStore {
@@ -535,6 +526,14 @@ public class CryptoStore: ObservableObject, WalletObserverStore {
       nftDetailStore = nil
     }
   }
+  
+  public private(set) lazy var settingsStore = SettingsStore(
+    keyringService: keyringService,
+    walletService: walletService,
+    rpcService: rpcService,
+    txService: txService,
+    ipfsApi: ipfsApi
+  )
   
   // This will be called when users exit from edit visible asset screen
   // so that Portfolio and NFT tabs will update assets
