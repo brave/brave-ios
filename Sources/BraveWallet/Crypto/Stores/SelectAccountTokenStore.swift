@@ -6,7 +6,7 @@
 import SwiftUI
 import BraveCore
 
-class SelectAccountTokenStore: ObservableObject, WalletSubStore {
+class SelectAccountTokenStore: ObservableObject, WalletObserverStore {
   
   struct AccountSection: Equatable, Identifiable {
     struct TokenBalance: Equatable, Identifiable {
@@ -114,6 +114,10 @@ class SelectAccountTokenStore: ObservableObject, WalletSubStore {
   private let assetManager: WalletUserAssetManagerType
   private var walletServiceObserver: WalletServiceObserver?
   
+  var isObserving: Bool {
+    walletServiceObserver != nil
+  }
+  
   init(
     didSelect: @escaping (BraveWallet.AccountInfo, BraveWallet.BlockchainToken) -> Void,
     keyringService: BraveWalletKeyringService,
@@ -132,6 +136,16 @@ class SelectAccountTokenStore: ObservableObject, WalletSubStore {
     self.ipfsApi = ipfsApi
     self.assetManager = userAssetManager
     self.query = query ?? ""
+    
+    self.setupObservers()
+  }
+  
+  func tearDown() {
+    walletServiceObserver = nil
+  }
+  
+  func setupObservers() {
+    guard !isObserving else { return }
     self.walletServiceObserver = WalletServiceObserver(
       walletService: walletService,
       _onDefaultBaseCurrencyChanged: { [weak self] currency in
@@ -140,6 +154,7 @@ class SelectAccountTokenStore: ObservableObject, WalletSubStore {
       _onNetworkListChanged: { [weak self] in
         Task { @MainActor [self] in
           // A network was added or removed, update our network filters for the change.
+          guard let rpcService = self?.rpcService else { return }
           self?.networkFilters = await rpcService.allNetworksForSupportedCoins().map { network in
             let existingSelectionValue = self?.networkFilters.first(where: { $0.model.chainId == network.chainId})?.isSelected
             return .init(isSelected: existingSelectionValue ?? true, model: network)
@@ -147,10 +162,6 @@ class SelectAccountTokenStore: ObservableObject, WalletSubStore {
         }
       }
     )
-  }
-  
-  func tearDown() {
-    walletServiceObserver = nil
   }
   
   func resetFilters() {

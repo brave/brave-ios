@@ -23,7 +23,7 @@ struct NFTAssetViewModel: Identifiable, Equatable {
   }
 }
 
-public class NFTStore: ObservableObject, WalletSubStore {
+public class NFTStore: ObservableObject, WalletObserverStore {
   /// The users visible NFTs
   @Published private(set) var userVisibleNFTs: [NFTAssetViewModel] = []
   /// All User Accounts
@@ -79,6 +79,10 @@ public class NFTStore: ObservableObject, WalletSubStore {
   /// Cache of metadata for NFTs. The key is the token's `id`.
   private var metadataCache: [String: NFTMetadata] = [:]
   
+  var isObserving: Bool {
+    rpcServiceObserver != nil && keyringServiceObserver != nil && walletServiveObserber != nil
+  }
+  
   public init(
     keyringService: BraveWalletKeyringService,
     rpcService: BraveWalletJsonRpcService,
@@ -96,6 +100,29 @@ public class NFTStore: ObservableObject, WalletSubStore {
     self.ipfsApi = ipfsApi
     self.assetManager = userAssetManager
     
+    self.setupObservers()
+    
+    keyringService.isLocked { [self] isLocked in
+      if !isLocked {
+        update()
+      }
+    }
+    Preferences.Wallet.showTestNetworks.observe(from: self)
+    Preferences.Wallet.isHidingUnownedNFTsFilter.observe(from: self)
+    Preferences.Wallet.isShowingNFTNetworkLogoFilter.observe(from: self)
+    Preferences.Wallet.nonSelectedNetworksFilter.observe(from: self)
+  }
+  
+  func tearDown() {
+    rpcServiceObserver = nil
+    keyringServiceObserver = nil
+    walletServiveObserber = nil
+    
+    userAssetsStore.tearDown()
+  }
+  
+  func setupObservers() {
+    guard !isObserving else { return }
     self.rpcServiceObserver = JsonRpcServiceObserver(
       rpcService: rpcService,
       _chainChangedEvent: { [weak self] _, _, _ in
@@ -128,23 +155,7 @@ public class NFTStore: ObservableObject, WalletSubStore {
       }
     )
     
-    keyringService.isLocked { [self] isLocked in
-      if !isLocked {
-        update()
-      }
-    }
-    Preferences.Wallet.showTestNetworks.observe(from: self)
-    Preferences.Wallet.isHidingUnownedNFTsFilter.observe(from: self)
-    Preferences.Wallet.isShowingNFTNetworkLogoFilter.observe(from: self)
-    Preferences.Wallet.nonSelectedNetworksFilter.observe(from: self)
-  }
-  
-  func tearDown() {
-    rpcServiceObserver = nil
-    keyringServiceObserver = nil
-    walletServiveObserber = nil
-    
-    userAssetsStore.tearDown()
+    userAssetsStore.setupObservers()
   }
   
   /// Cache of NFT balances for each account tokenBalances: [token.contractAddress]

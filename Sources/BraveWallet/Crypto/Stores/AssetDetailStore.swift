@@ -32,7 +32,7 @@ enum AssetDetailType: Identifiable {
   }
 }
 
-class AssetDetailStore: ObservableObject, WalletSubStore {
+class AssetDetailStore: ObservableObject, WalletObserverStore {
   @Published private(set) var isInitialState: Bool = true
   @Published private(set) var isLoadingPrice: Bool = false
   @Published private(set) var isLoadingChart: Bool = false
@@ -106,6 +106,10 @@ class AssetDetailStore: ObservableObject, WalletSubStore {
       }
     }
   }
+  
+  var isObserving: Bool {
+    keyringServiceObserver != nil && txServiceObserver != nil && walletServiceObserver != nil
+  }
 
   init(
     assetRatioService: BraveWalletAssetRatioService,
@@ -130,6 +134,21 @@ class AssetDetailStore: ObservableObject, WalletSubStore {
     self.assetManager = userAssetManager
     self.assetDetailType = assetDetailType
 
+    self.setupObservers()
+    
+    walletService.defaultBaseCurrency { [self] currencyCode in
+      self.currencyCode = currencyCode
+    }
+  }
+  
+  func tearDown() {
+    keyringServiceObserver = nil
+    txServiceObserver = nil
+    walletServiceObserver = nil
+  }
+  
+  func setupObservers() {
+    guard !isObserving else { return }
     self.keyringServiceObserver = KeyringServiceObserver(
       keyringService: keyringService,
       _accountsChanged: { [weak self] in
@@ -148,16 +167,6 @@ class AssetDetailStore: ObservableObject, WalletSubStore {
         self?.currencyCode = currency
       }
     )
-
-    walletService.defaultBaseCurrency { [self] currencyCode in
-      self.currencyCode = currencyCode
-    }
-  }
-  
-  func tearDown() {
-    keyringServiceObserver = nil
-    txServiceObserver = nil
-    walletServiceObserver = nil
   }
 
   private let percentFormatter = NumberFormatter().then {

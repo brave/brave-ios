@@ -100,6 +100,7 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
         }
       }
     self.walletStore = walletStore
+    walletStore.cryptoStore?.setupObservers()
   }
   
   @available(*, unavailable)

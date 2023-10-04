@@ -187,7 +187,7 @@ struct BalanceTimePrice: DataPoint, Equatable {
 }
 
 /// A store containing data around the users assets
-public class PortfolioStore: ObservableObject, WalletSubStore {
+public class PortfolioStore: ObservableObject, WalletObserverStore {
   /// The dollar amount of your portfolio
   @Published private(set) var balance: String = "$0.00"
   /// The users visible fungible token groups.
@@ -295,6 +295,10 @@ public class PortfolioStore: ObservableObject, WalletSubStore {
   private var rpcServiceObserver: JsonRpcServiceObserver?
   private var keyringServiceObserver: KeyringServiceObserver?
   private var walletServiceObserver: WalletServiceObserver?
+  
+  var isObserving: Bool {
+    rpcServiceObserver != nil && keyringServiceObserver != nil && walletServiceObserver != nil
+  }
 
   public init(
     keyringService: BraveWalletKeyringService,
@@ -313,45 +317,7 @@ public class PortfolioStore: ObservableObject, WalletSubStore {
     self.ipfsApi = ipfsApi
     self.assetManager = userAssetManager
 
-    rpcServiceObserver = JsonRpcServiceObserver(
-      rpcService: rpcService,
-      _chainChangedEvent: { [weak self] _, _, _ in
-        self?.update()
-      }
-    )
-    keyringServiceObserver = KeyringServiceObserver(
-      keyringService: keyringService,
-      _unlocked: { [weak self] in
-        DispatchQueue.main.async {
-          self?.update()
-        }
-      },
-      _accountsChanged: { [weak self] in
-        Task { @MainActor [self] in
-          // An account was added or removed, `update()` will update `allAccounts`.
-          self?.update()
-        }
-      }
-    )
-    walletServiceObserver = WalletServiceObserver(
-      walletService: walletService,
-      _onDefaultBaseCurrencyChanged: { [weak self] currency in
-        self?.currencyCode = currency
-      },
-      _onNetworkListChanged: { [weak self] in
-        Task { @MainActor [self] in
-          // A network was added or removed, `update()` will update `allNetworks`.
-          self?.update()
-        }
-      },
-      _onDiscoverAssetsStarted: { [weak self] in
-        self?.isLoadingDiscoverAssets = true
-      },
-      _onDiscoverAssetsCompleted: { [weak self] discoveredAssets in
-        self?.isLoadingDiscoverAssets = false
-        // assets update will be called via `CryptoStore`
-      }
-    )
+    self.setupObservers()
 
     keyringService.isLocked { [self] isLocked in
       if !isLocked {
@@ -374,6 +340,51 @@ public class PortfolioStore: ObservableObject, WalletSubStore {
     walletServiceObserver = nil
     
     userAssetsStore.tearDown()
+  }
+  
+  func setupObservers() {
+    guard !isObserving else { return }
+    self.rpcServiceObserver = JsonRpcServiceObserver(
+      rpcService: rpcService,
+      _chainChangedEvent: { [weak self] _, _, _ in
+        self?.update()
+      }
+    )
+    self.keyringServiceObserver = KeyringServiceObserver(
+      keyringService: keyringService,
+      _unlocked: { [weak self] in
+        DispatchQueue.main.async {
+          self?.update()
+        }
+      },
+      _accountsChanged: { [weak self] in
+        Task { @MainActor [self] in
+          // An account was added or removed, `update()` will update `allAccounts`.
+          self?.update()
+        }
+      }
+    )
+    self.walletServiceObserver = WalletServiceObserver(
+      walletService: walletService,
+      _onDefaultBaseCurrencyChanged: { [weak self] currency in
+        self?.currencyCode = currency
+      },
+      _onNetworkListChanged: { [weak self] in
+        Task { @MainActor [self] in
+          // A network was added or removed, `update()` will update `allNetworks`.
+          self?.update()
+        }
+      },
+      _onDiscoverAssetsStarted: { [weak self] in
+        self?.isLoadingDiscoverAssets = true
+      },
+      _onDiscoverAssetsCompleted: { [weak self] discoveredAssets in
+        self?.isLoadingDiscoverAssets = false
+        // assets update will be called via `CryptoStore`
+      }
+    )
+    
+    self.userAssetsStore.setupObservers()
   }
   
   func update() {

@@ -6,7 +6,7 @@
 import BraveCore
 import SwiftUI
 
-class TransactionsActivityStore: ObservableObject, WalletSubStore {
+class TransactionsActivityStore: ObservableObject, WalletObserverStore {
   @Published var transactionSummaries: [TransactionSummary] = []
   
   @Published private(set) var currencyCode: String = CurrencyCode.usd.code {
@@ -40,6 +40,10 @@ class TransactionsActivityStore: ObservableObject, WalletSubStore {
   private var txServiceObserver: TxServiceObserver?
   private var walletServiceObserver: WalletServiceObserver?
   
+  var isObserving: Bool {
+    keyringServiceObserver != nil && txServiceObserver != nil && walletServiceObserver != nil
+  }
+  
   init(
     keyringService: BraveWalletKeyringService,
     rpcService: BraveWalletJsonRpcService,
@@ -59,6 +63,21 @@ class TransactionsActivityStore: ObservableObject, WalletSubStore {
     self.solTxManagerProxy = solTxManagerProxy
     self.assetManager = userAssetManager
     
+    self.setupObservers()
+
+    Task { @MainActor in
+      self.currencyCode = await walletService.defaultBaseCurrency()
+    }
+  }
+  
+  func tearDown() {
+    keyringServiceObserver = nil
+    txServiceObserver = nil
+    walletServiceObserver = nil
+  }
+  
+  func setupObservers() {
+    guard !isObserving else { return }
     self.keyringServiceObserver = KeyringServiceObserver(
       keyringService: keyringService,
       _accountsChanged: { [weak self] in
@@ -72,13 +91,13 @@ class TransactionsActivityStore: ObservableObject, WalletSubStore {
       txService: txService,
       _onNewUnapprovedTx: { [weak self] _ in
         self?.update()
-      }, 
+      },
       _onUnapprovedTxUpdated: { [weak self] _ in
         self?.update()
-      }, 
+      },
       _onTransactionStatusChanged: { [weak self] _ in
         self?.update()
-      }, 
+      },
       _onTxServiceReset: { [weak self] in
         self?.update()
       }
@@ -88,6 +107,7 @@ class TransactionsActivityStore: ObservableObject, WalletSubStore {
       _onNetworkListChanged: { [weak self] in
         Task { @MainActor [self] in
           // A network was added or removed, update our network filters for the change.
+          guard let rpcService = self?.rpcService else { return }
           self?.networkFilters = await rpcService.allNetworksForSupportedCoins().map { network in
             let existingSelectionValue = self?.networkFilters.first(where: { $0.model.chainId == network.chainId})?.isSelected
             return .init(isSelected: existingSelectionValue ?? true, model: network)
@@ -95,16 +115,6 @@ class TransactionsActivityStore: ObservableObject, WalletSubStore {
         }
       }
     )
-
-    Task { @MainActor in
-      self.currencyCode = await walletService.defaultBaseCurrency()
-    }
-  }
-  
-  func tearDown() {
-    keyringServiceObserver = nil
-    txServiceObserver = nil
-    walletServiceObserver = nil
   }
   
   private var updateTask: Task<Void, Never>?

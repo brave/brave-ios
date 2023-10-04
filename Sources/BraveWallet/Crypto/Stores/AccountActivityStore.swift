@@ -6,7 +6,7 @@
 import Foundation
 import BraveCore
 
-class AccountActivityStore: ObservableObject, WalletSubStore {
+class AccountActivityStore: ObservableObject, WalletObserverStore {
   /// If we want to observe selected account changes (ex. in `WalletPanelView`).
   /// In some cases, we do not want to update the account displayed when the
   /// selected account changes (ex. when removing an account).
@@ -43,6 +43,10 @@ class AccountActivityStore: ObservableObject, WalletSubStore {
   private var txServiceObserver: TxServiceObserver?
   private var walletServiceObserver: WalletServiceObserver?
   
+  var isObserving: Bool {
+    keyringServiceObserver != nil && rpcServiceObserver != nil && txServiceObserver != nil && walletServiceObserver != nil
+  }
+  
   init(
     account: BraveWallet.AccountInfo,
     observeAccountUpdates: Bool,
@@ -68,6 +72,22 @@ class AccountActivityStore: ObservableObject, WalletSubStore {
     self.ipfsApi = ipfsApi
     self.assetManager = userAssetManager
     
+    self.setupObservers()
+    
+    walletService.defaultBaseCurrency { [self] currencyCode in
+      self.currencyCode = currencyCode
+    }
+  }
+  
+  func tearDown() {
+    keyringServiceObserver = nil
+    rpcServiceObserver = nil
+    txServiceObserver = nil
+    walletServiceObserver = nil
+  }
+  
+  func setupObservers() {
+    guard !isObserving else { return }
     self.keyringServiceObserver = KeyringServiceObserver(
       keyringService: keyringService,
       _selectedWalletAccountChanged: { [weak self] account in
@@ -105,17 +125,6 @@ class AccountActivityStore: ObservableObject, WalletSubStore {
         self?.currencyCode = currency
       }
     )
-    
-    walletService.defaultBaseCurrency { [self] currencyCode in
-      self.currencyCode = currencyCode
-    }
-  }
-  
-  func tearDown() {
-    keyringServiceObserver = nil
-    rpcServiceObserver = nil
-    txServiceObserver = nil
-    walletServiceObserver = nil
   }
 
   func update() {

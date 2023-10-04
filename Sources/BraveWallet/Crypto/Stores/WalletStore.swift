@@ -106,11 +106,15 @@ public class WalletStore {
   }
 }
 
-protocol WalletSubStore: AnyObject {
+protocol WalletObserverStore: AnyObject {
+  var isObserving: Bool { get }
   func tearDown()
+  func setupObservers()
 }
 
-extension WalletSubStore {
+extension WalletObserverStore {
   func tearDown() {
+  }
+  func setupObservers() {
   }
 }

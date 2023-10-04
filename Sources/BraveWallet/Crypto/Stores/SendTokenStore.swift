@@ -10,7 +10,7 @@ import BigNumber
 import Combine
 
 /// A store contains data for sending tokens
-public class SendTokenStore: ObservableObject, WalletSubStore {
+public class SendTokenStore: ObservableObject, WalletObserverStore {
   /// User's asset with selected account and chain
   @Published var userAssets: [BraveWallet.BlockchainToken] = []
   /// The current selected token to send. Default with nil value.
@@ -155,6 +155,10 @@ public class SendTokenStore: ObservableObject, WalletSubStore {
   private let assetManager: WalletUserAssetManagerType
   private var keyringServiceObserver: KeyringServiceObserver?
   private var rpcServiceObserver: JsonRpcServiceObserver?
+  
+  var isObserving: Bool {
+    keyringServiceObserver != nil && rpcServiceObserver != nil
+  }
 
   public init(
     keyringService: BraveWalletKeyringService,
@@ -181,6 +185,18 @@ public class SendTokenStore: ObservableObject, WalletSubStore {
     self.ipfsApi = ipfsApi
     self.assetManager = userAssetManager
 
+    self.setupObservers()
+  }
+  
+  func tearDown() {
+    keyringServiceObserver = nil
+    rpcServiceObserver = nil
+    
+    selectTokenStore.tearDown()
+  }
+  
+  func setupObservers() {
+    guard !isObserving else { return }
     self.keyringServiceObserver = KeyringServiceObserver(
       keyringService: keyringService,
       _selectedWalletAccountChanged: { [weak self] _ in
@@ -205,13 +221,8 @@ public class SendTokenStore: ObservableObject, WalletSubStore {
         self.validateSendAddress() // `sendAddress` may no longer be valid if coin type changed
       }
     )
-  }
-  
-  func tearDown() {
-    keyringServiceObserver = nil
-    rpcServiceObserver = nil
     
-    selectTokenStore.tearDown()
+    self.selectTokenStore.setupObservers()
   }
   
   func suggestedAmountTapped(_ amount: ShortcutAmountGrid.Amount) {

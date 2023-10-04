@@ -57,7 +57,7 @@ enum WebpageRequestResponse: Equatable {
   case signAllTransactions(approved: Bool, id: Int32)
 }
 
-public class CryptoStore: ObservableObject, WalletSubStore {
+public class CryptoStore: ObservableObject, WalletObserverStore {
   public let networkStore: NetworkStore
   public let portfolioStore: PortfolioStore
   let nftStore: NFTStore
@@ -100,6 +100,11 @@ public class CryptoStore: ObservableObject, WalletSubStore {
     didSet {
       networkStore.origin = origin
     }
+  }
+  
+  /// A boolean value indicate this class is observing wallet service changes.
+  public var isObserving: Bool {
+    keyringServiceObserver != nil && rpcServiceObserver != nil && txServiceObserver != nil && walletServiceObserver != nil
   }
   
   private let keyringService: BraveWalletKeyringService
@@ -190,6 +195,19 @@ public class CryptoStore: ObservableObject, WalletSubStore {
       walletService: walletService
     )
     
+    setupObservers()
+    
+    Preferences.Wallet.migrateCoreToWalletUserAssetCompleted.observe(from: self)
+    
+    isUpdatingUserAssets = true
+    userAssetManager.migrateUserAssets() { [weak self] in
+      self?.isUpdatingUserAssets = false
+      self?.updateAssets()
+    }
+  }
+  
+  public func setupObservers() {
+    guard !isObserving else { return }
     self.keyringServiceObserver = KeyringServiceObserver(
       keyringService: keyringService,
       _keyringReset: { [weak self] in
@@ -203,7 +221,7 @@ public class CryptoStore: ObservableObject, WalletSubStore {
         // 2. We don't need to rely on this observer method to migrate user visible assets
         // when user creates or imports a new account with a new keyring since any new
         // supported coin type / keyring will be migrated inside `CryptoStore`'s init()
-      }, 
+      },
       _keyringRestored: { [weak self] _ in
         // This observer method will only get called when user restore a wallet
         // from the lock screen
@@ -256,10 +274,10 @@ public class CryptoStore: ObservableObject, WalletSubStore {
       },
       _onUnapprovedTxUpdated: { [weak self] _ in
         self?.prepare()
-      }, 
+      },
       _onTransactionStatusChanged: { [weak self] _ in
         self?.prepare()
-      }, 
+      },
       _onTxServiceReset: { [weak self] in
         self?.prepare()
       }
@@ -278,8 +296,8 @@ public class CryptoStore: ObservableObject, WalletSubStore {
         Task { @MainActor [self] in
           if let addNetworkDappRequestCompletion = self?.addNetworkDappRequestCompletion[chainId] {
             if error.isEmpty {
-              let allNetworks = await rpcService.allNetworks(.eth)
-              if let network = allNetworks.first(where: { $0.chainId == chainId }) {
+              let allNetworks = await self?.rpcService.allNetworks(.eth)
+              if let network = allNetworks?.first(where: { $0.chainId == chainId }) {
                 self?.userAssetManager.addUserAsset(network.nativeToken) {
                   self?.updateAssets()
                 }
@@ -292,13 +310,21 @@ public class CryptoStore: ObservableObject, WalletSubStore {
       }
     )
     
-    Preferences.Wallet.migrateCoreToWalletUserAssetCompleted.observe(from: self)
+    // sub stores' observers
+    networkStore.setupObservers()
+    portfolioStore.setupObservers()
+    nftStore.setupObservers()
+    transactionsActivityStore.setupObservers()
+    marketStore.setupObservers()
+    settingsStore.setupObservers()
     
-    isUpdatingUserAssets = true
-    userAssetManager.migrateUserAssets() { [weak self] in
-      self?.isUpdatingUserAssets = false
-      self?.updateAssets()
-    }
+    accountActivityStore?.setupObservers()
+    assetDetailStore?.setupObservers()
+    nftDetailStore?.setupObservers()
+    confirmationStore?.setupObservers()
+    buyTokenStore?.setupObservers()
+    sendTokenStore?.setupObservers()
+    swapTokenStore?.setupObservers()
   }
   
   // A manual tear-down that nil all the wallet service observer classes 

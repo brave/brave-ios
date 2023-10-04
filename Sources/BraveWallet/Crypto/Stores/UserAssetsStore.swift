@@ -9,7 +9,7 @@ import Combine
 import Data
 import Preferences
 
-public class AssetStore: ObservableObject, Equatable, WalletSubStore {
+public class AssetStore: ObservableObject, Equatable, WalletObserverStore {
   @Published var token: BraveWallet.BlockchainToken
   @Published var isVisible: Bool {
     didSet {
@@ -22,6 +22,8 @@ public class AssetStore: ObservableObject, Equatable, WalletSubStore {
   private let ipfsApi: IpfsAPI
   private let assetManager: WalletUserAssetManagerType
   private(set) var isCustomToken: Bool
+  
+  var isObserving: Bool = false
 
   init(
     rpcService: BraveWalletJsonRpcService,
@@ -50,7 +52,7 @@ public class AssetStore: ObservableObject, Equatable, WalletSubStore {
   }
 }
 
-public class UserAssetsStore: ObservableObject, WalletSubStore {
+public class UserAssetsStore: ObservableObject, WalletObserverStore {
   @Published private(set) var assetStores: [AssetStore] = []
   @Published var isSearchingToken: Bool = false
   @Published var networkFilters: [Selectable<BraveWallet.NetworkInfo>] = [] {
@@ -71,6 +73,10 @@ public class UserAssetsStore: ObservableObject, WalletSubStore {
   private var timer: Timer?
   private var keyringServiceObserver: KeyringServiceObserver?
   private var walletServiceObserver: WalletServiceObserver?
+  
+  var isObserving: Bool {
+    keyringServiceObserver != nil && walletServiceObserver != nil
+  }
 
   public init(
     blockchainRegistry: BraveWalletBlockchainRegistry,
@@ -88,6 +94,19 @@ public class UserAssetsStore: ObservableObject, WalletSubStore {
     self.walletService = walletService
     self.ipfsApi = ipfsApi
     self.assetManager = userAssetManager
+    
+    self.setupObservers()
+    
+    Preferences.Wallet.showTestNetworks.observe(from: self)
+  }
+  
+  func tearDown() {
+    keyringServiceObserver = nil
+    walletServiceObserver = nil
+  }
+  
+  func setupObservers() {
+    guard !isObserving else { return }
     self.keyringServiceObserver = KeyringServiceObserver(
       keyringService: keyringService,
       _keyringCreated: { [weak self] _ in
@@ -99,6 +118,7 @@ public class UserAssetsStore: ObservableObject, WalletSubStore {
       _onNetworkListChanged: { [weak self] in
         Task { @MainActor [self] in
           // A network was added or removed, update our network filters for the change.
+          guard let rpcService = self?.rpcService else { return }
           self?.networkFilters = await rpcService.allNetworksForSupportedCoins().map { network in
             let existingSelectionValue = self?.networkFilters.first(where: { $0.model.chainId == network.chainId})?.isSelected
             return .init(isSelected: existingSelectionValue ?? true, model: network)
@@ -106,13 +126,6 @@ public class UserAssetsStore: ObservableObject, WalletSubStore {
         }
       }
     )
-    
-    Preferences.Wallet.showTestNetworks.observe(from: self)
-  }
-  
-  func tearDown() {
-    keyringServiceObserver = nil
-    walletServiceObserver = nil
   }
   
   func update() {

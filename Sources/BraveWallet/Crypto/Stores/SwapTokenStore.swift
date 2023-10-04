@@ -10,7 +10,7 @@ import Strings
 import Combine
 
 /// A store contains data for swap tokens
-public class SwapTokenStore: ObservableObject, WalletSubStore {
+public class SwapTokenStore: ObservableObject, WalletObserverStore {
   /// All  tokens for searching use
   @Published var allTokens: [BraveWallet.BlockchainToken] = []
   /// The current selected token to swap from. Default with nil value.
@@ -131,6 +131,10 @@ public class SwapTokenStore: ObservableObject, WalletSubStore {
   private var jupiterQuote: BraveWallet.JupiterQuote?
   private var keyringServiceObserver: KeyringServiceObserver?
   private var rpcServiceObserver: JsonRpcServiceObserver?
+  
+  var isObserving: Bool {
+    keyringServiceObserver != nil && rpcServiceObserver != nil
+  }
 
   enum SwapParamsBase {
     // calculating based on sell asset amount
@@ -175,13 +179,24 @@ public class SwapTokenStore: ObservableObject, WalletSubStore {
     self.assetManager = userAssetManager
     self.prefilledToken = prefilledToken
 
+    self.setupObservers()
+  }
+  
+  func tearDown() {
+    keyringServiceObserver = nil
+    rpcServiceObserver = nil
+  }
+  
+  func setupObservers() {
+    guard !isObserving else { return }
     self.keyringServiceObserver = KeyringServiceObserver(
       keyringService: keyringService,
       _selectedWalletAccountChanged: { [weak self] account in
         Task { @MainActor [self] in
-          let network = await rpcService.network(account.coin, origin: nil)
-          let isSwapSupported = await swapService.isSwapSupported(network.chainId)
-          guard isSwapSupported else {
+          guard let network = await self?.rpcService.network(account.coin, origin: nil),
+                let isSwapSupported = await self?.swapService.isSwapSupported(network.chainId),
+                isSwapSupported
+          else {
             self?.accountInfo = account
             return
           }
@@ -198,10 +213,11 @@ public class SwapTokenStore: ObservableObject, WalletSubStore {
       rpcService: rpcService,
       _chainChangedEvent: { [weak self] chainId, coin, origin in
         Task { @MainActor [self] in
-          let isSwapSupported = await swapService.isSwapSupported(chainId)
-          guard isSwapSupported else { return }
-          guard let _ = await walletService.ensureSelectedAccount(forChain: coin, chainId: chainId),
-                let selectedAccount = await keyringService.allAccounts().selectedAccount else {
+          guard let isSwapSupported = await self?.swapService.isSwapSupported(chainId),
+                isSwapSupported
+          else { return }
+          guard let _ = await self?.walletService.ensureSelectedAccount(forChain: coin, chainId: chainId),
+                let selectedAccount = await self?.keyringService.allAccounts().selectedAccount else {
             assertionFailure("selectedAccount should never be nil.")
             return
           }
@@ -214,11 +230,6 @@ public class SwapTokenStore: ObservableObject, WalletSubStore {
         }
       }
     )
-  }
-  
-  func tearDown() {
-    keyringServiceObserver = nil
-    rpcServiceObserver = nil
   }
 
   private func fetchTokenBalance(

@@ -13,7 +13,7 @@ import Combine
 /// An interface that helps you interact with a json-rpc service
 ///
 /// This wraps a JsonRpcService that you would obtain through BraveCore and makes it observable
-public class NetworkStore: ObservableObject, WalletSubStore {
+public class NetworkStore: ObservableObject, WalletObserverStore {
   
   enum SetSelectedChainError: Error {
     case selectedChainHasNoAccounts
@@ -57,6 +57,10 @@ public class NetworkStore: ObservableObject, WalletSubStore {
   private var keyringServiceObserver: KeyringServiceObserver?
   
   private weak var networkSelectionStore: NetworkSelectionStore?
+  
+  var isObserving: Bool {
+    rpcServiceObserver != nil && keyringServiceObserver != nil
+  }
 
   public init(
     keyringService: BraveWalletKeyringService,
@@ -73,13 +77,25 @@ public class NetworkStore: ObservableObject, WalletSubStore {
     self.assetManager = userAssetManager
     self.origin = origin
     
-    rpcServiceObserver = JsonRpcServiceObserver(
+    self.setupObservers()
+  }
+  
+  func tearDown() {
+    rpcServiceObserver = nil
+    keyringServiceObserver = nil
+    
+    networkSelectionStore?.tearDown()
+  }
+  
+  func setupObservers() {
+    guard !isObserving else { return }
+    self.rpcServiceObserver = JsonRpcServiceObserver(
       rpcService: rpcService,
       _chainChangedEvent: { [weak self] chainId, coin, origin in
         Task { @MainActor [self] in
           // Verify correct account is selected for the new network.
           // This could occur from Eth Switch Chain request when Solana account selected.
-          let accountId = await walletService.ensureSelectedAccount(forChain: coin, chainId: chainId)
+          let accountId = await self?.walletService.ensureSelectedAccount(forChain: coin, chainId: chainId)
           if accountId == nil {
             assertionFailure("Should not have a nil selectedAccount for any network.")
           }
@@ -88,14 +104,15 @@ public class NetworkStore: ObservableObject, WalletSubStore {
             self?.selectedChainIdForOrigin = chainId
           } else if origin == nil {
             self?.defaultSelectedChainId = chainId
-            self?.isSwapSupported = await swapService.isSwapSupported(chainId)
+            self?.isSwapSupported = await self?.swapService.isSwapSupported(chainId) ?? false
             if let origin = self?.origin {
               // The default network may be used for this origin if no
               // other network was assigned for this origin. If so, we
               // need to make sure the `selectedChainIdForOrigin` is updated
               // to reflect the correct network.
-              let network = await rpcService.network(coin, origin: origin)
-              self?.selectedChainIdForOrigin = network.chainId
+              if let network = await self?.rpcService.network(coin, origin: origin) {
+                self?.selectedChainIdForOrigin = network.chainId
+              }
             }
           }
         }
@@ -106,32 +123,29 @@ public class NetworkStore: ObservableObject, WalletSubStore {
         }
       }
     )
-    keyringServiceObserver = KeyringServiceObserver(
+    self.keyringServiceObserver = KeyringServiceObserver(
       keyringService: keyringService,
       _selectedWalletAccountChanged: { [weak self] account in
         Task { @MainActor [self] in
           if self?.defaultSelectedChain.coin != account.coin {
-            let selectedNetwork = await rpcService.network(account.coin, origin: nil)
-            self?.defaultSelectedChainId = selectedNetwork.chainId
+            if let selectedNetwork = await self?.rpcService.network(account.coin, origin: nil) {
+              self?.defaultSelectedChainId = selectedNetwork.chainId
+            }
           }
-          if let origin, self?.selectedChainForOrigin.coin != account.coin {
+          if let origin = self?.origin, self?.selectedChainForOrigin.coin != account.coin {
             // The default network may be used for this origin if no
             // other network was assigned for this origin. If so, we
             // need to make sure the `selectedChainIdForOrigin` is updated
             // to reflect the correct network.
-            let selectedNetwork = await rpcService.network(account.coin, origin: origin)
-            self?.selectedChainIdForOrigin = selectedNetwork.chainId
+            if let selectedNetwork = await self?.rpcService.network(account.coin, origin: origin) {
+              self?.selectedChainIdForOrigin = selectedNetwork.chainId
+            }
           }
         }
       }
     )
-  }
-  
-  func tearDown() {
-    rpcServiceObserver = nil
-    keyringServiceObserver = nil
     
-    networkSelectionStore?.tearDown()
+    self.networkSelectionStore?.setupObservers()
   }
   
   @MainActor func setup() async {

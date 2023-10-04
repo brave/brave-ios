@@ -9,7 +9,7 @@ import OrderedCollections
 import Combine
 
 /// A store contains data for buying tokens
-public class BuyTokenStore: ObservableObject, WalletSubStore {
+public class BuyTokenStore: ObservableObject, WalletObserverStore {
   /// The current selected token to buy. Default with nil value.
   @Published var selectedBuyToken: BraveWallet.BlockchainToken?
   /// The supported currencies for purchasing
@@ -72,6 +72,10 @@ public class BuyTokenStore: ObservableObject, WalletSubStore {
     BraveWallet.FilecoinMainnet: ["fil"],
     BraveWallet.AvalancheMainnetChainId: ["avax", "avaxc"]
   ]
+  
+  var isObserving: Bool {
+    rpcServiceObserver != nil && keyringServiceObserver != nil
+  }
 
   public init(
     blockchainRegistry: BraveWalletBlockchainRegistry,
@@ -93,6 +97,20 @@ public class BuyTokenStore: ObservableObject, WalletSubStore {
       $0[$1] = []
     }
     
+    self.setupObservers()
+    
+    Task {
+      await updateInfo()
+    }
+  }
+  
+  func tearDown() {
+    rpcServiceObserver = nil
+    keyringServiceObserver = nil
+  }
+  
+  func setupObservers() {
+    guard !isObserving else { return }
     self.rpcServiceObserver = JsonRpcServiceObserver(
       rpcService: rpcService,
       _chainChangedEvent: { [weak self] _, _, _ in
@@ -109,15 +127,6 @@ public class BuyTokenStore: ObservableObject, WalletSubStore {
         }
       }
     )
-    
-    Task {
-      await updateInfo()
-    }
-  }
-  
-  func tearDown() {
-    rpcServiceObserver = nil
-    keyringServiceObserver = nil
   }
   
   @MainActor private func validatePrefilledToken(on network: BraveWallet.NetworkInfo) async {

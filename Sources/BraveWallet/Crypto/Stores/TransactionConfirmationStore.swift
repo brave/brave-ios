@@ -9,7 +9,7 @@ import BigNumber
 import Strings
 import Combine
 
-public class TransactionConfirmationStore: ObservableObject, WalletSubStore {
+public class TransactionConfirmationStore: ObservableObject, WalletObserverStore {
   /// The value that are being sent/swapped/approved in this transaction
   @Published var value: String = ""
   /// The symbol of token that are being send/swapped/approved in this transaction
@@ -142,6 +142,10 @@ public class TransactionConfirmationStore: ObservableObject, WalletSubStore {
   private var selectedChain: BraveWallet.NetworkInfo = .init()
   private var txServiceObserver: TxServiceObserver?
   private var walletServiceObserver: WalletServiceObserver?
+  
+  var isObserving: Bool {
+    txServiceObserver != nil && walletServiceObserver != nil
+  }
 
   init(
     assetRatioService: BraveWalletAssetRatioService,
@@ -164,6 +168,20 @@ public class TransactionConfirmationStore: ObservableObject, WalletSubStore {
     self.solTxManagerProxy = solTxManagerProxy
     self.assetManager = userAssetManager
 
+    self.setupObservers()
+    
+    walletService.defaultBaseCurrency { [self] currencyCode in
+      self.currencyCode = currencyCode
+    }
+  }
+  
+  func tearDown() {
+    txServiceObserver = nil
+    walletServiceObserver = nil
+  }
+  
+  func setupObservers() {
+    guard !isObserving else { return }
     self.txServiceObserver = TxServiceObserver(
       txService: txService,
       _onNewUnapprovedTx: { _ in
@@ -219,15 +237,6 @@ public class TransactionConfirmationStore: ObservableObject, WalletSubStore {
         self?.currencyCode = currency
       }
     )
-    
-    walletService.defaultBaseCurrency { [self] currencyCode in
-      self.currencyCode = currencyCode
-    }
-  }
-  
-  func tearDown() {
-    txServiceObserver = nil
-    walletServiceObserver = nil
   }
   
   func nextTransaction() {

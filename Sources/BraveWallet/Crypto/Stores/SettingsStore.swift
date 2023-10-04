@@ -10,7 +10,7 @@ import Data
 import Preferences
 import Combine
 
-public class SettingsStore: ObservableObject, WalletSubStore {
+public class SettingsStore: ObservableObject, WalletObserverStore {
   /// The number of minutes to wait until the Brave Wallet is automatically locked
   @Published var autoLockInterval: AutoLockInterval = .minute {
     didSet {
@@ -82,6 +82,10 @@ public class SettingsStore: ObservableObject, WalletSubStore {
   private let keychain: KeychainType
   private var keyringServiceObserver: KeyringServiceObserver?
   private var walletServiceObserver: WalletServiceObserver?
+  
+  var isObserving: Bool {
+    keyringServiceObserver != nil && walletServiceObserver != nil
+  }
 
   public init(
     keyringService: BraveWalletKeyringService,
@@ -98,10 +102,20 @@ public class SettingsStore: ObservableObject, WalletSubStore {
     self.ipfsApi = ipfsApi
     self.keychain = keychain
 
+    self.setupObservers()
+  }
+  
+  func tearDown() {
+    keyringServiceObserver = nil
+    walletServiceObserver = nil
+  }
+  
+  func setupObservers() {
+    guard !isObserving else { return }
     self.keyringServiceObserver = KeyringServiceObserver(
       keyringService: keyringService,
       _autoLockMinutesChanged: { [weak self] in
-        keyringService.autoLockMinutes { minutes in
+        self?.keyringService.autoLockMinutes { minutes in
           self?.autoLockInterval = .init(value: minutes)
         }
       }
@@ -112,11 +126,6 @@ public class SettingsStore: ObservableObject, WalletSubStore {
         self?.currencyCode = CurrencyCode(code: currency)
       }
     )
-  }
-  
-  func tearDown() {
-    keyringServiceObserver = nil
-    walletServiceObserver = nil
   }
   
   func setup() {

@@ -72,6 +72,7 @@ public class WalletPanelHostingController: UIHostingController<WalletPanelContai
         }
       }
     self.walletStore = walletStore
+    walletStore.cryptoStore?.setupObservers()
   }
   
   @available(*, unavailable)
