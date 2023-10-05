@@ -536,15 +536,17 @@ extension BrowserViewController {
     // Case 2: User Referral on Brave side
     if Preferences.URP.referralLookupOutstanding.value == true {
       urp.adCampaignLookup() { [weak self] response, error in
-        var referralCode = UserReferralProgram.getReferralCode()
+        // Checking referral code from User Referral program exists If not send 001
+        // Prefix this code with BRV for organic iOS installs
+        var referralCode = "BRV\(UserReferralProgram.getReferralCode() ?? "001")"
         
         if error == nil, response?.0 == true, let campaignId = response?.1 {
-          referralCode = String(campaignId)
+          // Adding ASA User refcode prefix to indicate
+          // Apple Ads Attribution is true
+          referralCode = "ASA\(String(campaignId))"
         }
         
         self?.performProgramReferralLookup(urp, refCode: referralCode)
-        
-        // TODO: Add Referral sequence
       }
     } else {
       urp.pingIfEnoughTimePassed()
