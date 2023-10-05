@@ -25,7 +25,10 @@ struct TestAdblockEnginesView: View {
   private var numberOfEngines = 100
   @AppStorage("TestAdblockEnginesView.compileType")
   private var compileType: CompileType = .series
+  @AppStorage("TestAdblockEnginesView.removeEngines")
+  private var removeEngineAfterCompilation = true
   
+  @State private var adblockStats = AdBlockStats()
   @State private var testStarted = false
   @State private var testRunning = false
   @State private var result: Result<ContinuousClock.Instant.Duration, Error>?
@@ -35,6 +38,7 @@ struct TestAdblockEnginesView: View {
     List {
       Section {
         TextField("Number of engines", value: $numberOfEngines, format: .number)
+        Toggle("Remove engine after compilation", isOn: $removeEngineAfterCompilation)
         Picker("Process", selection: $compileType) {
           ForEach(CompileType.allCases, id: \.rawValue) { type in
             Text(type.title).tag(type)
@@ -56,8 +60,10 @@ struct TestAdblockEnginesView: View {
           case .failure(let error):
             Text(String(describing: error)).foregroundStyle(.red)
           case nil:
-            ProgressView("Compiling engines", value: Double(compiledCount), total: Double(numberOfEngines))
-              .progressViewStyle(.linear)
+            ProgressView(
+              "Compiling engines (\(compiledCount))", 
+              value: Double(compiledCount), total: Double(numberOfEngines)
+            ).progressViewStyle(.linear)
           }
         } header: {
           Text("Results")
@@ -67,6 +73,7 @@ struct TestAdblockEnginesView: View {
   }
   
   private func startTest() {
+    adblockStats = AdBlockStats()
     testStarted = true
     compiledCount = 0
     result = nil
@@ -76,22 +83,11 @@ struct TestAdblockEnginesView: View {
       do {
         let clock = ContinuousClock()
         let result = try await clock.measure {
-          switch compileType {
-          case .series:
-            try await (0..<numberOfEngines).asyncForEach { index in
-              try await compileEngine(at: index)
-              
-              await MainActor.run {
-                self.compiledCount += 1
-              }
-            }
-          case .parallel:
-            try await (0..<numberOfEngines).asyncConcurrentForEach { index in
-              try await compileEngine(at: index)
-              
-              await MainActor.run {
-                self.compiledCount += 1
-              }
+          try await (0..<numberOfEngines).asyncConcurrentForEach { index in
+            try await compileEngine(at: index, compileType: compileType)
+            
+            await MainActor.run {
+              self.compiledCount += 1
             }
           }
         }
@@ -104,7 +100,7 @@ struct TestAdblockEnginesView: View {
     }
   }
   
-  private func compileEngine(at index: Int) async throws {
+  private func compileEngine(at index: Int, compileType: CompileType) async throws {
     let uuid = "test-engine-\(index)"
     let sampleFilterListURL = Bundle.module.url(forResource: "list", withExtension: "txt")!
     let resourcesURL = Bundle.module.url(forResource: "resources", withExtension: "json")!
@@ -119,9 +115,26 @@ struct TestAdblockEnginesView: View {
       version: "bundled", fileType: .text
     )
     
-    _ = try await CachedAdBlockEngine.compile(
-      filterListInfo: filterListInfo, resourcesInfo: resourcesInfo, isAlwaysAggressive: false
-    )
+    switch compileType {
+    case .parallel:
+      try await adblockStats.compileAsync(
+        filterListInfo: filterListInfo, resourcesInfo: resourcesInfo, isAlwaysAggressive: false
+      )
+      
+      if removeEngineAfterCompilation {
+        Task.detached {
+          await adblockStats.removeEngine(for: .filterList(componentId: uuid))
+        }
+      }
+    case .series:
+      try await adblockStats.compile(
+        filterListInfo: filterListInfo, resourcesInfo: resourcesInfo, isAlwaysAggressive: false
+      )
+      
+      if removeEngineAfterCompilation {
+        await adblockStats.removeEngine(for: .filterList(componentId: uuid))
+      }
+    }
   }
 }
 

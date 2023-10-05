@@ -35,8 +35,16 @@ class ContentBlockerManagerTests: XCTestCase {
       }
       
       do {
-        try await manager.compile(encodedContentRuleList: encodedContentRuleList, for: .filterList(componentId: filterListUUID, isAlwaysAggressive: false))
-        try await manager.compile(encodedContentRuleList: encodedContentRuleList, for: .customFilterList(uuid: filterListCustomUUID))
+        try await manager.compile(
+          encodedContentRuleList: encodedContentRuleList, 
+          for: .filterList(componentId: filterListUUID, isAlwaysAggressive: false),
+          version: "1.0"
+        )
+        try await manager.compile(
+          encodedContentRuleList: encodedContentRuleList, 
+          for: .customFilterList(uuid: filterListCustomUUID),
+          version: "1.0"
+        )
       } catch {
         XCTFail(error.localizedDescription)
       }

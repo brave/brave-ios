@@ -49,7 +49,6 @@ struct FilterListsView: View {
               }
             }
             .disabled(editMode?.wrappedValue.isEditing == true)
-            .toggleStyle(SwitchToggleStyle(tint: .accentColor))
             .onChange(of: filterListURL.setting.isEnabled) { value in
               Task {
                 CustomFilterListSetting.save(inMemory: !customFilterListStorage.persistChanges)
@@ -60,7 +59,7 @@ struct FilterListsView: View {
             .font(.caption)
             .foregroundColor(Color(.secondaryBraveLabel))
             .allowsTightening(true)
-          }.listRowBackground(Color(.secondaryBraveGroupedBackground))
+          }
         }
         .onDelete(perform: onDeleteHandling)
         
@@ -78,8 +77,23 @@ struct FilterListsView: View {
       } header: {
         Text(Strings.customFilterLists)
       }
+      .listRowBackground(Color(.secondaryBraveGroupedBackground))
+      .toggleStyle(SwitchToggleStyle(tint: .accentColor))
       
       Section {
+        #if DEBUG
+        let allToggled = Binding<Bool> {
+          self.filterListStorage.filterLists.allSatisfy({ $0.isEnabled })
+        } set: { allToggled in
+          for index in 0..<filterListStorage.filterLists.count {
+            filterListStorage.filterLists[index].isEnabled = allToggled
+          }
+        }
+
+        Toggle("All", isOn: allToggled)
+          .toggleStyle(SwitchToggleStyle(tint: .accentColor))
+        #endif
+        
         ForEach($filterListStorage.filterLists) { $filterList in
           Toggle(isOn: $filterList.isEnabled) {
             VStack(alignment: .leading) {
@@ -89,8 +103,7 @@ struct FilterListsView: View {
                 .font(.caption)
                 .foregroundColor(Color(.secondaryBraveLabel))
             }
-          }.toggleStyle(SwitchToggleStyle(tint: .accentColor))
-            .listRowBackground(Color(.secondaryBraveGroupedBackground))
+          }
         }
       } header: {
         VStack(alignment: .leading, spacing: 4) {
@@ -100,6 +113,8 @@ struct FilterListsView: View {
             .textCase(.none)
         }
       }
+      .toggleStyle(SwitchToggleStyle(tint: .accentColor))
+      .listRowBackground(Color(.secondaryBraveGroupedBackground))
     }
     .animation(.default, value: customFilterListStorage.filterListsURLs)
     .listBackgroundColor(Color(UIColor.braveGroupedBackground))

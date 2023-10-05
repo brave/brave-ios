@@ -17,6 +17,15 @@ public actor AdblockResourceDownloader: Sendable {
     .adBlockRules, .debounceRules
   ]
   
+  /// A formatter that is used to format a version number
+  private let fileVersionDateFormatter: DateFormatter = {
+    let dateFormatter = DateFormatter()
+    dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+    dateFormatter.dateFormat = "yyyy.MM.dd.HH.mm.ss"
+    dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
+    return dateFormatter
+  }()
+  
   /// A list of old resources that need to be deleted so as not to take up the user's disk space
   private static let deprecatedResources: [BraveS3Resource] = [.deprecatedGeneralCosmeticFilters]
   
@@ -138,6 +147,7 @@ public actor AdblockResourceDownloader: Sendable {
 
       // No modes are needed to be compiled
       guard !modes.isEmpty else { return }
+      let version = fileVersionDateFormatter.string(from: downloadResult.date)
       
       do {
         guard let filterSet = try resource.downloadedString() else {
@@ -149,13 +159,15 @@ public actor AdblockResourceDownloader: Sendable {
         
         // try to compile
         try await ContentBlockerManager.shared.compile(
-          encodedContentRuleList: result.rulesJSON, for: blocklistType,
-          modes: modes
+          encodedContentRuleList: result.rulesJSON, for: blocklistType, version: version, modes: modes
         )
       } catch {
+        #if DEBUG
+        let fileURL = downloadResult.fileURL
         ContentBlockerManager.log.error(
-          "Failed to compile downloaded content blocker resource: \(error.localizedDescription)"
+          "Failed to compile rule lists for `\(blocklistType.identifier)` v\(version):\n\(fileURL.absoluteString)"
         )
+        #endif
       }
       
     case .debounceRules:

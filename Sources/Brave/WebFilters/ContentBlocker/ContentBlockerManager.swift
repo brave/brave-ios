@@ -83,7 +83,7 @@ actor ContentBlockerManager {
     case filterList(componentId: String, isAlwaysAggressive: Bool)
     case customFilterList(uuid: String)
     
-    private var identifier: String {
+    var identifier: String {
       switch self {
       case .generic(let type):
         return [Self.genericPrifix, type.bundledFileName].joined(separator: "-")
@@ -128,11 +128,17 @@ actor ContentBlockerManager {
     }
   }
   
+  public enum RuleListResult {
+    case success(WKContentRuleList)
+    case failure(Error)
+    case emptyRules
+  }
+  
   public static var shared = ContentBlockerManager()
   /// The store in which these rule lists should be compiled
   let ruleStore: WKContentRuleListStore
   /// We cached the rule lists so that we can return them quicker if we need to
-  private var cachedRuleLists: [String: Result<WKContentRuleList, Error>]
+  private var cachedRuleLists: [String: RuleListResult]
   /// A list of etld+1s that are always aggressive
   /// TODO: @JS Replace this with the 1st party ad-block list
   let alwaysAggressiveETLDs: Set<String> = ["youtube.com"]
@@ -166,17 +172,23 @@ actor ContentBlockerManager {
   }
   
   /// Compile the given resource and store it in cache for the given blocklist type using all allowed modes
-  func compile(encodedContentRuleList: String, for type: BlocklistType, options: CompileOptions = []) async throws {
-    try await self.compile(encodedContentRuleList: encodedContentRuleList, for: type, modes: type.allowedModes)
+  func compile(encodedContentRuleList: String, for type: BlocklistType, version: String, options: CompileOptions = []) async throws {
+    try await self.compile(encodedContentRuleList: encodedContentRuleList, for: type, version: version, modes: type.allowedModes)
   }
   
   /// Compile the given resource and store it in cache for the given blocklist type and specified modes
-  func compile(encodedContentRuleList: String, for type: BlocklistType, options: CompileOptions = [], modes: [BlockingMode]) async throws {
+  func compile(encodedContentRuleList: String, for type: BlocklistType, version: String, options: CompileOptions = [], modes: [BlockingMode]) async throws {
     guard !modes.isEmpty else { return }
     let cleanedRuleList: [[String: Any?]]
     
     do {
-      cleanedRuleList = try await process(encodedContentRuleList: encodedContentRuleList, with: options)
+      cleanedRuleList = try await process(encodedContentRuleList: encodedContentRuleList, for: type, with: options)
+      guard !cleanedRuleList.isEmpty else {
+        for mode in modes {
+          self.cachedRuleLists[type.makeIdentifier(for: mode)] = .emptyRules
+        }
+        return
+      }
     } catch {
       for mode in modes {
         self.cachedRuleLists[type.makeIdentifier(for: mode)] = .failure(error)
@@ -186,19 +198,24 @@ actor ContentBlockerManager {
     
     var foundError: Error?
     
-    for mode in modes {
-      let moddedRuleList = self.set(mode: mode, forRuleList: cleanedRuleList)
-      let identifier = type.makeIdentifier(for: mode)
-      
-      do {
+    do {
+      for mode in modes {
+        let moddedRuleList = self.set(mode: mode, forRuleList: cleanedRuleList)
+        let identifier = type.makeIdentifier(for: mode)
         let ruleList = try await compile(ruleList: moddedRuleList, for: type, mode: mode)
         self.cachedRuleLists[identifier] = .success(ruleList)
-        Self.log.debug("Compiled content blockers for `\(identifier)`")
-      } catch {
-        self.cachedRuleLists[identifier] = .failure(error)
-        Self.log.debug("Failed to compile content blockers for `\(identifier)`: \(String(describing: error))")
-        foundError = error
+        Self.log.debug("Compiled rule list for `\(identifier)` v\(version)")
       }
+    } catch {
+      for mode in modes {
+        let identifier = type.makeIdentifier(for: mode)
+        self.cachedRuleLists[identifier] = .failure(error)
+      }
+      
+      ContentBlockerManager.log.error(
+        "Failed to compile rule lists for `\(type.identifier)` v\(version):\n\(error)"
+      )
+      foundError = error
     }
     
     if let error = foundError {
@@ -271,11 +288,16 @@ actor ContentBlockerManager {
   
   /// Load a rule list from the rule store and return it. Will use cached results if they exist
   func ruleList(for type: BlocklistType, mode: BlockingMode) async throws -> WKContentRuleList? {
-    if let result = cachedRuleLists[type.makeIdentifier(for: mode)] {
-      return try result.get()
+    switch cachedRuleLists[type.makeIdentifier(for: mode)] {
+    case .success(let ruleList):
+      return ruleList
+    case .failure:
+      return nil
+    case .emptyRules:
+      return nil
+    case .none:
+      return try await loadRuleList(for: type, mode: mode)
     }
-    
-    return try await loadRuleList(for: type, mode: mode)
   }
   
   /// Load a rule list from the rule store and return it. Will not use cached results
@@ -316,7 +338,7 @@ actor ContentBlockerManager {
     let type = BlocklistType.generic(genericType)
     try await compile(
       encodedContentRuleList: encodedContentRuleList,
-      for: type, modes: modes
+      for: type, version: "Bundled", modes: modes
     )
   }
   
@@ -378,7 +400,9 @@ actor ContentBlockerManager {
       do {
         return try await self.ruleList(for: blocklistType, mode: mode)
       } catch {
-        Self.log.error("Missing rule list for `\(blocklistType.makeIdentifier(for: mode))`")
+        // We can't log the error because some rules have empty rules. This is normal
+        // But on relaunches we try to reload the filter list and this will give us an error.
+        // Need to find a more graceful way of handling this so error here can be logged properly
         return nil
       }
     }))
@@ -406,13 +430,12 @@ actor ContentBlockerManager {
   }
   
   /// Perform operations of the rule list given by the provided options
-  func process(encodedContentRuleList: String, with options: CompileOptions) async throws -> [[String: Any?]] {
+  func process(encodedContentRuleList: String, for type: BlocklistType, with options: CompileOptions) async throws -> [[String: Any?]] {
     var ruleList = try decode(encodedContentRuleList: encodedContentRuleList)
     if options.isEmpty { return ruleList }
     
     #if DEBUG
     let originalCount = ruleList.count
-    ContentBlockerManager.log.debug("Cleanining up \(originalCount) rules")
     #endif
     
     if options.contains(.stripContentBlockers) {
@@ -425,7 +448,9 @@ actor ContentBlockerManager {
     
     #if DEBUG
     let count = originalCount - ruleList.count
-    ContentBlockerManager.log.debug("Filtered out \(count) rules")
+    if count > 0 {
+      ContentBlockerManager.log.debug("Filtered out \(count) rules for `\(type.identifier)`")
+    }
     #endif
     
     return ruleList

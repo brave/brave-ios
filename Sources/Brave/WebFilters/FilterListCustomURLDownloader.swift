@@ -80,6 +80,7 @@ actor FilterListCustomURLDownloader: ObservableObject {
   /// Handle the download results of a custom filter list. This will process the download by compiling iOS rule lists and adding the rule list to the `AdblockEngineManager`.
   private func handle(downloadResult: ResourceDownloader<DownloadResource>.DownloadResult, for filterListCustomURL: FilterListCustomURL) async {
     let uuid = await filterListCustomURL.setting.uuid
+    let version = fileVersionDateFormatter.string(from: downloadResult.date)
     
     // Compile this rule list if we haven't already or if the file has been modified
     if downloadResult.isModified {
@@ -90,7 +91,7 @@ actor FilterListCustomURLDownloader: ObservableObject {
         
         try await ContentBlockerManager.shared.compile(
           encodedContentRuleList: result.rulesJSON,
-          for: type,
+          for: type, version: version,
           options: .all
         )
         
@@ -103,34 +104,27 @@ actor FilterListCustomURLDownloader: ObservableObject {
         )
       }
     }
+    
+    let source = CachedAdBlockEngine.Source.filterListURL(uuid: uuid)
+    let filterListInfo = CachedAdBlockEngine.FilterListInfo(
+      source: source,
+      localFileURL: downloadResult.fileURL,
+      version: version, fileType: .text
+    )
       
     // Add/remove the resource depending on if it is enabled/disabled
-    if await filterListCustomURL.setting.isEnabled {
-      guard let resourcesInfo = await FilterListResourceDownloader.shared.resourcesInfo else {
-        assertionFailure("This should not have been called if the resources are not ready")
-        return
-      }
-      
-      let version = fileVersionDateFormatter.string(from: downloadResult.date)
-      let filterListInfo = CachedAdBlockEngine.FilterListInfo(
-        source: .filterListURL(uuid: uuid),
-        localFileURL: downloadResult.fileURL,
-        version: version, fileType: .text
+    guard await filterListCustomURL.setting.isEnabled else {
+      await AdBlockStats.shared.removeEngine(for: source)
+      await AdBlockStats.shared.updateIfNeeded(filterListInfo: filterListInfo, isAlwaysAggressive: true)
+      return
+    }
+    
+    do {
+      try await AdBlockStats.shared.compile(
+        filterListInfo: filterListInfo, isAlwaysAggressive: true
       )
-      
-      do {
-        let engine = try await CachedAdBlockEngine.compile(
-          filterListInfo: filterListInfo, resourcesInfo: resourcesInfo,
-          isAlwaysAggressive: true
-        )
-        
-        await AdBlockStats.shared.add(engine: engine)
-        ContentBlockerManager.log.debug("Compiled engine for custom filter list `\(uuid)` v\(version)")
-      } catch {
-        ContentBlockerManager.log.error("Failed to compile engine for custom filter list `\(uuid)` v\(version): \(String(describing: error))")
-      }
-    } else {
-      await AdBlockStats.shared.removeEngine(for: .filterListURL(uuid: uuid))
+    } catch {
+      ContentBlockerManager.log.error("Failed to compile engine for custom filter list `\(uuid)` v\(version): \(String(describing: error))")
     }
   }
   

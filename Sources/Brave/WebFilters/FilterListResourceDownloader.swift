@@ -26,8 +26,6 @@ public actor FilterListResourceDownloader {
   /// A marker that says that we loaded shield components for the first time.
   /// This boolean is used to configure this downloader only once after `AdBlockService` generic shields have been loaded.
   private var loadedShieldComponents = false
-  /// The path to the resources file
-  private(set) var resourcesInfo: CachedAdBlockEngine.ResourcesInfo?
   
   init() {
     self.adBlockServiceTasks = [:]
@@ -51,11 +49,11 @@ public actor FilterListResourceDownloader {
       localFileURL: folderURL.appendingPathComponent("resources.json", conformingTo: .json),
       version: version
     )
-    self.resourcesInfo = resourcesInfo
     
+    await AdBlockStats.shared.updateIfNeeded(resourcesInfo: resourcesInfo)
     async let startedCustomFilterListsDownloader: Void = FilterListCustomURLDownloader.shared.start()
-    async let cachedFilterLists: Void = compileCachedFilterLists(resourcesInfo: resourcesInfo)
-    async let compileDefaultEngine: Void = compileDefaultEngine(shieldsInstallFolder: folderURL, resourcesInfo: resourcesInfo)
+    async let cachedFilterLists: Void = compileCachedFilterLists()
+    async let compileDefaultEngine: Void = compileDefaultEngine(shieldsInstallFolder: folderURL)
     _ = await (startedCustomFilterListsDownloader, cachedFilterLists, compileDefaultEngine)
   }
   
@@ -68,7 +66,7 @@ public actor FilterListResourceDownloader {
   ///
   /// - Warning: This method loads filter list settings.
   /// You need to wait for `DataController.shared.initializeOnce()` to be called first before invoking this method
-  private func compileCachedFilterLists(resourcesInfo: CachedAdBlockEngine.ResourcesInfo) async {
+  private func compileCachedFilterLists() async {
     await FilterListStorage.shared.loadFilterListSettings()
     let filterListSettings = await FilterListStorage.shared.allFilterListSettings
       
@@ -83,8 +81,7 @@ public actor FilterListResourceDownloader {
       
       await self.compileFilterListEngineIfNeeded(
         fromComponentId: componentId, folderURL: folderURL,
-        isAlwaysAggressive: setting.isAlwaysAggressive,
-        resourcesInfo: resourcesInfo
+        isAlwaysAggressive: setting.isAlwaysAggressive
       )
     }
   }
@@ -121,7 +118,8 @@ public actor FilterListResourceDownloader {
       localFileURL: folderURL.appendingPathComponent("resources.json", conformingTo: .json),
       version: version
     )
-    self.resourcesInfo = resourcesInfo
+    
+    await AdBlockStats.shared.updateIfNeeded(resourcesInfo: resourcesInfo)
     
     // Perform one time setup
     if !loadedShieldComponents && !adBlockFilterLists.isEmpty {
@@ -137,31 +135,28 @@ public actor FilterListResourceDownloader {
     }
   
     // Compile the engine
-    await compileDefaultEngine(shieldsInstallFolder: folderURL, resourcesInfo: resourcesInfo)
+    await compileDefaultEngine(shieldsInstallFolder: folderURL)
     await registerAllFilterLists()
   }
   
   /// Compile the general engine from the given `AdblockService` `shieldsInstallPath` `URL`.
-  private func compileDefaultEngine(shieldsInstallFolder folderURL: URL, resourcesInfo: CachedAdBlockEngine.ResourcesInfo) async {
+  private func compileDefaultEngine(shieldsInstallFolder folderURL: URL) async {
     let version = folderURL.lastPathComponent
     let filterListInfo = CachedAdBlockEngine.FilterListInfo(
       source: .adBlock,
       localFileURL: folderURL.appendingPathComponent("rs-ABPFilterParserData.dat", conformingTo: .data),
       version: version, fileType: .dat
     )
-    
-    guard await AdBlockStats.shared.needsCompilation(for: filterListInfo, resourcesInfo: resourcesInfo) else {
+        
+    guard await AdBlockStats.shared.needsCompilation(for: filterListInfo) else {
       return
     }
     
     do {
-      let engine = try await CachedAdBlockEngine.compile(
-        filterListInfo: filterListInfo, resourcesInfo: resourcesInfo,
+      try await AdBlockStats.shared.compile(
+        filterListInfo: filterListInfo,
         isAlwaysAggressive: false
       )
-      
-      ContentBlockerManager.log.debug("Compiled default engine v\(version)")
-      await AdBlockStats.shared.add(engine: engine)
     } catch {
       ContentBlockerManager.log.debug("Failed to compile default engine v\(version): \(String(describing: error))")
     }
@@ -170,28 +165,34 @@ public actor FilterListResourceDownloader {
   /// Load general filter lists (shields) from the given `AdblockService` `shieldsInstallPath` `URL`.
   private func compileFilterListEngineIfNeeded(
     fromComponentId componentId: String, folderURL: URL,
-    isAlwaysAggressive: Bool,
-    resourcesInfo: CachedAdBlockEngine.ResourcesInfo
+    isAlwaysAggressive: Bool
   ) async {
     let version = folderURL.lastPathComponent
+    let source = CachedAdBlockEngine.Source.filterList(componentId: componentId)
     let filterListInfo = CachedAdBlockEngine.FilterListInfo(
-      source: .filterList(componentId: componentId),
+      source: source,
       localFileURL: folderURL.appendingPathComponent("list.txt", conformingTo: .text),
       version: version, fileType: .text
     )
     
-    guard await AdBlockStats.shared.needsCompilation(for: filterListInfo, resourcesInfo: resourcesInfo) else {
+    guard await AdBlockStats.shared.isEagerlyLoaded(source: source) else {
+      // We only want to compile non-lazy loaded filter lists
+      // This filter list will be lazily loaded when the user toggles the setting
+      await AdBlockStats.shared.removeEngine(for: source)
+      await AdBlockStats.shared.updateIfNeeded(filterListInfo: filterListInfo, isAlwaysAggressive: isAlwaysAggressive)
+      return
+    }
+    
+    guard await AdBlockStats.shared.needsCompilation(for: filterListInfo) else {
       // Don't compile unless needed
       return
     }
     
     do {
-      let engine = try await CachedAdBlockEngine.compile(
-        filterListInfo: filterListInfo, resourcesInfo: resourcesInfo,
-        isAlwaysAggressive: false
+      try await AdBlockStats.shared.compile(
+        filterListInfo: filterListInfo,
+        isAlwaysAggressive: isAlwaysAggressive
       )
-      ContentBlockerManager.log.debug("Compiled engine for `\(componentId)` v\(version)")
-      await AdBlockStats.shared.add(engine: engine)
     } catch {
       ContentBlockerManager.log.error("Failed to compile engine for `\(componentId)` v\(version): \(String(describing: error))")
     }
@@ -213,16 +214,11 @@ public actor FilterListResourceDownloader {
     adBlockServiceTasks[filterList.entry.componentId] = Task { @MainActor in
       for await folderURL in adBlockService.register(filterList: filterList) {
         guard let folderURL = folderURL else { continue }
-        guard let resourcesInfo = await self.resourcesInfo else {
-          assertionFailure("We shouldn't have started downloads before getting this value")
-          return
-        }
         
         await self.loadShields(
           fromComponentId: filterList.entry.componentId, folderURL: folderURL, relativeOrder: filterList.order,
           loadContentBlockers: true,
-          isAlwaysAggressive: filterList.isAlwaysAggressive,
-          resourcesInfo: resourcesInfo
+          isAlwaysAggressive: filterList.isAlwaysAggressive
         )
         
         // Save the downloaded folder for later (caching) purposes
@@ -238,8 +234,7 @@ public actor FilterListResourceDownloader {
   /// If `loadContentBlockers` is set to `true`, this method will compile the rule lists to content blocker format and load them into the `WKContentRuleListStore`.
   /// As both these procedures are expensive, this should be set to `false` if this method is called on a blocking UI process such as the launch of the application.
   private func loadShields(
-    fromComponentId componentId: String, folderURL: URL, relativeOrder: Int, loadContentBlockers: Bool, isAlwaysAggressive: Bool,
-    resourcesInfo: CachedAdBlockEngine.ResourcesInfo
+    fromComponentId componentId: String, folderURL: URL, relativeOrder: Int, loadContentBlockers: Bool, isAlwaysAggressive: Bool
   ) async {
     // Check if we're loading the new component or an old component from cache.
     // The new component has a file `list.txt` which we check the presence of.
@@ -254,8 +249,7 @@ public actor FilterListResourceDownloader {
     
     // Add or remove the filter list from the engine depending if it's been enabled or not
     await self.compileFilterListEngineIfNeeded(
-      fromComponentId: componentId, folderURL: folderURL, isAlwaysAggressive: isAlwaysAggressive,
-      resourcesInfo: resourcesInfo
+      fromComponentId: componentId, folderURL: folderURL, isAlwaysAggressive: isAlwaysAggressive
     )
     
     // Compile this rule list if we haven't already or if the file has been modified
@@ -280,7 +274,7 @@ public actor FilterListResourceDownloader {
         let result = try AdblockEngine.contentBlockerRules(fromFilterSet: filterSet)
         
         try await ContentBlockerManager.shared.compile(
-          encodedContentRuleList: result.rulesJSON, for: blocklistType,
+          encodedContentRuleList: result.rulesJSON, for: blocklistType, version: version,
           options: .all, modes: modes
         )
         
