@@ -69,7 +69,7 @@ public actor AdBlockStats {
   ) async throws {
     if delayed {
       Task.detached(priority: .background) {
-        ContentBlockerManager.log.error("Delaying \(filterListInfo.source.debugDescription)")
+        ContentBlockerManager.log.debug("Delaying \(filterListInfo.source.debugDescription)")
         await self.compile(
           filterListInfo: filterListInfo, resourcesInfo: resourcesInfo,
           isAlwaysAggressive: isAlwaysAggressive
