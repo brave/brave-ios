@@ -535,7 +535,7 @@ extension BrowserViewController {
     // Case 1: AppStore Search Ad impression
     // Case 2: User Referral on Brave side
     if Preferences.URP.referralLookupOutstanding.value == true {
-      urp.adCampaignLookup2() { [weak self] response, error in
+      urp.adCampaignLookup() { [weak self] response, error in
         var referralCode = UserReferralProgram.getReferralCode()
         
         if error == nil, response?.0 == true, let campaignId = response?.1 {
@@ -552,7 +552,7 @@ extension BrowserViewController {
   }
   
   private func performProgramReferralLookup(_ urp: UserReferralProgram, refCode: String?) {
-    urp.referralLookup(refCode: UserReferralProgram.getReferralCode()) { referralCode, offerUrl in
+    urp.referralLookup(refCode: refCode) { referralCode, offerUrl in
       // Attempting to send ping after first urp lookup.
       // This way we can grab the referral code if it exists, see issue #2586.
       AppState.shared.dau.sendPingToServer()
@@ -561,9 +561,6 @@ extension BrowserViewController {
         let retryDeadline = Date() + retryTime
 
         Preferences.NewTabPage.superReferrerThemeRetryDeadline.value = retryDeadline
-        
-        // TODO: Set the code in core somehow if we want to support Super Referrals again
-        //       then call updateSponsoredImageComponentIfNeeded
       }
 
       guard let url = offerUrl?.asURL else { return }

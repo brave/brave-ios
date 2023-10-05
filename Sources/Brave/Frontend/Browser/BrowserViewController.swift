@@ -375,11 +375,6 @@ public class BrowserViewController: UIViewController {
     if Preferences.Privacy.screenTimeEnabled.value {
       screenTimeViewController = STWebpageController()
     }
-    
-    
-    fetchAdCampaignId { toID in
-      print("TOKEN OJECT \(toID)")
-    }
   }
 
   deinit {
@@ -435,54 +430,6 @@ public class BrowserViewController: UIViewController {
       tab.newTabPageViewController = nil
     }
   }
-  
-  
-  func fetchAdCampaignId(_ completion: @escaping (Int?) -> Void){
-    // Fetching ad attibution token
-    var adAttributionToken = ""
-    do {
-      adAttributionToken = try AAAttribution.attributionToken()
-    } catch {
-      print("Couldnt fetch attribute tokens with error: \(error)")
-      completion(nil)
-      
-      return
-    }
-    
-    // Request Creation
-    let request = NSMutableURLRequest(url: URL(string: "https://api-adservices.apple.com/api/v1/")!)
-    request.httpMethod = "POST"
-    request.setValue("text/plain", forHTTPHeaderField: "Content-Type")
-    request.httpBody = adAttributionToken.data(using: .utf8)
-    
-    let task = URLSession.shared.dataTask(with: request as URLRequest) { (data, response, error) in
-      if let error = error {
-        print("Ad services task failed with error \(error)")
-        completion(nil)
-
-        return
-      }
-      
-      if let data = data {
-        do {
-          if let dataResponseJSON = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: Any] {
-            if let campaignId = dataResponseJSON["campaignId"] as? Int {
-              print("Campaign \(campaignId)")
-              
-              completion(campaignId)
-            }
-          }
-        } catch {
-          print("Serialization failed for data with error \(error)")
-
-          completion(nil)
-        }
-      }
-    }
-    
-    task.resume()
-  }
-
 
   private var rewardsEnabledObserveration: NSKeyValueObservation?
 

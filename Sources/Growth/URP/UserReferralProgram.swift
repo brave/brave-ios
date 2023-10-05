@@ -121,13 +121,7 @@ public class UserReferralProgram {
     service.referralCodeLookup(refCode: refCode, completion: referralBlock)
   }
   
-  public func adCampaignLookup1(token: String, completion: @escaping ((Bool?, Int?)?, Error?) -> Void) {
-    service.adCampaignTokenLookupQueue1(adAttributionToken: token) { response, error in
-      completion(response, error)
-    }
-  }
-  
-  public func adCampaignLookup2(completion: @escaping ((Bool?, Int?)?, Error?) -> Void) {
+  public func adCampaignLookup(completion: @escaping ((Bool?, Int?)?, Error?) -> Void) {
     // Fetching ad attibution token
     do {
       let adAttributionToken = try AAAttribution.attributionToken()
