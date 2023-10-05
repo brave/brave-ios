@@ -26,27 +26,27 @@ public class WalletStore {
   
   var isPresentingWalletPanel: Bool = false {
     didSet {
-      if oldValue == true, isPresentingWalletPanel == false { // dismiss
-        if isPresentingFullWallet == false {
+      if oldValue, !isPresentingWalletPanel { // dismiss
+        if !isPresentingFullWallet { // both full wallet and wallet panel are dismissed
           cryptoStore?.tearDown()
         } else {
           // dismiss panel to present full screen. observer should be setup")
           cryptoStore?.setupObservers()
         }
-      } else if oldValue == false, isPresentingWalletPanel == true { // present
+      } else if !oldValue, isPresentingWalletPanel { // present
         cryptoStore?.setupObservers()
       }
     }
   }
   var isPresentingFullWallet: Bool = false {
     didSet {
-      if oldValue == true, isPresentingFullWallet == false { // dismiss
-        if isPresentingWalletPanel == false { // both panel and full wallet is dismissed
+      if oldValue, !isPresentingFullWallet { // dismiss
+        if !isPresentingWalletPanel { // both panel and full wallet are dismissed
           cryptoStore?.tearDown()
         } else {
           // panel is still visible, do not tear down
         }
-      } else if oldValue == false, isPresentingFullWallet == true { // present
+      } else if !oldValue, isPresentingFullWallet { // present
         if isPresentingWalletPanel {
           // observers should be setup when wallet panel is presented
         } else {
