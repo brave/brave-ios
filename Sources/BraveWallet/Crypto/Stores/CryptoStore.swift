@@ -326,7 +326,7 @@ public class CryptoStore: ObservableObject, WalletObserverStore {
   }
   
   // A manual tear-down that nil all the wallet service observer classes 
-  func tearDown() {
+  public func tearDown() {
     keyringServiceObserver = nil
     walletServiceObserver = nil
     txServiceObserver = nil

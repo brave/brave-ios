@@ -217,7 +217,7 @@ public class KeyringStore: ObservableObject, WalletObserverStore {
       }
   }
   
-  func setupObservers() {
+  public func setupObservers() {
     guard !isObserving else { return }
     self.keyringServiceObserver = KeyringServiceObserver(
       keyringService: keyringService,
@@ -283,7 +283,7 @@ public class KeyringStore: ObservableObject, WalletObserverStore {
     )
   }
   
-  func tearDown() {
+  public func tearDown() {
     keyringServiceObserver = nil
     rpcServiceObserver = nil
   }
