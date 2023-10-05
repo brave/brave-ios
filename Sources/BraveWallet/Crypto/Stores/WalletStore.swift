@@ -28,13 +28,13 @@ public class WalletStore {
     didSet {
       if oldValue, !isPresentingWalletPanel { // dismiss
         if !isPresentingFullWallet { // both full wallet and wallet panel are dismissed
-          cryptoStore?.tearDown()
+          self.tearDown()
         } else {
           // dismiss panel to present full screen. observer should be setup")
-          cryptoStore?.setupObservers()
+          self.setupObservers()
         }
       } else if !oldValue, isPresentingWalletPanel { // present
-        cryptoStore?.setupObservers()
+        self.setupObservers()
       }
     }
   }
@@ -42,7 +42,7 @@ public class WalletStore {
     didSet {
       if oldValue, !isPresentingFullWallet { // dismiss
         if !isPresentingWalletPanel { // both panel and full wallet are dismissed
-          cryptoStore?.tearDown()
+          self.tearDown()
         } else {
           // panel is still visible, do not tear down
         }
@@ -51,7 +51,7 @@ public class WalletStore {
           // observers should be setup when wallet panel is presented
         } else {
           // either open from browser settings or from wallet panel
-          cryptoStore?.setupObservers()
+          self.setupObservers()
         }
       }
     }
@@ -88,6 +88,16 @@ public class WalletStore {
       ipfsApi: ipfsApi
     )
   }
+  
+  public func setupObservers() {
+    keyringStore.setupObservers()
+    cryptoStore?.setupObservers()
+  }
+  
+  public func tearDown() {
+    keyringStore.tearDown()
+    cryptoStore?.tearDown()
+  }
 
   private func setUp(
     keyringService: BraveWalletKeyringService,
@@ -107,6 +117,8 @@ public class WalletStore {
       .sink { [weak self] isDefaultKeyringCreated in
         guard let self = self else { return }
         if !isDefaultKeyringCreated, self.cryptoStore != nil {
+          // only tear down `CryptoStore` since we still need to listen
+          // default keyring creation if user didn't dismiss the wallet after reset
           self.cryptoStore?.tearDown()
           self.cryptoStore = nil
         } else if isDefaultKeyringCreated, self.cryptoStore == nil {
