@@ -55,7 +55,7 @@ public actor AdBlockStats {
   
   func didReceiveMemoryWarning() async {
     self.didRecieveMemoryWarning = true
-    clearCaches()
+    cachedEngines.values.forEach({ $0.clearCaches() })
     
     // When we get a memory warning, we need to clear some engines.
     // Unfortuantely the user does not have the appropriate resources to run all filter lists.
@@ -66,11 +66,6 @@ public actor AdBlockStats {
       if sources.contains(source) { continue }
       cachedEngines.removeValue(forKey: source)
     }
-  }
-  
-  /// Clear the caches on all of the engines
-  func clearCaches() {
-    cachedEngines.values.forEach({ $0.clearCaches() })
   }
   
   /// Create and add an engine from the given filter list info.
@@ -189,23 +184,23 @@ public actor AdBlockStats {
   func shouldBlock(requestURL: URL, sourceURL: URL, resourceType: AdblockEngine.ResourceType, isAggressiveMode: Bool) async -> Bool {
     let sources = await self.enabledSources
     
-    return await cachedEngines(for: sources).asyncConcurrentMap({ cachedEngine in
-      return await cachedEngine.shouldBlock(
+    return cachedEngines(for: sources).contains(where: { cachedEngine in
+      return cachedEngine.shouldBlock(
         requestURL: requestURL,
         sourceURL: sourceURL,
         resourceType: resourceType,
         isAggressiveMode: isAggressiveMode
       )
-    }).contains(where: { $0 })
+    })
   }
   
   /// This returns all the user script types for the given frame
   func makeEngineScriptTypes(frameURL: URL, isMainFrame: Bool, domain: Domain) async -> Set<UserScriptType> {
     // Add any engine scripts for this frame
-    return await cachedEngines(for: domain).enumerated().asyncMap({ index, cachedEngine -> Set<UserScriptType> in
+    return await cachedEngines(for: domain).enumerated().map({ index, cachedEngine -> Set<UserScriptType> in
       do {
-        return try await cachedEngine.makeEngineScriptTypes(
-          frameURL: frameURL, isMainFrame: isMainFrame, domain: domain, index: index
+        return try cachedEngine.makeEngineScriptTypes(
+          frameURL: frameURL, isMainFrame: isMainFrame, index: index
         )
       } catch {
         assertionFailure()
@@ -218,9 +213,9 @@ public actor AdBlockStats {
   
   /// Returns all the models for this frame URL
   func cosmeticFilterModels(forFrameURL frameURL: URL, domain: Domain) async -> [CosmeticFilterModelTuple] {
-    return await cachedEngines(for: domain).asyncConcurrentCompactMap { cachedEngine -> CosmeticFilterModelTuple? in
+    return await cachedEngines(for: domain).compactMap { cachedEngine -> CosmeticFilterModelTuple? in
       do {
-        guard let model = try await cachedEngine.cosmeticFilterModel(forFrameURL: frameURL) else {
+        guard let model = try cachedEngine.cosmeticFilterModel(forFrameURL: frameURL) else {
           return nil
         }
         return (cachedEngine.isAlwaysAggressive, model)
@@ -237,8 +232,8 @@ public actor AdBlockStats {
   }
   
   /// Return all the cached engines for the given sources. If any filter list is not yet loaded, it will be lazily loaded
-  private func cachedEngines(for sources: [CachedAdBlockEngine.Source]) async -> [CachedAdBlockEngine] {
-    return await sources.asyncCompactMap { source -> CachedAdBlockEngine? in
+  private func cachedEngines(for sources: [CachedAdBlockEngine.Source]) -> [CachedAdBlockEngine] {
+    return sources.compactMap { source -> CachedAdBlockEngine? in
       do {
         return try cachedEngine(for: source)
       } catch {

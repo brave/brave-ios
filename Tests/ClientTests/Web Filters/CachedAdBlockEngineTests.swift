@@ -26,7 +26,7 @@ final class CachedAdBlockEngineTests: XCTestCase {
     
     var cachedEngine: CachedAdBlockEngine? = CachedAdBlockEngine(
       engine: engine!, filterListInfo: filterListInfo, resourcesInfo: resourcesInfo,
-      serialQueue: DispatchQueue(label: "test"), isAlwaysAggressive: false
+      isAlwaysAggressive: false
     )
     
     XCTAssertNotNil(cachedEngine)
@@ -65,7 +65,7 @@ final class CachedAdBlockEngineTests: XCTestCase {
       
       await filterListInfos.asyncConcurrentForEach { filterListInfo in
         do {
-          let engine = try await CachedAdBlockEngine.compile(
+          let engine = try CachedAdBlockEngine.compile(
             filterListInfo: filterListInfo, resourcesInfo: resourcesInfo, isAlwaysAggressive: false
           )
           
@@ -121,32 +121,21 @@ final class CachedAdBlockEngineTests: XCTestCase {
     options.iterationCount = 10
     
     measure(metrics: [XCTClockMetric(), XCTCPUMetric(), XCTMemoryMetric()], options: options) {
-      let exp = expectation(description: "Finished")
-
-      Task {
-        await (0..<200).asyncConcurrentForEach { _ in
-          let uuid = UUID().uuidString
-          
-          let filterListInfo = CachedAdBlockEngine.FilterListInfo(
-            source: .filterList(componentId: uuid),
-            localFileURL: sampleFilterListURL,
-            version: "bundled", fileType: .text
-          )
-          
-          do {
-            _ = try await CachedAdBlockEngine.compile(
-              filterListInfo: filterListInfo, resourcesInfo: resourcesInfo, isAlwaysAggressive: false
-            )
-            print("COMPILED")
-          } catch {
-            XCTFail(error.localizedDescription)
-          }
-        }
-        
-        exp.fulfill()
-      }
+      let uuid = UUID().uuidString
       
-      wait(for: [exp], timeout: 200)
+      let filterListInfo = CachedAdBlockEngine.FilterListInfo(
+        source: .filterList(componentId: uuid),
+        localFileURL: sampleFilterListURL,
+        version: "bundled", fileType: .text
+      )
+      
+      do {
+        _ = try CachedAdBlockEngine.compile(
+          filterListInfo: filterListInfo, resourcesInfo: resourcesInfo, isAlwaysAggressive: false
+        )
+      } catch {
+        XCTFail(error.localizedDescription)
+      }
     }
   }
 }
