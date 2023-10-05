@@ -109,13 +109,9 @@ public actor LaunchHelper {
   /// Get all possible types of blocklist types available in this app, this includes actual and potential types
   /// This is used to delete old filter lists so that we clean up old stuff
   @MainActor private func getAllValidBlocklistTypes() -> Set<ContentBlockerManager.BlocklistType> {
-    return FilterListStorage.shared.filterLists
+    return FilterListStorage.shared
       // All filter lists blocklist types
-      .reduce(Set<ContentBlockerManager.BlocklistType>()) { partialResult, filterList in
-        return partialResult.union([
-          .filterList(componentId: filterList.entry.componentId, isAlwaysAggressive: filterList.isAlwaysAggressive)
-        ])
-      }
+      .validBlocklistTypes
       // All generic types
       .union(
         ContentBlockerManager.GenericBlocklistType.allCases.map { .generic($0) }
@@ -127,6 +123,24 @@ public actor LaunchHelper {
   }
 }
 
+private extension FilterListStorage {
+  var validBlocklistTypes: Set<ContentBlockerManager.BlocklistType> {
+    if filterLists.isEmpty {
+      return allFilterListSettings.reduce(Set<ContentBlockerManager.BlocklistType>()) { partialResult, setting in
+        guard let componentId = setting.componentId else { return partialResult }
+        return partialResult.union([
+          .filterList(componentId: componentId, isAlwaysAggressive: setting.isAlwaysAggressive)
+        ])
+      }
+    } else {
+      return filterLists.reduce(Set<ContentBlockerManager.BlocklistType>()) { partialResult, filterList in
+        return partialResult.union([
+          .filterList(componentId: filterList.entry.componentId, isAlwaysAggressive: filterList.isAlwaysAggressive)
+        ])
+      }
+    }
+  }
+}
 private extension ShieldLevel {
   /// Return a list of first launch content blocker modes that MUST be precompiled during launch
   var firstLaunchBlockingModes: Set<ContentBlockerManager.BlockingMode> {
