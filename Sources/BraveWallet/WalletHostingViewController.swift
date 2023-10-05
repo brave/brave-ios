@@ -100,7 +100,6 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
         }
       }
     self.walletStore = walletStore
-    walletStore.cryptoStore?.setupObservers()
   }
   
   @available(*, unavailable)
@@ -110,7 +109,7 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
   
   deinit {
     gesture.view?.removeGestureRecognizer(gesture)
-    walletStore?.cryptoStore?.tearDown()
+    walletStore?.isPresentingFullWallet = false
   }
   
   private let gesture: WalletInteractionGestureRecognizer
@@ -119,6 +118,11 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
     super.viewDidAppear(animated)
     view.window?.addGestureRecognizer(gesture)
     UIDevice.current.forcePortraitIfIphone(for: UIApplication.shared)
+  }
+  
+  public override func viewDidLoad() {
+    super.viewDidLoad()
+    walletStore?.isPresentingFullWallet = true
   }
   
   // MARK: -

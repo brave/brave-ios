@@ -23,6 +23,39 @@ public class WalletStore {
   }
   
   public let onPendingRequestUpdated = PassthroughSubject<Void, Never>()
+  
+  var isPresentingWalletPanel: Bool = false {
+    didSet {
+      if oldValue == true, isPresentingWalletPanel == false { // dismiss
+        if isPresentingFullWallet == false {
+          cryptoStore?.tearDown()
+        } else {
+          // dismiss panel to present full screen. observer should be setup")
+          cryptoStore?.setupObservers()
+        }
+      } else if oldValue == false, isPresentingWalletPanel == true { // present
+        cryptoStore?.setupObservers()
+      }
+    }
+  }
+  var isPresentingFullWallet: Bool = false {
+    didSet {
+      if oldValue == true, isPresentingFullWallet == false { // dismiss
+        if isPresentingWalletPanel == false { // both panel and full wallet is dismissed
+          cryptoStore?.tearDown()
+        } else {
+          // panel is still visible, do not tear down
+        }
+      } else if oldValue == false, isPresentingFullWallet == true { // present
+        if isPresentingWalletPanel {
+          // observers should be setup when wallet panel is presented
+        } else {
+          // either open from browser settings or from wallet panel
+          cryptoStore?.setupObservers()
+        }
+      }
+    }
+  }
 
   // MARK: -
 
