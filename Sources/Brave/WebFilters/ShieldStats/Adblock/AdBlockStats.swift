@@ -13,49 +13,131 @@ import os.log
 public actor AdBlockStats {
   typealias CosmeticFilterModelTuple = (isAlwaysAggressive: Bool, model: CosmeticFilterModel)
   public static let shared = AdBlockStats()
+  
+  /// An object containing the basic information to allow us to compile an engine
+  struct LazyFilterListInfo {
+    let filterListInfo: CachedAdBlockEngine.FilterListInfo
+    let isAlwaysAggressive: Bool
+  }
 
-  // Adblock engine for general adblock lists.
-  private var cachedEngines: [CachedAdBlockEngine]
+  /// A list of filter list info that should be compiled
+  private(set) var availableFilterLists: [CachedAdBlockEngine.Source: LazyFilterListInfo]
+  /// The info for the resource file. This is a shared file used by all filter lists that contain scriplets.
+  private(set) var resourcesInfo: CachedAdBlockEngine.ResourcesInfo?
+  /// Adblock engine for general adblock lists.
+  private(set) var cachedEngines: [CachedAdBlockEngine.Source: CachedAdBlockEngine]
+  /// The queue that ensures that engines are compiled in series since they can be coming from all kinds of async tasks
+  private let serialQueue = DispatchQueue(label: "com.brave.AdBlockStats.\(UUID().uuidString)")
+  
+  /// Return all the critical sources
+  ///
+  /// Critical sources are those that are enabled and are "on" by default. Giving us the most important sources.
+  /// Used for memory managment so we know which filter lists to disable upon a memory warning
+  @MainActor var criticalSources: [CachedAdBlockEngine.Source] {
+    var enabledSources: [CachedAdBlockEngine.Source] = [.adBlock]
+    enabledSources.append(contentsOf: FilterListStorage.shared.ciriticalSources)
+    return enabledSources
+  }
+  
+  @MainActor var enabledSources: [CachedAdBlockEngine.Source] {
+    var enabledSources: [CachedAdBlockEngine.Source] = [.adBlock]
+    enabledSources.append(contentsOf: FilterListStorage.shared.enabledSources)
+    enabledSources.append(contentsOf: CustomFilterListStorage.shared.enabledSources)
+    return enabledSources
+  }
 
   init() {
-    cachedEngines = []
+    cachedEngines = [:]
+    availableFilterLists = [:]
   }
   
-  /// Clear the caches on all of the engines
-  func clearCaches() {
-    cachedEngines.forEach({ $0.clearCaches() })
+  /// Handle memory warnings by freeing up some memory
+  func didReceiveMemoryWarning() async {
+    cachedEngines.values.forEach({ $0.clearCaches() })
+    await removeDisabledEngines()
   }
   
-  func add(engine: CachedAdBlockEngine) {
-    if let index = cachedEngines.firstIndex(where: { $0.filterListInfo.source == engine.filterListInfo.source }) {
-      cachedEngines[index] = engine
-    } else {
-      cachedEngines.append(engine)
-    }
-  }
-  
-  func removeEngine(for source: CachedAdBlockEngine.Source) {
-    cachedEngines.removeAll { cachedEngine in
-      cachedEngine.filterListInfo.source == source
-    }
-  }
-  
-  func needsCompilation(for filterListInfo: CachedAdBlockEngine.FilterListInfo, resourcesInfo: CachedAdBlockEngine.ResourcesInfo) -> Bool {
-    return !cachedEngines.contains { cachedEngine in
-      if cachedEngine.filterListInfo.source == filterListInfo.source {
-        return cachedEngine.filterListInfo.version < filterListInfo.version
-          || cachedEngine.resourcesInfo.version < resourcesInfo.version
-      } else {
-        return true
+  /// Create and add an engine from the given resources.
+  /// If an engine already exists for the given source, it will be replaced.
+  ///
+  /// - Note: This method will ensure syncronous compilation
+  public func compile(
+    filterListInfo: CachedAdBlockEngine.FilterListInfo, resourcesInfo: CachedAdBlockEngine.ResourcesInfo, isAlwaysAggressive: Bool
+  ) throws {
+    try serialQueue.sync {
+      guard needsCompilation(for: filterListInfo, resourcesInfo: resourcesInfo) else {
+        // Ensure we only compile if we need to. This prevents two lazy loads from recompiling
+        return
       }
+      
+      let engine = try CachedAdBlockEngine.compile(
+        filterListInfo: filterListInfo, resourcesInfo: resourcesInfo, isAlwaysAggressive: isAlwaysAggressive
+      )
+      
+      add(engine: engine)
+    }
+  }
+  
+  /// Add a new engine to the list.
+  /// If an engine already exists for the same source, it will be replaced instead.
+  private func add(engine: CachedAdBlockEngine) {
+    cachedEngines[engine.filterListInfo.source] = engine
+    updateIfNeeded(resourcesInfo: engine.resourcesInfo)
+    updateIfNeeded(filterListInfo: engine.filterListInfo, isAlwaysAggressive: engine.isAlwaysAggressive)
+    ContentBlockerManager.log.debug("Added engine for \(engine.filterListInfo.debugDescription)")
+  }
+  
+  /// Add or update `filterListInfo` if it is a newer version.
+  func updateIfNeeded(filterListInfo: CachedAdBlockEngine.FilterListInfo, isAlwaysAggressive: Bool) {
+    if let existingLazyInfo = availableFilterLists[filterListInfo.source] {
+      guard filterListInfo.version > existingLazyInfo.filterListInfo.version else { return }
+    }
+    
+    availableFilterLists[filterListInfo.source] = LazyFilterListInfo(
+      filterListInfo: filterListInfo, isAlwaysAggressive: isAlwaysAggressive
+    )
+  }
+  
+  /// Add or update `resourcesInfo` if it is a newer version.
+  func updateIfNeeded(resourcesInfo: CachedAdBlockEngine.ResourcesInfo) {
+    guard self.resourcesInfo == nil || resourcesInfo.version > self.resourcesInfo!.version else { return }
+    self.resourcesInfo = resourcesInfo
+  }
+  
+  /// Remove an engine for the given source.
+  func removeEngine(for source: CachedAdBlockEngine.Source) {
+    cachedEngines.removeValue(forKey: source)
+  }
+  
+  /// Remove all the engines
+  func removeAllEngines() {
+    cachedEngines.removeAll()
+  }
+  
+  /// Remove all engines that have disabled sources
+  func removeDisabledEngines() async {
+    let sources = await Set(enabledSources)
+    
+    for source in cachedEngines.keys {
+      guard !sources.contains(source) else { continue }
+      cachedEngines.removeValue(forKey: source)
+    }
+  }
+  
+  /// Tells us if an engine needs compilation if it's missing or if its resources are outdated
+  func needsCompilation(for filterListInfo: CachedAdBlockEngine.FilterListInfo, resourcesInfo: CachedAdBlockEngine.ResourcesInfo) -> Bool {
+    if let cachedEngine = cachedEngines[filterListInfo.source] {
+      return cachedEngine.filterListInfo.version < filterListInfo.version
+        && cachedEngine.resourcesInfo.version < resourcesInfo.version
+    } else {
+      return true
     }
   }
   
   /// Checks the general and regional engines to see if the request should be blocked
-  ///
-  /// - Warning: This method needs to be synced on `AdBlockStatus.adblockSerialQueue`
   func shouldBlock(requestURL: URL, sourceURL: URL, resourceType: AdblockEngine.ResourceType, isAggressiveMode: Bool) async -> Bool {
-    return await cachedEngines.asyncConcurrentMap({ cachedEngine in
+    let sources = await self.enabledSources
+    return await cachedEngines(for: sources).asyncConcurrentMap({ cachedEngine in
       return await cachedEngine.shouldBlock(
         requestURL: requestURL,
         sourceURL: sourceURL,
@@ -82,15 +164,17 @@ public actor AdBlockStats {
     })
   }
   
-  /// Returns all the models for this frame URL
-  func cachedEngines(for domain: Domain) async -> [CachedAdBlockEngine] {
-    let enabledSources = await enabledSources(for: domain)
-    
-    let engines = await cachedEngines.asyncFilter({ cachedEngine in
-      return enabledSources.contains(cachedEngine.filterListInfo.source)
-    })
-    
-    return engines
+  /// Returns all appropriate engines for the given domain
+  @MainActor func cachedEngines(for domain: Domain) async -> [CachedAdBlockEngine] {
+    let sources = enabledSources(for: domain)
+    return await cachedEngines(for: sources)
+  }
+  
+  /// Return all the cached engines for the given sources. If any filter list is not yet loaded, it will be lazily loaded
+  private func cachedEngines(for sources: [CachedAdBlockEngine.Source]) -> [CachedAdBlockEngine] {
+    return sources.compactMap { source -> CachedAdBlockEngine? in
+      return cachedEngines[source]
+    }
   }
   
   /// Returns all the models for this frame URL
@@ -108,41 +192,51 @@ public actor AdBlockStats {
     }
   }
   
-  @MainActor private func enabledSources(for domain: Domain) -> Set<CachedAdBlockEngine.Source> {
-    var enabledSources = FilterListStorage.shared.enabledSources.union(
-      CustomFilterListStorage.shared.enabledSources
-    )
-    enabledSources.insert(.adBlock)
+  /// Give us all the enabled sources for the given domain
+  @MainActor private func enabledSources(for domain: Domain) -> [CachedAdBlockEngine.Source] {
+    let enabledSources = self.enabledSources
     return enabledSources.filter({ $0.isEnabled(for: domain )})
   }
 }
 
 private extension FilterListStorage {
-  @MainActor var enabledSources: Set<CachedAdBlockEngine.Source> {
-    let sources = allFilterListSettings.compactMap { setting -> CachedAdBlockEngine.Source? in
-      guard setting.isEnabled else { return nil }
-      
-      if let componentId = setting.componentId {
-        return .filterList(componentId: componentId)
-      } else if let filterList = filterLists.first(where: { $0.uuid == setting.uuid }) {
+  /// Gives us source representations of all the critical filter lists
+  ///
+  /// Critical filter lists are those that are enabled and are "on" by default. Giving us the most important filter lists.
+  /// Used for memory managment so we know which filter lists to disable upon a memory warning
+  @MainActor var ciriticalSources: [CachedAdBlockEngine.Source] {
+    return filterLists.compactMap { filterList -> CachedAdBlockEngine.Source? in
+      guard filterList.isEnabled else { return nil }
+      guard FilterList.defaultOnComponentIds.contains(filterList.entry.componentId) else { return nil }
+      return .filterList(componentId: filterList.entry.componentId)
+    }
+  }
+  
+  /// Gives us source representations of all the enabled filter lists
+  @MainActor var enabledSources: [CachedAdBlockEngine.Source] {
+    if !filterLists.isEmpty {
+      return filterLists.compactMap { filterList -> CachedAdBlockEngine.Source? in
+        guard filterList.isEnabled else { return nil }
         return .filterList(componentId: filterList.entry.componentId)
-      } else {
-        return nil
+      }
+    } else {
+      // We may not have the filter lists loaded yet. In which case we load the settings
+      return allFilterListSettings.compactMap { setting -> CachedAdBlockEngine.Source? in
+        guard setting.isEnabled else { return nil }
+        guard let componentId = setting.componentId else { return nil }
+        return .filterList(componentId: componentId)
       }
     }
-    
-    return Set(sources)
   }
 }
 
 private extension CustomFilterListStorage {
-  @MainActor var enabledSources: Set<CachedAdBlockEngine.Source> {
-    let sources = filterListsURLs.compactMap { filterList -> CachedAdBlockEngine.Source? in
+  /// Gives us source representations of all the enabled custom filter lists
+  @MainActor var enabledSources: [CachedAdBlockEngine.Source] {
+    return filterListsURLs.compactMap { filterList -> CachedAdBlockEngine.Source? in
       guard filterList.setting.isEnabled else { return nil }
       return .filterListURL(uuid: filterList.setting.uuid)
     }
-    
-    return Set(sources)
   }
 }
 
