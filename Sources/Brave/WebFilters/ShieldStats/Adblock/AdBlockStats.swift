@@ -130,20 +130,27 @@ public actor AdBlockStats {
   
   /// Remove all engines that have disabled sources
   func ensureEnabledEngines() async {
-    for source in await Set(enabledSources) {
-      guard cachedEngines[source] == nil else { continue }
-      guard let availableFilterList = availableFilterLists[source] else { continue }
-      guard let resourcesInfo = self.resourcesInfo else { continue }
-      
-      do {
-        try compile(
-          filterListInfo: availableFilterList.filterListInfo, 
-          resourcesInfo: resourcesInfo,
-          isAlwaysAggressive: availableFilterList.isAlwaysAggressive
-        )
-      } catch {
-        // Ignore this error
+    do {
+      for source in await Set(enabledSources) {
+        guard cachedEngines[source] == nil else { continue }
+        guard let availableFilterList = availableFilterLists[source] else { continue }
+        guard let resourcesInfo = self.resourcesInfo else { continue }
+        
+        do {
+          try compile(
+            filterListInfo: availableFilterList.filterListInfo,
+            resourcesInfo: resourcesInfo,
+            isAlwaysAggressive: availableFilterList.isAlwaysAggressive
+          )
+        } catch {
+          // Ignore this error
+        }
+        
+        // Sleep for 1ms. This drastically reduces memory usage without much impact to usability
+        try await Task.sleep(nanoseconds: 1000000)
       }
+    } catch {
+      // Ignore cancellation errors
     }
   }
   

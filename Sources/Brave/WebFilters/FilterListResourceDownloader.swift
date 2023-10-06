@@ -72,20 +72,27 @@ public actor FilterListResourceDownloader {
     await FilterListStorage.shared.loadFilterListSettings()
     let filterListSettings = await FilterListStorage.shared.allFilterListSettings
       
-    await filterListSettings.asyncConcurrentForEach { setting in
-      guard await setting.isEnabled == true else { return }
-      guard let componentId = await setting.componentId else { return }
-      
-      // Try to load the filter list folder. We always have to compile this at start
-      guard let folderURL = await setting.folderURL, FileManager.default.fileExists(atPath: folderURL.path) else {
-        return
+    do {
+      try await filterListSettings.asyncConcurrentForEach { setting in
+        guard await setting.isEnabled == true else { return }
+        guard let componentId = await setting.componentId else { return }
+        
+        // Try to load the filter list folder. We always have to compile this at start
+        guard let folderURL = await setting.folderURL, FileManager.default.fileExists(atPath: folderURL.path) else {
+          return
+        }
+        
+        await self.compileFilterListEngineIfNeeded(
+          fromComponentId: componentId, folderURL: folderURL,
+          isAlwaysAggressive: setting.isAlwaysAggressive,
+          resourcesInfo: resourcesInfo
+        )
+        
+        // Sleep for 1ms. This drastically reduces memory usage without much impact to usability
+        try await Task.sleep(nanoseconds: 1000000)
       }
-      
-      await self.compileFilterListEngineIfNeeded(
-        fromComponentId: componentId, folderURL: folderURL,
-        isAlwaysAggressive: setting.isAlwaysAggressive,
-        resourcesInfo: resourcesInfo
-      )
+    } catch {
+      // Ignore the cancellation.
     }
   }
   
