@@ -58,22 +58,29 @@ actor FilterListCustomURLDownloader: ObservableObject {
     self.startedService = true
     await CustomFilterListStorage.shared.loadCachedFilterLists()
     
-    await CustomFilterListStorage.shared.filterListsURLs.asyncConcurrentForEach { customURL in
-      let resource = await customURL.setting.resource
-      
-      do {
-        if let cachedResult = try resource.cachedResult() {
-          await self.handle(downloadResult: cachedResult, for: customURL)
+    do {
+      try await CustomFilterListStorage.shared.filterListsURLs.asyncConcurrentForEach { customURL in
+        let resource = await customURL.setting.resource
+        
+        do {
+          if let cachedResult = try resource.cachedResult() {
+            await self.handle(downloadResult: cachedResult, for: customURL)
+          }
+        } catch {
+          let uuid = await customURL.setting.uuid
+          ContentBlockerManager.log.error(
+            "Failed to cached data for custom filter list `\(uuid)`: \(error)"
+          )
         }
-      } catch {
-        let uuid = await customURL.setting.uuid
-        ContentBlockerManager.log.error(
-          "Failed to cached data for custom filter list `\(uuid)`: \(error)"
-        )
+        
+        // Always fetch this resource so it's ready if the user enables it.
+        await self.startFetching(filterListCustomURL: customURL)
+        
+        // Sleep for 1ms. This drastically reduces memory usage without much impact to usability
+        try await Task.sleep(nanoseconds: 1000000)
       }
-      
-      // Always fetch this resource so it's ready if the user enables it.
-      await self.startFetching(filterListCustomURL: customURL)
+    } catch {
+      // Ignore cancellation errors
     }
   }
   
