@@ -171,11 +171,19 @@ public actor FilterListResourceDownloader {
     resourcesInfo: CachedAdBlockEngine.ResourcesInfo
   ) async {
     let version = folderURL.lastPathComponent
+    let source = CachedAdBlockEngine.Source.filterList(componentId: componentId)
     let filterListInfo = CachedAdBlockEngine.FilterListInfo(
-      source: .filterList(componentId: componentId),
+      source: source,
       localFileURL: folderURL.appendingPathComponent("list.txt", conformingTo: .text),
       version: version, fileType: .text
     )
+    
+    guard await AdBlockStats.shared.isEagerlyLoaded(source: source) else {
+      // Don't compile unless eager
+      await AdBlockStats.shared.updateIfNeeded(resourcesInfo: resourcesInfo)
+      await AdBlockStats.shared.updateIfNeeded(filterListInfo: filterListInfo, isAlwaysAggressive: isAlwaysAggressive)
+      return
+    }
     
     guard await AdBlockStats.shared.needsCompilation(for: filterListInfo, resourcesInfo: resourcesInfo) else {
       // Don't compile unless needed

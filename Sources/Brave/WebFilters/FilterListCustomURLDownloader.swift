@@ -105,29 +105,33 @@ actor FilterListCustomURLDownloader: ObservableObject {
     }
       
     // Add/remove the resource depending on if it is enabled/disabled
-    if await filterListCustomURL.setting.isEnabled {
-      guard let resourcesInfo = await FilterListResourceDownloader.shared.resourcesInfo else {
-        assertionFailure("This should not have been called if the resources are not ready")
-        return
-      }
-      
-      let version = fileVersionDateFormatter.string(from: downloadResult.date)
-      let filterListInfo = CachedAdBlockEngine.FilterListInfo(
-        source: .filterListURL(uuid: uuid),
-        localFileURL: downloadResult.fileURL,
-        version: version, fileType: .text
+    let source = CachedAdBlockEngine.Source.filterListURL(uuid: uuid)
+    guard let resourcesInfo = await FilterListResourceDownloader.shared.resourcesInfo else {
+      assertionFailure("This should not have been called if the resources are not ready")
+      return
+    }
+    
+    let version = fileVersionDateFormatter.string(from: downloadResult.date)
+    let filterListInfo = CachedAdBlockEngine.FilterListInfo(
+      source: .filterListURL(uuid: uuid),
+      localFileURL: downloadResult.fileURL,
+      version: version, fileType: .text
+    )
+    
+    guard await AdBlockStats.shared.isEagerlyLoaded(source: source) else {
+      // Don't compile unless eager
+      await AdBlockStats.shared.updateIfNeeded(resourcesInfo: resourcesInfo)
+      await AdBlockStats.shared.updateIfNeeded(filterListInfo: filterListInfo, isAlwaysAggressive: true)
+      return
+    }
+    
+    do {
+      try await AdBlockStats.shared.compile(
+        filterListInfo: filterListInfo, resourcesInfo: resourcesInfo,
+        isAlwaysAggressive: true
       )
-      
-      do {
-        try await AdBlockStats.shared.compile(
-          filterListInfo: filterListInfo, resourcesInfo: resourcesInfo,
-          isAlwaysAggressive: true
-        )
-      } catch {
-        ContentBlockerManager.log.error("Failed to compile engine for \(filterListInfo.source.debugDescription)")
-      }
-    } else {
-      await AdBlockStats.shared.removeEngine(for: .filterListURL(uuid: uuid))
+    } catch {
+      ContentBlockerManager.log.error("Failed to compile engine for \(filterListInfo.source.debugDescription)")
     }
   }
   
