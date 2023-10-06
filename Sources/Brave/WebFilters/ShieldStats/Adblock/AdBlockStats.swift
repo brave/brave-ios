@@ -20,9 +20,9 @@ public actor AdBlockStats {
     let isAlwaysAggressive: Bool
   }
 
-  /// A list of filter list info that should be compiled
+  /// A list of filter list info that are available for compilation. This information is used for lazy loading.
   private(set) var availableFilterLists: [CachedAdBlockEngine.Source: LazyFilterListInfo]
-  /// The info for the resource file. This is a shared file used by all filter lists that contain scriplets.
+  /// The info for the resource file. This is a shared file used by all filter lists that contain scriplets. This information is used for lazy loading.
   private(set) var resourcesInfo: CachedAdBlockEngine.ResourcesInfo?
   /// Adblock engine for general adblock lists.
   private(set) var cachedEngines: [CachedAdBlockEngine.Source: CachedAdBlockEngine]
@@ -87,7 +87,7 @@ public actor AdBlockStats {
     ContentBlockerManager.log.debug("Added engine for \(engine.filterListInfo.debugDescription)")
   }
   
-  /// Add or update `filterListInfo` if it is a newer version.
+  /// Add or update `filterListInfo` if it is a newer version. This information is used for lazy loading.
   func updateIfNeeded(filterListInfo: CachedAdBlockEngine.FilterListInfo, isAlwaysAggressive: Bool) {
     if let existingLazyInfo = availableFilterLists[filterListInfo.source] {
       guard filterListInfo.version > existingLazyInfo.filterListInfo.version else { return }
@@ -98,7 +98,7 @@ public actor AdBlockStats {
     )
   }
   
-  /// Add or update `resourcesInfo` if it is a newer version.
+  /// Add or update `resourcesInfo` if it is a newer version. This information is used for lazy loading.
   func updateIfNeeded(resourcesInfo: CachedAdBlockEngine.ResourcesInfo) {
     guard self.resourcesInfo == nil || resourcesInfo.version > self.resourcesInfo!.version else { return }
     self.resourcesInfo = resourcesInfo
@@ -106,6 +106,10 @@ public actor AdBlockStats {
   
   /// Remove an engine for the given source.
   func removeEngine(for source: CachedAdBlockEngine.Source) {
+    if let filterListInfo = cachedEngines[source]?.filterListInfo {
+      ContentBlockerManager.log.debug("Removed engine for \(filterListInfo.debugDescription)")
+    }
+    
     cachedEngines.removeValue(forKey: source)
   }
   
@@ -120,8 +124,36 @@ public actor AdBlockStats {
     
     for source in cachedEngines.keys {
       guard !sources.contains(source) else { continue }
-      cachedEngines.removeValue(forKey: source)
+      removeEngine(for: source)
     }
+  }
+  
+  /// Remove all engines that have disabled sources
+  func ensureEnabledEngines() async {
+    for source in await Set(enabledSources) {
+      guard cachedEngines[source] == nil else { continue }
+      guard let availableFilterList = availableFilterLists[source] else { continue }
+      guard let resourcesInfo = self.resourcesInfo else { continue }
+      
+      do {
+        try compile(
+          filterListInfo: availableFilterList.filterListInfo, 
+          resourcesInfo: resourcesInfo,
+          isAlwaysAggressive: availableFilterList.isAlwaysAggressive
+        )
+      } catch {
+        // Ignore this error
+      }
+    }
+  }
+  
+  /// Tells us if this source should be eagerly loaded.
+  ///
+  /// Eagerness is determined by several factors:
+  /// * If the source represents a fitler list or a custom filter list, it is eager if it is enabled
+  /// * If the source represents the `adblock` default filter list, it is always eager regardless of shield settings
+  func isEagerlyLoaded(source: CachedAdBlockEngine.Source) async -> Bool {
+    return await enabledSources.contains(source)
   }
   
   /// Tells us if an engine needs compilation if it's missing or if its resources are outdated
