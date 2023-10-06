@@ -126,6 +126,11 @@ struct FilterListsView: View {
         editMode?.wrappedValue.isEditing == false
       )
     }
+    .onDisappear {
+      Task {
+        await AdBlockStats.shared.removeDisabledEngines()
+      }
+    }
   }
   
   private func onDeleteHandling(offsets: IndexSet) {

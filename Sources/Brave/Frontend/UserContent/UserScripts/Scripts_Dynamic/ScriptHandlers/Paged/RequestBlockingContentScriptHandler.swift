@@ -73,7 +73,8 @@ class RequestBlockingContentScriptHandler: TabContentScript {
         guard let domainURLString = domain.url else { return }
         let shouldBlock = await AdBlockStats.shared.shouldBlock(
           requestURL: requestURL, sourceURL: sourceURL, resourceType: dto.data.resourceType,
-          isAggressiveMode: domain.blockAdsAndTrackingLevel.isAggressive
+          isAggressiveMode: domain.blockAdsAndTrackingLevel.isAggressive,
+          domain: domain
         )
         
         // Ensure we check that the stats we're tracking is still for the same page

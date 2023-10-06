@@ -46,7 +46,7 @@ class TPStatsBlocklistChecker {
     case ad
   }
 
-  @MainActor func blockedTypes(requestURL: URL, sourceURL: URL, enabledRuleTypes: Set<ContentBlockerManager.GenericBlocklistType>, resourceType: AdblockEngine.ResourceType, isAggressiveMode: Bool) async -> BlockedType? {
+  @MainActor func blockedTypes(requestURL: URL, sourceURL: URL, enabledRuleTypes: Set<ContentBlockerManager.GenericBlocklistType>, resourceType: AdblockEngine.ResourceType, isAggressiveMode: Bool, domain: Domain) async -> BlockedType? {
     guard let host = requestURL.host, !host.isEmpty else {
       // TP Stats init isn't complete yet
       return nil
@@ -59,7 +59,8 @@ class TPStatsBlocklistChecker {
     if enabledRuleTypes.contains(.blockAds) || enabledRuleTypes.contains(.blockTrackers) {
       if await AdBlockStats.shared.shouldBlock(
         requestURL: requestURL, sourceURL: sourceURL, resourceType: resourceType,
-        isAggressiveMode: isAggressiveMode
+        isAggressiveMode: isAggressiveMode,
+        domain: domain
       ) {
         return .ad
       }

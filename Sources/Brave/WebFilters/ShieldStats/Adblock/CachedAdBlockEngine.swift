@@ -25,8 +25,15 @@ public class CachedAdBlockEngine {
     }
   }
   
-  public enum FileType: Hashable {
+  public enum FileType: Hashable, CustomDebugStringConvertible {
     case dat, text
+    
+    public var debugDescription: String {
+      switch self {
+      case .dat: return "dat"
+      case .text: return "txt"
+      }
+    }
   }
   
   public struct FilterListInfo: Hashable, Equatable, CustomDebugStringConvertible {
@@ -36,7 +43,7 @@ public class CachedAdBlockEngine {
     let fileType: FileType
     
     public var debugDescription: String {
-      return "\(source.debugDescription) v\(version)"
+      return "`\(source.debugDescription)` v\(version) (\(fileType.debugDescription))"
     }
   }
   
