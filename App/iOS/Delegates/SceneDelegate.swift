@@ -546,7 +546,7 @@ extension BrowserViewController {
     }
   }
   
-  private func generateReferralCode(attributionData: AdAttributionData?, fetchError: Error?) -> String {
+  private func generateReferralCode(attributionData: AdAttributionData?, fetchError: Error?) -> String? {
     // Checking referral code from User Referral program exists If not send 001
     // Prefix this code with BRV for organic iOS installs
     var referralCode = "BRV\(UserReferralProgram.getReferralCode() ?? "001")"
@@ -560,7 +560,7 @@ extension BrowserViewController {
       }
     }
     
-    return referralCode
+    return AppConstants.buildChannel == .release ? referralCode : UserReferralProgram.getReferralCode()
   }
   
   private func performProgramReferralLookup(_ urp: UserReferralProgram, refCode: String?) {
