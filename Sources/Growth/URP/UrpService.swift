@@ -78,7 +78,7 @@ struct UrpService {
     }
   }
   
-  @MainActor func adCampaignTokenLookupQueue2(adAttributionToken: String) async throws -> (Bool?, Int?) {
+  @MainActor func adCampaignTokenLookupQueue(adAttributionToken: String) async throws -> (AdAttributionData?) {
     guard let endPoint = URL(string: adServicesURL) else {
       Logger.module.error("AdServicesURLString can not be resolved: \(adServicesURL)")
       throw URLError(.badURL)
@@ -91,19 +91,16 @@ struct UrpService {
       UrpLog.log("Ad Attribution response: \(result)")
       
       if let resultData = result as? Data {
-        let jsonResponseDictionary = try JSONSerialization.jsonObject(with: resultData, options: []) as? [String: Any]
+        let jsonResponse = try JSONSerialization.jsonObject(with: resultData, options: []) as? [String: Any]
+        let adAttributionData = try AdAttributionData(json: jsonResponse)
         
-        if let jsonResponse = jsonResponseDictionary,
-           let attribution = jsonResponse["attribution"] as? Bool,
-           let campaignId = jsonResponse["campaignId"] as? Int {
-          return (attribution, campaignId)
-        }
+        return adAttributionData
       }
     } catch {
       throw error
     }
 
-    return (nil, nil)
+    return (nil)
   }
 
   func checkIfAuthorizedForGrant(with downloadId: String, completion: @escaping (Bool?, UrpError?) -> Void) {

@@ -121,15 +121,15 @@ public class UserReferralProgram {
     service.referralCodeLookup(refCode: refCode, completion: referralBlock)
   }
   
-  public func adCampaignLookup(completion: @escaping ((Bool?, Int?)?, Error?) -> Void) {
+  public func adCampaignLookup(completion: @escaping ((AdAttributionData)?, Error?) -> Void) {
     // Fetching ad attibution token
     do {
       let adAttributionToken = try AAAttribution.attributionToken()
       
       Task { @MainActor in
         do {
-          let result = try await service.adCampaignTokenLookupQueue2(adAttributionToken: adAttributionToken)
-          completion((result.0, result.1), nil)
+          let result = try await service.adCampaignTokenLookupQueue(adAttributionToken: adAttributionToken)
+          completion(result, nil)
         } catch {
           Logger.module.info("Could not retrieve ad campaign attibution from ad services")
           completion(nil, error)

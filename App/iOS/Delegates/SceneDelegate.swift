@@ -536,21 +536,28 @@ extension BrowserViewController {
     // Case 2: User Referral on Brave side
     if Preferences.URP.referralLookupOutstanding.value == true {
       urp.adCampaignLookup() { [weak self] response, error in
-        // Checking referral code from User Referral program exists If not send 001
-        // Prefix this code with BRV for organic iOS installs
-        var referralCode = "BRV\(UserReferralProgram.getReferralCode() ?? "001")"
+        guard let self = self else { return }
         
-        if error == nil, response?.0 == true, let campaignId = response?.1 {
-          // Adding ASA User refcode prefix to indicate
-          // Apple Ads Attribution is true
-          referralCode = "ASA\(String(campaignId))"
-        }
-        
-        self?.performProgramReferralLookup(urp, refCode: referralCode)
+        let refCode = self.generateReferralCode(attributionData: response, fetchError: error)
+        self.performProgramReferralLookup(urp, refCode: refCode)
       }
     } else {
       urp.pingIfEnoughTimePassed()
     }
+  }
+  
+  private func generateReferralCode(attributionData: AdAttributionData?, fetchError: Error?) -> String {
+    // Checking referral code from User Referral program exists If not send 001
+    // Prefix this code with BRV for organic iOS installs
+    var referralCode = "BRV\(UserReferralProgram.getReferralCode() ?? "001")"
+    
+    if fetchError == nil, attributionData?.attribution == true, let campaignId = attributionData?.campaignId {
+      // Adding ASA User refcode prefix to indicate
+      // Apple Ads Attribution is true
+      referralCode = "ASA\(String(campaignId))"
+    }
+    
+    return referralCode
   }
   
   private func performProgramReferralLookup(_ urp: UserReferralProgram, refCode: String?) {
@@ -558,12 +565,10 @@ extension BrowserViewController {
       // Attempting to send ping after first urp lookup.
       // This way we can grab the referral code if it exists, see issue #2586.
       AppState.shared.dau.sendPingToServer()
-      if let code = referralCode {
-        let retryTime = AppConstants.buildChannel.isPublic ? 1.days : 10.minutes
-        let retryDeadline = Date() + retryTime
+      let retryTime = AppConstants.buildChannel.isPublic ? 1.days : 10.minutes
+      let retryDeadline = Date() + retryTime
 
         Preferences.NewTabPage.superReferrerThemeRetryDeadline.value = retryDeadline
-      }
 
       guard let url = offerUrl?.asURL else { return }
       self.openReferralLink(url: url)
