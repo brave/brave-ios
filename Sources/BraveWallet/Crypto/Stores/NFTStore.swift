@@ -23,7 +23,7 @@ struct NFTAssetViewModel: Identifiable, Equatable {
   }
 }
 
-public class NFTStore: ObservableObject, , WalletObserverStore {
+public class NFTStore: ObservableObject, WalletObserverStore {
   /// The NFTs grouped by enum `NFTDisplayType` displayed in `NFTView`
   var displayNFTs: [NFTAssetViewModel] {
     switch displayType {
