@@ -2441,7 +2441,7 @@ public class BrowserViewController: UIViewController {
           topToolbar.locationContainer.alpha = 1
           topToolbar.actionButtons.forEach { $0.alpha = topToolbar.locationContainer.alpha }
           header.collapsedBarContainerView.alpha = 1 - topToolbar.locationContainer.alpha
-          tabsBar.view.subviews.forEach { $0.alpha = topToolbar.locationContainer.alpha }
+          tabsBar.view.alpha = topToolbar.locationContainer.alpha
           toolbar?.actionButtons.forEach { $0.alpha = topToolbar.locationContainer.alpha }
         }
         animator.startAnimation()
@@ -2464,7 +2464,7 @@ public class BrowserViewController: UIViewController {
         toolbarBottomConstraint?.update(offset: min(footerHeight, max(0, footerHeight * (1 - progress))))
       }
       topToolbar.actionButtons.forEach { $0.alpha = topToolbar.locationContainer.alpha }
-      tabsBar.view.subviews.forEach { $0.alpha = topToolbar.locationContainer.alpha }
+      tabsBar.view.alpha = topToolbar.locationContainer.alpha
       header.collapsedBarContainerView.alpha = 1 - topToolbar.locationContainer.alpha
       toolbar?.actionButtons.forEach { $0.alpha = topToolbar.locationContainer.alpha }
       return
@@ -2479,7 +2479,7 @@ public class BrowserViewController: UIViewController {
       topToolbar.locationContainer.alpha = 0
       toolbarBottomConstraint?.update(offset: footerHeight)
     }
-    tabsBar.view.subviews.forEach { $0.alpha = topToolbar.locationContainer.alpha }
+    tabsBar.view.alpha = topToolbar.locationContainer.alpha
     topToolbar.actionButtons.forEach { $0.alpha = topToolbar.locationContainer.alpha }
     header.collapsedBarContainerView.alpha = 1 - topToolbar.locationContainer.alpha
     toolbar?.actionButtons.forEach { $0.alpha = topToolbar.locationContainer.alpha }
