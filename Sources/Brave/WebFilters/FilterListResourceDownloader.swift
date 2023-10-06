@@ -155,15 +155,12 @@ public actor FilterListResourceDownloader {
     }
     
     do {
-      let engine = try await CachedAdBlockEngine.compile(
+      try await AdBlockStats.shared.compile(
         filterListInfo: filterListInfo, resourcesInfo: resourcesInfo,
         isAlwaysAggressive: false
       )
-      
-      ContentBlockerManager.log.debug("Compiled default engine v\(version)")
-      await AdBlockStats.shared.add(engine: engine)
     } catch {
-      ContentBlockerManager.log.debug("Failed to compile default engine v\(version): \(String(describing: error))")
+      ContentBlockerManager.log.error("Failed to compile engine for \(filterListInfo.source.debugDescription)")
     }
   }
   
@@ -186,14 +183,12 @@ public actor FilterListResourceDownloader {
     }
     
     do {
-      let engine = try await CachedAdBlockEngine.compile(
+      try await AdBlockStats.shared.compile(
         filterListInfo: filterListInfo, resourcesInfo: resourcesInfo,
         isAlwaysAggressive: false
       )
-      ContentBlockerManager.log.debug("Compiled engine for `\(componentId)` v\(version)")
-      await AdBlockStats.shared.add(engine: engine)
     } catch {
-      ContentBlockerManager.log.error("Failed to compile engine for `\(componentId)` v\(version): \(String(describing: error))")
+      ContentBlockerManager.log.error("Failed to compile engine for \(filterListInfo.source.debugDescription)")
     }
   }
   

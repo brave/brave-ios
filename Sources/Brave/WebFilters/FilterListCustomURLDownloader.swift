@@ -119,15 +119,12 @@ actor FilterListCustomURLDownloader: ObservableObject {
       )
       
       do {
-        let engine = try await CachedAdBlockEngine.compile(
+        try await AdBlockStats.shared.compile(
           filterListInfo: filterListInfo, resourcesInfo: resourcesInfo,
           isAlwaysAggressive: true
         )
-        
-        await AdBlockStats.shared.add(engine: engine)
-        ContentBlockerManager.log.debug("Compiled engine for custom filter list `\(uuid)` v\(version)")
       } catch {
-        ContentBlockerManager.log.error("Failed to compile engine for custom filter list `\(uuid)` v\(version): \(String(describing: error))")
+        ContentBlockerManager.log.error("Failed to compile engine for \(filterListInfo.source.debugDescription)")
       }
     } else {
       await AdBlockStats.shared.removeEngine(for: .filterListURL(uuid: uuid))
