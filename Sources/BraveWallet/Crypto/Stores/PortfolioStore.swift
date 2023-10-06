@@ -196,7 +196,7 @@ struct BalanceDifference: Equatable {
 public class PortfolioStore: ObservableObject, WalletObserverStore {
   /// The dollar amount of your portfolio
   @Published private(set) var balance: String = "$0.00"
-  ///
+  /// Balance difference used to display difference between first point on the graph and current balance.
   @Published private(set) var balanceDifference: BalanceDifference?
   /// The users visible fungible token groups.
   @Published private(set) var assetGroups: [AssetGroupViewModel] = []

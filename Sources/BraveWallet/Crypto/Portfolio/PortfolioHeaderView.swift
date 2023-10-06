@@ -208,7 +208,8 @@ private struct PortfolioHeaderButton: View {
           .overlay(
             Image(braveSystemName: style.iconName)
               .foregroundColor(.white)
-              .dynamicTypeSize(.large)
+              .font(.title3.weight(.semibold))
+              .dynamicTypeSize(...DynamicTypeSize.xLarge)
           )
         Text(style.label)
           .font(.footnote.weight(.semibold))
