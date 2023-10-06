@@ -36,11 +36,17 @@ struct ReferralData {
 }
 
 public struct AdAttributionData {
-  
+  // A value of true returns if a user clicks an Apple Search Ads impression up to 30 days before your app download.
+  // If the API can’t find a matching attribution record, the attribution value is false.
   public let attribution: Bool
+  // The identifier of the organization that owns the campaign.
+  // organizationId is the same as your account in the Apple Search Ads UI.
   public let organizationId: Int?
+  // The type of conversion is either Download or Redownload.
   public let conversionType: String?
+  // The unique identifier for the campaign.
   public let campaignId: Int
+  // The country or region for the campaign.
   public let countryOrRegion: String?
   
   init(attribution: Bool, organizationId: Int? = nil, conversionType: String? = nil, campaignId: Int, countryOrRegion: String? = nil) {
@@ -63,6 +69,8 @@ extension AdAttributionData {
       throw SerializationError.invalid("Invalid json Dictionary", "")
     }
     
+    // Attribution and campaignId are the major properties here
+    // They will indicate if the Apple Searhs Ads is clicked and for which campaign
     guard let attribution = json["attribution"] as? Bool else {
       Logger.module.error("Failed to unwrap json to Ad Attribution property.")
       UrpLog.log("Failed to unwrap json to Ad Attribution property. \(json)")

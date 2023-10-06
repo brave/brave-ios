@@ -551,10 +551,13 @@ extension BrowserViewController {
     // Prefix this code with BRV for organic iOS installs
     var referralCode = "BRV\(UserReferralProgram.getReferralCode() ?? "001")"
     
-    if fetchError == nil, attributionData?.attribution == true, let campaignId = attributionData?.campaignId {
-      // Adding ASA User refcode prefix to indicate
-      // Apple Ads Attribution is true
-      referralCode = "ASA\(String(campaignId))"
+    // Checking attribution if a user clicks an Apple Search Ads impression up to 30 days before your app download
+    if fetchError == nil, attributionData?.attribution == true {
+      if let campaignId = attributionData?.campaignId {
+        // Adding ASA User refcode prefix to indicate
+        // Apple Ads Attribution is true
+        referralCode = "ASA\(String(campaignId))"
+      }
     }
     
     return referralCode
