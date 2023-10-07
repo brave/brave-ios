@@ -76,6 +76,7 @@ public actor FilterListResourceDownloader {
       try await filterListSettings.asyncConcurrentForEach { setting in
         guard await setting.isEnabled == true else { return }
         guard let componentId = await setting.componentId else { return }
+        guard FilterList.disabledComponentIDs.contains(componentId) else { return }
         
         // Try to load the filter list folder. We always have to compile this at start
         guard let folderURL = await setting.folderURL, FileManager.default.fileExists(atPath: folderURL.path) else {
@@ -161,14 +162,10 @@ public actor FilterListResourceDownloader {
       return
     }
     
-    do {
-      try await AdBlockStats.shared.compile(
-        filterListInfo: filterListInfo, resourcesInfo: resourcesInfo,
-        isAlwaysAggressive: false
-      )
-    } catch {
-      ContentBlockerManager.log.error("Failed to compile engine for \(filterListInfo.source.debugDescription)")
-    }
+    await AdBlockStats.shared.compile(
+      filterListInfo: filterListInfo, resourcesInfo: resourcesInfo,
+      isAlwaysAggressive: false
+    )
   }
   
   /// Load general filter lists (shields) from the given `AdblockService` `shieldsInstallPath` `URL`.
@@ -197,13 +194,15 @@ public actor FilterListResourceDownloader {
       return
     }
     
+    let isImportant = await AdBlockStats.shared.criticalSources.contains(source)
+     
     do {
-      try await AdBlockStats.shared.compile(
+      try await AdBlockStats.shared.compileDelayed(
         filterListInfo: filterListInfo, resourcesInfo: resourcesInfo,
-        isAlwaysAggressive: isAlwaysAggressive
+        isAlwaysAggressive: isAlwaysAggressive, delayed: !isImportant
       )
     } catch {
-      ContentBlockerManager.log.error("Failed to compile engine for \(filterListInfo.source.debugDescription)")
+      // Don't handle cancellation errors
     }
   }
   
