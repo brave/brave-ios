@@ -133,12 +133,12 @@ actor FilterListCustomURLDownloader: ObservableObject {
     }
     
     do {
-      try await AdBlockStats.shared.compile(
+      try await AdBlockStats.shared.compileDelayed(
         filterListInfo: filterListInfo, resourcesInfo: resourcesInfo,
-        isAlwaysAggressive: true
+        isAlwaysAggressive: true, delayed: true
       )
     } catch {
-      ContentBlockerManager.log.error("Failed to compile engine for \(filterListInfo.source.debugDescription)")
+      // Don't handle cancellation errors
     }
   }
   
