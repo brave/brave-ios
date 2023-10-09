@@ -21,7 +21,7 @@ class BackForwardTableViewCell: UITableViewCell {
   }
 
   lazy var faviconView: UIImageView = {
-    let faviconView = UIImageView(image: Favicon.defaultImage)
+    let faviconView = UIImageView(image: UIImage(sharedNamed: "brave.logo"))
     faviconView.backgroundColor = .braveBackground
     faviconView.layer.cornerRadius = 6
     faviconView.layer.cornerCurve = .continuous
@@ -61,6 +61,7 @@ class BackForwardTableViewCell: UITableViewCell {
     didSet {
       if isCurrentTab {
         label.font = UIFont(name: "HelveticaNeue-Bold", size: BackForwardViewCellUX.fontSize)
+        contentView.backgroundColor = .secondaryBraveBackground
       }
     }
   }
@@ -70,7 +71,7 @@ class BackForwardTableViewCell: UITableViewCell {
       if let s = site {
         if InternalURL.isValid(url: s.tileURL) {
           faviconView.backgroundColor = .white
-          faviconView.image = Favicon.defaultImage
+          faviconView.image = UIImage(sharedNamed: "brave.logo")?.imageWithInsets(insets: .init(equalInset: 4))
         } else {
           faviconView.loadFavicon(for: s.tileURL, isPrivateBrowsing: isPrivateBrowsing)
         }
