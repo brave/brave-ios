@@ -28,7 +28,7 @@ class BackForwardTableViewCell: UITableViewCell {
     faviconView.layer.borderWidth = 0.5
     faviconView.layer.borderColor = UIColor(white: 0, alpha: 0.1).cgColor
     faviconView.layer.masksToBounds = true
-    faviconView.contentMode = .center
+    faviconView.contentMode = .scaleAspectFit
     return faviconView
   }()
 
