@@ -20,7 +20,7 @@ public class AdView: UIView {
 
     addSubview(adContentButton)
     //    addSubview(openSwipeButton)
-    addSubview(dislikeSwipeButton)
+    //    addSubview(dislikeSwipeButton)
 
     adContentButton.snp.makeConstraints {
       $0.edges.equalTo(self)
