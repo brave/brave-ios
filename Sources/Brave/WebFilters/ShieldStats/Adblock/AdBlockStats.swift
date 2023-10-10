@@ -27,8 +27,8 @@ public actor AdBlockStats {
   private(set) var resourcesInfo: CachedAdBlockEngine.ResourcesInfo?
   /// Adblock engine for general adblock lists.
   private(set) var cachedEngines: [CachedAdBlockEngine.Source: CachedAdBlockEngine]
-  /// The queue that ensures that engines are compiled in series since they can be coming from all kinds of async tasks
-  private let serialQueue = DispatchQueue(label: "com.brave.AdBlockStats.\(UUID().uuidString)")
+  /// The current task that is compiling.
+  private var currentCompileTask: Task<(), Never>?
   
   /// Return all the critical sources
   ///
@@ -76,7 +76,7 @@ public actor AdBlockStats {
         )
       }
     } else {
-      self.compile(
+      await self.compile(
         filterListInfo: filterListInfo, resourcesInfo: resourcesInfo,
         isAlwaysAggressive: isAlwaysAggressive
       )
@@ -90,12 +90,17 @@ public actor AdBlockStats {
   public func compile(
     filterListInfo: CachedAdBlockEngine.FilterListInfo, resourcesInfo: CachedAdBlockEngine.ResourcesInfo, 
     isAlwaysAggressive: Bool
-  ) {
-    serialQueue.sync {
-      if reachedMaxLimit && cachedEngines[filterListInfo.source] == nil { return }
-      
-      guard needsCompilation(for: filterListInfo, resourcesInfo: resourcesInfo) else {
-        // Ensure we only compile if we need to. This prevents two lazy loads from recompiling
+  ) async {
+    await currentCompileTask?.value
+    
+    guard needsCompilation(for: filterListInfo, resourcesInfo: resourcesInfo) else {
+      // Ensure we only compile if we need to. This prevents two lazy loads from recompiling
+      return
+    }
+    
+    currentCompileTask = Task {
+      if reachedMaxLimit && cachedEngines[filterListInfo.source] == nil {
+        ContentBlockerManager.log.error("Failed to compile engine for \(filterListInfo.source.debugDescription): Reached maximum!")
         return
       }
       
@@ -109,6 +114,8 @@ public actor AdBlockStats {
         ContentBlockerManager.log.error("Failed to compile engine for \(filterListInfo.source.debugDescription)")
       }
     }
+    
+    await currentCompileTask?.value
   }
   
   /// Add a new engine to the list.
