@@ -539,8 +539,6 @@ extension BrowserViewController: TopToolbarDelegate {
       sheet.largestUndimmedDetentIdentifier = .medium
       sheet.prefersEdgeAttachedInCompactHeight = true
       sheet.widthFollowsPreferredContentSizeWhenEdgeAttached = true
-      
-      // Allows the user to reference the sheet
       sheet.detents = [.medium(), .large()]
     }
     navigationController?.present(viewController, animated: true)
