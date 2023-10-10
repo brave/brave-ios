@@ -199,7 +199,7 @@ public actor FilterListResourceDownloader {
     do {
       try await AdBlockStats.shared.compileDelayed(
         filterListInfo: filterListInfo, resourcesInfo: resourcesInfo,
-        isAlwaysAggressive: false, delayed: !isImportant
+        isAlwaysAggressive: isAlwaysAggressive, delayed: !isImportant
       )
     } catch {
       // Don't handle cancellation errors
