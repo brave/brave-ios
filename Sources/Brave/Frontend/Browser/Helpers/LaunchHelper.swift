@@ -128,20 +128,21 @@ private extension FilterListStorage {
   var validBlocklistTypes: Set<ContentBlockerManager.BlocklistType> {
     if filterLists.isEmpty {
       // If we don't have filter lists yet loaded, use the settings
-      return allFilterListSettings.reduce(into: Set<ContentBlockerManager.BlocklistType>(), { partialResult, setting in
-        guard let componentId = setting.componentId else { return }
-        
-        partialResult.formUnion([
-          .filterList(componentId: componentId, isAlwaysAggressive: setting.isAlwaysAggressive)
-        ])
+      return Set(allFilterListSettings.compactMap { setting in
+        guard let componentId = setting.componentId else { return nil }
+        return .filterList(
+          componentId: componentId,
+          isAlwaysAggressive: setting.isAlwaysAggressive
+        )
       })
     } else {
       // If we do have filter lists yet loaded, use them as they are always the most up to date and accurate
-      return filterLists.reduce(into: Set<ContentBlockerManager.BlocklistType>()) { partialResult, filterList in
-        partialResult.formUnion([
-          .filterList(componentId: filterList.entry.componentId, isAlwaysAggressive: filterList.isAlwaysAggressive)
-        ])
-      }
+      return Set(filterLists.map { filterList in
+        return .filterList(
+          componentId: filterList.entry.componentId, 
+          isAlwaysAggressive: filterList.isAlwaysAggressive
+        )
+      })
     }
   }
 }
