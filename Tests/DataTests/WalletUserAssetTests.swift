@@ -38,9 +38,10 @@ class WalletUserAssetTests: CoreDataTestCase {
     
     XCTAssertTrue(userAsset.visible)
     XCTAssertFalse(userAsset.isSpam)
+    XCTAssertFalse(userAsset.isDeletedByUser)
     
     backgroundSaveAndWaitForExpectation {
-      WalletUserAsset.updateUserAsset(for: asset, visible: false, isDeletedByUser: true)
+      WalletUserAsset.updateUserAsset(for: asset, visible: false, isSpam: true, isDeletedByUser: true)
     }
     
     DataController.viewContext.refreshAllObjects()
@@ -48,6 +49,7 @@ class WalletUserAssetTests: CoreDataTestCase {
     XCTAssertEqual(try! DataController.viewContext.count(for: fetchRequest), 1)
     
     XCTAssertFalse(userAsset.visible)
+    XCTAssertTrue(userAsset.isSpam)
     XCTAssertTrue(userAsset.isDeletedByUser)
   }
   
@@ -57,7 +59,7 @@ class WalletUserAssetTests: CoreDataTestCase {
     createAndWait(asset: asset3)
     
     backgroundSaveAndWaitForExpectation {
-      WalletUserAsset.updateUserAsset(for: asset2, visible: false, isDeletedByUser: false)
+      WalletUserAsset.updateUserAsset(for: asset2, visible: false, isSpam: false, isDeletedByUser: false)
     }
     
     DataController.viewContext.refreshAllObjects()
@@ -71,7 +73,7 @@ class WalletUserAssetTests: CoreDataTestCase {
     createAndWait(asset: asset2)
     
     backgroundSaveAndWaitForExpectation {
-      WalletUserAsset.updateUserAsset(for: asset2, visible: false, isDeletedByUser: true)
+      WalletUserAsset.updateUserAsset(for: asset2, visible: false, isSpam: false, isDeletedByUser: true)
     }
     
     DataController.viewContext.refreshAllObjects()

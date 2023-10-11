@@ -13,7 +13,7 @@ public class AssetStore: ObservableObject, Equatable, WalletObserverStore {
   @Published var token: BraveWallet.BlockchainToken
   @Published var isVisible: Bool {
     didSet {
-      assetManager.updateUserAsset(for: token, visible: isVisible, isDeletedByUser: false, completion: nil)
+      assetManager.updateUserAsset(for: token, visible: isVisible, isSpam: false, isDeletedByUser: false, completion: nil)
     }
   }
   var network: BraveWallet.NetworkInfo

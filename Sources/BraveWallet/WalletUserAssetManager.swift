@@ -28,8 +28,8 @@ public protocol WalletUserAssetManagerType: AnyObject {
   func removeUserAsset(_ asset: BraveWallet.BlockchainToken, completion: (() -> Void)?)
   /// Remove an entire `WalletUserAssetGroup` with a given `groupId`
   func removeGroup(for groupId: String, completion: (() -> Void)?)
-  /// Update a `WalletUserAsset`'s `visible` and `isDeletedByUser` status
-  func updateUserAsset(for asset: BraveWallet.BlockchainToken, visible: Bool, isDeletedByUser: Bool, completion: (() -> Void)?)
+  /// Update a `WalletUserAsset`'s `visible`, `isSpam`, and `isDeletedByUser` status
+  func updateUserAsset(for asset: BraveWallet.BlockchainToken, visible: Bool, isSpam: Bool, isDeletedByUser: Bool, completion: (() -> Void)?)
 }
 
 public class WalletUserAssetManager: WalletUserAssetManagerType {
@@ -113,7 +113,7 @@ public class WalletUserAssetManager: WalletUserAssetManagerType {
   public func addUserAsset(_ asset: BraveWallet.BlockchainToken, completion: (() -> Void)?) {
     if let existedAsset = WalletUserAsset.getUserAsset(asset: asset) {
       if existedAsset.isDeletedByUser { // this asset was added before but user marked as deleted after
-        WalletUserAsset.updateUserAsset(for: asset, visible: true, isDeletedByUser: false, completion: completion)
+        WalletUserAsset.updateUserAsset(for: asset, visible: true, isSpam: false, isDeletedByUser: false, completion: completion)
       } else { // this asset exists, either in `Collected` or `Hidden` based on its `visible` value
         completion?()
         return
@@ -130,12 +130,14 @@ public class WalletUserAssetManager: WalletUserAssetManagerType {
   public func updateUserAsset(
     for asset: BraveWallet.BlockchainToken,
     visible: Bool,
+    isSpam: Bool,
     isDeletedByUser: Bool,
     completion: (() -> Void)?
   ) {
     WalletUserAsset.updateUserAsset(
       for: asset,
       visible: visible,
+      isSpam: isSpam,
       isDeletedByUser: isDeletedByUser,
       completion: completion
     )
@@ -238,6 +240,7 @@ public class TestableWalletUserAssetManager: WalletUserAssetManagerType {
   public func updateUserAsset(
     for asset: BraveWallet.BlockchainToken,
     visible: Bool,
+    isSpam: Bool,
     isDeletedByUser: Bool,
     completion: (() -> Void)?
   ) {

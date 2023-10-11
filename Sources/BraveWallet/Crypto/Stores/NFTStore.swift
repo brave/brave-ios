@@ -384,8 +384,18 @@ public class NFTStore: ObservableObject, WalletObserverStore {
     walletService.setNftDiscoveryEnabled(true)
   }
   
-  func updateNFTStatus(_ token: BraveWallet.BlockchainToken, visible: Bool, isDeletedByUser: Bool) {
-    assetManager.updateUserAsset(for: token, visible: visible, isDeletedByUser: isDeletedByUser) { [weak self] in
+  func updateNFTStatus(
+    _ token: BraveWallet.BlockchainToken,
+    visible: Bool,
+    isSpam: Bool,
+    isDeletedByUser: Bool
+  ) {
+    assetManager.updateUserAsset(
+      for: token,
+      visible: visible,
+      isSpam: isSpam,
+      isDeletedByUser: isDeletedByUser
+    ) { [weak self] in
       guard let self else { return }
       let selectedAccounts = self.filters.accounts.filter(\.isSelected).map(\.model)
       let selectedNetworks = self.filters.networks.filter(\.isSelected).map(\.model)

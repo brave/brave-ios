@@ -228,10 +228,10 @@ struct NFTView: View {
           }
           .contextMenu {
             Button(action: {
-              if nft.token.visible { // a collected visible NFT
-                nftStore.updateNFTStatus(nft.token, visible: false, isDeletedByUser: false)
-              } else { // including hidden NFTs and junk NFTs
-                nftStore.updateNFTStatus(nft.token, visible: true, isDeletedByUser: false)
+              if nft.token.visible { // a collected visible NFT, mark as hidden
+                nftStore.updateNFTStatus(nft.token, visible: false, isSpam: false, isDeletedByUser: false)
+              } else { // either a hidden NFT or a junk NFT, mark as visible
+                nftStore.updateNFTStatus(nft.token, visible: true, isSpam: false, isDeletedByUser: false)
               }
             }) {
               if nft.token.visible { // a collected visible NFT
@@ -243,7 +243,7 @@ struct NFTView: View {
               }
             }
             Button(action: {
-              nftStore.updateNFTStatus(nft.token, visible: false, isDeletedByUser: true)
+              nftStore.updateNFTStatus(nft.token, visible: false, isSpam: nft.token.isSpam, isDeletedByUser: true)
             }) {
               Label(Strings.Wallet.nftRemoveFromWallet, braveSystemImage: "leo.trash")
             }
