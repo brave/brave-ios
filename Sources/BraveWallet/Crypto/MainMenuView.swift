@@ -79,8 +79,7 @@ struct MainMenuView: View {
       if #available(iOS 16, *) {
         view
           .presentationDetents([
-            .height(viewHeight),
-            .large
+            .height(viewHeight)
           ])
       } else {
         view
@@ -168,6 +167,7 @@ private struct MenuRowView<AccessoryContent: View>: View {
       Spacer()
       accessoryContent()
     }
+    .font(.callout.weight(.semibold))
     .padding(.horizontal)
   }
 }
