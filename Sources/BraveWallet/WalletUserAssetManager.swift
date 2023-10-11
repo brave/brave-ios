@@ -16,6 +16,8 @@ public protocol WalletUserAssetManagerType: AnyObject {
   func getAllUserAssetsInNetworkAssets(networks: [BraveWallet.NetworkInfo], includingSpam: Bool) -> [NetworkAssets]
   /// Return all spam or non-spam user assets in form of `NetworkAssets`
   func getAllUserNFTs(networks: [BraveWallet.NetworkInfo], isSpam: Bool) -> [NetworkAssets]
+  /// Return all user marked deleted user assets
+  func getAllUserDeletedNFTs() -> [WalletUserAsset]
   /// Return a `WalletUserAsset` with a given `BraveWallet.BlockchainToken`
   func getUserAsset(_ asset: BraveWallet.BlockchainToken) -> WalletUserAsset?
   /// Add a `WalletUserAsset` representation of the given
@@ -26,8 +28,8 @@ public protocol WalletUserAssetManagerType: AnyObject {
   func removeUserAsset(_ asset: BraveWallet.BlockchainToken, completion: (() -> Void)?)
   /// Remove an entire `WalletUserAssetGroup` with a given `groupId`
   func removeGroup(for groupId: String, completion: (() -> Void)?)
-  /// Update a `WalletUserAsset`'s visible and spam status
-  func updateUserAsset(for asset: BraveWallet.BlockchainToken, visible: Bool, isSpam: Bool, completion: (() -> Void)?)
+  /// Update a `WalletUserAsset`'s `visible` and `isDeletedByUser` status
+  func updateUserAsset(for asset: BraveWallet.BlockchainToken, visible: Bool, isDeletedByUser: Bool, completion: (() -> Void)?)
 }
 
 public class WalletUserAssetManager: WalletUserAssetManagerType {
@@ -71,7 +73,7 @@ public class WalletUserAssetManager: WalletUserAssetManagerType {
     var allVisibleUserAssets: [NetworkAssets] = []
     for (index, network) in networks.enumerated() {
       let groupId = network.walletUserAssetGroupId
-      if let walletUserAssets = WalletUserAssetGroup.getGroup(groupId: groupId)?.walletUserAssets?.filter({ $0.visible == visible && $0.isSpam == false }) {
+      if let walletUserAssets = WalletUserAssetGroup.getGroup(groupId: groupId)?.walletUserAssets?.filter({ $0.visible == visible && $0.isSpam == false && $0.isDeletedByUser == false }) {
         let networkAsset = NetworkAssets(
           network: network,
           tokens: walletUserAssets.map(\.blockchainToken),
@@ -88,7 +90,7 @@ public class WalletUserAssetManager: WalletUserAssetManagerType {
     var allUserSpamAssets: [NetworkAssets] = []
     for (index, network) in networks.enumerated() {
       let groupId = network.walletUserAssetGroupId
-      if let walletUserAssets = WalletUserAssetGroup.getGroup(groupId: groupId)?.walletUserAssets?.filter({ $0.isSpam == isSpam && ($0.isERC721 || $0.isNFT) }) { // Even though users can only spam/unspam NFTs, but we put the NFT filter here to make sure only NFTs are returned
+      if let walletUserAssets = WalletUserAssetGroup.getGroup(groupId: groupId)?.walletUserAssets?.filter({ $0.isSpam == isSpam && ($0.isERC721 || $0.isNFT) && $0.isDeletedByUser == false }) { // Even though users can only spam/unspam NFTs, but we put the NFT filter here to make sure only NFTs are returned
         let networkAsset = NetworkAssets(
           network: network,
           tokens: walletUserAssets.map(\.blockchainToken),
@@ -100,16 +102,25 @@ public class WalletUserAssetManager: WalletUserAssetManagerType {
     return allUserSpamAssets.sorted(by: { $0.sortOrder < $1.sortOrder })
   }
   
+  public func getAllUserDeletedNFTs() -> [WalletUserAsset] {
+    WalletUserAsset.getAllUserDeletedUserAssets() ?? []
+  }
+  
   public func getUserAsset(_ asset: BraveWallet.BlockchainToken) -> WalletUserAsset? {
     WalletUserAsset.getUserAsset(asset: asset)
   }
   
   public func addUserAsset(_ asset: BraveWallet.BlockchainToken, completion: (() -> Void)?) {
-    guard WalletUserAsset.getUserAsset(asset: asset) == nil else {
-      completion?()
-      return
+    if let existedAsset = WalletUserAsset.getUserAsset(asset: asset) {
+      if existedAsset.isDeletedByUser { // this asset was added before but user marked as deleted after
+        WalletUserAsset.updateUserAsset(for: asset, visible: true, isDeletedByUser: false, completion: completion)
+      } else { // this asset exists, either in `Collected` or `Hidden` based on its `visible` value
+        completion?()
+        return
+      }
+    } else { // asset does not exist in database
+      WalletUserAsset.addUserAsset(asset: asset, completion: completion)
     }
-    WalletUserAsset.addUserAsset(asset: asset, completion: completion)
   }
   
   public func removeUserAsset(_ asset: BraveWallet.BlockchainToken, completion: (() -> Void)?) {
@@ -119,13 +130,13 @@ public class WalletUserAssetManager: WalletUserAssetManagerType {
   public func updateUserAsset(
     for asset: BraveWallet.BlockchainToken,
     visible: Bool,
-    isSpam: Bool,
+    isDeletedByUser: Bool,
     completion: (() -> Void)?
   ) {
     WalletUserAsset.updateUserAsset(
       for: asset,
       visible: visible,
-      isSpam: isSpam,
+      isDeletedByUser: isDeletedByUser,
       completion: completion
     )
   }
@@ -184,6 +195,7 @@ public class TestableWalletUserAssetManager: WalletUserAssetManagerType {
   public var _getAllUserAssetsInNetworkAssetsByVisibility: ((_ networks: [BraveWallet.NetworkInfo], _ visible: Bool) -> [NetworkAssets])?
   public var _getAllUserAssetsInNetworkAssets: ((_ networks: [BraveWallet.NetworkInfo], _ includingSpam: Bool) -> [NetworkAssets])?
   public var _getAllUserNFTs: ((_ networks: [BraveWallet.NetworkInfo], _ spamStatus: Bool) -> [NetworkAssets])?
+  public var _getAllUserDeletedNFTs: (() -> [WalletUserAsset])?
   
   public init() {}
   
@@ -206,6 +218,10 @@ public class TestableWalletUserAssetManager: WalletUserAssetManagerType {
     _getAllUserNFTs?(networks, isSpam) ?? []
   }
   
+  public func getAllUserDeletedNFTs() -> [WalletUserAsset] {
+    _getAllUserDeletedNFTs?() ?? []
+  }
+  
   public func getUserAsset(_ asset: BraveWallet.BlockchainToken) -> WalletUserAsset? {
     return nil
   }
@@ -222,7 +238,7 @@ public class TestableWalletUserAssetManager: WalletUserAssetManagerType {
   public func updateUserAsset(
     for asset: BraveWallet.BlockchainToken,
     visible: Bool,
-    isSpam: Bool,
+    isDeletedByUser: Bool,
     completion: (() -> Void)?
   ) {
   }

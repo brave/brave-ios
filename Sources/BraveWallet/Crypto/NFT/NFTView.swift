@@ -205,17 +205,47 @@ struct NFTView: View {
                   .multilineTextAlignment(.leading)
               }
             }
+            .overlay(alignment: .topLeading) {
+              if nft.token.isSpam {
+                HStack(spacing: 4) {
+                  Text(Strings.Wallet.nftSpam)
+                    .padding(.vertical, 4)
+                    .padding(.leading, 6)
+                    .foregroundColor(Color(.braveErrorLabel))
+                  Image(braveSystemName: "leo.warning.triangle-outline")
+                    .padding(.vertical, 4)
+                    .padding(.trailing, 6)
+                    .foregroundColor(Color(.braveErrorBorder))
+                }
+                .font(.system(size: 13).weight(.semibold))
+                .background(
+                  Color(uiColor: WalletV2Design.spamNFTLabelBackground)
+                    .cornerRadius(4)
+                )
+                .padding(12)
+              }
+            }
           }
           .contextMenu {
             Button(action: {
-              nftStore.updateNFTStatus(nft.token, visible: isHiddenNFT(nft.token), isSpam: false)
+              if nft.token.visible { // a collected visible NFT
+                nftStore.updateNFTStatus(nft.token, visible: false, isDeletedByUser: false)
+              } else { // including hidden NFTs and junk NFTs
+                nftStore.updateNFTStatus(nft.token, visible: true, isDeletedByUser: false)
+              }
             }) {
-              Label(isHiddenNFT(nft.token) ? Strings.Wallet.nftUnhide : Strings.recentSearchHide, braveSystemImage: isHiddenNFT(nft.token) ? "leo.eye.on" : "leo.eye.off")
+              if nft.token.visible { // a collected visible NFT
+                Label(Strings.recentSearchHide, braveSystemImage: "leo.eye.off")
+              } else if nft.token.isSpam { // a spam NFT
+                Label(Strings.Wallet.nftUnspam, braveSystemImage: "leo.disable.outline")
+              } else { // a hidden but not spam NFT
+                Label(Strings.Wallet.nftUnhide, braveSystemImage: "leo.eye.on")
+              }
             }
             Button(action: {
-              nftStore.updateNFTStatus(nft.token, visible: isSpamNFT(nft.token), isSpam: !isSpamNFT(nft.token))
+              nftStore.updateNFTStatus(nft.token, visible: false, isDeletedByUser: true)
             }) {
-              Label(isSpamNFT(nft.token) ? Strings.Wallet.nftUnspam : Strings.Wallet.nftMoveToSpam, braveSystemImage: "leo.disable.outline")
+              Label(Strings.Wallet.nftRemoveFromWallet, braveSystemImage: "leo.trash")
             }
           }
         }
@@ -319,22 +349,6 @@ struct NFTView: View {
           self.isShowingNFTDiscoveryAlert = true
         }
       }
-    }
-  }
-  
-  private func isSpamNFT(_ nft: BraveWallet.BlockchainToken) -> Bool {
-    if nftStore.displayType == .spam {
-      return true
-    } else {
-      return nft.isSpam
-    }
-  }
-  
-  private func isHiddenNFT(_ nft: BraveWallet.BlockchainToken) -> Bool {
-    if nftStore.displayType == .spam {
-      return false
-    } else {
-      return !nft.visible
     }
   }
 }

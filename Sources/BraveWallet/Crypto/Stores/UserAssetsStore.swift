@@ -13,7 +13,7 @@ public class AssetStore: ObservableObject, Equatable, WalletObserverStore {
   @Published var token: BraveWallet.BlockchainToken
   @Published var isVisible: Bool {
     didSet {
-      assetManager.updateUserAsset(for: token, visible: isVisible, isSpam: false, completion: nil)
+      assetManager.updateUserAsset(for: token, visible: isVisible, isDeletedByUser: false, completion: nil)
     }
   }
   var network: BraveWallet.NetworkInfo
@@ -183,7 +183,7 @@ public class UserAssetsStore: ObservableObject, WalletObserverStore {
     _ asset: BraveWallet.BlockchainToken,
     completion: @escaping (_ success: Bool) -> Void
   ) {
-    if assetManager.getUserAsset(asset) != nil {
+    if let existedAsset = assetManager.getUserAsset(asset), !existedAsset.isDeletedByUser {
       completion(false)
     } else {
       assetManager.addUserAsset(asset) { [weak self] in
