@@ -61,6 +61,13 @@ struct SubmitReportView: View {
     .foregroundStyle(Color(braveSystemName: .textSecondary))
     .navigationTitle(Strings.Shields.reportABrokenSite)
     .toolbar {
+      ToolbarItem(placement: .cancellationAction) {
+        Button(Strings.cancelButtonTitle) {
+          dismiss()
+        }
+        .disabled(isSubmittingReport)
+      }
+      
       ToolbarItem(placement: .confirmationAction) {
         Button(Strings.Shields.reportBrokenSubmitButtonTitle, action: {
           isSubmittingReport = true

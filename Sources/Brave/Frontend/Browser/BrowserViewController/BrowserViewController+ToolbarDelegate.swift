@@ -540,6 +540,7 @@ extension BrowserViewController: TopToolbarDelegate {
       sheet.prefersEdgeAttachedInCompactHeight = true
       sheet.widthFollowsPreferredContentSizeWhenEdgeAttached = true
       sheet.detents = [.medium(), .large()]
+      sheet.prefersGrabberVisible = true
     }
     navigationController?.present(viewController, animated: true)
   }
