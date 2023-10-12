@@ -51,7 +51,7 @@ platform :ios do
         "ClientTests/ContentBlockerTests",
         "ClientTests/HttpCookieExtensionTest/testSaveAndLoadCookie",
         "ClientTests/UserAgentTests",
-        "ClientTests/AdBlockEngineManagerTests/testPerformance",
+        "ClientTests/CachedAdBlockEngineTests/testPerformance",
         "DataTests",
         "BraveWalletTests/ManageSiteConnectionsStoreTests/testRemoveAllPermissions",
         "BraveWalletTests/ManageSiteConnectionsStoreTests/testRemovePermissions",
