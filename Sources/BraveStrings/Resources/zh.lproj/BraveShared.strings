@@ -623,7 +623,7 @@
 "defaultBrowserCallout.introTertiaryText" = "打开设置、点击默认浏览器应用，然后选择 Brave。";
 
 /* Notification body to promote setting Brave app as default browser */
-"defaultBrowserCallout.notificationBody" = "將 Brave 設為預設瀏覽器";
+"defaultBrowserCallout.notificationBody" = "将 Brave 设为默认浏览器";
 
 /* Notification title to promote setting Brave app as default browser */
 "defaultBrowserCallout.notificationTitle" = "每次点击链接都能获得 Brave 的保护";
