@@ -626,7 +626,7 @@
 "defaultBrowserCallout.notificationBody" = "將 Brave 設為預設瀏覽器";
 
 /* Notification title to promote setting Brave app as default browser */
-"defaultBrowserCallout.notificationTitle" = "每次點選連結都能獲得 Brave 保護";
+"defaultBrowserCallout.notificationTitle" = "每次点击链接都能获得 Brave 的保护";
 
 /* No comment provided by engineer. */
 "defaultBrowserCalloutCloseAccesabilityLabel" = "关闭默认浏览器标注";
@@ -1685,7 +1685,7 @@
 "playlist.playlistStartPlaybackSettingsFooterText" = "对于单个文件，请从上次暂停的位置重新开始播放。";
 
 /* Title for the Playlist Settings Option for Enable/Disable ability to start playing from the point where user last left-off */
-"playlist.playlistStartPlaybackSettingsOptionTitle" = "記住檔案播放位置";
+"playlist.playlistStartPlaybackSettingsOptionTitle" = "记住文件播放位置";
 
 /* Description for Playlist setting */
 "playlist.playlistWebCompatibilityDescription" = "禁用 WebKit MediaSource API";
@@ -2213,7 +2213,7 @@
 "ReportBrokenSiteBody1" = "让 Brave 的开发人员知道此网站无法与 Shields 一起正常使用：";
 
 /* This is the info text that is presented when a user is submitting a web-compatibility report. */
-"ReportBrokenSiteBody2" = "注意：傳送至 Brave 伺服器的報告會包括網址、Brave 版本號碼、Shields 設定、VPN 狀態和語言設定。";
+"ReportBrokenSiteBody2" = "注意：传送至 Brave 服务器的报告会包括网址、Brave 版本号码、Shields 设定、VPN 状态和语言设定。";
 
 /* No comment provided by engineer. */
 "ReportBrokenSubmitButtonTitle" = "提交";
@@ -2234,7 +2234,7 @@
 "RestoreTabOnCrashAlertMessage" = "抱歉，Brave 崩溃了或无法正常关闭。\n恢复标签页？";
 
 /* Restore Tabs Prompt Title */
-"RestoreTabOnCrashAlertTitle" = "Brave 意外關閉。";
+"RestoreTabOnCrashAlertTitle" = "Brave 意外闪退。";
 
 /* Body for Brave Talk rewards opt-in screen */
 "rewards.braveTalkRewardsOptInBody" = "借助 Brave Rewards，您可以查看来自 Brave Ads 网络的隐私保护广告。无需跟踪器，无需减速，而您的数据绝对安全。";
@@ -2948,19 +2948,19 @@
 "sync.syncDeleteAccountAlertDescriptionPart2" = "一旦删除即永久删除，资料将无法复原。如果您决定再次使用 Sync，您将需要建立新帐户，并逐一重新新增每台设备。";
 
 /* The message displayed in alert when a there is a problem with fetching devices */
-"sync.syncDeviceFetchErrorAlertDescription" = "擷取同步鏈中的裝置時發生錯誤。";
+"sync.syncDeviceFetchErrorAlertDescription" = "摘取同步链中的装置时发生错误。";
 
 /* The message displayed in alert when a list of devices will be shown */
-"sync.syncDevicesInSyncChainTitle" = "同步鏈中的裝置";
+"sync.syncDevicesInSyncChainTitle" = "同步链中的装置";
 
 /* A warning when user adds more than 5 device to sync chain */
-"sync.syncJoinChainCodewordsWarning" = "注意：您應確認您認得上方清單中的每個裝置。同步鏈中的裝置可能會收到個人資料，如密碼和瀏覽記錄。";
+"sync.syncJoinChainCodewordsWarning" = "注意：您应确认您认得上方清单中的每个装置。同步链中的装置可能会收到个人资料，如密码和浏览记录。";
 
 /* Title for alert error for device confirmation */
-"sync.syncJoinChainWarningTitle" = "確認裝置";
+"sync.syncJoinChainWarningTitle" = "确认裝置";
 
 /* The message displayed in alert when the maxmium of devices is reached */
-"sync.syncMaximumDeviceReachedErrorDescription" = "您已達同步鏈中允許的裝置數量上限 (10 個)。請移除裝置以繼續操作。";
+"sync.syncMaximumDeviceReachedErrorDescription" = "您已达到同步链中允许的装置上限（10 个）。请移除装置以继续操作。";
 
 /* The warning displayed in alert when the maxmium of devices is reached */
 "sync.syncMaximumDeviceReachedErrorTitle" = "裝置上限";
@@ -3713,7 +3713,7 @@
 "vpn.resetVPNErrorTitle" = "错误";
 
 /* Message to show when vpn configuration reset succeeds. */
-"vpn.resetVPNSuccessBody" = "已成功重設 VPN 設定。";
+"vpn.resetVPNSuccessBody" = "已成功重设 VPN 设定。";
 
 /* Title for success message when vpn configuration reset succeeds. */
 "vpn.resetVPNSuccessTitle" = "成功";
@@ -3878,7 +3878,7 @@
 "vpn.vpnSettingsYearlySubName" = "每年订阅";
 
 /* Text description of VPN subscription needs a method of payment update */
-"vpn.vpnUpdatePaymentMethodDescriptionText" = "請更新您的付款方式";
+"vpn.vpnUpdatePaymentMethodDescriptionText" = "请更新您的付款方式";
 
 /* Used in context: 'yearly subscription, renew annually (to) save 16%'. The placeholder is for percent value */
 "vpn.yearlySubDetail" = "每年续约，可节省 %@";

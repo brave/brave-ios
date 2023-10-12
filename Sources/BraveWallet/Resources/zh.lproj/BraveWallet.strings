@@ -227,7 +227,7 @@
 "wallet.chartAxisPriceLabel" = "价格";
 
 /* The description of one of the 'Coinbase Pay' provider. */
-"wallet.coinbaseNetworkProviderDescription" = "使用加密貨幣領域最值得信賴的品牌進行購買。";
+"wallet.coinbaseNetworkProviderDescription" = "使用加密货币领域最值得信赖的品牌进行购买。";
 
 /* A disclaimer that appears at the bottom of an asset detail screen which shows prices and price history. CoinGecko is a third-party product. */
 "wallet.coinGeckoDisclaimer" = "价格数据由 CoinGecko 提供";
@@ -818,7 +818,7 @@
 "wallet.insufficientLiquidity" = "流动资产不足";
 
 /* The title of a button that Deselects all visible options. */
-"wallet.internalErrorMessage" = "發生內部錯誤";
+"wallet.internalErrorMessage" = "发生内部错误";
 
 /* A title will displayed in the IPFS error page when IPFS is disabled. */
 "wallet.ipfsErrorTitle" = "无法访问此网站";
@@ -1256,7 +1256,7 @@
 "wallet.sendErrorDomainNotRegistered" = "网域没有已连结的 %@ 地址";
 
 /* An error that appears below the send crypto address text field, when the input `To` Filecoin address that is invalid */
-"wallet.sendErrorInvalidRecipientAddress" = "無效的收件者地址";
+"wallet.sendErrorInvalidRecipientAddress" = "无效的收件人地址";
 
 /* A placeholder of the address text field. */
 "wallet.sendToCryptoAddressPlaceholder" = "输入地址";
@@ -1568,7 +1568,7 @@
 "wallet.sortAssetsTitle" = "资产分类";
 
 /* The description of one of the 'Stripe' provider. */
-"wallet.stripeNetworkProviderDescription" = "使用信用卡、簽帳金融卡或銀行帳戶支付。";
+"wallet.stripeNetworkProviderDescription" = "使用信用卡、签帐金融卡或银行账户支付。";
 
 /* The name of one of the on ramp providers where the first '%@' is `Link` and second '%@' is `Stripe` product names. */
 "wallet.stripeNetworkProviderName" = "%2$@ 的 %1$@";
