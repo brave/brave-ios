@@ -164,13 +164,13 @@ struct AccountActivityView: View {
           }
         }
     )
-    .onReceive(keyringStore.$allAccounts, perform: { allAccounts in
+    .onReceive(keyringStore.$allAccounts) { allAccounts in
       if !allAccounts.contains(where: { $0.address == accountInfo.address }) {
         // Account was deleted
         detailsPresentation = nil
         presentationMode.dismiss()
       }
-    })
+    }
     .onAppear {
       activityStore.update()
     }
