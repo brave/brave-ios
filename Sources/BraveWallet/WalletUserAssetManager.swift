@@ -13,7 +13,7 @@ public protocol WalletUserAssetManagerType: AnyObject {
   /// Return all visible or all invisible user assets in form of `NetworkAssets`
   func getAllUserAssetsInNetworkAssetsByVisibility(networks: [BraveWallet.NetworkInfo], visible: Bool) -> [NetworkAssets]
   /// Return all user assets in form of `NetworkAssets`
-  func getAllUserAssetsInNetworkAssets(networks: [BraveWallet.NetworkInfo], includingSpam: Bool) -> [NetworkAssets]
+  func getAllUserAssetsInNetworkAssets(networks: [BraveWallet.NetworkInfo], includingUserDeleted: Bool) -> [NetworkAssets]
   /// Return all spam or non-spam user assets in form of `NetworkAssets`
   func getAllUserNFTs(networks: [BraveWallet.NetworkInfo], isSpam: Bool) -> [NetworkAssets]
   /// Return all user marked deleted user assets
@@ -46,13 +46,13 @@ public class WalletUserAssetManager: WalletUserAssetManagerType {
   }
   
   /// Return all user's assets stored in CoreData
-  public func getAllUserAssetsInNetworkAssets(networks: [BraveWallet.NetworkInfo], includingSpam: Bool) -> [NetworkAssets] {
+  public func getAllUserAssetsInNetworkAssets(networks: [BraveWallet.NetworkInfo], includingUserDeleted: Bool) -> [NetworkAssets] {
     var allUserAssets: [NetworkAssets] = []
     for (index, network) in networks.enumerated() {
       let groupId = network.walletUserAssetGroupId
       if let walletUserAssets = WalletUserAssetGroup.getGroup(groupId: groupId)?.walletUserAssets?.filter({
-        if !includingSpam {
-          return $0.isSpam == false
+        if !includingUserDeleted {
+          return $0.isDeletedByUser == false
         }
         return true
       }) {
@@ -114,7 +114,7 @@ public class WalletUserAssetManager: WalletUserAssetManagerType {
     if let existedAsset = WalletUserAsset.getUserAsset(asset: asset) {
       if existedAsset.isDeletedByUser { // this asset was added before but user marked as deleted after
         WalletUserAsset.updateUserAsset(for: asset, visible: true, isSpam: false, isDeletedByUser: false, completion: completion)
-      } else { // this asset exists, either in `Collected` or `Hidden` based on its `visible` value
+      } else { // this asset already exists
         completion?()
         return
       }
@@ -195,19 +195,19 @@ public class WalletUserAssetManager: WalletUserAssetManagerType {
 #if DEBUG
 public class TestableWalletUserAssetManager: WalletUserAssetManagerType {
   public var _getAllUserAssetsInNetworkAssetsByVisibility: ((_ networks: [BraveWallet.NetworkInfo], _ visible: Bool) -> [NetworkAssets])?
-  public var _getAllUserAssetsInNetworkAssets: ((_ networks: [BraveWallet.NetworkInfo], _ includingSpam: Bool) -> [NetworkAssets])?
+  public var _getAllUserAssetsInNetworkAssets: ((_ networks: [BraveWallet.NetworkInfo], _ includingUserDeleted: Bool) -> [NetworkAssets])?
   public var _getAllUserNFTs: ((_ networks: [BraveWallet.NetworkInfo], _ spamStatus: Bool) -> [NetworkAssets])?
   public var _getAllUserDeletedNFTs: (() -> [WalletUserAsset])?
   
   public init() {}
   
-  public func getAllUserAssetsInNetworkAssets(networks: [BraveWallet.NetworkInfo], includingSpam: Bool) -> [NetworkAssets] {
+  public func getAllUserAssetsInNetworkAssets(networks: [BraveWallet.NetworkInfo], includingUserDeleted: Bool) -> [NetworkAssets] {
     let defaultAssets: [NetworkAssets] = [
       NetworkAssets(network: .mockMainnet, tokens: [.previewToken], sortOrder: 0),
       NetworkAssets(network: .mockGoerli, tokens: [.previewToken], sortOrder: 1)
     ]
     let chainIds = networks.map { $0.chainId }
-    return _getAllUserAssetsInNetworkAssets?(networks, includingSpam) ?? defaultAssets.filter({
+    return _getAllUserAssetsInNetworkAssets?(networks, includingUserDeleted) ?? defaultAssets.filter({
       chainIds.contains($0.network.chainId)
     })
   }

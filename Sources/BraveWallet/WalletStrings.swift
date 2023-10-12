@@ -4381,6 +4381,20 @@ extension Strings {
       value: "Don't show in wallet",
       comment: "The title of context button for user to do not show a NFT in wallet at all."
     )
+    public static let nftRemoveFromWalletAlertTitle = NSLocalizedString(
+      "wallet.nftRemoveFromWalletAlertTitle",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Remove from Brave Wallet?",
+      comment: "The title of the alert when user attempts to remove an NFT from wallet."
+    )
+    public static let nftRemoveFromWalletAlertDescription = NSLocalizedString(
+      "wallet.nftRemoveFromWalletAlertDescription",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "NFT will be removed from Brave Wallet but will remain on the blockchain. If you remove it, then change your mind, you'll need to import it again manually.",
+      comment: "The description of the alert when user attempts to remove an NFT from wallet."
+    )
     public static let selectTokenToSendTitle = NSLocalizedString(
       "wallet.selectTokenToSendTitle",
       tableName: "BraveWallet",

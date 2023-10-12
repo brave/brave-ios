@@ -20,6 +20,7 @@ struct NFTView: View {
   @State private var isShowingNFTDiscoveryAlert: Bool = false
   @State private var isShowingAddCustomNFT: Bool = false
   @State private var isNFTDiscoveryEnabled: Bool = false
+  @State private var nftToBeRemoved: NFTAssetViewModel?
   
   @Environment(\.buySendSwapDestination)
   private var buySendSwapDestination: Binding<BuySendSwapDestination?>
@@ -243,7 +244,7 @@ struct NFTView: View {
               }
             }
             Button(action: {
-              nftStore.updateNFTStatus(nft.token, visible: false, isSpam: nft.token.isSpam, isDeletedByUser: true)
+              nftToBeRemoved = nft
             }) {
               Label(Strings.Wallet.nftRemoveFromWallet, braveSystemImage: "leo.trash")
             }
@@ -330,6 +331,38 @@ struct NFTView: View {
           }
         }
       )
+    )
+    .background(
+      WalletPromptView(
+        isPresented: Binding(
+          get: { nftToBeRemoved != nil },
+          set: { if !$0 { nftToBeRemoved = nil } }
+        ),
+        primaryButton: .init(
+          title: Strings.Wallet.manageSiteConnectionsConfirmAlertRemove,
+          action: { _ in
+            guard let nft = nftToBeRemoved else { return }
+            nftStore.updateNFTStatus(nft.token, visible: false, isSpam: nft.token.isSpam, isDeletedByUser: true)
+            nftToBeRemoved = nil
+          }
+        ),
+        secondaryButton: .init(
+          title: Strings.CancelString,
+          action: { _ in
+            nftToBeRemoved = nil
+          }
+        ),
+        showCloseButton: false,
+        content: {
+          VStack(spacing: 16) {
+            Text(Strings.Wallet.nftRemoveFromWalletAlertTitle)
+              .font(.headline)
+              .foregroundColor(Color(.bravePrimary))
+            Text(Strings.Wallet.nftRemoveFromWalletAlertDescription)
+              .font(.footnote)
+              .foregroundStyle(Color(.secondaryBraveLabel))
+          }
+        })
     )
     .sheet(isPresented: $isShowingAddCustomNFT) {
       AddCustomAssetView(
