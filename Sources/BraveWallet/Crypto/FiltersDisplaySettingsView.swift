@@ -164,6 +164,9 @@ struct FiltersDisplaySettingsView: View {
       ScrollView {
         LazyVStack(spacing: 0) {
           if isNFTFilters {
+            groupByRow
+              .padding(.vertical, rowPadding)
+            
             showNFTNetworkLogo
               .padding(.vertical, rowPadding)
             

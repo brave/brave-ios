@@ -20,6 +20,7 @@ struct NFTView: View {
   @State private var isShowingNFTDiscoveryAlert: Bool = false
   @State private var isShowingAddCustomNFT: Bool = false
   @State private var isNFTDiscoveryEnabled: Bool = false
+  @State private var groupToggleState: [NFTGroupViewModel.ID: Bool] = [:]
   
   @Environment(\.buySendSwapDestination)
   private var buySendSwapDestination: Binding<BuySendSwapDestination?>
@@ -140,7 +141,6 @@ struct NFTView: View {
       Text(Strings.Wallet.assetsTitle)
         .font(.footnote)
         .foregroundColor(Color(.secondaryBraveLabel))
-        .padding(.leading, 16)
       if nftStore.isLoadingDiscoverAssets && isNFTDiscoveryEnabled {
         ProgressView()
           .padding(.leading, 5)
@@ -162,7 +162,6 @@ struct NFTView: View {
       addCustomAssetButton
     }
     .textCase(nil)
-    .padding(.horizontal, 10)
     .frame(maxWidth: .infinity, alignment: .leading)
   }
   
@@ -191,62 +190,170 @@ struct NFTView: View {
   }
   
   @ViewBuilder var nftGridsView: some View {
-    if nftStore.displayNFTs.isEmpty {
-      emptyView
-        .listRowBackground(Color(.clear))
+    if nftStore.isShowingNFTEmptyState {
+      Section {
+        emptyView
+          .listRowBackground(Color(.clear))
+      } header: {
+        nftHeaderView
+      }
     } else {
-      LazyVGrid(columns: nftGrids) {
-        ForEach(nftStore.displayNFTs) { nft in
-          Button(action: {
-            selectedNFTViewModel = nft
-          }) {
-            VStack(alignment: .leading, spacing: 4) {
-              nftImage(nft)
-                .padding(.bottom, 8)
-              Text(nft.token.nftTokenTitle)
-                .font(.callout.weight(.medium))
-                .foregroundColor(Color(.braveLabel))
-                .multilineTextAlignment(.leading)
-              if !nft.token.symbol.isEmpty {
-                Text(nft.token.symbol)
-                  .font(.caption)
-                  .foregroundColor(Color(.secondaryBraveLabel))
-                  .multilineTextAlignment(.leading)
-              }
-            }
+      ForEach(nftStore.displayNFTGroups) { group in
+        Section {
+          if group.groupType == .none {
+            ungroupedNFTs(group)
+              .listRowBackground(Color(.secondaryBraveGroupedBackground))
+          } else {
+            groupedNFTSection(group)
+              .listRowBackground(Color(.secondaryBraveGroupedBackground))
           }
-          .contextMenu {
-            Button(action: {
-              nftStore.updateNFTStatus(nft.token, visible: isHiddenNFT(nft.token), isSpam: false)
-            }) {
-              Label(isHiddenNFT(nft.token) ? Strings.Wallet.nftUnhide : Strings.recentSearchHide, braveSystemImage: isHiddenNFT(nft.token) ? "leo.eye.on" : "leo.eye.off")
-            }
-            Button(action: {
-              nftStore.updateNFTStatus(nft.token, visible: isSpamNFT(nft.token), isSpam: !isSpamNFT(nft.token))
-            }) {
-              Label(isSpamNFT(nft.token) ? Strings.Wallet.nftUnspam : Strings.Wallet.nftMoveToSpam, braveSystemImage: "leo.disable.outline")
-            }
+        } header: {
+          if group == nftStore.displayNFTGroups.first {
+            nftHeaderView
           }
         }
       }
-      VStack(spacing: 16) {
-        Divider()
-        editUserAssetsButton
+    }
+  }
+  
+  /// Builds the grids of NFTs without any grouping or expandable / collapse behaviour.
+  @ViewBuilder private func ungroupedNFTs(_ group: NFTGroupViewModel) -> some View {
+    LazyVGrid(columns: nftGrids) {
+      ForEach(group.assets) { nft in
+        Button(action: {
+          selectedNFTViewModel = nft
+        }) {
+          VStack(alignment: .leading, spacing: 4) {
+            nftImage(nft)
+              .padding(.bottom, 8)
+            Text(nft.token.nftTokenTitle)
+              .font(.callout.weight(.medium))
+              .foregroundColor(Color(.braveLabel))
+              .multilineTextAlignment(.leading)
+            if !nft.token.symbol.isEmpty {
+              Text(nft.token.symbol)
+                .font(.caption)
+                .foregroundColor(Color(.secondaryBraveLabel))
+                .multilineTextAlignment(.leading)
+            }
+          }
+        }
+        .contextMenu {
+          Button(action: {
+            nftStore.updateNFTStatus(nft.token, visible: isHiddenNFT(nft.token), isSpam: false)
+          }) {
+            Label(isHiddenNFT(nft.token) ? Strings.Wallet.nftUnhide : Strings.recentSearchHide, braveSystemImage: isHiddenNFT(nft.token) ? "leo.eye.on" : "leo.eye.off")
+          }
+          Button(action: {
+            nftStore.updateNFTStatus(nft.token, visible: isSpamNFT(nft.token), isSpam: !isSpamNFT(nft.token))
+          }) {
+            Label(isSpamNFT(nft.token) ? Strings.Wallet.nftUnspam : Strings.Wallet.nftMoveToSpam, braveSystemImage: "leo.disable.outline")
+          }
+        }
       }
-      .padding(.top, 20)
+    }
+  }
+  
+  /// Builds the expandable /  collapseable section content for a given group.
+  @ViewBuilder private func groupedNFTSection(_ group: NFTGroupViewModel) -> some View {
+    WalletDisclosureGroup(
+      isExpanded: Binding(
+        get: { groupToggleState[group.id, default: true] },
+        set: { groupToggleState[group.id] = $0 }
+      ),
+      content: {
+        if group.assets.isEmpty {
+          EmptyView()
+        } else {
+          LazyVGrid(columns: nftGrids) {
+            ForEach(group.assets) { nft in
+              Button(action: {
+                selectedNFTViewModel = nft
+              }) {
+                VStack(alignment: .leading, spacing: 4) {
+                  nftImage(nft)
+                    .padding(.bottom, 8)
+                  Text(nft.token.nftTokenTitle)
+                    .font(.callout.weight(.medium))
+                    .foregroundColor(Color(.braveLabel))
+                    .multilineTextAlignment(.leading)
+                  if !nft.token.symbol.isEmpty {
+                    Text(nft.token.symbol)
+                      .font(.caption)
+                      .foregroundColor(Color(.secondaryBraveLabel))
+                      .multilineTextAlignment(.leading)
+                  }
+                }
+              }
+              .contextMenu {
+                Button(action: {
+                  nftStore.updateNFTStatus(nft.token, visible: isHiddenNFT(nft.token), isSpam: false)
+                }) {
+                  Label(isHiddenNFT(nft.token) ? Strings.Wallet.nftUnhide : Strings.recentSearchHide, braveSystemImage: isHiddenNFT(nft.token) ? "leo.eye.on" : "leo.eye.off")
+                }
+                Button(action: {
+                  nftStore.updateNFTStatus(nft.token, visible: isSpamNFT(nft.token), isSpam: !isSpamNFT(nft.token))
+                }) {
+                  Label(isSpamNFT(nft.token) ? Strings.Wallet.nftUnspam : Strings.Wallet.nftMoveToSpam, braveSystemImage: "leo.disable.outline")
+                }
+              }
+            }
+          }
+        }
+      },
+      label: {
+        if case let .account(account) = group.groupType {
+          AddressView(address: account.address) {
+            groupHeader(for: group)
+          }
+        } else {
+          groupHeader(for: group)
+        }
+      }
+    )
+  }
+  
+  /// Builds the in-section header for an NFTGroupViewModel that is shown in expanded and non-expanded state. Not used for ungrouped assets.
+  private func groupHeader(for group: NFTGroupViewModel) -> some View {
+    VStack(spacing: 0) {
+      HStack {
+        if case let .network(networkInfo) = group.groupType {
+          NetworkIcon(network: networkInfo, length: 32)
+        } else if case let .account(accountInfo) = group.groupType {
+          Blockie(address: accountInfo.address, shape: .rectangle)
+            .frame(width: 32, height: 32)
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+        }
+        VStack(alignment: .leading) {
+          Text(group.title)
+            .font(.callout.weight(.semibold))
+            .foregroundColor(Color(WalletV2Design.textPrimary))
+          if let description = group.description {
+            Text(description)
+              .font(.footnote)
+              .foregroundColor(Color(WalletV2Design.textSecondary))
+          }
+        }
+        .multilineTextAlignment(.leading)
+      }
+      .padding(.vertical, 4)
     }
   }
   
   var body: some View {
-    ScrollView {
-      VStack {
-        nftHeaderView
-          .padding(.horizontal, 8)
-        nftGridsView
-          .padding(.horizontal, 24)
-      }
-      .padding(.vertical, 24)
+//    ScrollView {
+//      VStack {
+//        nftHeaderView
+//          .padding(.horizontal, 8)
+//        nftGridsView
+//          .padding(.horizontal, 24)
+//      }
+//      .padding(.vertical, 24)
+//    }
+    List {
+      nftGridsView
     }
+    .animation(.default, value: nftStore.displayNFTGroups)
     .background(Color(UIColor.braveGroupedBackground))
     .background(
       NavigationLink(
