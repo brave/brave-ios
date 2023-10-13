@@ -202,9 +202,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     
     BraveSkusManager.refreshSKUCredential(isPrivate: scene.browserViewController?.privateBrowsingManager.isPrivateBrowsing == true)
+    
+    scene.browserViewControllers.forEach({
+      $0.sceneDidBecomeActive(scene)
+    })
   }
 
   func sceneWillResignActive(_ scene: UIScene) {
+    if let scene = scene as? UIWindowScene {
+      scene.browserViewControllers.forEach({
+        $0.sceneWillResignActive(scene)
+      })
+    }
+    
     Preferences.AppState.backgroundedCleanly.value = true
     scene.userActivity?.resignCurrent()
   }

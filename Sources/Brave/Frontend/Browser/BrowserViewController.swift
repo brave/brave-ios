@@ -710,8 +710,8 @@ public class BrowserViewController: UIViewController {
   @objc func tappedTopArea() {
     toolbarVisibilityViewModel.toolbarState = .expanded
   }
-
-  @objc func appWillResignActiveNotification() {
+  
+  public func sceneWillResignActive(_ scene: UIScene) {
     tabManager.saveAllTabs()
     
     // Dismiss any popovers that might be visible
@@ -746,7 +746,7 @@ public class BrowserViewController: UIViewController {
     }
   }
 
-  @objc func appDidBecomeActiveNotification() {
+  public func sceneDidBecomeActive(_ scene: UIScene) {
     guard let tab = tabManager.selectedTab, tab.isPrivate else {
       return
     }
@@ -831,12 +831,6 @@ public class BrowserViewController: UIViewController {
     footer.isHidden = false
     
     NotificationCenter.default.do {
-      $0.addObserver(
-        self, selector: #selector(appWillResignActiveNotification),
-        name: UIApplication.willResignActiveNotification, object: nil)
-      $0.addObserver(
-        self, selector: #selector(appDidBecomeActiveNotification),
-        name: UIApplication.didBecomeActiveNotification, object: nil)
       $0.addObserver(
         self, selector: #selector(appDidEnterBackgroundNotification),
         name: UIApplication.didEnterBackgroundNotification, object: nil)
