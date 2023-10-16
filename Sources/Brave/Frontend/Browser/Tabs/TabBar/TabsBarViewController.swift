@@ -103,8 +103,9 @@ class TabsBarViewController: UIViewController {
       make.right.equalTo(view).inset(UX.TabsBar.buttonWidth)
     }
 
-    updatePlusButtonMenu()
-    updateColors()
+    let isPrivateBrowsing = tabManager?.privateBrowsingManager.isPrivateBrowsing == true
+    updatePlusButtonMenu(isPrivateBrowsing)
+    updateColors(isPrivateBrowsing)
     
     privateModeCancellable = tabManager?.privateBrowsingManager
       .$isPrivateBrowsing
@@ -112,8 +113,8 @@ class TabsBarViewController: UIViewController {
       .receive(on: RunLoop.main)
       .sink(receiveValue: { [weak self] isPrivateBrowsing in
         guard let self = self else { return }
-        self.updatePlusButtonMenu()
-        self.updateColors()
+        self.updatePlusButtonMenu(isPrivateBrowsing)
+        self.updateColors(isPrivateBrowsing)
       })
   }
   
@@ -183,10 +184,8 @@ class TabsBarViewController: UIViewController {
     }
   }
   
-  func updatePlusButtonMenu() {
+  func updatePlusButtonMenu(_ isPrivateBrowsing: Bool) {
     var newTabMenu: [UIAction] = []
-    let isPrivateBrowsing = tabManager?.privateBrowsingManager.isPrivateBrowsing == true
-    
     let openNewTab = UIAction(
       title: isPrivateBrowsing ? Strings.Hotkey.newPrivateTabTitle : Strings.Hotkey.newTabTitle,
       image: isPrivateBrowsing ? UIImage(systemName: "plus.square.fill.on.square.fill") : UIImage(systemName: "plus.square.on.square"),
