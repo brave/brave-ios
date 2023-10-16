@@ -108,6 +108,7 @@ class TabsBarViewController: UIViewController {
     privateModeCancellable = tabManager?.privateBrowsingManager
       .$isPrivateBrowsing
       .removeDuplicates()
+      .receive(on: RunLoop.main)
       .sink(receiveValue: { [weak self] isPrivateBrowsing in
         guard let self = self else { return }
         self.updatePlusButtonMenu()
