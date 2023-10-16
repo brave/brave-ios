@@ -16,6 +16,9 @@ public class SwapTokenStore: ObservableObject, WalletObserverStore {
   /// The current selected token to swap from. Default with nil value.
   @Published var selectedFromToken: BraveWallet.BlockchainToken? {
     didSet {
+      if oldValue != selectedFromToken {
+        clearAllAmount()
+      }
       if let token = selectedFromToken {
         fetchTokenBalance(for: token) { [weak self] balance in
           self?.selectedFromTokenBalance = balance
@@ -26,6 +29,9 @@ public class SwapTokenStore: ObservableObject, WalletObserverStore {
   /// The current selected token to swap to. Default with nil value
   @Published var selectedToToken: BraveWallet.BlockchainToken? {
     didSet {
+      if oldValue != selectedToToken {
+        clearAllAmount()
+      }
       if let token = selectedToToken {
         fetchTokenBalance(for: token) { [weak self] balance in
           self?.selectedToTokenBalance = balance
@@ -411,8 +417,8 @@ public class SwapTokenStore: ObservableObject, WalletObserverStore {
   }
 
   private func clearAllAmount() {
-    sellAmount = "0"
-    buyAmount = "0"
+    sellAmount = ""
+    buyAmount = ""
     selectedFromTokenPrice = "0"
   }
 

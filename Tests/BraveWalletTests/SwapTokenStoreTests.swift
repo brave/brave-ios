@@ -309,9 +309,13 @@ class SwapStoreTests: XCTestCase {
     let buyAmountExpectation = expectation(description: "buyAmountExpectation")
     store.$buyAmount
       .dropFirst()
-      .first()
-      .sink { buyAmount in
+      .collect(3)
+      .sink { buyAmounts in
         defer { buyAmountExpectation.fulfill() }
+        guard let buyAmount = buyAmounts.last else {
+          XCTFail("Expected multiple buyAmount assignments.")
+          return
+        }
         XCTAssertFalse(buyAmount.isEmpty)
         XCTAssertEqual(buyAmount, "2.0000")
       }
@@ -365,9 +369,13 @@ class SwapStoreTests: XCTestCase {
     let sellAmountExpectation = expectation(description: "sellAmountExpectation")
     store.$sellAmount
       .dropFirst()
-      .first()
-      .sink { sellAmount in
+      .collect(3)
+      .sink { sellAmounts in
         defer { sellAmountExpectation.fulfill() }
+        guard let sellAmount = sellAmounts.last else {
+          XCTFail("Expected multiple sellAmount assignments.")
+          return
+        }
         XCTAssertFalse(sellAmount.isEmpty)
         XCTAssertEqual(sellAmount, "3.0000")
       }
@@ -441,8 +449,13 @@ class SwapStoreTests: XCTestCase {
     let buyAmountExpectation = expectation(description: "buyAmountExpectation")
     store.$buyAmount
       .dropFirst()
-      .sink { buyAmount in
+      .collect(3)
+      .sink { buyAmounts in
         defer { buyAmountExpectation.fulfill() }
+        guard let buyAmount = buyAmounts.last else {
+          XCTFail("Expected multiple buyAmount assignments.")
+          return
+        }
         XCTAssertFalse(buyAmount.isEmpty)
         XCTAssertEqual(buyAmount, "2.5000")
       }
@@ -504,8 +517,13 @@ class SwapStoreTests: XCTestCase {
     let stateExpectation = expectation(description: "stateExpectation")
     store.$state
       .dropFirst()
-      .sink { state in
+      .collect(5) // sellAmount, buyAmount didSet to `.idle`
+      .sink { states in
         defer { stateExpectation.fulfill() }
+        guard let state = states.last else {
+          XCTFail("Expected multiple state updates.")
+          return
+        }
         XCTAssertEqual(state, .error(Strings.Wallet.insufficientLiquidity))
       }
       .store(in: &cancellables)
