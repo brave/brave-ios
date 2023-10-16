@@ -19,7 +19,6 @@ public enum FullScreenCalloutType: CaseIterable {
    - VPN Promotion
    - Default Browser
    - Rewards
-   - Cookie Notification
    - VPN Link Receipt
   */
   case p3a, vpnUpdateBilling, bottomBar, vpnPromotion, defaultBrowser, rewards, vpnLinkReceipt

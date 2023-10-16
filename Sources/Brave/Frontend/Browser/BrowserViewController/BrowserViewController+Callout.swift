@@ -27,7 +27,6 @@ extension BrowserViewController {
    - VPN Promotion
    - Default Browser
    - Rewards
-   - Cookie Notification
    - VPN Link Receipt
   */
   func presentFullScreenCallouts() {
