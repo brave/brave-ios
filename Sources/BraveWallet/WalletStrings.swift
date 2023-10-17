@@ -4371,7 +4371,7 @@ extension Strings {
       "wallet.nftUnspam",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Mark As Not Junk",
+      value: "Mark as Not Junk",
       comment: "The title of context button for user to unspam a NFT."
     )
     public static let nftRemoveFromWallet = NSLocalizedString(
