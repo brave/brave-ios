@@ -27,6 +27,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   internal var window: UIWindow?
   private var windowProtection: WindowProtection?
   static var shouldHandleUrpLookup = false
+  static var shouldHandleInstallAttributionFetch = false
 
   private var cancellables: Set<AnyCancellable> = []
   private let log = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "scene-delegate")
@@ -80,12 +81,21 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       }
       .store(in: &cancellables)
 
+    // Handle URP Lookup at first launch
     if SceneDelegate.shouldHandleUrpLookup {
-      // TODO: Find a better way to do this when multiple windows are involved.
       SceneDelegate.shouldHandleUrpLookup = false
 
       if let urp = UserReferralProgram.shared {
         browserViewController.handleReferralLookup(urp)
+      }
+    }
+    
+    // Handle Install Attribution Fetch at first launch
+    if SceneDelegate.shouldHandleInstallAttributionFetch {
+      SceneDelegate.shouldHandleInstallAttributionFetch = false
+      
+      if let urp = UserReferralProgram.shared {
+        browserViewController.handleSearchAdsInstallAttribution(urp)
       }
     }
 
@@ -531,36 +541,40 @@ extension SceneDelegate: UIViewControllerRestoration {
 
 extension BrowserViewController {
   func handleReferralLookup(_ urp: UserReferralProgram) {
-    // Referral lookup preference is checking for both cases
-    // Case 1: AppStore Search Ad impression
-    // Case 2: User Referral on Brave side
     if Preferences.URP.referralLookupOutstanding.value == true {
-      urp.adCampaignLookup() { [weak self] response, error in
-        guard let self = self else { return }
-        
-        let refCode = self.generateReferralCode(attributionData: response, fetchError: error)
-        self.performProgramReferralLookup(urp, refCode: refCode)
-      }
+      performProgramReferralLookup(urp, refCode: UserReferralProgram.getReferralCode())
     } else {
       urp.pingIfEnoughTimePassed()
     }
   }
   
-  private func generateReferralCode(attributionData: AdAttributionData?, fetchError: Error?) -> String? {
+  func handleSearchAdsInstallAttribution(_ urp: UserReferralProgram) {
+    urp.adCampaignLookup() { [weak self] response, error in
+      guard let self = self else { return }
+      
+      let refCode = self.generateReferralCode(attributionData: response, fetchError: error)
+      // Setting up referral code value
+      // This value should be set before first DAU ping
+      Preferences.URP.referralCode.value = refCode
+    }
+  }
+  
+  private func generateReferralCode(attributionData: AdAttributionData?, fetchError: Error?) -> String {
     // Checking referral code from User Referral program exists If not send 001
     // Prefix this code with BRV for organic iOS installs
     var referralCode = "BRV\(UserReferralProgram.getReferralCode() ?? "001")"
     
-    // Checking attribution if a user clicks an Apple Search Ads impression up to 30 days before your app download
-    if fetchError == nil, attributionData?.attribution == true {
-      if let campaignId = attributionData?.campaignId {
-        // Adding ASA User refcode prefix to indicate
-        // Apple Ads Attribution is true
-        referralCode = "ASA\(String(campaignId))"
-      }
+    if fetchError == nil, attributionData?.attribution == true, let campaignId = attributionData?.campaignId {
+      var campaignId = String(campaignId)
+      // Only use the first 3 
+      campaignId = String(campaignId.prefix(3))
+      
+      // Adding ASA User refcode prefix to indicate
+      // Apple Ads Attribution is true
+      referralCode = "ASA\(String(campaignId))"
     }
     
-    return AppConstants.buildChannel == .release ? referralCode : UserReferralProgram.getReferralCode()
+    return referralCode
   }
   
   private func performProgramReferralLookup(_ urp: UserReferralProgram, refCode: String?) {
