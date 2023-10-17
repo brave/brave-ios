@@ -15,8 +15,8 @@ extension UIView {
     let offset = offset ?? .zero
 
     // Temporary check to handle _UIGraphicsBeginImageContextWithOptions zero size error
-    // Shiould be replaced with UIGraphicsImageRenderer
-    if size.width <= 0 || size.height <= 0 {
+    // Should be replaced with UIGraphicsImageRenderer
+    guard size.width > 0, size.height > 0 else {
       return nil
     }
     
