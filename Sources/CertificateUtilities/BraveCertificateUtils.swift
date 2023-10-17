@@ -166,21 +166,14 @@ public extension BraveCertificateUtils {
   }
 }
 
-public enum BraveCertificateUtilError: LocalizedError {
-  case noCertificatesProvided
-  case cannotCreateServerTrust
-  case trustEvaluationFailed
-  
-  public var errorDescription: String? {
-    switch self {
-    case .noCertificatesProvided:
-      return "Cannot Create Server Trust - No Certificates Provided"
-    case .cannotCreateServerTrust:
-      return "Cannot Create Server Trust"
-    case .trustEvaluationFailed:
-      return "Trust Evaluation Failed"
+public enum BraveCertificateUtilError: String, LocalizedError {
+    case noCertificatesProvided = "Cannot Create Server Trust - No Certificates Provided"
+    case cannotCreateServerTrust = "Cannot Create Server Trust"
+    case trustEvaluationFailed = "Trust Evaluation Failed"
+
+    public var errorDescription: String? {
+        rawValue
     }
-  }
 }
 
 public extension BraveCertificateUtils {
