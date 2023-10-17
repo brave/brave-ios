@@ -16,6 +16,7 @@ struct SubmitReportView: View {
   let url: URL
   let isPrivateBrowsing: Bool
   
+  @ScaledMetric private var textEditorHeight = 80.0
   @State private var additionalDetails = ""
   @State private var contactDetails = ""
   @State private var isSubmittingReport = false
@@ -41,7 +42,7 @@ struct SubmitReportView: View {
         BraveTextEditor(
           text: $additionalDetails,
           prompt: Strings.Shields.reportBrokenAdditionalDetails
-        ).frame(height: 80)
+        ).frame(height: textEditorHeight)
         
         VStack(alignment: .leading, spacing: 4) {
           Text(Strings.Shields.reportBrokenContactMe).font(.caption)

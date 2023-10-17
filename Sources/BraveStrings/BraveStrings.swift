@@ -1425,14 +1425,14 @@ extension Strings {
     )
     
     public static let reportBrokenContactMe = NSLocalizedString(
-      "ReportBrokenAdditionalDetails", tableName: "BraveShared", bundle: .module,
+      "ReportBrokenContactMe", tableName: "BraveShared", bundle: .module,
       value: "Contact me at: (optional)",
       comment: "A label for a text entry field where the user can provide contact details within a web-compatibilty report"
     )
     
     
     public static let reportBrokenContactMeSuggestions = NSLocalizedString(
-      "ReportBrokenAdditionalDetails", tableName: "BraveShared", bundle: .module,
+      "ReportBrokenContactMeSuggestions", tableName: "BraveShared", bundle: .module,
       value: "Email, Twitter, etc.",
       comment: "A placeholder for a text entry field within a web-compatibilty report which shows a few suggestions of what the user should enter for their contact contact details (in a 'Contact me at: (optional)' field)."
     )
