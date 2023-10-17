@@ -565,10 +565,6 @@ extension BrowserViewController {
     var referralCode = "BRV\(UserReferralProgram.getReferralCode() ?? "001")"
     
     if fetchError == nil, attributionData?.attribution == true, let campaignId = attributionData?.campaignId {
-      var campaignId = String(campaignId)
-      // Only use the first 3 
-      campaignId = String(campaignId.prefix(3))
-      
       // Adding ASA User refcode prefix to indicate
       // Apple Ads Attribution is true
       referralCode = "ASA\(String(campaignId))"
