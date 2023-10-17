@@ -31,8 +31,6 @@ import Growth
 import BraveShields
 import CertificateUtilities
 import ScreenTime
-import iAd
-import AdServices
 
 private let KVOs: [KVOConstants] = [
   .estimatedProgress,
