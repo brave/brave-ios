@@ -11,8 +11,8 @@ import PanModal
 import BraveUI
 import Strings
 
-struct CryptoTabsView: View {
-  private enum Tab: Equatable, Hashable {
+struct CryptoTabsView<DismissContent: ToolbarContent>: View {
+  private enum Tab: Equatable, Hashable, CaseIterable {
     case portfolio
     case activity
     case accounts
@@ -34,9 +34,10 @@ struct CryptoTabsView: View {
   
   @ObservedObject var cryptoStore: CryptoStore
   @ObservedObject var keyringStore: KeyringStore
+  var toolbarDismissContent: DismissContent
 
   @State private var isShowingMainMenu: Bool = false
-  @State private var isShowingSettings: Bool = false
+  @State private var isTabShowingSettings: [Tab: Bool] = Tab.allCases.reduce(into: [Tab: Bool]()) { $0[$1] = false }
   @State private var isShowingSearch: Bool = false
   @State private var fetchedPendingRequestsThisSession: Bool = false
   @State private var selectedTab: Tab = .portfolio
@@ -50,39 +51,93 @@ struct CryptoTabsView: View {
 
   var body: some View {
     TabView(selection: $selectedTab) {
-      PortfolioView(
-        cryptoStore: cryptoStore,
-        keyringStore: keyringStore,
-        networkStore: cryptoStore.networkStore,
-        portfolioStore: cryptoStore.portfolioStore
-      )
+      NavigationView {
+        PortfolioView(
+          cryptoStore: cryptoStore,
+          keyringStore: keyringStore,
+          networkStore: cryptoStore.networkStore,
+          portfolioStore: cryptoStore.portfolioStore
+        )
+        .navigationTitle(Strings.Wallet.portfolioPageTitle)
+        .navigationBarTitleDisplayMode(.inline)
+        .introspectViewController(customize: { vc in
+          vc.navigationItem.do {
+            // no shadow when content is at top.
+            let noShadowAppearance: UINavigationBarAppearance = {
+              let appearance = UINavigationBarAppearance()
+              appearance.configureWithOpaqueBackground()
+              appearance.titleTextAttributes = [.foregroundColor: UIColor.braveLabel]
+              appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.braveLabel]
+              appearance.backgroundColor = UIColor(braveSystemName: .pageBackground)
+              appearance.shadowColor = .clear
+              return appearance
+            }()
+            $0.scrollEdgeAppearance = noShadowAppearance
+            $0.compactScrollEdgeAppearance = noShadowAppearance
+            // shadow when content is scrolled behind navigation bar.
+            let shadowAppearance: UINavigationBarAppearance = {
+              let appearance = UINavigationBarAppearance()
+              appearance.configureWithOpaqueBackground()
+              appearance.titleTextAttributes = [.foregroundColor: UIColor.braveLabel]
+              appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.braveLabel]
+              appearance.backgroundColor = UIColor(braveSystemName: .pageBackground)
+              return appearance
+            }()
+            $0.standardAppearance = shadowAppearance
+            $0.compactAppearance = shadowAppearance
+          }
+        })
+        .toolbar { sharedToolbarItems }
+        .background(settingsNavigationLink(for: .portfolio))
+      }
       .tabItem {
         Tab.portfolio.tabLabel
       }
       .tag(Tab.portfolio)
       
-      TransactionsActivityView(
-        store: cryptoStore.transactionsActivityStore,
-        networkStore: cryptoStore.networkStore
-      )
+      NavigationView {
+        TransactionsActivityView(
+          store: cryptoStore.transactionsActivityStore,
+          networkStore: cryptoStore.networkStore
+        )
+        .navigationTitle(Strings.Wallet.activityPageTitle)
+        .navigationBarTitleDisplayMode(.inline)
+        .applyRegularNavigationAppearance()
+        .toolbar { sharedToolbarItems }
+        .background(settingsNavigationLink(for: .activity))
+      }
       .tabItem {
         Tab.activity.tabLabel
       }
       .tag(Tab.activity)
       
-      AccountsView(
-        cryptoStore: cryptoStore,
-        keyringStore: keyringStore
-      )
+      NavigationView {
+        AccountsView(
+          cryptoStore: cryptoStore,
+          keyringStore: keyringStore
+        )
+        .navigationTitle(Strings.Wallet.accountsPageTitle)
+        .navigationBarTitleDisplayMode(.inline)
+        .applyRegularNavigationAppearance()
+        .toolbar { sharedToolbarItems }
+        .background(settingsNavigationLink(for: .accounts))
+      }
       .tabItem {
         Tab.accounts.tabLabel
       }
       .tag(Tab.accounts)
       
-      MarketView(
-        cryptoStore: cryptoStore,
-        keyringStore: keyringStore
-      )
+      NavigationView {
+        MarketView(
+          cryptoStore: cryptoStore,
+          keyringStore: keyringStore
+        )
+        .navigationTitle(Strings.Wallet.marketPageTitle)
+        .navigationBarTitleDisplayMode(.inline)
+        .applyRegularNavigationAppearance()
+        .toolbar { sharedToolbarItems }
+        .background(settingsNavigationLink(for: .market))
+      }
       .tabItem {
         Tab.market.tabLabel
       }
@@ -119,9 +174,70 @@ struct CryptoTabsView: View {
       }
     }
     .ignoresSafeArea()
-    .navigationTitle(Strings.Wallet.cryptoTitle)
-    .navigationBarTitleDisplayMode(.inline)
-    .introspectViewController(customize: { vc in
+    .background(
+      Color.clear
+        .sheet(isPresented: $cryptoStore.isPresentingAssetSearch) {
+          AssetSearchView(
+            keyringStore: keyringStore,
+            cryptoStore: cryptoStore,
+            userAssetsStore: cryptoStore.portfolioStore.userAssetsStore
+          )
+        }
+    )
+    .sheet(isPresented: $isShowingMainMenu) {
+      MainMenuView(
+        isFromPortfolio: selectedTab == .portfolio,
+        isShowingSettings: Binding(get: {
+          self.isTabShowingSettings[selectedTab, default: false]
+        }, set: { isActive, _ in
+          self.isTabShowingSettings[selectedTab] = isActive
+        }),
+        keyringStore: keyringStore
+      )
+    }
+  }
+  
+  @ToolbarContentBuilder private var sharedToolbarItems: some ToolbarContent {
+    ToolbarItemGroup(placement: .navigationBarTrailing) {
+      Button(action: {
+        cryptoStore.isPresentingAssetSearch = true
+      }) {
+        Label(Strings.Wallet.searchTitle, systemImage: "magnifyingglass")
+          .labelStyle(.iconOnly)
+          .foregroundColor(Color(.braveBlurpleTint))
+      }
+      Button(action: { self.isShowingMainMenu = true }) {
+        Label(Strings.Wallet.otherWalletActionsAccessibilityTitle, braveSystemImage: "leo.more.horizontal")
+          .labelStyle(.iconOnly)
+          .foregroundColor(Color(.braveBlurpleTint))
+      }
+      .accessibilityLabel(Strings.Wallet.otherWalletActionsAccessibilityTitle)
+    }
+    toolbarDismissContent
+  }
+  
+  private func settingsNavigationLink(for tab: Tab) -> some View {
+    NavigationLink(
+      destination: Web3SettingsView(
+        settingsStore: cryptoStore.settingsStore,
+        networkStore: cryptoStore.networkStore,
+        keyringStore: keyringStore
+      ),
+      isActive: Binding(get: {
+        self.isTabShowingSettings[tab, default: false]
+      }, set: { isActive, _ in
+        self.isTabShowingSettings[tab] = isActive
+      })
+    ) {
+      Text(Strings.Wallet.settings)
+    }
+    .hidden()
+  }
+}
+
+private extension View {
+  func applyRegularNavigationAppearance() -> some View {
+    introspectViewController(customize: { vc in
       vc.navigationItem.do {
         let appearance: UINavigationBarAppearance = {
           let appearance = UINavigationBarAppearance()
@@ -136,52 +252,5 @@ struct CryptoTabsView: View {
         $0.scrollEdgeAppearance = appearance
       }
     })
-    .background(
-      NavigationLink(
-        destination: Web3SettingsView(
-          settingsStore: cryptoStore.settingsStore,
-          networkStore: cryptoStore.networkStore,
-          keyringStore: keyringStore
-        ),
-        isActive: $isShowingSettings
-      ) {
-        Text(Strings.Wallet.settings)
-      }
-      .hidden()
-    )
-    .background(
-      Color.clear
-        .sheet(isPresented: $cryptoStore.isPresentingAssetSearch) {
-          AssetSearchView(
-            keyringStore: keyringStore,
-            cryptoStore: cryptoStore,
-            userAssetsStore: cryptoStore.portfolioStore.userAssetsStore
-          )
-        }
-    )
-    .toolbar {
-      ToolbarItemGroup(placement: .navigationBarTrailing) {
-        Button(action: {
-          cryptoStore.isPresentingAssetSearch = true
-        }) {
-          Label(Strings.Wallet.searchTitle, systemImage: "magnifyingglass")
-            .labelStyle(.iconOnly)
-            .foregroundColor(Color(.braveBlurpleTint))
-        }
-        Button(action: { self.isShowingMainMenu = true }) {
-          Label(Strings.Wallet.otherWalletActionsAccessibilityTitle, braveSystemImage: "leo.more.horizontal")
-            .labelStyle(.iconOnly)
-            .foregroundColor(Color(.braveBlurpleTint))
-        }
-        .accessibilityLabel(Strings.Wallet.otherWalletActionsAccessibilityTitle)
-      }
-    }
-    .sheet(isPresented: $isShowingMainMenu) {
-      MainMenuView(
-        isFromPortfolio: selectedTab == .portfolio,
-        isShowingSettings: $isShowingSettings,
-        keyringStore: keyringStore
-      )
-    }
   }
 }
