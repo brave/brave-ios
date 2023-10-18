@@ -313,7 +313,7 @@ private struct CryptoContainerView<DismissContent: ToolbarContent>: View {
 
   var body: some View {
     UIKitNavigationView {
-      CryptoPagesView(cryptoStore: cryptoStore, keyringStore: keyringStore)
+      CryptoTabsView(cryptoStore: cryptoStore, keyringStore: keyringStore)
         .toolbar {
           toolbarDismissContent
         }
