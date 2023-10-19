@@ -58,7 +58,7 @@ struct CryptoTabsView<DismissContent: ToolbarContent>: View {
           networkStore: cryptoStore.networkStore,
           portfolioStore: cryptoStore.portfolioStore
         )
-        .navigationTitle(Strings.Wallet.portfolioPageTitle)
+        .navigationTitle(Strings.Wallet.wallet)
         .navigationBarTitleDisplayMode(.inline)
         .introspectViewController(customize: { vc in
           vc.navigationItem.do {
@@ -100,7 +100,7 @@ struct CryptoTabsView<DismissContent: ToolbarContent>: View {
           store: cryptoStore.transactionsActivityStore,
           networkStore: cryptoStore.networkStore
         )
-        .navigationTitle(Strings.Wallet.activityPageTitle)
+        .navigationTitle(Strings.Wallet.wallet)
         .navigationBarTitleDisplayMode(.inline)
         .applyRegularNavigationAppearance()
         .toolbar { sharedToolbarItems }
@@ -116,7 +116,7 @@ struct CryptoTabsView<DismissContent: ToolbarContent>: View {
           cryptoStore: cryptoStore,
           keyringStore: keyringStore
         )
-        .navigationTitle(Strings.Wallet.accountsPageTitle)
+        .navigationTitle(Strings.Wallet.wallet)
         .navigationBarTitleDisplayMode(.inline)
         .applyRegularNavigationAppearance()
         .toolbar { sharedToolbarItems }
@@ -132,7 +132,7 @@ struct CryptoTabsView<DismissContent: ToolbarContent>: View {
           cryptoStore: cryptoStore,
           keyringStore: keyringStore
         )
-        .navigationTitle(Strings.Wallet.marketPageTitle)
+        .navigationTitle(Strings.Wallet.wallet)
         .navigationBarTitleDisplayMode(.inline)
         .applyRegularNavigationAppearance()
         .toolbar { sharedToolbarItems }
