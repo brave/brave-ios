@@ -90,6 +90,7 @@ struct CryptoTabsView<DismissContent: ToolbarContent>: View {
         .toolbar { sharedToolbarItems }
         .background(settingsNavigationLink(for: .portfolio))
       }
+      .navigationViewStyle(.stack)
       .tabItem {
         Tab.portfolio.tabLabel
       }
@@ -106,6 +107,7 @@ struct CryptoTabsView<DismissContent: ToolbarContent>: View {
         .toolbar { sharedToolbarItems }
         .background(settingsNavigationLink(for: .activity))
       }
+      .navigationViewStyle(.stack)
       .tabItem {
         Tab.activity.tabLabel
       }
@@ -122,6 +124,7 @@ struct CryptoTabsView<DismissContent: ToolbarContent>: View {
         .toolbar { sharedToolbarItems }
         .background(settingsNavigationLink(for: .accounts))
       }
+      .navigationViewStyle(.stack)
       .tabItem {
         Tab.accounts.tabLabel
       }
@@ -138,6 +141,7 @@ struct CryptoTabsView<DismissContent: ToolbarContent>: View {
         .toolbar { sharedToolbarItems }
         .background(settingsNavigationLink(for: .market))
       }
+      .navigationViewStyle(.stack)
       .tabItem {
         Tab.market.tabLabel
       }
