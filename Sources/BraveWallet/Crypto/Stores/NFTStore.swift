@@ -385,6 +385,9 @@ public class NFTStore: ObservableObject, WalletObserverStore {
         isHidingUnownedNFTs: filters.isHidingUnownedNFTs,
         selectedAccounts: selectedAccounts
       )
+      .optionallySort(shouldSort: true) { first, second in
+        first.token.symbol < second.token.symbol
+      }
     case let .network(network):
       guard let networkAssets = allUserAssets
         .first(where: { $0.network.chainId == network.chainId && $0.network.coin == network.coin }) else {
@@ -405,13 +408,17 @@ public class NFTStore: ObservableObject, WalletObserverStore {
           isHidingUnownedNFTs: filters.isHidingUnownedNFTs,
           selectedAccounts: selectedAccounts
         )
+        .optionallySort(shouldSort: true) { first, second in
+          first.token.symbol < second.token.symbol
+        }
     case let .account(account):
       return allUserAssets
         .filter { $0.network.coin == account.coin && $0.network.supportedKeyrings.contains(account.accountId.keyringId.rawValue as NSNumber)
         }
         .flatMap { networkAssets in
           networkAssets.tokens.compactMap { token in
-            guard token.isErc721 || token.isNft else { return nil }
+            // we need to exclude any NFT that THIS account does not own (balance is not 1)
+            guard token.isErc721 || token.isNft, let balance = nftBalancesCache[token.id]?[account.address], balance > 0 else { return nil }
             return NFTAssetViewModel(
               groupType: groupType,
               token: token,
@@ -422,9 +429,12 @@ public class NFTStore: ObservableObject, WalletObserverStore {
           }
         }
         .optionallyFilterUnownedNFTs(
-          isHidingUnownedNFTs: true, // by default hiding unowned NFTs when `Group By` is `Accounts`
+          isHidingUnownedNFTs: true,
           selectedAccounts: selectedAccounts
         )
+        .optionallySort(shouldSort: true) { first, second in
+          first.token.symbol < second.token.symbol
+        }
     }
   }
   
