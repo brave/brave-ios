@@ -15,7 +15,7 @@ public actor AdBlockStats {
   static var maxNumberOfAllowedFilterLists: Int = {
     let memory = Int(ProcessInfo.processInfo.physicalMemory / 1073741824)
     ContentBlockerManager.log.debug("Memory: \(memory)")
-    return min(5 * memory, 40)
+    return max(min(5 * memory, 40), 20)
   }()
   
   typealias CosmeticFilterModelTuple = (isAlwaysAggressive: Bool, model: CosmeticFilterModel)
