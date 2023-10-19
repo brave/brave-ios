@@ -554,12 +554,21 @@ public class NFTStore: ObservableObject, WalletObserverStore {
       let selectedNetworks = self.filters.networks.filter(\.isSelected).map(\.model)
       let userVisibleAssets = self.assetManager.getAllUserAssetsInNetworkAssetsByVisibility(networks: selectedNetworks, visible: true)
       let userHiddenAssets = self.assetManager.getAllUserAssetsInNetworkAssetsByVisibility(networks: selectedNetworks, visible: false)
-      let spamNFTs = computeSpamNFTs(
+      let unionedSpamNFTs = computeSpamNFTs(
         selectedNetworks: selectedNetworks,
         selectedAccounts: selectedAccounts,
         simpleHashSpamNFTs: simpleHashSpamNFTs
       )
-      let allNetworkAssets = userVisibleAssets + userHiddenAssets + spamNFTs
+      var allNetworkAssets: [NetworkAssets] = []
+      for networkAssets in userVisibleAssets {
+        let hiddenAssets = userHiddenAssets.first(where: {
+          $0.network.chainId == networkAssets.network.chainId && $0.network.coin == networkAssets.network.coin
+        })?.tokens ?? []
+        let spamNFTs = unionedSpamNFTs.first(where: {
+          $0.network.chainId == networkAssets.network.chainId && $0.network.coin == networkAssets.network.coin
+        })?.tokens ?? []
+        allNetworkAssets.append(.init(network: networkAssets.network, tokens: networkAssets.tokens + hiddenAssets + spamNFTs, sortOrder: networkAssets.sortOrder))
+      }
       userNFTGroups = buildNFTGroupModels(
         groupBy: filters.groupBy,
         allUserAssets: allNetworkAssets,
