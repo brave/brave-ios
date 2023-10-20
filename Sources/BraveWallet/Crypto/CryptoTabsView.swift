@@ -6,8 +6,6 @@
 import Foundation
 import UIKit
 import SwiftUI
-import BraveCore
-import PanModal
 import BraveUI
 import Strings
 
@@ -147,6 +145,13 @@ struct CryptoTabsView<DismissContent: ToolbarContent>: View {
       }
       .tag(Tab.market)
     }
+    .introspectTabBarController(customize: { tabBarController in
+      let appearance = UITabBarAppearance()
+      appearance.configureWithOpaqueBackground()
+      appearance.backgroundColor = UIColor(braveSystemName: .containerBackground)
+      tabBarController.tabBar.standardAppearance = appearance
+      tabBarController.tabBar.scrollEdgeAppearance = appearance
+    })
     .overlay(alignment: .bottomTrailing, content: {
       if isConfirmationButtonVisible {
         Button(action: {
