@@ -163,6 +163,10 @@ public class NFTStore: ObservableObject, WalletObserverStore {
     return displayNFTGroups.isEmpty
   }
   
+  var totalDisplayNFTCounter: Int {
+    displayNFTGroups.reduce(0) { $0 + $1.assets.count }
+  }
+  
   public init(
     keyringService: BraveWalletKeyringService,
     rpcService: BraveWalletJsonRpcService,
@@ -191,6 +195,7 @@ public class NFTStore: ObservableObject, WalletObserverStore {
     Preferences.Wallet.isHidingUnownedNFTsFilter.observe(from: self)
     Preferences.Wallet.isShowingNFTNetworkLogoFilter.observe(from: self)
     Preferences.Wallet.nonSelectedNetworksFilter.observe(from: self)
+    Preferences.Wallet.groupByFilter.observe(from: self)
   }
   
   func tearDown() {

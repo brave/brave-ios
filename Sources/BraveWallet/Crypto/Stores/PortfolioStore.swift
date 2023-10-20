@@ -353,6 +353,7 @@ public class PortfolioStore: ObservableObject, WalletObserverStore {
     Preferences.Wallet.isHidingSmallBalancesFilter.observe(from: self)
     Preferences.Wallet.nonSelectedAccountsFilter.observe(from: self)
     Preferences.Wallet.nonSelectedNetworksFilter.observe(from: self)
+    Preferences.Wallet.groupByFilter.observe(from: self)
   }
   
   func tearDown() {

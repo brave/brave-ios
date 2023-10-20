@@ -113,28 +113,40 @@ struct NFTView: View {
   
   private var nftHeaderView: some View {
     HStack {
-      Text(Strings.Wallet.assetsTitle)
-        .font(.title3.weight(.semibold))
-        .foregroundColor(Color(braveSystemName: .textPrimary))
+      Menu {
+        Picker("", selection: $nftStore.displayType) {
+          ForEach(NFTStore.NFTDisplayType.allCases) { type in
+            Text(type.dropdownTitle)
+              .foregroundColor(Color(.secondaryBraveLabel))
+              .tag(type)
+          }
+        }
+        .pickerStyle(.inline)
+      } label: {
+        HStack(spacing: 12) {
+          Text(nftStore.displayType.dropdownTitle)
+            .font(.subheadline.weight(.semibold))
+          Text("\(nftStore.totalDisplayNFTCounter)")
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .font(.caption2.weight(.semibold))
+            .background(
+              Color(uiColor: WalletV2Design.displayNFTCounterColor)
+                .cornerRadius(4)
+            )
+          Image(braveSystemName: "leo.carat.down")
+            .font(.subheadline.weight(.semibold))
+        }
+        .foregroundColor(Color(.braveBlurpleTint))
+      }
       if nftStore.isLoadingDiscoverAssets && isNFTDiscoveryEnabled {
         ProgressView()
           .padding(.leading, 5)
       }
       Spacer()
-      Picker(selection: $nftStore.displayType) {
-        ForEach(NFTStore.NFTDisplayType.allCases) { type in
-          Text(type.dropdownTitle)
-            .foregroundColor(Color(.secondaryBraveLabel))
-            .tag(type)
-        }
-      } label: {
-        Text(nftStore.displayType.dropdownTitle)
-          .font(.footnote)
-          .foregroundColor(Color(.braveLabel))
-      }
-      filtersButton
-        .padding(.trailing, 10)
       addCustomAssetButton
+        .padding(.trailing, 10)
+      filtersButton
     }
     .padding(.horizontal)
     .frame(maxWidth: .infinity, alignment: .leading)
@@ -236,50 +248,25 @@ struct NFTView: View {
       EmptyView()
     } else {
       WalletDisclosureGroup(
+        isNFTGroup: true,
         isExpanded: Binding(
           get: { groupToggleState[group.id, default: true] },
           set: { groupToggleState[group.id] = $0 }
         ),
         content: {
           nftGridsPlainView(group)
+            .padding(.top)
         },
         label: {
           if case let .account(account) = group.groupType {
             AddressView(address: account.address) {
-              groupHeader(for: group)
+              PortfolioAssetGroupHeaderView(group: group)
             }
           } else {
-            groupHeader(for: group)
+            PortfolioAssetGroupHeaderView(group: group)
           }
         }
       )
-    }
-  }
-  
-  /// Builds the in-section header for an NFTGroupViewModel that is shown in expanded and non-expanded state. Not used for ungrouped assets.
-  private func groupHeader(for group: NFTGroupViewModel) -> some View {
-    VStack(spacing: 0) {
-      HStack {
-        if case let .network(networkInfo) = group.groupType {
-          NetworkIcon(network: networkInfo, length: 32)
-        } else if case let .account(accountInfo) = group.groupType {
-          Blockie(address: accountInfo.address, shape: .rectangle)
-            .frame(width: 32, height: 32)
-            .clipShape(RoundedRectangle(cornerRadius: 4))
-        }
-        VStack(alignment: .leading) {
-          Text(group.title)
-            .font(.callout.weight(.semibold))
-            .foregroundColor(Color(WalletV2Design.textPrimary))
-          if let description = group.description {
-            Text(description)
-              .font(.footnote)
-              .foregroundColor(Color(WalletV2Design.textSecondary))
-          }
-        }
-        .multilineTextAlignment(.leading)
-      }
-      .padding(.vertical, 4)
     }
   }
   
