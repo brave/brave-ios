@@ -146,7 +146,8 @@ import Preferences
     let mockEthUserAssets: [BraveWallet.BlockchainToken] = [
       .previewToken.copy(asVisibleAsset: true),
       .previewDaiToken, // Verify non-visible assets not displayed #6386
-      .mockUSDCToken.copy(asVisibleAsset: true)
+      .mockUSDCToken.copy(asVisibleAsset: true),
+      .mockERC721NFTToken.copy(asVisibleAsset: true) // Verify NFTs not used in Portfolio #7945
     ]
     let ethBalanceWei = formatter.weiString(
       from: mockETHBalanceAccount1,
@@ -259,6 +260,10 @@ import Preferences
       } else {
         completion(usdcAccount2BalanceWei, .success, "")
       }
+    }
+    rpcService._erc721TokenBalance = { _, _, _, _, completion in
+      // should not be fetching NFT balance in Portfolio
+      completion("", .internalError, "Error Message")
     }
     rpcService._solanaBalance = { accountAddress, chainId, completion in
       // sol balance
@@ -662,6 +667,12 @@ import Preferences
         XCTAssertEqual(group.assets[safe: 4]?.quantity, String(format: "%.04f", 0))
         // SOL (value = $0, SOL networks hidden)
         XCTAssertNil(group.assets[safe: 5])
+        
+        // Verify NFTs not used in Portfolio #7945
+        let noAssetsAreNFTs = lastUpdatedAssetGroups.flatMap(\.assets).allSatisfy({
+          !($0.token.isNft || $0.token.isErc721)
+        })
+        XCTAssertTrue(noAssetsAreNFTs)
       }.store(in: &cancellables)
     store.saveFilters(.init(
       groupBy: store.filters.groupBy,
@@ -778,6 +789,12 @@ import Preferences
         XCTAssertEqual(filAccount2Group.assets[safe: 0]?.token.symbol,
                        BraveWallet.BlockchainToken.mockFilToken.symbol)
         XCTAssertEqual(filAccount2Group.assets[safe: 0]?.quantity, String(format: "%.04f", 0))
+        
+        // Verify NFTs not used in Portfolio #7945
+        let noAssetsAreNFTs = lastUpdatedAssetGroups.flatMap(\.assets).allSatisfy({
+          !($0.token.isNft || $0.token.isErc721)
+        })
+        XCTAssertTrue(noAssetsAreNFTs)
       }
       .store(in: &cancellables)
     store.saveFilters(.init(
@@ -942,6 +959,12 @@ import Preferences
         XCTAssertEqual(ethGoerliGroup.assets[safe: 0]?.token.symbol,
                        BraveWallet.BlockchainToken.previewToken.symbol)
         XCTAssertEqual(ethGoerliGroup.assets[safe: 0]?.quantity, String(format: "%.04f", 0))
+        
+        // Verify NFTs not used in Portfolio #7945
+        let noAssetsAreNFTs = lastUpdatedAssetGroups.flatMap(\.assets).allSatisfy({
+          !($0.token.isNft || $0.token.isErc721)
+        })
+        XCTAssertTrue(noAssetsAreNFTs)
       }
       .store(in: &cancellables)
     store.saveFilters(.init(
