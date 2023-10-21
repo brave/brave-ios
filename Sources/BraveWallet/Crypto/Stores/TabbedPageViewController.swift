@@ -68,7 +68,21 @@ class TabbedPageViewController: UIViewController {
   )
 
   private var contentOffsetObservation: NSKeyValueObservation?
-
+  
+  private let selectedIndexChanged: ((Int) -> Void)?
+  
+  public init(
+    selectedIndexChanged: ((Int) -> Void)?
+  ) {
+    self.selectedIndexChanged = selectedIndexChanged
+    super.init(nibName: nil, bundle: nil)
+  }
+  
+  @available(*, unavailable)
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -108,8 +122,8 @@ class TabbedPageViewController: UIViewController {
 
     if let scrollView = pageViewController.scrollView {
       contentOffsetObservation =
-        scrollView.observe(\.contentOffset) { [unowned self] scrollView, _ in
-          updateTabsBarSelectionIndicator(contentOffset: scrollView.contentOffset)
+        scrollView.observe(\.contentOffset) { [weak self] scrollView, _ in
+          self?.updateTabsBarSelectionIndicator(contentOffset: scrollView.contentOffset)
         }
     }
   }
@@ -219,6 +233,7 @@ class TabbedPageViewController: UIViewController {
       self.updateTabsBarSelectionIndicator(pageIndex: indexPath.item)
     }.startAnimation()
     pageViewController.setViewControllers([vc], direction: direction, animated: true)
+    selectedIndexChanged?(indexPath.item)
   }
 }
 
@@ -282,6 +297,7 @@ extension TabbedPageViewController: UIPageViewControllerDelegate {
     }
     self.pageTransitionContext = nil
     if let currentIndex = currentIndex {
+      selectedIndexChanged?(currentIndex)
       // Update the selected tab for accessibility purposes and also in case UIPageViewController
       // ever changes how its `UIScrollView` is managed this will continue to show the user what the
       // selected tab is even if it doesn't interpolate while scrolling
@@ -346,9 +362,7 @@ private class TabsBarView: UIView, UICollectionViewDelegate {
       flowLayout.minimumInteritemSpacing = 0
       flowLayout.minimumLineSpacing = 0
       flowLayout.sectionInset = .init(top: 0, left: 16, bottom: 0, right: 16)
-      // When we add back more items to the pages list, switch this back to estimated and remove
-      // item size setting within `layoutSubviews`
-      flowLayout.itemSize = CGSize(width: 44, height: tabBarHeight)
+      flowLayout.estimatedItemSize = CGSize(width: 44, height: tabBarHeight)
       return flowLayout
     }()
   )
@@ -362,14 +376,6 @@ private class TabsBarView: UIView, UICollectionViewDelegate {
         boundsWidthChanged?()
       }
     }
-  }
-
-  override func layoutSubviews() {
-    super.layoutSubviews()
-
-    guard bounds.width != 0 && collectionView.numberOfItems(inSection: 0) != 0 else { return }
-    (collectionView.collectionViewLayout as? UICollectionViewFlowLayout)?
-      .itemSize = CGSize(width: (bounds.width - 32) / CGFloat(collectionView.numberOfItems(inSection: 0)), height: tabBarHeight)
   }
 
   override init(frame: CGRect) {

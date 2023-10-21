@@ -6,7 +6,7 @@
 import UIKit
 import Shared
 import BraveUI
-import BraveShared
+import Preferences
 
 class BraveSearchPromotionCell: UITableViewCell {
   private struct DesignUX {
@@ -70,22 +70,15 @@ class BraveSearchPromotionCell: UITableViewCell {
   override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
     super.init(style: style, reuseIdentifier: reuseIdentifier)
     
-    backgroundColor = .secondaryBraveBackground
+    backgroundColor = .clear
     selectionStyle = .none
     
     contentView.addSubview(promotionContentView)
     promotionContentView.snp.makeConstraints {
       $0.leading.equalTo(contentView.safeArea.leading).inset(8)
       $0.trailing.equalTo(contentView.safeArea.trailing).inset(8)
-      
-      if #available(iOS 15, *) {
-        $0.top.equalTo(contentView.safeArea.top)
-        $0.bottom.equalTo(contentView.safeArea.bottom)
-      } else {
-        // iOS 14 table headers look different, solid color, adding small inset to make it look better.
-        $0.top.equalTo(contentView.safeArea.top).inset(8)
-        $0.bottom.equalTo(contentView.safeArea.bottom).inset(8)
-      }
+      $0.top.equalTo(contentView.safeArea.top)
+      $0.bottom.equalTo(contentView.safeArea.bottom)
     }
     
     promotionContentView.addSubview(vStackView)
@@ -165,7 +158,7 @@ class BraveSearchPromotionCell: UITableViewCell {
           Strings.BraveSearchPromotion.braveSearchPromotionBannerDismissButtonTitle,
         for: .normal)
       $0.setTitleColor(.braveBlurpleTint, for: .normal)
-      $0.titleLabel?.font = .preferredFont(forTextStyle: .subheadline, weight: .semibold)
+      $0.titleLabel?.font = .preferredFont(for: .subheadline, weight: .semibold)
       $0.titleLabel?.minimumScaleFactor = 0.5
       $0.titleEdgeInsets = titleEdgeInsets
       $0.contentEdgeInsets = contentEdgeInsets
@@ -212,7 +205,7 @@ class TrySearchButton: UIControl {
   let titleLabel = UILabel().then {
     $0.textColor = .white
     $0.text = Strings.BraveSearchPromotion.braveSearchPromotionBannerTryButtonTitle
-    $0.font = .preferredFont(forTextStyle: .subheadline, weight: .semibold)
+    $0.font = .preferredFont(for: .subheadline, weight: .semibold)
     $0.numberOfLines = 0
     $0.lineBreakMode = .byWordWrapping
     $0.textAlignment = .center

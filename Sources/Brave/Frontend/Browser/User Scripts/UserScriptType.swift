@@ -14,29 +14,24 @@ enum UserScriptType: Hashable {
       let selector: String
       var rules: Set<String>
     }
-    
-    /// The url of the frame this script belongs to
-    ///
-    /// We need this to control which script gets executed on which frame
-    /// on the JS side since we cannot control this on the iOS side
-    let frameURL: URL
-    /// Determines if we hide first party content or not
-    ///
-    /// - Note: For now this is always true as to be more aggressive. Later we may make this more configurable
-    let hideFirstPartyContent = true
+    /// Determines if we hide first party content or not. This is controlled via agressive or standard mode
+    /// Standard mode may unhide 1p content for certain filter lists.
+    let hideFirstPartyContent: Bool
     /// This value come from the engine. In most cases this is false.
     let genericHide: Bool
     /// The delay on which to start polling on.
-    ///
-    /// For the most part, this is 0 (or undefined) on main frames but fixed on sub-frames.
-    let firstSelectorsPollingDelayMs: Int? = nil
-
-    /// Some setting the script requires. Not used for now so hard-coed to nil
-    let switchToSelectorsPollingThreshold: Int? = nil
-    /// Some setting the script requires. Not used for now so hard-coed to nil
-    let fetchNewClassIdRulesThrottlingMs: Int? = nil
-    /// These are hide selectors that will get automatically processed when the script loads.
-    let hideSelectors: Set<String>
+    let firstSelectorsPollingDelayMs: Int?
+    /// After a while of using the mutation observer we switch to selectors polling.
+    /// This is purely an optimizaiton
+    let switchToSelectorsPollingThreshold: Int?
+    /// We can add a delay when sending new classes and ids
+    let fetchNewClassIdRulesThrottlingMs: Int?
+    /// These are agressive hide selectors that will get automatically processed when the script loads.
+    /// Agressive selectors may never be unhidden even on standard mode
+    let aggressiveSelectors: Set<String>
+    /// These are standard hide selectors that will get automatically processed when the script loads.
+    /// Standard selectors may be unhidden on standard mode if they contain 1p content
+    let standardSelectors: Set<String>
     /// These are hide selectors that will get automatically processed when the script loads.
     let styleSelectors: Set<StyleSelectorEntry>
   }
@@ -65,6 +60,9 @@ enum UserScriptType: Hashable {
   case domainUserScript(DomainUserScript)
   /// An engine script on the main frame
   case engineScript(EngineScriptConfiguration)
+  /// Selectors poller script (aka cosmetic filtering script) is responsible for hiding and unhiding css elements as dictated by the ad-block engines.
+  /// This script is actually executed rather than injected and this type is solely used for the creation rather than the injection of the script.
+  case selectorsPoller(SelectorsPollerSetup)
 
   /// The order in which we want to inject the scripts
   var order: Int {
@@ -73,7 +71,27 @@ enum UserScriptType: Hashable {
     case .farblingProtection: return 1
     case .domainUserScript: return 2
     case .siteStateListener: return 3
-    case .engineScript(let configuration): return 4 + configuration.order
+    case .selectorsPoller: return 4
+    case .engineScript(let configuration): return 5 + configuration.order
+    }
+  }
+}
+
+extension UserScriptType: CustomDebugStringConvertible {
+  var debugDescription: String {
+    switch self {
+    case .domainUserScript(let domainUserScript):
+      return "domainUserScript(\(domainUserScript.associatedDomains.joined(separator: ", ")))"
+    case .engineScript(let configuration):
+      return "engineScript(\(configuration.frameURL))"
+    case .farblingProtection(let etld):
+      return "farblingProtection(\(etld))"
+    case .nacl:
+      return "nacl"
+    case .siteStateListener:
+      return "siteStateListener"
+    case .selectorsPoller:
+      return "selectorsPoller"
     }
   }
 }

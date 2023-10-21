@@ -5,9 +5,9 @@
 
 import UIKit
 import BraveUI
-import BraveShared
+import BraveStrings
 
-protocol TabSyncHeaderViewDelegate {
+protocol TabSyncHeaderViewDelegate: AnyObject {
   func toggleSection(_ header: TabSyncHeaderView, section: Int)
   func hideForNow(_ header: TabSyncHeaderView, section: Int)
   func openAll(_ header: TabSyncHeaderView, section: Int)
@@ -21,7 +21,7 @@ class TabSyncHeaderView: UITableViewHeaderFooterView, TableViewReusable {
     static let iconSize = 20.0
   }
   
-  var delegate: TabSyncHeaderViewDelegate?
+  weak var delegate: TabSyncHeaderViewDelegate?
   var section = 0
   var isCollapsed = false {
     didSet {
@@ -45,7 +45,7 @@ class TabSyncHeaderView: UITableViewHeaderFooterView, TableViewReusable {
   
   let titleLabel = UILabel().then {
     $0.textColor = .braveLabel
-    $0.font = .preferredFont(forTextStyle: .body, weight: .bold)
+    $0.font = .preferredFont(for: .body, weight: .bold)
   }
   
   let descriptionLabel = UILabel().then {
@@ -152,7 +152,7 @@ extension TabSyncHeaderView: UIContextMenuInteractionDelegate {
 
       let hideForAction = UIAction(
         title: Strings.OpenTabs.openSessionHideAllActionTitle,
-        image: UIImage(braveSystemNamed: "brave.eye.slash"),
+        image: UIImage(braveSystemNamed: "leo.eye.off"),
         attributes: .destructive,
         handler: UIAction.deferredActionHandler { _ in
           self.delegate?.hideForNow(self, section: self.section)
@@ -184,7 +184,7 @@ class TabSyncTableViewCell: UITableViewCell, TableViewReusable {
     static let imageSize = 32.0
   }
   
-  var delegate: TabSyncHeaderViewDelegate?
+  weak var delegate: TabSyncHeaderViewDelegate?
   
   let imageIconView = UIImageView().then {
     $0.contentMode = .scaleAspectFit

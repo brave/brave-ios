@@ -28,6 +28,9 @@ struct RequestContainerView<DismissContent: ToolbarContent>: View {
               keyringStore: keyringStore,
               onDismiss: onDismiss
             )
+            .onDisappear {
+              cryptoStore.closeConfirmationStore()
+            }
           case .addSuggestedToken(let request):
             AddSuggestedTokenView(
               token: request.token,
@@ -37,8 +40,7 @@ struct RequestContainerView<DismissContent: ToolbarContent>: View {
             )
           case .switchChain(let request):
             SuggestedNetworkView(
-              mode: .switchNetworks(chainId: request.chainId),
-              originInfo: request.originInfo,
+              mode: .switchNetworks(request),
               cryptoStore: cryptoStore,
               keyringStore: keyringStore,
               networkStore: cryptoStore.networkStore,
@@ -46,8 +48,7 @@ struct RequestContainerView<DismissContent: ToolbarContent>: View {
             )
           case .addChain(let request):
             SuggestedNetworkView(
-              mode: .addNetwork(request.networkInfo),
-              originInfo: request.originInfo,
+              mode: .addNetwork(request),
               cryptoStore: cryptoStore,
               keyringStore: keyringStore,
               networkStore: cryptoStore.networkStore,
@@ -58,14 +59,19 @@ struct RequestContainerView<DismissContent: ToolbarContent>: View {
               requests: requests,
               keyringStore: keyringStore,
               cryptoStore: cryptoStore,
+              networkStore: cryptoStore.networkStore,
               onDismiss: onDismiss
+            )
+          case let .signMessageError(signMessageErrors):
+            SignMessageErrorView(
+              signMessageErrors: signMessageErrors,
+              cryptoStore: cryptoStore
             )
           case let .getEncryptionPublicKey(request):
             EncryptionView(
               request: .getEncryptionPublicKey(request),
               cryptoStore: cryptoStore,
               keyringStore: keyringStore,
-              networkStore: cryptoStore.networkStore,
               onDismiss: onDismiss
             )
           case let .decrypt(request):
@@ -73,7 +79,6 @@ struct RequestContainerView<DismissContent: ToolbarContent>: View {
               request: .decrypt(request),
               cryptoStore: cryptoStore,
               keyringStore: keyringStore,
-              networkStore: cryptoStore.networkStore,
               onDismiss: onDismiss
             )
           case let .signTransaction(requests):

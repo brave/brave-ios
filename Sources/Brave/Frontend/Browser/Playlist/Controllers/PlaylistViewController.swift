@@ -10,8 +10,8 @@ import AVFoundation
 import CarPlay
 import MediaPlayer
 import Combine
-
-import BraveShared
+import Playlist
+import Preferences
 import Shared
 import SDWebImage
 import CoreData
@@ -21,12 +21,11 @@ import os.log
 // MARK: PlaylistViewControllerDelegate
 protocol PlaylistViewControllerDelegate: AnyObject {
   func attachPlayerView()
-  func detachPlayerView()
   func onSidePanelStateChanged()
   func onFullscreen()
   func onExitFullscreen()
   func showStaticImage(image: UIImage?)
-  func playItem(item: PlaylistInfo, completion: ((PlaylistInfo, PlaylistMediaStreamer.PlaybackError) -> Void)?)
+  func playItem(item: PlaylistInfo) async throws -> PlaylistInfo
   func pausePlaying()
   func stopPlaying()
   func deleteItem(itemId: String, at index: Int)
@@ -50,16 +49,15 @@ class PlaylistViewController: UIViewController {
   private let player: MediaPlayer
   private let playerView = VideoView()
   private let mediaStreamer: PlaylistMediaStreamer
+  private let isPrivateBrowsing: Bool
 
   private let splitController = UISplitViewController()
   private let folderController = PlaylistFolderController()
-  private lazy var listController = PlaylistListViewController(playerView: playerView)
-  private let detailController = PlaylistDetailViewController()
+  private lazy var listController = PlaylistListViewController(playerView: playerView, isPrivateBrowsing: isPrivateBrowsing)
+  private lazy var detailController = PlaylistDetailViewController(isPrivateBrowsing: isPrivateBrowsing)
 
   private var folderObserver: AnyCancellable?
   private var playerStateObservers = Set<AnyCancellable>()
-  private var assetStateObservers = Set<AnyCancellable>()
-  private var assetLoadingStateObservers = Set<AnyCancellable>()
 
   private var openInNewTab: ((_ url: URL?, _ isPrivate: Bool, _ isPrivileged: Bool) -> Void)?
   private var openPlaylistSettingsMenu: (() -> Void)?
@@ -71,14 +69,17 @@ class PlaylistViewController: UIViewController {
     profile: Profile?,
     mediaPlayer: MediaPlayer,
     initialItem: PlaylistInfo?,
-    initialItemPlaybackOffset: Double
+    initialItemPlaybackOffset: Double,
+    isPrivateBrowsing: Bool
   ) {
 
     self.openInNewTab = openInNewTab
     self.openPlaylistSettingsMenu = openPlaylistSettingsMenu
     self.player = mediaPlayer
-    self.mediaStreamer = PlaylistMediaStreamer(playerView: playerView)
+    self.mediaStreamer = PlaylistMediaStreamer(playerView: playerView, webLoaderFactory: LivePlaylistWebLoaderFactory())
+    self.isPrivateBrowsing = isPrivateBrowsing
     self.folderSharingUrl = nil
+    
     super.init(nibName: nil, bundle: nil)
 
     listController.initialItem = initialItem
@@ -92,12 +93,11 @@ class PlaylistViewController: UIViewController {
   }
 
   deinit {
+    PlaylistCarplayManager.shared.isPlaylistControllerPresented = false
+    
     // Store the last played item's time-offset
-    if let playTime = player.currentItem?.currentTime(),
-      Preferences.Playlist.playbackLeftOff.value {
-      Preferences.Playlist.lastPlayedItemTime.value = playTime.seconds
-    } else {
-      Preferences.Playlist.lastPlayedItemTime.value = 0.0
+    if let item = PlaylistCarplayManager.shared.currentPlaylistItem {
+      updateLastPlayedItem(item: item)
     }
 
     // Stop picture in picture
@@ -119,16 +119,7 @@ class PlaylistViewController: UIViewController {
 
     // Cancel all loading.
     listController.stopLoadingSharedPlaylist()
-    assetLoadingStateObservers.removeAll()
-    assetStateObservers.removeAll()
-
-    // If this controller is retained in app-delegate for Picture-In-Picture support
-    // then we need to re-attach the player layer
-    // and deallocate it.
-    if UIDevice.isIpad {
-      playerView.attachLayer(player: player)
-    }
-
+    PlaylistManager.shared.playbackTask = nil
     PlaylistCarplayManager.shared.playlistController = nil
   }
 
@@ -200,6 +191,22 @@ class PlaylistViewController: UIViewController {
 
     detailController.setVideoPlayer(playerView)
     updateLayoutForOrientationMode()
+    
+    NotificationCenter.default.do {
+      $0.addObserver(
+        self, selector: #selector(saveLastPlayedPosition),
+        name: UIApplication.willResignActiveNotification, object: nil)
+      $0.addObserver(
+        self, selector: #selector(saveLastPlayedPosition),
+        name: UIApplication.willTerminateNotification, object: nil)
+    }
+  }
+  
+  @objc
+  private func saveLastPlayedPosition() {
+    if let item = PlaylistCarplayManager.shared.currentPlaylistItem {
+      updateLastPlayedItem(item: item)
+    }
   }
   
   func setFolderSharingUrl(_ folderSharingUrl: String) {
@@ -308,7 +315,7 @@ class PlaylistViewController: UIViewController {
     }
 
     if let item = PlaylistCarplayManager.shared.currentPlaylistItem {
-      playerView.setVideoInfo(videoDomain: item.pageSrc, videoTitle: item.pageTitle)
+      playerView.setVideoInfo(videoDomain: item.pageSrc, videoTitle: item.pageTitle, isPrivateBrowsing: isPrivateBrowsing)
     } else {
       playerView.resetVideoInfo()
     }
@@ -325,7 +332,8 @@ class PlaylistViewController: UIViewController {
       } else if let item = PlaylistCarplayManager.shared.currentPlaylistItem {
         self.playerView.setVideoInfo(
           videoDomain: item.pageSrc,
-          videoTitle: item.pageTitle)
+          videoTitle: item.pageTitle,
+          isPrivateBrowsing: self.isPrivateBrowsing)
       }
       
       self.listController.highlightActiveItem()
@@ -350,8 +358,7 @@ class PlaylistViewController: UIViewController {
       PlaylistCarplayManager.shared.currentPlaylistItem = nil
 
       // Cancel all loading.
-      self.assetLoadingStateObservers.removeAll()
-      self.assetStateObservers.removeAll()
+      PlaylistManager.shared.playbackTask = nil
     }.store(in: &playerStateObservers)
 
     player.publisher(for: .changePlaybackRate).sink { [weak self] event in
@@ -365,7 +372,7 @@ class PlaylistViewController: UIViewController {
       } else if playbackRate == 1.5 {
         button.setTitle("1.5x", for: .normal)
       } else {
-        button.setTitle("2x", for: .normal)
+        button.setTitle("2.0x", for: .normal)
       }
 
       if !PlaylistCarplayManager.shared.isCarPlayAvailable {
@@ -393,16 +400,6 @@ class PlaylistViewController: UIViewController {
     player.publisher(for: .nextTrack).sink { [weak self] _ in
       guard let self = self, !PlaylistCarplayManager.shared.isCarPlayAvailable else { return }
       self.onNextTrack(self.playerView, isUserInitiated: true)
-    }.store(in: &playerStateObservers)
-    
-    player.publisher(for: .seekBackward).sink { [weak self] _ in
-      guard let self = self, !PlaylistCarplayManager.shared.isCarPlayAvailable else { return }
-      self.seekBackwards(self.playerView)
-    }.store(in: &playerStateObservers)
-    
-    player.publisher(for: .seekForward).sink { [weak self] _ in
-      guard let self = self, !PlaylistCarplayManager.shared.isCarPlayAvailable else { return }
-      self.seekForwards(self.playerView)
     }.store(in: &playerStateObservers)
 
     player.publisher(for: .finishedPlaying).sink { [weak self] event in
@@ -441,6 +438,10 @@ class PlaylistViewController: UIViewController {
 
         self.playerView.controlsView.trackBar.setTimeRange(currentTime: currentItem.currentTime(), endTime: endTime)
         event.mediaPlayer.seek(to: .zero)
+        
+        if let item = PlaylistCarplayManager.shared.currentPlaylistItem {
+          self.updateLastPlayedItem(item: item)
+        }
 
         self.playerView.controlsView.playPauseButton.isEnabled = true
         self.playerView.controlsView.playPauseButton.setImage(UIImage(named: "playlist_play", in: .module, compatibleWith: nil)!, for: .normal)
@@ -527,11 +528,6 @@ extension PlaylistViewController: PlaylistViewControllerDelegate {
     playerView.attachLayer(player: player)
   }
 
-  func detachPlayerView() {
-    playerView.delegate = nil
-    playerView.detachLayer()
-  }
-
   func onSidePanelStateChanged() {
     detailController.onSidePanelStateChanged()
   }
@@ -585,8 +581,7 @@ extension PlaylistViewController: PlaylistViewControllerDelegate {
     stop(playerView)
 
     // Cancel all loading.
-    assetLoadingStateObservers.removeAll()
-    assetStateObservers.removeAll()
+    PlaylistManager.shared.playbackTask = nil
   }
 
   func deleteItem(itemId: String, at index: Int) {
@@ -602,14 +597,11 @@ extension PlaylistViewController: PlaylistViewControllerDelegate {
   }
 
   func updateLastPlayedItem(item: PlaylistInfo) {
-    Preferences.Playlist.lastPlayedItemUrl.value = item.pageSrc
-
-    if let playTime = player.currentItem?.currentTime(),
-      Preferences.Playlist.playbackLeftOff.value {
-      Preferences.Playlist.lastPlayedItemTime.value = playTime.seconds
-    } else {
-      Preferences.Playlist.lastPlayedItemTime.value = 0.0
+    guard let playTime = player.currentItem?.currentTime() else {
+      return
     }
+    
+    PlaylistManager.shared.updateLastPlayed(item: item, playTime: playTime.seconds)
   }
 
   func displayLoadingResourceError() {
@@ -664,6 +656,7 @@ extension PlaylistViewController: VideoViewDelegate {
       return
     }
 
+    saveLastPlayedPosition()
     let index = PlaylistCarplayManager.shared.currentlyPlayingItemIndex - 1
     if index < PlaylistManager.shared.numberOfAssets {
       let indexPath = IndexPath(row: index, section: 0)
@@ -678,32 +671,18 @@ extension PlaylistViewController: VideoViewDelegate {
 
         PlaylistCarplayManager.shared.currentlyPlayingItemIndex = indexPath.row
         PlaylistCarplayManager.shared.currentPlaylistItem = item
-
-        self.playItem(item: item) { [weak self] item, error in
-          PlaylistCarplayManager.shared.currentPlaylistItem = nil
-
-          guard let self = self else { return }
-          PlaylistCarplayManager.shared.currentPlaylistItem = item
-
-          switch error {
-          case .other(let err):
-            Logger.module.error("\(err.localizedDescription)")
-            self.listController.commitPlayerItemTransaction(at: indexPath, isExpired: false)
-            self.displayLoadingResourceError()
-          case .cannotLoadMedia:
-            self.listController.commitPlayerItemTransaction(at: indexPath, isExpired: false)
-            self.displayLoadingResourceError()
-          case .expired:
-            self.listController.commitPlayerItemTransaction(at: indexPath, isExpired: true)
-            self.displayExpiredResourceError(item: item)
-          case .none:
+        
+        PlaylistManager.shared.playbackTask = Task { @MainActor in
+          do {
+            let item = try await self.playItem(item: item)
             PlaylistCarplayManager.shared.currentlyPlayingItemIndex = index
             PlaylistCarplayManager.shared.currentPlaylistItem = item
             self.listController.commitPlayerItemTransaction(at: indexPath, isExpired: false)
             self.updateLastPlayedItem(item: item)
-          case .cancelled:
+          } catch {
+            Logger.module.error("Playlist Error Playing Item: \(error)")
             self.listController.commitPlayerItemTransaction(at: indexPath, isExpired: false)
-            Logger.module.debug("User Cancelled Playlist Playback")
+            self.displayLoadingResourceError()
           }
         }
       }
@@ -714,6 +693,7 @@ extension PlaylistViewController: VideoViewDelegate {
     let assetCount = PlaylistManager.shared.numberOfAssets
     let isAtEnd = PlaylistCarplayManager.shared.currentlyPlayingItemIndex >= assetCount - 1
     var index = PlaylistCarplayManager.shared.currentlyPlayingItemIndex
+    saveLastPlayedPosition()
 
     switch repeatMode {
     case .none:
@@ -721,10 +701,6 @@ extension PlaylistViewController: VideoViewDelegate {
         player.pictureInPictureController?.delegate = nil
         player.pictureInPictureController?.stopPictureInPicture()
         player.stop()
-
-        if UIDevice.isIpad {
-          playerView.attachLayer(player: player)
-        }
         PlaylistCarplayManager.shared.playlistController = nil
         return
       }
@@ -752,21 +728,21 @@ extension PlaylistViewController: VideoViewDelegate {
 
         PlaylistCarplayManager.shared.currentlyPlayingItemIndex = indexPath.row
         PlaylistCarplayManager.shared.currentPlaylistItem = item
-
-        self.playItem(item: item) { [weak self] item, error in
-          PlaylistCarplayManager.shared.currentPlaylistItem = nil
-          guard let self = self else { return }
-          PlaylistCarplayManager.shared.currentPlaylistItem = item
-
-          switch error {
-          case .other(let err):
-            Logger.module.error("\(err.localizedDescription)")
+        
+        PlaylistManager.shared.playbackTask = Task { @MainActor in
+          do {
+            let item = try await self.playItem(item: item)
+            PlaylistCarplayManager.shared.currentPlaylistItem = item
+            
             self.listController.commitPlayerItemTransaction(at: indexPath, isExpired: false)
-            self.displayLoadingResourceError()
-          case .cannotLoadMedia:
-            self.listController.commitPlayerItemTransaction(at: indexPath, isExpired: false)
-            self.displayLoadingResourceError()
-          case .expired:
+            PlaylistCarplayManager.shared.currentlyPlayingItemIndex = index
+            PlaylistCarplayManager.shared.currentPlaylistItem = item
+            self.updateLastPlayedItem(item: item)
+          } catch {
+            PlaylistCarplayManager.shared.currentPlaylistItem = nil
+            PlaylistCarplayManager.shared.currentlyPlayingItemIndex = -1
+            Logger.module.error("Playlist Error Playing Item: \(error)")
+            
             if isUserInitiated || self.repeatMode == .repeatOne || assetCount <= 1 {
               self.listController.commitPlayerItemTransaction(at: indexPath, isExpired: true)
               self.displayExpiredResourceError(item: item)
@@ -777,14 +753,6 @@ extension PlaylistViewController: VideoViewDelegate {
                 self.onNextTrack(videoView, isUserInitiated: isUserInitiated)
               }
             }
-          case .none:
-            self.listController.commitPlayerItemTransaction(at: indexPath, isExpired: false)
-            PlaylistCarplayManager.shared.currentlyPlayingItemIndex = index
-            PlaylistCarplayManager.shared.currentPlaylistItem = item
-            self.updateLastPlayedItem(item: item)
-          case .cancelled:
-            self.listController.commitPlayerItemTransaction(at: indexPath, isExpired: false)
-            Logger.module.debug("User Cancelled Playlist Playback")
           }
         }
       }
@@ -800,10 +768,7 @@ extension PlaylistViewController: VideoViewDelegate {
         pictureInPictureController.delegate = self
         pictureInPictureController.stopPictureInPicture()
       } else {
-        if #available(iOS 14.0, *) {
-          pictureInPictureController.requiresLinearPlayback = false
-        }
-
+        pictureInPictureController.requiresLinearPlayback = false
         // Picture in Picture enabled
         pictureInPictureController.delegate = self
         pictureInPictureController.startPictureInPicture()
@@ -885,87 +850,58 @@ extension PlaylistViewController: VideoViewDelegate {
   func toggleRepeatMode(_ videoView: VideoView) {
     player.toggleRepeatMode()
   }
-
-  func load(_ videoView: VideoView, url: URL, autoPlayEnabled: Bool) -> AnyPublisher<Void, MediaPlaybackError> {
-    load(videoView, asset: AVURLAsset(url: url, options: AVAsset.defaultOptions), autoPlayEnabled: autoPlayEnabled)
+  
+  private func clear() {
+    PlaylistMediaStreamer.clearNowPlayingInfo()
+    player.clear()
+    
+    PlaylistManager.shared.playbackTask?.cancel()
+    PlaylistManager.shared.playbackTask = nil
   }
 
-  func load(_ videoView: VideoView, asset: AVURLAsset, autoPlayEnabled: Bool) -> AnyPublisher<Void, MediaPlaybackError> {
-    assetLoadingStateObservers.removeAll()
-    player.stop()
-
-    return Future { [weak self] resolver in
-      guard let self = self else {
-        Logger.module.debug("User Cancelled Playback")
-        resolver(.failure(.cancelled))
-        return
-      }
-
-      self.player.load(asset: asset)
-        .receive(on: RunLoop.main)
-        .sink(
-          receiveCompletion: { status in
-            switch status {
-            case .failure(let error):
-              switch error {
-              case .cancelled:
-                resolver(.failure(.cancelled))
-              case .other(let err):
-                resolver(.failure(.other(err)))
-              case .cannotLoadAsset(status: let status):
-                resolver(.failure(.other(error)))
-              }
-            case .finished:
-              break
-            }
-          },
-          receiveValue: { [weak self] isNewItem in
-            guard let self = self, let item = self.player.currentItem else {
-              Logger.module.debug("User Cancelled Playback")
-              resolver(.failure(.cancelled))
-              return
-            }
-
-            // We are playing the same item again..
-            if !isNewItem {
-              self.pause(videoView)
-              self.seek(videoView, relativeOffset: 0.0)  // Restart playback
-              self.play(videoView)
-              resolver(.success(Void()))
-              return
-            }
-
-            // Live media item
-            let isPlayingLiveMedia = self.player.isLiveMedia
-            self.playerView.setMediaIsLive(isPlayingLiveMedia)
-
-            // Track-bar
-            let endTime = CMTimeConvertScale(item.asset.duration, timescale: self.player.currentTime.timescale, method: .roundHalfAwayFromZero)
-            self.playerView.controlsView.trackBar.setTimeRange(currentTime: item.currentTime(), endTime: endTime)
-
-            // Successfully loaded
-            resolver(.success(Void()))
-
-            if autoPlayEnabled {
-              self.play(videoView)  // Play the new item
-            }
-          }
-        ).store(in: &self.assetLoadingStateObservers)
-    }.eraseToAnyPublisher()
+  func load(_ videoView: VideoView, url: URL, autoPlayEnabled: Bool) async throws {
+    try await load(videoView, asset: AVURLAsset(url: url, options: AVAsset.defaultOptions), autoPlayEnabled: autoPlayEnabled)
   }
 
-  func playItem(item: PlaylistInfo, completion: ((PlaylistInfo, PlaylistMediaStreamer.PlaybackError) -> Void)?) {
-    assetLoadingStateObservers.removeAll()
-    assetStateObservers.removeAll()
+  func load(_ videoView: VideoView, asset: AVURLAsset, autoPlayEnabled: Bool) async throws /*`MediaPlaybackError`*/ {
+    self.clear()
+    
+    let isNewItem = try await player.load(asset: asset)
+    
+    guard let item = player.currentItem else {
+      throw MediaPlaybackError.cancelled
+    }
 
+    // We are playing the same item again..
+    if !isNewItem {
+      pause(videoView)
+      seek(videoView, relativeOffset: 0.0)  // Restart playback
+      play(videoView)
+      return
+    }
+
+    // Live media item
+    let isPlayingLiveMedia = self.player.isLiveMedia
+    self.playerView.setMediaIsLive(isPlayingLiveMedia)
+
+    // Track-bar
+    let endTime = CMTimeConvertScale(item.asset.duration, timescale: self.player.currentTime.timescale, method: .roundHalfAwayFromZero)
+    self.playerView.controlsView.trackBar.setTimeRange(currentTime: item.currentTime(), endTime: endTime)
+
+    // Successfully loaded
+    if autoPlayEnabled {
+      self.play(videoView)  // Play the new item
+    }
+  }
+
+  func playItem(item: PlaylistInfo) async throws -> PlaylistInfo {
     // This MUST be checked.
     // The user must not be able to alter a player that isn't visible from any UI!
-    // This is because, if car-play is interface is attached, the player can only be
+    // This is because, if car-play's interface is attached, the player can only be
     // controller through this UI so long as it is attached to it.
     // If it isn't attached, the player can only be controlled through the car-play interface.
     guard player.isAttachedToDisplay else {
-      completion?(item, .cancelled)
-      return
+      throw PlaylistMediaStreamer.PlaybackError.cancelled
     }
 
     // If the item is cached, load it from the cache and play it.
@@ -973,136 +909,65 @@ extension PlaylistViewController: VideoViewDelegate {
     if cacheState != .invalid {
       if let index = PlaylistManager.shared.index(of: item.tagId),
         let asset = PlaylistManager.shared.assetAtIndex(index) {
-        load(playerView, asset: asset, autoPlayEnabled: listController.autoPlayEnabled)
-          .handleEvents(receiveCancel: {
-            PlaylistMediaStreamer.clearNowPlayingInfo()
-            completion?(item, .cancelled)
-          })
-          .sink(
-            receiveCompletion: { status in
-              switch status {
-              case .failure(let error):
-                PlaylistMediaStreamer.clearNowPlayingInfo()
-
-                switch error {
-                case .cancelled:
-                  completion?(item, .cancelled)
-                case .other(let err):
-                  completion?(item, .other(err))
-                case .cannotLoadAsset(_):
-                  completion?(item, .other(error))
-                }
-
-              case .finished:
-                break
-              }
-            },
-            receiveValue: { [weak self] _ in
-              guard let self = self else {
-                PlaylistMediaStreamer.clearNowPlayingInfo()
-                completion?(item, .cancelled)
-                return
-              }
-
-              self.playerView.setVideoInfo(
-                videoDomain: item.pageSrc,
-                videoTitle: item.pageTitle)
-              PlaylistMediaStreamer.setNowPlayingInfo(item, withPlayer: self.player)
-              completion?(item, .none)
-            }
-          ).store(in: &assetLoadingStateObservers)
+        
+        do {
+          try await load(playerView, asset: asset, autoPlayEnabled: listController.autoPlayEnabled)
+          PlaylistMediaStreamer.clearNowPlayingInfo()
+          self.playerView.setVideoInfo(
+            videoDomain: item.pageSrc,
+            videoTitle: item.pageTitle,
+            isPrivateBrowsing: self.isPrivateBrowsing)
+          PlaylistMediaStreamer.setNowPlayingInfo(item, withPlayer: self.player)
+        } catch {
+          PlaylistMediaStreamer.clearNowPlayingInfo()
+          throw error
+        }
       } else {
         PlaylistMediaStreamer.clearNowPlayingInfo()
-        completion?(item, .expired)
+        throw PlaylistMediaStreamer.PlaybackError.expired
       }
-      return
+      return item
     }
 
     // The item is not cached so we should attempt to stream it
-    streamItem(item: item, completion: completion)
+    return try await streamItem(item: item)
   }
 
-  func streamItem(item: PlaylistInfo, completion: ((PlaylistInfo, PlaylistMediaStreamer.PlaybackError) -> Void)?) {
-    mediaStreamer.loadMediaStreamingAsset(item)
-      .handleEvents(receiveCancel: {
-        PlaylistMediaStreamer.clearNowPlayingInfo()
-        completion?(item, .cancelled)
-      })
-      .sink(
-        receiveCompletion: { status in
-          switch status {
-          case .failure(let error):
-            PlaylistMediaStreamer.clearNowPlayingInfo()
-            completion?(item, error)
-          case .finished:
-            break
-          }
-        },
-        receiveValue: { [weak self] item in
-          guard let self = self else {
-            PlaylistMediaStreamer.clearNowPlayingInfo()
-            completion?(item, .cancelled)
-            return
-          }
-
-          // Item can be streamed, so let's retrieve its URL from our DB
-          guard let index = PlaylistManager.shared.index(of: item.tagId),
-            let item = PlaylistManager.shared.itemAtIndex(index)
-          else {
-            PlaylistMediaStreamer.clearNowPlayingInfo()
-            completion?(item, .expired)
-            return
-          }
-
-          // Attempt to play the stream
-          if let url = URL(string: item.src) {
-            self.load(
-              self.playerView,
-              url: url,
-              autoPlayEnabled: self.listController.autoPlayEnabled
-            )
-            .handleEvents(receiveCancel: {
-              PlaylistMediaStreamer.clearNowPlayingInfo()
-              completion?(item, .cancelled)
-            })
-            .sink(
-              receiveCompletion: { status in
-                switch status {
-                case .failure(let error):
-                  PlaylistMediaStreamer.clearNowPlayingInfo()
-
-                  switch error {
-                  case .cancelled:
-                    completion?(item, .cancelled)
-                  case .other(let err):
-                    completion?(item, .other(err))
-                  case .cannotLoadAsset(_):
-                    completion?(item, .other(error))
-                  }
-                case .finished:
-                  break
-                }
-              },
-              receiveValue: { [weak self] _ in
-                guard let self = self else {
-                  PlaylistMediaStreamer.clearNowPlayingInfo()
-                  completion?(item, .cancelled)
-                  return
-                }
-
-                self.playerView.setVideoInfo(
-                  videoDomain: item.pageSrc,
-                  videoTitle: item.pageTitle)
-                PlaylistMediaStreamer.setNowPlayingInfo(item, withPlayer: self.player)
-                completion?(item, .none)
-              }
-            ).store(in: &self.assetLoadingStateObservers)
-          } else {
-            PlaylistMediaStreamer.clearNowPlayingInfo()
-            completion?(item, .expired)
-          }
-        }
-      ).store(in: &assetStateObservers)
+  func streamItem(item: PlaylistInfo) async throws -> PlaylistInfo {
+    var item = item
+    
+    do {
+      item = try await mediaStreamer.loadMediaStreamingAsset(item)
+    } catch {
+      PlaylistMediaStreamer.clearNowPlayingInfo()
+      throw error
+    }
+    
+    // Item can be streamed
+    guard let url = URL(string: item.src) else {
+      PlaylistMediaStreamer.clearNowPlayingInfo()
+      throw PlaylistMediaStreamer.PlaybackError.expired
+    }
+    
+    // Attempt to play the stream
+    do {
+      try await load(
+        self.playerView,
+        url: url,
+        autoPlayEnabled: self.listController.autoPlayEnabled
+      )
+    } catch {
+      PlaylistMediaStreamer.clearNowPlayingInfo()
+      throw PlaylistMediaStreamer.PlaybackError.cannotLoadMedia
+    }
+    
+    playerView.setVideoInfo(
+      videoDomain: item.pageSrc,
+      videoTitle: item.pageTitle,
+      isPrivateBrowsing: isPrivateBrowsing)
+    
+    PlaylistMediaStreamer.setNowPlayingInfo(item, withPlayer: self.player)
+    return item
   }
 
   var isPlaying: Bool {
@@ -1132,11 +997,7 @@ extension PlaylistViewController: VideoViewDelegate {
 extension PlaylistFolder {
   var isPersistent: Bool {
     managedObjectContext?.persistentStoreCoordinator?.persistentStores.first(where: {
-      if #available(iOS 15.0, *) {
-        return $0.type == NSPersistentStore.StoreType.inMemory.rawValue
-      } else {
-        return $0.type == "InMemory"
-      }
+      return $0.type == NSPersistentStore.StoreType.inMemory.rawValue
     }) == nil
   }
 }

@@ -10,7 +10,7 @@ import Shared
 import Data
 import Favicon
 
-class TestFavicons: ProfileTest {
+@MainActor class TestFavicons: ProfileTest {
   
   override func setUp() {
     super.setUp()
@@ -28,7 +28,7 @@ class TestFavicons: ProfileTest {
   func testImageViewLoad() {
     let expectation = XCTestExpectation(description: "favicon.load")
     let imageView = UIImageView()
-    imageView.loadFavicon(for: URL(string: "http://www.google.de")!, monogramFallbackCharacter: nil) { _ in 
+    imageView.loadFavicon(for: URL(string: "http://www.google.de")!, isPrivateBrowsing: false, monogramFallbackCharacter: nil) { _ in 
       // Should be a default icon therefore not truly async
       XCTAssertNotNil(imageView.image)
       expectation.fulfill()

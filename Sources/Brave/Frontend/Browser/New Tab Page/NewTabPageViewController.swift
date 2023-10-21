@@ -9,6 +9,7 @@ import CoreData
 import Data
 import Shared
 import BraveShared
+import Preferences
 import BraveCore
 import SnapKit
 import SwiftUI
@@ -106,7 +107,7 @@ class NewTabPageViewController: UIViewController {
 
   private var background: NewTabPageBackground
   private let backgroundView = NewTabPageBackgroundView()
-  private let backgroundButtonsView = NewTabPageBackgroundButtonsView()
+  private let backgroundButtonsView: NewTabPageBackgroundButtonsView
   /// A gradient to display over background images to ensure visibility of
   /// the NTP contents and sponsored logo
   ///
@@ -128,45 +129,55 @@ class NewTabPageViewController: UIViewController {
 
   private let notifications: NewTabPageNotifications
   private var cancellables: Set<AnyCancellable> = []
+  private let privateBrowsingManager: PrivateBrowsingManager
+  
+  private let p3aHelper: NewTabPageP3AHelper
 
   init(
     tab: Tab,
     profile: Profile,
     dataSource: NTPDataSource,
     feedDataSource: FeedDataSource,
-    rewards: BraveRewards
+    rewards: BraveRewards,
+    privateBrowsingManager: PrivateBrowsingManager,
+    p3aUtils: BraveP3AUtils
   ) {
     self.tab = tab
     self.rewards = rewards
     self.feedDataSource = feedDataSource
+    self.privateBrowsingManager = privateBrowsingManager
+    self.backgroundButtonsView = NewTabPageBackgroundButtonsView(privateBrowsingManager: privateBrowsingManager)
+    self.p3aHelper = .init(p3aUtils: p3aUtils)
     background = NewTabPageBackground(dataSource: dataSource)
     notifications = NewTabPageNotifications(rewards: rewards)
     collectionView = NewTabCollectionView(frame: .zero, collectionViewLayout: layout)
     super.init(nibName: nil, bundle: nil)
+    
+    self.p3aHelper.dataSource = self
 
     Preferences.NewTabPage.showNewTabPrivacyHub.observe(from: self)
     Preferences.NewTabPage.showNewTabFavourites.observe(from: self)
     
     sections = [
-      StatsSectionProvider(openPrivacyHubPressed: { [weak self] in
-        if PrivateBrowsingManager.shared.isPrivateBrowsing {
+      StatsSectionProvider(isPrivateBrowsing: tab.isPrivate, openPrivacyHubPressed: { [weak self] in
+        if self?.privateBrowsingManager.isPrivateBrowsing == true {
           return
         }
         
-        let host = UIHostingController(rootView: PrivacyReportsManager.prepareView())
-        host.rootView.onDismiss = { [weak self, weak host] in
-          host?.dismiss(animated: true) {
+        let host = UIHostingController(rootView: PrivacyReportsManager.prepareView(isPrivateBrowsing: privateBrowsingManager.isPrivateBrowsing))
+        host.rootView.onDismiss = { [weak self] in
+          DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             guard let self = self else { return }
             
             // Handle App Rating
             // User finished viewing the privacy report (tapped close)
-            AppReviewManager.shared.handleAppReview(for: self)
+            AppReviewManager.shared.handleAppReview(for: .revised, using: self)
           }
         }
         
         host.rootView.openPrivacyReportsUrl = { [weak self] in
           self?.delegate?.navigateToInput(
-            BraveUX.privacyReportsURL.absoluteString,
+            URL.brave.privacyFeatures.absoluteString,
             inNewTab: false,
             // Privacy Reports view is unavailable in private mode.
             switchingToPrivateMode: false
@@ -182,18 +193,24 @@ class NewTabPageViewController: UIViewController {
         self?.handleFavoriteAction(favorite: bookmark, action: action)
       }, legacyLongPressAction: { [weak self] alertController in
         self?.present(alertController, animated: true)
-      }),
+      }, isPrivateBrowsing: privateBrowsingManager.isPrivateBrowsing),
       FavoritesOverflowSectionProvider(action: { [weak self] in
         self?.delegate?.focusURLBar()
       }),
     ]
 
+    var isBackgroundNTPSI = false
+    if let ntpBackground = background.currentBackground, case .sponsoredImage = ntpBackground {
+      isBackgroundNTPSI = true
+    }
+    let ntpDefaultBrowserCalloutProvider = NTPDefaultBrowserCalloutProvider(isBackgroundNTPSI: isBackgroundNTPSI)
+    
     // This is a one-off view, adding it to the NTP only if necessary.
-    if NTPDefaultBrowserCalloutProvider.shouldShowCallout {
-      sections.insert(NTPDefaultBrowserCalloutProvider(), at: 0)
+    if ntpDefaultBrowserCalloutProvider.shouldShowCallout() {
+      sections.insert(ntpDefaultBrowserCalloutProvider, at: 0)
     }
 
-    if !PrivateBrowsingManager.shared.isPrivateBrowsing {
+    if !privateBrowsingManager.isPrivateBrowsing {
       sections.append(
         BraveNewsSectionProvider(
           dataSource: feedDataSource,
@@ -232,7 +249,7 @@ class NewTabPageViewController: UIViewController {
       braveNewsFeatureUsage.recordHistogram()
       recordBraveNewsDaysUsedP3A()
     }
-    braveNewsFeatureUsage.recordReturningUsageMetric()
+    
     recordNewTabCreatedP3A()
     recordBraveNewsWeeklyUsageCountP3A()
   }
@@ -285,10 +302,17 @@ class NewTabPageViewController: UIViewController {
       provider.registerCells(to: collectionView)
       if let observableProvider = provider as? NTPObservableSectionProvider {
         observableProvider.sectionDidChange = { [weak self] in
-          UIView.performWithoutAnimation {
-            self?.collectionView.reloadSections(IndexSet(integer: index))
+          guard let self = self else { return }
+          if self.parent != nil {
+            UIView.performWithoutAnimation {
+              // As of iOS 16.4, reloadSections seems to do some sort of validation of the underlying data
+              // for other sections that aren't being refreshed. This can cause assertions for sections that
+              // may need to reload in the same batch but don't. Since we don't animate this section anyways
+              // we can just switch to `reloadData` here.
+              self.collectionView.reloadData()
+            }
           }
-          self?.collectionView.collectionViewLayout.invalidateLayout()
+          self.collectionView.collectionViewLayout.invalidateLayout()
         }
       }
     }
@@ -314,7 +338,17 @@ class NewTabPageViewController: UIViewController {
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
 
-    reportSponsoredImageBackgroundEvent(.viewed)
+    reportSponsoredImageBackgroundEvent(.served)
+
+    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+      // As a temporary fix until 1.53.x, we trigger the .viewed event after 1 second to
+      // give time for the .served event to be triggered; otherwise, the sponsored image
+      // viewed event will fail because it needs a corresponding served event. In 1.53.x
+      // and above we should trigger the .served event and in the completion block if
+      // successful we should trigger a .viewed event.
+      self.reportSponsoredImageBackgroundEvent(.viewed)
+    }
+
     presentNotification()
 
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.50) {
@@ -352,10 +386,10 @@ class NewTabPageViewController: UIViewController {
         hideNotification()
         return
       }
-      switch background.type {
-      case .regular, .withQRCode:
+      switch background {
+      case .image, .superReferral:
         hideNotification()
-      case .withBrandLogo:
+      case .sponsoredImage:
         // Current background is still a sponsored image so it can stay
         // visible
         break
@@ -368,18 +402,17 @@ class NewTabPageViewController: UIViewController {
 
     hideVisibleSponsoredImageNotification()
 
-    if let backgroundType = background.currentBackground?.type {
-      switch backgroundType {
-      case .regular:
-        if let name = background.currentBackground?.wallpaper.credit?.name {
+    if let background = background.currentBackground {
+      switch background {
+      case .image(let background):
+        if case let name = background.author, !name.isEmpty {
           backgroundButtonsView.activeButton = .imageCredit(name)
         } else {
           backgroundButtonsView.activeButton = .none
         }
-      case .withBrandLogo(let defaultLogo):
-        guard let logo = background.currentBackground?.wallpaper.logo ?? defaultLogo else { break }
-        backgroundButtonsView.activeButton = .brandLogo(logo)
-      case .withQRCode(_):
+      case .sponsoredImage(let background):
+        backgroundButtonsView.activeButton = .brandLogo(background.logo)
+      case .superReferral:
         backgroundButtonsView.activeButton = .QRCode
       }
     } else {
@@ -402,9 +435,11 @@ class NewTabPageViewController: UIViewController {
     }
     
     // If no focal point provided we do nothing. The image is centered by default.
-    guard let focalX = background.currentBackground?.wallpaper.focalPoint?.x else {
+    guard let focalPoint = background.currentBackground?.focalPoint else {
       return
     }
+    
+    let focalX = focalPoint.x
     
     // Calculate the sizing difference between `image` and `imageView` to determine the pixel difference ratio.
     // Most image calculations have to use this property to get coordinates right.
@@ -428,18 +463,25 @@ class NewTabPageViewController: UIViewController {
     backgroundView.updateImageXOffset(by: realisticXOffset)
   }
 
-  private func reportSponsoredImageBackgroundEvent(_ event: Ads.NewTabPageAdEventType) {
-    guard let backgroundType = background.currentBackground?.type,
-      case .withBrandLogo = backgroundType,
-      let creativeInstanceId = background.currentBackground?.wallpaper.creativeInstanceId
-    else {
-      return
+  private func reportSponsoredImageBackgroundEvent(_ event: BraveAds.NewTabPageAdEventType) {
+    if case .sponsoredImage(let sponsoredBackground) = background.currentBackground {
+      let eventType: NewTabPageP3AHelper.EventType? = {
+        switch event {
+        case .clicked: return .tapped
+        case .viewed: return .viewed
+        default: return nil
+        }
+      }()
+      if let eventType {
+        p3aHelper.recordEvent(eventType, on: sponsoredBackground)
+      }
+      rewards.ads.reportNewTabPageAdEvent(
+        background.wallpaperId.uuidString,
+        creativeInstanceId: sponsoredBackground.creativeInstanceId,
+        eventType: event,
+        completion: { _ in }
+      )
     }
-    rewards.ads.reportNewTabPageAdEvent(
-      background.wallpaperId.uuidString,
-      creativeInstanceId: creativeInstanceId,
-      eventType: event
-    )
   }
 
   // MARK: - Notifications
@@ -451,12 +493,12 @@ class NewTabPageViewController: UIViewController {
   }
 
   private func presentNotification() {
-    if PrivateBrowsingManager.shared.isPrivateBrowsing || notificationShowing {
+    if privateBrowsingManager.isPrivateBrowsing || notificationShowing {
       return
     }
 
     var isShowingSponseredImage = false
-    if case .withBrandLogo(let logo) = background.currentBackground?.type, logo != nil {
+    if case .sponsoredImage = background.currentBackground {
       isShowingSponseredImage = true
     }
 
@@ -546,13 +588,13 @@ class NewTabPageViewController: UIViewController {
         self.backgroundButtonsView.alpha = 1.0
       }
     case .optInCardAction(.learnMoreButtonTapped):
-      delegate?.navigateToInput(BraveUX.braveNewsPrivacyURL.absoluteString, inNewTab: false, switchingToPrivateMode: false)
+      delegate?.navigateToInput(URL.brave.braveNewsPrivacy.absoluteString, inNewTab: false, switchingToPrivateMode: false)
     case .optInCardAction(.turnOnBraveNewsButtonTapped):
       preventReloadOnBraveNewsEnabledChange = true
       Preferences.BraveNews.userOptedIn.value = true
       Preferences.BraveNews.isShowingOptIn.value = false
       Preferences.BraveNews.isEnabled.value = true
-      rewards.ads.initialize { [weak self] _ in
+      rewards.ads.initialize() { [weak self] _ in
         // Initialize ads if it hasn't already been done
         self?.loadFeedContents()
       }
@@ -562,13 +604,13 @@ class NewTabPageViewController: UIViewController {
       loadFeedContents()
     case .moreBraveOffersTapped:
       delegate?.navigateToInput(
-        BraveUX.braveOffersURL.absoluteString,
+        URL.brave.braveOffers.absoluteString,
         inNewTab: false,
         switchingToPrivateMode: false
       )
     case .bravePartnerLearnMoreTapped:
       delegate?.navigateToInput(
-        BraveUX.braveNewsPartnersURL.absoluteString,
+        URL.brave.braveNews.absoluteString,
         inNewTab: false,
         switchingToPrivateMode: false
       )
@@ -580,14 +622,27 @@ class NewTabPageViewController: UIViewController {
         rewards.ads.reportPromotedContentAdEvent(
           item.content.urlHash,
           creativeInstanceId: creativeInstanceID,
-          eventType: .clicked
+          eventType: .clicked,
+          completion: { _ in }
         )
       }
-      delegate?.navigateToInput(
-        url.absoluteString,
-        inNewTab: inNewTab,
-        switchingToPrivateMode: switchingToPrivateMode
-      )
+      if switchingToPrivateMode, Preferences.Privacy.privateBrowsingLock.value {
+        self.askForLocalAuthentication { [weak self] success, error in
+          if success {
+            self?.delegate?.navigateToInput(
+              url.absoluteString,
+              inNewTab: inNewTab,
+              switchingToPrivateMode: switchingToPrivateMode
+            )
+          }
+        }
+      } else {
+        delegate?.navigateToInput(
+          url.absoluteString,
+          inNewTab: inNewTab,
+          switchingToPrivateMode: switchingToPrivateMode
+        )
+      }
       // Donate Open Brave News Activity for Custom Suggestions
       let openBraveNewsActivity = ActivityShortcutManager.shared.createShortcutActivity(type: .openBraveNews)
       self.userActivity = openBraveNewsActivity
@@ -608,7 +663,8 @@ class NewTabPageViewController: UIViewController {
         rewards.ads.reportInlineContentAdEvent(
           ad.placementID,
           creativeInstanceId: ad.creativeInstanceID,
-          eventType: .clicked
+          eventType: .clicked,
+          completion: { _ in }
         )
       }
       delegate?.navigateToInput(
@@ -619,6 +675,19 @@ class NewTabPageViewController: UIViewController {
     case .inlineContentAdAction(.toggledSource, _):
       // Inline content ads have no source
       break
+    case .rateCardAction(.rateBrave):
+      Preferences.Review.newsCardShownDate.value = Date()
+      guard let writeReviewURL = URL(
+        string: "https://itunes.apple.com/app/id1052879175?action=write-review") else {
+        return
+      }
+      UIApplication.shared.open(writeReviewURL)
+      feedDataSource.setNeedsReloadCards()
+      loadFeedContents()
+    case .rateCardAction(.hideCard):
+      Preferences.Review.newsCardShownDate.value = Date()
+      feedDataSource.setNeedsReloadCards()
+      loadFeedContents()
     }
   }
 
@@ -632,7 +701,7 @@ class NewTabPageViewController: UIViewController {
     _ oldValue: FeedDataSource.State,
     _ newValue: FeedDataSource.State
   ) {
-    guard let section = layout.braveNewsSection else { return }
+    guard let section = layout.braveNewsSection, parent != nil else { return }
 
     func _completeLoading() {
       UIView.animate(
@@ -688,13 +757,9 @@ class NewTabPageViewController: UIViewController {
         feedOverlayView.loaderView.isHidden = false
         feedOverlayView.loaderView.start()
 
-        if let section = layout.braveNewsSection {
-          let numberOfItems = collectionView.numberOfItems(inSection: section)
-          if numberOfItems > 0 {
-            collectionView.deleteItems(
-              at: (0..<numberOfItems).map({ IndexPath(item: $0, section: section) })
-            )
-          }
+        let numberOfItems = collectionView.numberOfItems(inSection: section)
+        if numberOfItems > 0 {
+          collectionView.reloadSections(IndexSet(integer: section))
         }
       }
     case (.loading, _):
@@ -754,7 +819,7 @@ class NewTabPageViewController: UIViewController {
     })
     controller.viewDidDisappear = { [weak self] in
       if Preferences.Review.braveNewsCriteriaPassed.value {
-        AppReviewManager.shared.isReviewRequired = true
+        AppReviewManager.shared.isRevisedReviewRequired = true
         Preferences.Review.braveNewsCriteriaPassed.value = false
       }
       self?.checkForUpdatedFeed()
@@ -765,20 +830,21 @@ class NewTabPageViewController: UIViewController {
 
   private func tappedActiveBackgroundButton(_ sender: UIControl) {
     guard let background = background.currentBackground else { return }
-    switch background.type {
-    case .regular:
+    switch background {
+    case .image:
       presentImageCredit(sender)
-    case .withBrandLogo(let defaultLogo):
-      guard let logo = background.wallpaper.logo ?? defaultLogo else { break }
-      tappedSponsorButton(logo)
-    case .withQRCode(let code):
+    case .sponsoredImage(let background):
+      tappedSponsorButton(background.logo)
+    case .superReferral(_, let code):
       tappedQRCode(code)
     }
   }
 
-  private func tappedSponsorButton(_ logo: NTPLogo) {
+  private func tappedSponsorButton(_ logo: NTPSponsoredImageLogo) {
     UIImpactFeedbackGenerator(style: .medium).bzzt()
-    delegate?.navigateToInput(logo.destinationUrl, inNewTab: false, switchingToPrivateMode: false)
+    if let url = logo.destinationURL {
+      delegate?.navigateToInput(url.absoluteString, inNewTab: false, switchingToPrivateMode: false)
+    }
 
     reportSponsoredImageBackgroundEvent(.clicked)
   }
@@ -798,15 +864,15 @@ class NewTabPageViewController: UIViewController {
   }
 
   private func presentImageCredit(_ button: UIControl) {
-    guard let credit = background.currentBackground?.wallpaper.credit else { return }
+    guard case .image(let background) = background.currentBackground else { return }
 
-    let alert = UIAlertController(title: credit.name, message: nil, preferredStyle: .actionSheet)
+    let alert = UIAlertController(title: background.author, message: nil, preferredStyle: .actionSheet)
 
-    if let creditWebsite = credit.url, let creditURL = URL(string: creditWebsite) {
+    if let creditURL = background.link {
       let websiteTitle = String(format: Strings.viewOn, creditURL.hostSLD.capitalizeFirstLetter)
       alert.addAction(
         UIAlertAction(title: websiteTitle, style: .default) { [weak self] _ in
-          self?.delegate?.navigateToInput(creditWebsite, inNewTab: false, switchingToPrivateMode: false)
+          self?.delegate?.navigateToInput(creditURL.absoluteString, inNewTab: false, switchingToPrivateMode: false)
         })
     }
 
@@ -854,7 +920,7 @@ extension NewTabPageViewController: PreferencesObserver {
 // MARK: - UIScrollViewDelegate
 extension NewTabPageViewController {
   var isBraveNewsVisible: Bool {
-    return !PrivateBrowsingManager.shared.isPrivateBrowsing && (Preferences.BraveNews.isEnabled.value || Preferences.BraveNews.isShowingOptIn.value)
+    return !privateBrowsingManager.isPrivateBrowsing && (Preferences.BraveNews.isEnabled.value || Preferences.BraveNews.isShowingOptIn.value)
   }
   
   func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -923,7 +989,6 @@ extension NewTabPageViewController {
     
     // Usage
     braveNewsFeatureUsage.recordUsage()
-    braveNewsFeatureUsage.recordReturningUsageMetric()
     var braveNewsWeeklyCount = P3ATimedStorage<Int>.braveNewsWeeklyCount
     braveNewsWeeklyCount.add(value: 1, to: Date())
     
@@ -998,7 +1063,7 @@ extension NewTabPageViewController {
     newTabsStorage.add(value: 1, to: Date())
     let newTabsCreatedAnswer = newTabsStorage.maximumDaysCombinedValue
     
-    if case .withBrandLogo = background.currentBackground?.type {
+    if case .sponsoredImage = background.currentBackground {
       sponsoredStorage.add(value: 1, to: Date())
     }
     
@@ -1032,6 +1097,16 @@ extension NewTabPageViewController {
         value: sponsoredPercent
       )
     }
+  }
+}
+
+// MARK: - NewTabPageP3AHelperDataSource
+extension NewTabPageViewController: NewTabPageP3AHelperDataSource {
+  var currentTabURL: URL? {
+    tab?.url
+  }
+  var isRewardsEnabled: Bool {
+    rewards.isEnabled
   }
 }
 

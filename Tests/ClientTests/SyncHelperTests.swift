@@ -3,7 +3,7 @@ import XCTest
 
 @testable import Brave
 
-class SyncHelperTests: XCTestCase {
+@MainActor class SyncHelperTests: XCTestCase {
   
   func testSyncedSessionPeriodDate() {
     var dateComponents = DateComponents()
@@ -22,7 +22,7 @@ class SyncHelperTests: XCTestCase {
     let someRandomDateTime = userCalendar.date(from: dateComponents)!
     
     
-    XCTAssertEqual(someRandomDateTime.formattedSyncSessionPeriodDate, "08:34 AM 07-11-1980")
+    XCTAssertEqual(someRandomDateTime.formattedSyncSessionPeriodDate, "8:34 AM 07-11-1980")
     XCTAssertEqual(today.formattedActivePeriodDate, "Active Today")
     XCTAssertEqual(yesterday.formattedActivePeriodDate, "Active Yesterday")
     XCTAssertEqual(randomDateInLastWeek.formattedActivePeriodDate, "Active Last Week")

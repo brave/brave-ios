@@ -6,10 +6,11 @@
 import Foundation
 import WebKit
 import Shared
+import BraveShields
 import os.log
 
 class SiteStateListenerScriptHandler: TabContentScript {
-  private struct MessageDTO: Decodable {
+  struct MessageDTO: Decodable {
     struct MessageDTOData: Decodable, Hashable {
       let windowURL: String
     }
@@ -32,12 +33,12 @@ class SiteStateListenerScriptHandler: TabContentScript {
     guard var script = loadUserScript(named: scriptName) else {
       return nil
     }
-    return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
-                                                    securityToken: scriptId,
-                                                    script: script),
-                               injectionTime: .atDocumentStart,
-                               forMainFrameOnly: false,
-                               in: scriptSandbox)
+    return WKUserScript(source: secureScript(handlerName: messageHandlerName,
+                                             securityToken: scriptId,
+                                             script: script),
+                        injectionTime: .atDocumentStart,
+                        forMainFrameOnly: false,
+                        in: scriptSandbox)
   }()
   
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
@@ -64,44 +65,40 @@ class SiteStateListenerScriptHandler: TabContentScript {
       if let pageData = tab.currentPageData {
         Task { @MainActor in
           let domain = pageData.domain(persistent: !tab.isPrivate)
+          guard domain.isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true) else { return }
+          
           let models = await AdBlockStats.shared.cosmeticFilterModels(forFrameURL: frameURL, domain: domain)
-          let args = try await self.makeArgs(from: models, frameURL: frameURL)
-          let source = try ScriptFactory.shared.makeScriptSource(of: .selectorsPoller).replacingOccurrences(of: "$<args>", with: args)
+          let setup = try self.makeSetup(from: models, isAggressive: domain.blockAdsAndTrackingLevel.isAggressive)
+          let script = try ScriptFactory.shared.makeScript(for: .selectorsPoller(setup))
           
-          let secureSource = CosmeticFiltersScriptHandler.secureScript(
-            handlerName: CosmeticFiltersScriptHandler.messageHandlerName,
-            securityToken: CosmeticFiltersScriptHandler.scriptId,
-            script: source
-          )
-          
-          webView.evaluateSafeJavaScript(
-            functionName: secureSource,
+          try await webView.evaluateSafeJavaScriptThrowing(
+            functionName: script.source,
             frame: message.frameInfo,
-            contentWorld: .defaultClient,
-            asFunction: false,
-            completion: { _, error in
-              guard let error = error else { return }
-              Logger.module.error("\(error.localizedDescription)")
-            }
+            contentWorld: CosmeticFiltersScriptHandler.scriptSandbox,
+            asFunction: false
           )
         }
       }
     } catch {
-      assertionFailure("Invalid type of message. Fix the `Site.js` script")
+      assertionFailure("Invalid type of message. Fix the `SiteStateListenerScript.js` script")
       Logger.module.error("\(error.localizedDescription)")
     }
   }
   
-  private func makeArgs(from models: [CosmeticFilterModel], frameURL: URL) async throws -> String {
-    let hideSelectors = models.reduce(Set<String>(), { partialResult, model in
-      return partialResult.union(model.hideSelectors)
-    })
-    
+  @MainActor private func makeSetup(from modelTuples: [AdBlockStats.CosmeticFilterModelTuple], isAggressive: Bool) throws -> UserScriptType.SelectorsPollerSetup {
+    var standardSelectors: Set<String> = []
+    var aggressiveSelectors: Set<String> = []
     var styleSelectors: [String: Set<String>] = [:]
     
-    for model in models {
-      for (key, values) in model.styleSelectors {
+    for modelTuple in modelTuples {
+      for (key, values) in modelTuple.model.styleSelectors {
         styleSelectors[key] = styleSelectors[key]?.union(Set(values)) ?? Set(values)
+      }
+      
+      if modelTuple.isAlwaysAggressive {
+        aggressiveSelectors = aggressiveSelectors.union(modelTuple.model.hideSelectors)
+      } else {
+        standardSelectors = standardSelectors.union(modelTuple.model.hideSelectors)
       }
     }
     
@@ -111,15 +108,15 @@ class SiteStateListenerScriptHandler: TabContentScript {
       )
     }
     
-    let setup = UserScriptType.SelectorsPollerSetup(
-      frameURL: frameURL,
-      genericHide: models.contains { $0.genericHide },
-      hideSelectors: hideSelectors,
+    return UserScriptType.SelectorsPollerSetup(
+      hideFirstPartyContent: isAggressive,
+      genericHide: modelTuples.contains { $0.model.genericHide },
+      firstSelectorsPollingDelayMs: nil,
+      switchToSelectorsPollingThreshold: 1000,
+      fetchNewClassIdRulesThrottlingMs: 100,
+      aggressiveSelectors: aggressiveSelectors,
+      standardSelectors: standardSelectors,
       styleSelectors: Set(styleSelectorObjects)
     )
-    
-    let encoder = JSONEncoder()
-    let data = try encoder.encode(setup)
-    return String(data: data, encoding: .utf8)!
   }
 }

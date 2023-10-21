@@ -6,6 +6,7 @@ import Shared
 import Foundation
 import UIKit
 import Data
+import Preferences
 
 extension BrowserViewController {
   
@@ -20,12 +21,14 @@ extension BrowserViewController {
   @objc private func goBackKeyCommand() {
     if let tab = tabManager.selectedTab, tab.canGoBack, favoritesController == nil {
       tab.goBack()
+      resetExternalAlertProperties(tab)
     }
   }
 
   @objc private func goForwardKeyCommand() {
     if let tab = tabManager.selectedTab, tab.canGoForward {
       tab.goForward()
+      resetExternalAlertProperties(tab)
     }
   }
 
@@ -43,13 +46,22 @@ extension BrowserViewController {
   }
 
   @objc private func newTabKeyCommand() {
-    openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
+    openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: privateBrowsingManager.isPrivateBrowsing)
   }
 
   @objc private func newPrivateTabKeyCommand() {
     // NOTE: We cannot and should not distinguish between "new-tab" and "new-private-tab"
     // when recording telemetry for key commands.
-    openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: true)
+    if !privateBrowsingManager.isPrivateBrowsing, Preferences.Privacy.privateBrowsingLock.value {
+      self.askForLocalAuthentication { [weak self] success, error in
+        if success {
+          self?.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: true)
+
+        }
+      }
+    } else {
+      openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: true)
+    }
   }
 
   @objc private func closeTabKeyCommand() {
@@ -211,7 +223,7 @@ extension BrowserViewController {
       UIKeyCommand(title: Strings.Hotkey.newPrivateTabTitle, action: #selector(newPrivateTabKeyCommand), input: "n", modifierFlags: [.command, .shift]),
     ]
     
-    if !PrivateBrowsingManager.shared.isPrivateBrowsing {
+    if !privateBrowsingManager.isPrivateBrowsing {
       navigationCommands += [
         UIKeyCommand(title: Strings.Hotkey.recentlyClosedTabTitle, action: #selector(reopenRecentlyClosedTabCommand), input: "t", modifierFlags: [.command, .shift])
       ]
@@ -221,7 +233,6 @@ extension BrowserViewController {
       UIKeyCommand(title: Strings.Hotkey.closeTabTitle, action: #selector(closeTabKeyCommand), input: "w", modifierFlags: .command),
       UIKeyCommand(title: Strings.Hotkey.closeAllTabsFromTabTrayKeyCodeTitle, action: #selector(closeAllTabsKeyCommand), input: "w", modifierFlags: [.command, .alternate])
     ]
-    
     
     let tabNavigationKeyCommands = [
       // Tab Navigation Key Commands
@@ -267,15 +278,18 @@ extension BrowserViewController {
       UIKeyCommand(title: Strings.Hotkey.findInPageTitle, action: #selector(findInPageKeyCommand), input: "f", modifierFlags: .command)
     ]
 
-    let findTextUtilitiesCommands = [
-      UIKeyCommand(title: Strings.Hotkey.findNextTitle, action: #selector(findNextCommand), input: "g", modifierFlags: [.command]),
-      UIKeyCommand(title: Strings.Hotkey.findPreviousTitle, action: #selector(findPreviousCommand), input: "g", modifierFlags: [.command, .shift]),
-    ]
-
-    let isFindingText = !(findInPageBar?.text?.isEmpty ?? true)
-
-    if isFindingText {
-      findTextCommands.append(contentsOf: findTextUtilitiesCommands)
+    // These are automatically handled in iOS 16's UIFindInteraction
+    if #unavailable(iOS 16.0) {
+      let findTextUtilitiesCommands = [
+        UIKeyCommand(title: Strings.Hotkey.findNextTitle, action: #selector(findNextCommand), input: "g", modifierFlags: [.command]),
+        UIKeyCommand(title: Strings.Hotkey.findPreviousTitle, action: #selector(findPreviousCommand), input: "g", modifierFlags: [.command, .shift]),
+      ]
+      
+      let isFindingText = !(findInPageBar?.text?.isEmpty ?? true)
+      
+      if isFindingText {
+        findTextCommands.append(contentsOf: findTextUtilitiesCommands)
+      }
     }
 
     // Share With Key Command
@@ -303,12 +317,10 @@ extension BrowserViewController {
 #endif
 
     // In iOS 15+, certain keys events are delivered to the text input or focus systems first, unless specified otherwise
-    if #available(iOS 15, *) {
-      searchLocationCommands.forEach { $0.wantsPriorityOverSystemBehavior = true }
-      tabMovementCommands.forEach { $0.wantsPriorityOverSystemBehavior = true }
-      tabNavigationKeyCommands.forEach { $0.wantsPriorityOverSystemBehavior = true }
-      additionalPriorityCommandKeys.forEach { $0.wantsPriorityOverSystemBehavior = true }
-    }
+    searchLocationCommands.forEach { $0.wantsPriorityOverSystemBehavior = true }
+    tabMovementCommands.forEach { $0.wantsPriorityOverSystemBehavior = true }
+    tabNavigationKeyCommands.forEach { $0.wantsPriorityOverSystemBehavior = true }
+    additionalPriorityCommandKeys.forEach { $0.wantsPriorityOverSystemBehavior = true }
 
     if topToolbar.inOverlayMode {
       keyCommandList.append(contentsOf: searchLocationCommands)

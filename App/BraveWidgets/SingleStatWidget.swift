@@ -6,10 +6,10 @@
 import WidgetKit
 import SwiftUI
 import Intents
-import Strings
-import BraveShared
 import BraveWidgetsModels
 import DesignSystem
+import BraveShields
+import Strings
 
 struct SingleStatWidget: Widget {
 
@@ -33,7 +33,7 @@ private struct StatProvider: IntentTimelineProvider {
   typealias Entry = StatEntry
 
   func placeholder(in context: Context) -> Entry {
-    StatEntry(date: Date(), statData: .init(name: Strings.shieldsAdAndTrackerStats, value: "100k"))
+    StatEntry(date: Date(), statData: .init(name: Strings.Shields.shieldsAdAndTrackerStats, value: "100k"))
   }
   func getSnapshot(for configuration: Intent, in context: Context, completion: @escaping (Entry) -> Void) {
     let stat = configuration.statKind
@@ -72,8 +72,7 @@ private struct StatView: View {
         .unredacted()
     }
     .frame(maxWidth: .infinity, alignment: .leading)
-    .padding()
-    .background(Color(UIColor.secondaryBraveBackground))
+    .widgetBackground { Color(UIColor.secondaryBraveBackground) }
     .foregroundColor(Color(UIColor.braveLabel))
   }
 }

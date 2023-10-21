@@ -8,23 +8,23 @@ import Data
 
 protocol FilterListInterface {
   @MainActor var uuid: String { get }
-  @MainActor var filterListComponentId: String? { get }
-}
- 
-extension FilterListInterface {
-  @MainActor var resources: [ResourceDownloader.Resource] {
-    guard let filterListComponentId = self.filterListComponentId else { return [] }
-    
-    return [
-      .filterListContentBlockingBehaviors(uuid: uuid, componentId: filterListComponentId)
-    ]
-  }
+  @MainActor var debugTitle: String { get }
 }
 
 extension FilterListSetting: FilterListInterface {
-  @MainActor var filterListComponentId: String? { return componentId }
+  var debugTitle: String {
+    return "\(uuid) \(componentId ?? "unknown")"
+  }
 }
 
 extension FilterList: FilterListInterface {
-  @MainActor var filterListComponentId: String? { return componentId }
+  var uuid: String { entry.uuid }
+  
+  var debugTitle: String {
+    return "\(entry.title) \(entry.componentId)"
+  }
+  
+  var isRegional: Bool {
+    return !entry.languages.isEmpty
+  }
 }

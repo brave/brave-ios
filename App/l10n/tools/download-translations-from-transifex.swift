@@ -98,7 +98,7 @@ guard let apiKey = ProcessInfo.processInfo.environment["PASSWORD"] else {
 
   let process = Process()
   process.executableURL = URL(fileURLWithPath: "/usr/bin/env")
-  process.arguments = ["python", "xliff-cleanup.py", xliffURL.path]
+  process.arguments = ["python3", "xliff-cleanup.py", xliffURL.path]
   do {
     try process.run()
     process.waitUntilExit()
@@ -145,7 +145,7 @@ try await withThrowingTaskGroup(of: Void.self) { group in
       while true {
         let xliffData = await downloadResource(with: resourceURL)
         do {
-          let _ = try JSONSerialization.jsonObject(with: xliffData, options: [])
+          _ = try JSONSerialization.jsonObject(with: xliffData, options: [])
           // Found JSON, not ready
           retryCount += 1
           print("Resource for \(code) not ready yet. Retrying in 5 seconds (attempt #\(retryCount))")

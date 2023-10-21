@@ -5,13 +5,21 @@
 
 import UIKit
 import Shared
-import BraveShared
+import Preferences
 import StoreKit
 import os.log
+import DesignSystem
 
-class BuyVPNViewController: UIViewController {
+class BuyVPNViewController: VPNSetupLoadingController {
     
   let iapObserver: IAPObserver
+  private var iapRestoreTimer: Timer?
+
+  var activeSubcriptionChoice: SubscriptionType = .yearly {
+    didSet {
+      buyVPNView.activeSubcriptionChoice = activeSubcriptionChoice
+    }
+  }
   
   init(iapObserver: IAPObserver) {
     self.iapObserver = iapObserver
@@ -21,64 +29,68 @@ class BuyVPNViewController: UIViewController {
   @available(*, unavailable)
   required init?(coder: NSCoder) { fatalError() }
   
-  private var buyVPNView: View {
-    return view as! View  // swiftlint:disable:this force_cast
-  }
-
-  override func loadView() {
-    view = View()
-  }
-
-  /// View to show when the vpn purchase is pending.
-  private var overlayView: UIView?
-
-  private var isLoading: Bool = false {
-    didSet {
-      overlayView?.removeFromSuperview()
-
-      // Toggle 'restore' button.
-      navigationItem.rightBarButtonItem?.isEnabled = !isLoading
-
-      // Prevent dismissing the modal by swipe when the VPN is being configured
-      navigationController?.isModalInPresentation = isLoading == true
-
-      if !isLoading { return }
-
-      let overlay = UIView().then {
-        $0.backgroundColor = UIColor.black.withAlphaComponent(0.5)
-        let activityIndicator = UIActivityIndicatorView().then { indicator in
-          indicator.startAnimating()
-          indicator.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        }
-
-        $0.addSubview(activityIndicator)
-      }
-
-      buyVPNView.addSubview(overlay)
-      overlay.snp.makeConstraints {
-        $0.edges.equalToSuperview()
-      }
-
-      overlayView = overlay
-    }
-  }
-
+  private var buyVPNView = BuyVPNView(with: .yearly)
+  
   override func viewDidLoad() {
     super.viewDidLoad()
 
     title = Strings.VPN.vpnName
+    view.backgroundColor = BraveVPNCommonUI.UX.purpleBackgroundColor
 
     navigationItem.standardAppearance = BraveVPNCommonUI.navigationBarAppearance
-
-    #if swift(>=5.5)
-    if #available(iOS 15.0, *) {
-      navigationItem.scrollEdgeAppearance = BraveVPNCommonUI.navigationBarAppearance
-    }
-    #endif
+    navigationItem.scrollEdgeAppearance = BraveVPNCommonUI.navigationBarAppearance
 
     navigationItem.rightBarButtonItem = .init(
       title: Strings.VPN.restorePurchases, style: .done,
       target: self, action: #selector(restorePurchasesAction))
+    
+    let actionTitle = Preferences.VPN.freeTrialUsed.value
+      ? Strings.VPN.activateSubscriptionAction.capitalized
+      : Strings.VPN.freeTrialPeriodAction.capitalized
+    
+    let actionButton = BraveGradientButton(gradient: .backgroundGradient1).then {
+      $0.titleLabel?.font = .systemFont(ofSize: 15, weight: .bold)
+      $0.titleLabel?.textAlignment = .center
+       
+      $0.setTitle(actionTitle, for: .normal)
+      
+      $0.snp.makeConstraints {
+        $0.height.equalTo(50)
+      }
+      
+      $0.layer.do {
+        $0.cornerRadius = 24
+        $0.cornerCurve = .continuous
+        $0.masksToBounds = true
+      }
+      
+      $0.addTarget(self, action: #selector(startSubscriptionAction), for: .touchUpInside)
+    }
+  
+    let seperator = UIView().then {
+      $0.backgroundColor = UIColor.white.withAlphaComponent(0.1)
+      $0.snp.makeConstraints { make in
+        make.height.equalTo(1)
+      }
+    }
+        
+    view.addSubview(buyVPNView)
+    view.addSubview(seperator)
+    view.addSubview(actionButton)
+    
+    buyVPNView.snp.makeConstraints {
+      $0.leading.trailing.top.equalToSuperview()
+    }
+    
+    seperator.snp.makeConstraints() {
+      $0.top.equalTo(buyVPNView.snp.bottom)
+      $0.leading.trailing.equalToSuperview()
+    }
+    
+    actionButton.snp.makeConstraints() {
+      $0.top.equalTo(seperator.snp.bottom).inset(-12)
+      $0.leading.trailing.bottom.equalToSuperview().inset(24)
+    }
 
     buyVPNView.monthlySubButton
       .addTarget(self, action: #selector(monthlySubscriptionAction), for: .touchUpInside)
@@ -106,34 +118,60 @@ class BuyVPNViewController: UIViewController {
     navigationController?.navigationBar.tintColor = UINavigationBar.appearance().tintColor
   }
 
-  // MARK: - Button actions
+  // MARK: - Button Actions
+  
+  @objc func yearlySubscriptionAction() {
+    activeSubcriptionChoice = .yearly
+  }
+  
   @objc func monthlySubscriptionAction() {
-    guard let monthlySub = VPNProductInfo.monthlySubProduct else {
-      Logger.module.error("Failed to retrieve monthly subcription product")
-      return
-    }
-    isLoading = true
-    let payment = SKPayment(product: monthlySub)
-    SKPaymentQueue.default().add(payment)
+    activeSubcriptionChoice = .monthly
   }
 
   @objc func closeView() {
     dismiss(animated: true)
   }
 
-  @objc func yearlySubscriptionAction() {
-    guard let yearlySub = VPNProductInfo.yearlySubProduct else {
-      Logger.module.error("Failed to retrieve yearly subcription product")
-      return
-    }
-    isLoading = true
-    let payment = SKPayment(product: yearlySub)
-    SKPaymentQueue.default().add(payment)
-  }
-
   @objc func restorePurchasesAction() {
     isLoading = true
     SKPaymentQueue.default().restoreCompletedTransactions()
+    
+    if iapRestoreTimer != nil {
+      iapRestoreTimer?.invalidate()
+      iapRestoreTimer = nil
+    }
+    
+    // Adding 1 minute timer for restore
+    iapRestoreTimer = Timer.scheduledTimer(
+      timeInterval: 1.minutes,
+      target: self,
+      selector: #selector(handleRestoreTimeoutFailure),
+      userInfo: nil,
+      repeats: false)
+  }
+  
+  @objc func startSubscriptionAction() {
+    addPaymentForSubcription(type: activeSubcriptionChoice)
+  }
+  
+  private func addPaymentForSubcription(type: SubscriptionType) {
+    var subscriptionProduct: SKProduct?
+    
+    switch type {
+    case .yearly:
+      subscriptionProduct = VPNProductInfo.yearlySubProduct
+    case .monthly:
+      subscriptionProduct = VPNProductInfo.monthlySubProduct
+    }
+    
+    guard let subscriptionProduct = subscriptionProduct else {
+      Logger.module.error("Failed to retrieve \(type.rawValue) subcription product")
+      return
+    }
+    
+    isLoading = true
+    let payment = SKPayment(product: subscriptionProduct)
+    SKPaymentQueue.default().add(payment)
   }
 }
 
@@ -153,11 +191,30 @@ extension BuyVPNViewController: IAPObserverDelegate {
     }
     
     if validateReceipt {
-      BraveVPN.validateReceipt()
+      BraveVPN.validateReceiptData()
     }
   }
 
   func purchaseFailed(error: IAPObserver.PurchaseError) {
+    // Handle Transaction or Restore error
+    guard isLoading else {
+      return
+    }
+    
+    handleTransactionError(error: error)
+  }
+  
+  @objc func handleRestoreTimeoutFailure() {
+    // Handle Restore error from timeout
+    guard isLoading else {
+      return
+    }
+    
+    let errorRestore = SKError(SKError.unknown, userInfo: ["detail": "time-out"])
+    handleTransactionError(error: .transactionError(error: errorRestore))
+  }
+  
+  private func handleTransactionError(error: IAPObserver.PurchaseError) {
     DispatchQueue.main.async {
       self.isLoading = false
 
@@ -178,5 +235,57 @@ extension BuyVPNViewController: IAPObserverDelegate {
       alert.addAction(ok)
       self.present(alert, animated: true)
     }
+  }
+}
+
+class VPNSetupLoadingController: UIViewController {
+  
+  private var overlayView: UIView?
+
+  var isLoading: Bool = false {
+    didSet {
+      overlayView?.removeFromSuperview()
+
+      // Disable Action bar button while loading
+      navigationItem.rightBarButtonItem?.isEnabled = !isLoading
+
+      // Prevent dismissing the modal by swipe
+      navigationController?.isModalInPresentation = isLoading == true
+
+      if !isLoading { return }
+
+      let overlay = UIView().then {
+        $0.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+        let activityIndicator = UIActivityIndicatorView().then {
+          $0.startAnimating()
+          $0.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+          $0.style = .large
+          $0.color = .white
+        }
+
+        $0.addSubview(activityIndicator)
+      }
+
+      view.addSubview(overlay)
+      overlay.snp.makeConstraints {
+        $0.edges.equalToSuperview()
+      }
+
+      overlayView = overlay
+    }
+  }
+}
+
+extension BraveGradient {
+  
+  public static var backgroundGradient1: BraveGradient {
+    .init(
+      stops: [
+        .init(color: UIColor(rgb: 0x8b10c6), position: 0.22),
+        .init(color: UIColor(rgb: 0xd02480), position: 0.7),
+        .init(color: UIColor(rgb: 0xe95e3c), position: 0.96),
+      ],
+      angle: .figmaDegrees(138)
+    )
   }
 }

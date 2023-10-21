@@ -2,19 +2,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import Foundation
 import UIKit
 import WebKit
 import Shared
 import Storage
 import SnapKit
-import SwiftyJSON
 import Data
 import BraveShared
 import BraveCore
 import CoreData
 import StoreKit
-import SafariServices
 import BraveUI
 import NetworkExtension
 import FeedKit
@@ -23,6 +20,7 @@ import class Combine.AnyCancellable
 import BraveWallet
 import BraveVPN
 import BraveNews
+import Preferences
 import os.log
 #if canImport(BraveTalk)
 import BraveTalk
@@ -30,6 +28,9 @@ import BraveTalk
 import Favicon
 import Onboarding
 import Growth
+import BraveShields
+import CertificateUtilities
+import ScreenTime
 
 private let KVOs: [KVOConstants] = [
   .estimatedProgress,
@@ -40,6 +41,7 @@ private let KVOs: [KVOConstants] = [
   .title,
   .hasOnlySecureContent,
   .serverTrust,
+  ._sampledPageTopColor
 ]
 
 public class BrowserViewController: UIViewController {
@@ -48,7 +50,7 @@ public class BrowserViewController: UIViewController {
   
   private(set) lazy var topToolbar: TopToolbarView = {
     // Setup the URL bar, wrapped in a view to get transparency effect
-    let topToolbar = TopToolbarView()
+    let topToolbar = TopToolbarView(voiceSearchSupported: speechRecognizer.isVoiceSearchAvailable, privateBrowsingManager: privateBrowsingManager)
     topToolbar.translatesAutoresizingMaskIntoConstraints = false
     topToolbar.delegate = self
     topToolbar.tabToolbarDelegate = self
@@ -65,7 +67,7 @@ public class BrowserViewController: UIViewController {
   }()
 
   // These views wrap the top and bottom toolbars to provide background effects on them
-  let header = HeaderContainerView()
+  private(set) lazy var header = HeaderContainerView(privateBrowsingManager: privateBrowsingManager)
   private let headerHeightLayoutGuide = UILayoutGuide()
   
   let footer: UIView = {
@@ -100,10 +102,10 @@ public class BrowserViewController: UIViewController {
   var readerModeBar: ReaderModeBarView?
   var readerModeCache: ReaderModeCache
   
-  private let statusBarOverlay: UIView = {
+  private(set) lazy var statusBarOverlay: UIView = {
     // Temporary work around for covering the non-clipped web view content
     let statusBarOverlay = UIView()
-    statusBarOverlay.backgroundColor = Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
+    statusBarOverlay.backgroundColor = privateBrowsingManager.browserColors.chromeBackground
     return statusBarOverlay
   }()
   
@@ -124,11 +126,12 @@ public class BrowserViewController: UIViewController {
   var pageZoomBar: UIHostingController<PageZoomView>?
   private var pageZoomListener: NSObjectProtocol?
   private var openTabsModelStateListener: SendTabToSelfModelStateListener?
+  private var syncServiceStateListener: AnyObject?
   let collapsedURLBarView = CollapsedURLBarView()
 
   // Single data source used for all favorites vcs
-  public let backgroundDataSource = NTPDataSource()
-  let feedDataSource = FeedDataSource()
+  public let backgroundDataSource: NTPDataSource
+  let feedDataSource: FeedDataSource
 
   private var postSetupTasks: [() -> Void] = []
   private var setupTasksCompleted: Bool = false
@@ -136,7 +139,12 @@ public class BrowserViewController: UIViewController {
   private var privateModeCancellable: AnyCancellable?
   private var appReviewCancelable: AnyCancellable?
   var onPendingRequestUpdatedCancellable: AnyCancellable?
-
+  
+  /// Voice Search
+  var voiceSearchViewController: PopupViewController<VoiceSearchInputView>?
+  var voiceSearchCancelable: AnyCancellable?
+  let speechRecognizer = SpeechRecognizer()
+  
   /// Custom Search Engine
   var openSearchEngine: OpenSearchReference?
 
@@ -153,11 +161,13 @@ public class BrowserViewController: UIViewController {
   var displayedPopoverController: UIViewController?
   var updateDisplayedPopoverProperties: (() -> Void)?
 
+  public let windowId: UUID
   let profile: Profile
   let braveCore: BraveCoreMain
   let tabManager: TabManager
   let migration: Migration?
   let bookmarkManager: BookmarkManager
+  public let privateBrowsingManager: PrivateBrowsingManager
 
   /// Whether last session was a crash or not
   private let crashedLastSession: Bool
@@ -188,9 +198,6 @@ public class BrowserViewController: UIViewController {
     return toolbar ?? topToolbar
   }
 
-  /// Keep track of the URL request that was upgraded so that we can add it to the HTTPS page stats
-  var pendingHTTPUpgrades = [String: URLRequest]()
-
   // Keep track of allowed `URLRequest`s from `webView(_:decidePolicyFor:decisionHandler:)` so
   // that we can obtain the originating `URLRequest` when a `URLResponse` is received. This will
   // allow us to re-trigger the `URLRequest` if the user requests a file to be downloaded.
@@ -205,12 +212,11 @@ public class BrowserViewController: UIViewController {
   private var cancellables: Set<AnyCancellable> = []
 
   let rewards: BraveRewards
-  var ledgerObserver: LedgerObserver?
-  let legacyWallet: BraveLedger?
+  var rewardsObserver: RewardsObserver?
   var promotionFetchTimer: Timer?
   private var notificationsHandler: AdsNotificationHandler?
   let notificationsPresenter = BraveNotificationsPresenter()
-  var publisher: Ledger.PublisherInfo?
+  var publisher: BraveCore.BraveRewards.PublisherInfo?
 
   let vpnProductInfo = VPNProductInfo()
 
@@ -258,49 +264,42 @@ public class BrowserViewController: UIViewController {
   weak var walletStore: WalletStore?
   
   var lastEnteredURLVisitType: VisitType = .unknown
+  
+  var processAddressBarTask: Task<(), Never>?
+  var topToolbarDidPressReloadTask: Task<(), Never>?
 
   public init(
+    windowId: UUID,
     profile: Profile,
     diskImageStore: DiskImageStore?,
     braveCore: BraveCoreMain,
+    rewards: BraveRewards,
     migration: Migration?,
-    crashedLastSession: Bool
+    crashedLastSession: Bool,
+    newsFeedDataSource: FeedDataSource,
+    privateBrowsingManager: PrivateBrowsingManager
   ) {
+    self.windowId = windowId
     self.profile = profile
     self.braveCore = braveCore
     self.bookmarkManager = BookmarkManager(bookmarksAPI: braveCore.bookmarksAPI)
+    self.rewards = rewards
     self.migration = migration
     self.crashedLastSession = crashedLastSession
-
-    let configuration: BraveRewards.Configuration = .current()
-
-    let buildChannel = Ads.BuildChannelInfo().then {
-      $0.name = AppConstants.buildChannel.rawValue
-      $0.isRelease = AppConstants.buildChannel == .release
-    }
-    Self.migrateAdsConfirmations(for: configuration)
-    legacyWallet = Self.legacyWallet(for: configuration)
-    if let wallet = legacyWallet {
-      // Legacy ledger is disabled by default
-      wallet.isAutoContributeEnabled = false
-      // Ensure we remove any pending contributions or recurring tips from the legacy wallet
-      wallet.removeAllPendingContributions { _ in }
-      wallet.listRecurringTips { publishers in
-        publishers.forEach {
-          wallet.removeRecurringTip(publisherId: $0.id)
-        }
-      }
-    }
-
-    // Initialize Rewards
-    self.rewards = BraveRewards(configuration: configuration, buildChannel: buildChannel)
+    self.privateBrowsingManager = privateBrowsingManager
+    self.feedDataSource = newsFeedDataSource
+    feedDataSource.historyAPI = braveCore.historyAPI
+    backgroundDataSource = .init(service: braveCore.backgroundImagesService,
+                                 privateBrowsingManager: privateBrowsingManager)
 
     // Initialize TabManager
     self.tabManager = TabManager(
+      windowId: windowId,
       prefs: profile.prefs,
-      imageStore: diskImageStore,
       rewards: rewards,
-      tabGeneratorAPI: braveCore.tabGeneratorAPI)
+      tabGeneratorAPI: braveCore.tabGeneratorAPI,
+      privateBrowsingManager: privateBrowsingManager
+    )
     
     // Add Regular tabs to Sync Chain
     if Preferences.Chromium.syncOpenTabsEnabled.value {
@@ -323,7 +322,7 @@ public class BrowserViewController: UIViewController {
       }
     }
 
-    self.deviceCheckClient = DeviceCheckClient(environment: configuration.environment)
+    self.deviceCheckClient = DeviceCheckClient(environment: BraveRewards.Configuration.current().environment)
 
     if Locale.current.regionCode == "JP" {
       benchmarkBlockingDataSource = BlockingSummaryDataSource()
@@ -332,24 +331,26 @@ public class BrowserViewController: UIViewController {
     super.init(nibName: nil, bundle: nil)
     didInit()
 
-    rewards.ledgerServiceDidStart = { [weak self] _ in
+    rewards.rewardsServiceDidStart = { [weak self] _ in
       self?.setupLedger()
     }
 
     rewards.ads.captchaHandler = self
     let shouldStartAds = rewards.ads.isEnabled || Preferences.BraveNews.isEnabled.value
     if shouldStartAds {
-      // Only start ledger service automatically if ads is enabled
+      // Only start rewards service automatically if ads is enabled
       if rewards.isEnabled {
-        rewards.startLedgerService {
-          self.legacyWallet?.initializeLedgerService(nil)
-        }
+        rewards.startRewardsService(nil)
       } else {
-        rewards.ads.initialize { _ in }
+        rewards.ads.initialize() { _ in }
       }
     }
 
-    feedDataSource.ads = rewards.ads
+    self.feedDataSource.getAdsAPI = {
+      // The ads object gets re-recreated when shutdown, so we need to make sure News fetches it out of
+      // the BraveRewards container
+      return rewards.ads
+    }
     
     // Observer watching tab information is sent by another device
     openTabsModelStateListener = braveCore.sendTabAPI.add(
@@ -357,60 +358,30 @@ public class BrowserViewController: UIViewController {
         if case .sendTabToSelfEntriesAddedRemotely(let newEntries) = stateChange {
           // Fetching the last URL that has been sent from synced sessions
           if let requestedURL = newEntries.last?.url {
-            self?.presentTabReceivedCallout(url: requestedURL)
+            self?.presentTabReceivedToast(url: requestedURL)
           }
         }
       })
+    
+    // Observer watching state change in sync chain
+    syncServiceStateListener = braveCore.syncAPI.addServiceStateObserver { [weak self] in
+      guard let self = self else { return }
+      // Observe Sync State in order to determine if the sync chain is deleted
+      // from another device - Clean local sync chain
+      if self.braveCore.syncAPI.shouldLeaveSyncGroup {
+        self.braveCore.syncAPI.leaveSyncGroup()
+      }
+    }
+    
+    if Preferences.Privacy.screenTimeEnabled.value {
+      screenTimeViewController = STWebpageController()
+    }
   }
 
   deinit {
     // Remove the open tabs model state observer
     if let observer = openTabsModelStateListener {
       braveCore.sendTabAPI.removeObserver(observer)
-    }
-  }
-  
-  static func legacyWallet(for config: BraveRewards.Configuration) -> BraveLedger? {
-    let fm = FileManager.default
-    let stateStorage = config.storageURL
-    let legacyLedger = stateStorage.appendingPathComponent("legacy_ledger")
-
-    // Check if we've already migrated the users wallet to the `legacy_rewards` folder
-    if fm.fileExists(atPath: legacyLedger.path) {
-      return BraveLedger(stateStoragePath: legacyLedger.path)
-    }
-
-    // We've already performed an attempt at migration, if there wasn't a legacy folder, then
-    // we have no legacy wallet.
-    if Preferences.Rewards.migratedLegacyWallet.value {
-      return nil
-    }
-
-    // Ledger exists in the state storage under `ledger` folder, if that folder doesn't exist
-    // then the user hasn't actually launched the app before and doesn't need to migrate
-    let ledgerFolder = stateStorage.appendingPathComponent("ledger")
-    if !fm.fileExists(atPath: ledgerFolder.path) {
-      // No wallet, therefore no legacy folder needed
-      Preferences.Rewards.migratedLegacyWallet.value = true
-      return nil
-    }
-
-    do {
-      // Copy the current `ledger` directory into the new legacy state storage path
-      try fm.copyItem(at: ledgerFolder, to: legacyLedger)
-      // Remove the old Rewards DB so that it starts fresh
-      try fm.removeItem(atPath: ledgerFolder.appendingPathComponent("Rewards.db").path)
-      // And remove the sqlite journal file if it exists
-      let journalPath = ledgerFolder.appendingPathComponent("Rewards.db-journal").path
-      if fm.fileExists(atPath: journalPath) {
-        try fm.removeItem(atPath: journalPath)
-      }
-
-      Preferences.Rewards.migratedLegacyWallet.value = true
-      return BraveLedger(stateStoragePath: legacyLedger.path)
-    } catch {
-      adsRewardsLog.error("Failed to migrate legacy wallet into a new folder: \(error.localizedDescription)")
-      return nil
     }
   }
 
@@ -451,7 +422,10 @@ public class BrowserViewController: UIViewController {
   override public func didReceiveMemoryWarning() {
     super.didReceiveMemoryWarning()
     ScriptFactory.shared.clearCaches()
-    AdBlockStats.shared.clearCaches()
+    
+    Task {
+      await AdBlockStats.shared.didReceiveMemoryWarning()
+    }
 
     for tab in tabManager.tabsForCurrentMode where tab.id != tabManager.selectedTab?.id {
       tab.newTabPageViewController = nil
@@ -464,30 +438,16 @@ public class BrowserViewController: UIViewController {
     updateApplicationShortcuts()
     tabManager.addDelegate(self)
     tabManager.addNavigationDelegate(self)
-    tabManager.makeWalletEthProvider = { [weak self] tab in
-      guard let self = self,
-            let provider = self.braveCore.braveWalletAPI.ethereumProvider(with: tab, isPrivateBrowsing: tab.isPrivate),
-            let js = self.braveCore.braveWalletAPI.providerScripts(for: .eth)[.ethereum] else {
-        return nil
-      }
-      return (provider, js: js)
-    }
-    tabManager.makeWalletSolProvider = { [weak self] tab in
-      guard let self = self,
-            let provider = self.braveCore.braveWalletAPI.solanaProvider(with: tab, isPrivateBrowsing: tab.isPrivate) else {
-        return nil
-      }
-      let scripts = self.braveCore.braveWalletAPI.providerScripts(for: .sol)
-      return (provider, jsScripts: scripts)
-    }
+    UserScriptManager.shared.fetchWalletScripts(from: braveCore.braveWalletAPI)
     downloadQueue.delegate = self
 
     // Observe some user preferences
     Preferences.Privacy.privateBrowsingOnly.observe(from: self)
     Preferences.General.tabBarVisibility.observe(from: self)
-    Preferences.General.alwaysRequestDesktopSite.observe(from: self)
+    Preferences.UserAgent.alwaysRequestDesktopSite.observe(from: self)
     Preferences.General.enablePullToRefresh.observe(from: self)
     Preferences.General.mediaAutoBackgrounding.observe(from: self)
+    Preferences.General.youtubeHighQuality.observe(from: self)
     Preferences.General.defaultPageZoomLevel.observe(from: self)
     Preferences.Shields.allShields.forEach { $0.observe(from: self) }
     Preferences.Privacy.blockAllCookies.observe(from: self)
@@ -496,11 +456,14 @@ public class BrowserViewController: UIViewController {
     Preferences.Playlist.enablePlaylistMenuBadge.observe(from: self)
     Preferences.Playlist.enablePlaylistURLBarButton.observe(from: self)
     Preferences.Playlist.syncSharedFoldersAutomatically.observe(from: self)
+    Preferences.NewTabPage.backgroundSponsoredImages.observe(from: self)
+    ShieldPreferences.blockAdsAndTrackingLevelRaw.observe(from: self)
+    Preferences.Privacy.screenTimeEnabled.observe(from: self)
     
     pageZoomListener = NotificationCenter.default.addObserver(forName: PageZoomView.notificationName, object: nil, queue: .main) { [weak self] _ in
       self?.tabManager.allTabs.forEach({
         guard let url = $0.webView?.url else { return }
-        let zoomLevel = PrivateBrowsingManager.shared.isPrivateBrowsing ? 1.0 : Domain.getPersistedDomain(for: url)?.zoom_level?.doubleValue ?? Preferences.General.defaultPageZoomLevel.value
+        let zoomLevel = self?.privateBrowsingManager.isPrivateBrowsing == true ? 1.0 : Domain.getPersistedDomain(for: url)?.zoom_level?.doubleValue ?? Preferences.General.defaultPageZoomLevel.value
         $0.webView?.setValue(zoomLevel, forKey: PageZoomView.propertyName)
       })
     }
@@ -509,14 +472,14 @@ public class BrowserViewController: UIViewController {
       guard let self = self else { return }
       self.updateRewardsButtonState()
       self.setupAdsNotificationHandler()
+      self.recordAdsUsageType()
     }
-    Preferences.NewTabPage.selectedCustomTheme.observe(from: self)
     Preferences.Playlist.webMediaSourceCompatibility.observe(from: self)
     Preferences.PrivacyReports.captureShieldsData.observe(from: self)
     Preferences.PrivacyReports.captureVPNAlerts.observe(from: self)
     Preferences.Wallet.defaultEthWallet.observe(from: self)
 
-    if rewards.ledger != nil {
+    if rewards.rewardsAPI != nil {
       // Ledger was started immediately due to user having ads enabled
       setupLedger()
     }
@@ -590,8 +553,18 @@ public class BrowserViewController: UIViewController {
     // Used in App Rating criteria
     AppReviewManager.shared.processMainCriteria(for: .daysInUse)
     
+    // P3A Record
     maybeRecordInitialShieldsP3A()
     recordVPNUsageP3A(vpnEnabled: BraveVPN.isConnected)
+    recordAccessibilityDisplayZoomEnabledP3A()
+    recordAccessibilityDocumentsDirectorySizeP3A()
+    recordTimeBasedNumberReaderModeUsedP3A(activated: false)
+    recordGeneralBottomBarLocationP3A()
+    PlaylistP3A.recordHistogram()
+    recordAdsUsageType()
+    
+    // Revised Review Handling
+    AppReviewManager.shared.handleAppReview(for: .revisedCrossPlatform, using: self)
   }
 
   private func setupAdsNotificationHandler() {
@@ -600,7 +573,7 @@ public class BrowserViewController: UIViewController {
                                                   notificationsPresenter: notificationsPresenter)
     notificationsHandler?.canShowNotifications = { [weak self] in
       guard let self = self else { return false }
-      return !PrivateBrowsingManager.shared.isPrivateBrowsing && !self.topToolbar.inOverlayMode
+      return !self.privateBrowsingManager.isPrivateBrowsing && !self.topToolbar.inOverlayMode
     }
     notificationsHandler?.actionOccured = { [weak self] ad, action in
       guard let self = self, let ad = ad else { return }
@@ -617,7 +590,7 @@ public class BrowserViewController: UIViewController {
           return
         }
         let request = URLRequest(url: targetURL)
-        self.tabManager.addTabAndSelect(request, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
+        self.tabManager.addTabAndSelect(request, isPrivate: self.privateBrowsingManager.isPrivateBrowsing)
       }
     }
   }
@@ -625,20 +598,17 @@ public class BrowserViewController: UIViewController {
   func shouldShowFooterForTraitCollection(_ previousTraitCollection: UITraitCollection) -> Bool {
     return previousTraitCollection.verticalSizeClass != .compact && previousTraitCollection.horizontalSizeClass != .regular
   }
-
-  func toggleSnackBarVisibility(show: Bool) {
-    if show {
-      UIView.animate(withDuration: 0.1, animations: { self.alertStackView.isHidden = false })
-    } else {
-      alertStackView.isHidden = true
-    }
-  }
   
   private func updateUsingBottomBar(using traitCollection: UITraitCollection) {
     isUsingBottomBar = Preferences.General.isUsingBottomBar.value &&
     traitCollection.horizontalSizeClass == .compact &&
     traitCollection.verticalSizeClass == .regular &&
     traitCollection.userInterfaceIdiom == .phone
+    
+    // Reinserts the fav controller whos parent is based on bottom bar
+    if let favoritesController {
+      insertFavoritesControllerView(favoritesController: favoritesController)
+    }
   }
 
   public override func viewSafeAreaInsetsDidChange() {
@@ -658,7 +628,7 @@ public class BrowserViewController: UIViewController {
     bottomTouchArea.isEnabled = showToolbar
 
     if showToolbar {
-      toolbar = BottomToolbarView()
+      toolbar = BottomToolbarView(privateBrowsingManager: privateBrowsingManager)
       toolbar?.setSearchButtonState(url: tabManager.selectedTab?.url)
       footer.addSubview(toolbar!)
       toolbar?.tabToolbarDelegate = self
@@ -689,6 +659,7 @@ public class BrowserViewController: UIViewController {
   func updateToolbarCurrentURL(_ currentURL: URL?) {
     topToolbar.currentURL = currentURL
     collapsedURLBarView.currentURL = currentURL
+    updateScreenTimeUrl(currentURL)
   }
 
   override public func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -704,7 +675,7 @@ public class BrowserViewController: UIViewController {
     coordinator.animate(
       alongsideTransition: { context in
         if self.isViewLoaded {
-          self.statusBarOverlay.backgroundColor = self.topToolbar.backgroundColor
+          self.updateStatusBarOverlayColor()
           self.bottomBarKeyboardBackground.backgroundColor = self.topToolbar.backgroundColor
           self.setNeedsStatusBarAppearanceUpdate()
         }
@@ -720,11 +691,20 @@ public class BrowserViewController: UIViewController {
     displayedPopoverController?.dismiss(animated: true)
   }
 
-  @objc func appDidEnterBackgroundNotification() {
+  @objc func sceneDidEnterBackgroundNotification(_ notification: NSNotification) {
+    guard let scene = notification.object as? UIScene, scene == currentScene else {
+      return
+    }
+    
     displayedPopoverController?.dismiss(animated: false) {
       self.updateDisplayedPopoverProperties = nil
       self.displayedPopoverController = nil
     }
+  }
+  
+  @objc func appWillTerminateNotification() {
+    tabManager.saveAllTabs()
+    tabManager.removePrivateWindows()
   }
   
   @objc private func tappedCollapsedURLBar() {
@@ -739,7 +719,13 @@ public class BrowserViewController: UIViewController {
     toolbarVisibilityViewModel.toolbarState = .expanded
   }
 
-  @objc func appWillResignActiveNotification() {
+  @objc func sceneWillResignActiveNotification(_ notification: NSNotification) {
+    guard let scene = notification.object as? UIScene, scene == currentScene else {
+      return
+    }
+    
+    tabManager.saveAllTabs()
+    
     // Dismiss any popovers that might be visible
     displayedPopoverController?.dismiss(animated: false) {
       self.updateDisplayedPopoverProperties = nil
@@ -751,10 +737,16 @@ public class BrowserViewController: UIViewController {
     if let tab = tabManager.selectedTab, tab.isPrivate {
       webViewContainerBackdrop.alpha = 1
       webViewContainer.alpha = 0
+      activeNewTabPageViewController?.view.alpha = 0
+      favoritesController?.view.alpha = 0
+      searchController?.view.alpha = 0
       header.contentView.alpha = 0
       presentedViewController?.popoverPresentationController?.containerView?.alpha = 0
       presentedViewController?.view.alpha = 0
     }
+    
+    // Stop Voice Search and dismiss controller
+    stopVoiceSearch()
   }
 
   @objc func vpnConfigChanged() {
@@ -766,7 +758,11 @@ public class BrowserViewController: UIViewController {
     }
   }
 
-  @objc func appDidBecomeActiveNotification() {
+  @objc func sceneDidBecomeActiveNotification(_ notification: NSNotification) {
+    guard let scene = notification.object as? UIScene, scene == currentScene else {
+      return
+    }
+    
     guard let tab = tabManager.selectedTab, tab.isPrivate else {
       return
     }
@@ -777,6 +773,9 @@ public class BrowserViewController: UIViewController {
       animations: {
         self.webViewContainer.alpha = 1
         self.header.contentView.alpha = 1
+        self.activeNewTabPageViewController?.view.alpha = 1
+        self.favoritesController?.view.alpha = 1
+        self.searchController?.view.alpha = 1
         self.presentedViewController?.popoverPresentationController?.containerView?.alpha = 1
         self.presentedViewController?.view.alpha = 1
         self.view.backgroundColor = .clear
@@ -794,6 +793,7 @@ public class BrowserViewController: UIViewController {
       bottomBarKeyboardBackground.isHidden = !isUsingBottomBar
       topToolbar.displayTabTraySwipeGestureRecognizer?.isEnabled = isUsingBottomBar
       updateTabsBarVisibility()
+      updateStatusBarOverlayColor()
       updateViewConstraints()
     }
   }
@@ -821,8 +821,8 @@ public class BrowserViewController: UIViewController {
     view.addSubview(topTouchArea)
     view.addSubview(bottomBarKeyboardBackground)
     view.addSubview(footer)
-    view.addSubview(header)
     view.addSubview(statusBarOverlay)
+    view.addSubview(header)
     
     // For now we hide some elements so they are not visible
     header.isHidden = true
@@ -833,24 +833,7 @@ public class BrowserViewController: UIViewController {
     updateToolbarStateForTraitCollection(self.traitCollection)
     
     // Legacy Review Handling
-    if AppConstants.buildChannel.isPublic && AppReviewManager.shared.legacyShouldRequestReview() {
-      // Request Review when the main-queue is free or on the next cycle.
-      DispatchQueue.main.async {
-        guard let windowScene = self.currentScene else { return }
-        SKStoreReviewController.requestReview(in: windowScene)
-      }
-    }
-    
-    // Do some migratins
-    LegacyBookmarksHelper.restore_1_12_Bookmarks() {
-      Logger.module.info("Bookmarks from old database were successfully restored")
-    }
-    
-    // Perform migration to brave-core sync objects
-    if !Migration.isChromiumMigrationCompleted,
-      !Preferences.Chromium.syncV2PasswordMigrationStarted.value {
-      Preferences.Chromium.syncV2ObjectMigrationCount.value = 0
-    }
+    AppReviewManager.shared.handleAppReview(for: .legacy, using: self)
     
     // Adding Screenshot Service Delegate to browser to fetch full screen webview screenshots
     currentScene?.screenshotService?.delegate = self
@@ -865,14 +848,17 @@ public class BrowserViewController: UIViewController {
     
     NotificationCenter.default.do {
       $0.addObserver(
-        self, selector: #selector(appWillResignActiveNotification),
-        name: UIApplication.willResignActiveNotification, object: nil)
+        self, selector: #selector(sceneWillResignActiveNotification(_:)),
+        name: UIScene.willDeactivateNotification, object: nil)
       $0.addObserver(
-        self, selector: #selector(appDidBecomeActiveNotification),
-        name: UIApplication.didBecomeActiveNotification, object: nil)
+        self, selector: #selector(sceneDidBecomeActiveNotification(_:)),
+        name: UIScene.didActivateNotification, object: nil)
       $0.addObserver(
-        self, selector: #selector(appDidEnterBackgroundNotification),
-        name: UIApplication.didEnterBackgroundNotification, object: nil)
+        self, selector: #selector(sceneDidEnterBackgroundNotification),
+        name: UIScene.didEnterBackgroundNotification, object: nil)
+      $0.addObserver(
+        self, selector: #selector(appWillTerminateNotification),
+        name: UIApplication.willTerminateNotification, object: nil)
       $0.addObserver(
         self, selector: #selector(resetNTPNotification),
         name: .adsOrRewardsToggledInSettings, object: nil)
@@ -922,49 +908,37 @@ public class BrowserViewController: UIViewController {
       }
     }
 
-    doSyncMigration()
-
-    if #available(iOS 14, *), !Preferences.DefaultBrowserIntro.defaultBrowserNotificationScheduled.value {
+    // Schedule Default Browser Local Notification
+    // If notification is not already scheduled or
+    // an external URL opened in Brave (which indicates Brave is set as default)
+    if !Preferences.DefaultBrowserIntro.defaultBrowserNotificationScheduled.value {
       scheduleDefaultBrowserNotification()
     }
 
-    privateModeCancellable = PrivateBrowsingManager.shared
+    privateModeCancellable = privateBrowsingManager
       .$isPrivateBrowsing
       .removeDuplicates()
+      .receive(on: RunLoop.main)
       .sink(receiveValue: { [weak self] isPrivateBrowsing in
-        if isPrivateBrowsing {
-          self?.statusBarOverlay.backgroundColor = .privateModeBackground
-        } else {
-          self?.statusBarOverlay.backgroundColor =
-          Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
-        }
-        self?.bottomBarKeyboardBackground.backgroundColor = self?.statusBarOverlay.backgroundColor
+        guard let self = self else { return }
+        self.updateStatusBarOverlayColor()
+        self.bottomBarKeyboardBackground.backgroundColor = self.topToolbar.backgroundColor
+        self.collapsedURLBarView.browserColors = self.privateBrowsingManager.browserColors
       })
     
     appReviewCancelable = AppReviewManager.shared
-      .$isReviewRequired
+      .$isRevisedReviewRequired
       .removeDuplicates()
-      .sink(receiveValue: { [weak self] isReviewRequired in
+      .sink(receiveValue: { [weak self] isRevisedReviewRequired in
         guard let self = self else { return }
-        if isReviewRequired {
+        if isRevisedReviewRequired {
+          AppReviewManager.shared.isRevisedReviewRequired = false
+          
           // Handle App Rating
           // User made changes to the Brave News sources (tapped close)
-          AppReviewManager.shared.handleAppReview(for: self)
+          AppReviewManager.shared.handleAppReview(for: .revised, using: self)
         }
       })
-    
-    Preferences.General.nightModeEnabled.objectWillChange
-      .receive(on: RunLoop.main)
-      .sink { [weak self] _ in
-        if PrivateBrowsingManager.shared.isPrivateBrowsing {
-          self?.statusBarOverlay.backgroundColor = .privateModeBackground
-        } else {
-          self?.statusBarOverlay.backgroundColor =
-          Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
-        }
-        self?.bottomBarKeyboardBackground.backgroundColor = self?.statusBarOverlay.backgroundColor
-      }
-      .store(in: &cancellables)
     
     Preferences.General.isUsingBottomBar.objectWillChange
       .receive(on: RunLoop.main)
@@ -1003,7 +977,7 @@ public class BrowserViewController: UIViewController {
 
         let content = UNMutableNotificationContent().then {
           $0.title = Strings.DefaultBrowserCallout.notificationTitle
-          $0.body = String(format: Strings.DefaultBrowserCallout.notificationBody, String(ProcessInfo().operatingSystemVersion.majorVersion))
+          $0.body = Strings.DefaultBrowserCallout.notificationBody
         }
 
         let timeToShow = AppConstants.buildChannel.isPublic ? 2.hours : 2.minutes
@@ -1026,6 +1000,13 @@ public class BrowserViewController: UIViewController {
     }
   }
   
+  private func cancelScheduleDefaultBrowserNotification() {
+    let center = UNUserNotificationCenter.current()
+    center.removePendingNotificationRequests(withIdentifiers: [Self.defaultBrowserNotificationId])
+    
+    Preferences.DefaultBrowserIntro.defaultBrowserNotificationIsCanceled.value = true
+  }
+  
   private func executeAfterSetup(_ block: @escaping () -> Void) {
     if setupTasksCompleted {
       block()
@@ -1035,7 +1016,7 @@ public class BrowserViewController: UIViewController {
   }
 
   private func setupTabs() {
-    let isPrivate = Preferences.Privacy.privateBrowsingOnly.value
+    let isPrivate = privateBrowsingManager.isPrivateBrowsing || Preferences.Privacy.privateBrowsingOnly.value
     let noTabsAdded = self.tabManager.tabsForCurrentMode.isEmpty
     
     var tabToSelect: Tab?
@@ -1115,6 +1096,8 @@ public class BrowserViewController: UIViewController {
     }
     searchController?.additionalSafeAreaInsets = additionalInsets
     favoritesController?.additionalSafeAreaInsets = additionalInsets
+    
+    tabsBar.reloadDataAndRestoreSelectedTab(isAnimated: false)
   }
 
   override public var canBecomeFirstResponder: Bool {
@@ -1130,8 +1113,8 @@ public class BrowserViewController: UIViewController {
     super.viewWillAppear(animated)
     updateToolbarUsingTabManager(tabManager)
 
-    if let tabId = tabManager.selectedTab?.rewardsId, rewards.ledger?.selectedTabId == 0 {
-      rewards.ledger?.selectedTabId = tabId
+    if let tabId = tabManager.selectedTab?.rewardsId, rewards.rewardsAPI?.selectedTabId == 0 {
+      rewards.rewardsAPI?.selectedTabId = tabId
     }
   }
 
@@ -1145,7 +1128,7 @@ public class BrowserViewController: UIViewController {
 
   fileprivate func showRestoreTabsAlert() {
     guard canRestoreTabs() else {
-      self.tabManager.addTabAndSelect(isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
+      self.tabManager.addTabAndSelect(isPrivate: self.privateBrowsingManager.isPrivateBrowsing)
       return
     }
     let alert = UIAlertController.restoreTabsAlert(
@@ -1153,8 +1136,8 @@ public class BrowserViewController: UIViewController {
         self.setupTabs()
       },
       noCallback: { _ in
-        TabMO.deleteAll()
-        self.tabManager.addTabAndSelect(isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
+        SessionTab.deleteAll()
+        self.tabManager.addTabAndSelect(isPrivate: self.privateBrowsingManager.isPrivateBrowsing)
       }
     )
     self.present(alert, animated: true, completion: nil)
@@ -1162,26 +1145,17 @@ public class BrowserViewController: UIViewController {
 
   fileprivate func canRestoreTabs() -> Bool {
     // Make sure there's at least one real tab open
-    return !TabMO.getAll().compactMap({ $0.url }).isEmpty
+    return !SessionTab.all().compactMap({ $0.url }).isEmpty
   }
 
   override public func viewDidAppear(_ animated: Bool) {
-    // Passcode Migration has highest priority, it should be presented over everything else
-    presentPassCodeMigration()
-
+    
     // Present Onboarding to new users, existing users will not see the onboarding
     presentOnboardingIntro()
 
     // Full Screen Callout Presentation
-    // Priority: P3A - VPN - Default Browser - Rewards
-    // TODO: Remove the dispatch after with a proper fix and fix calling present functions before super.viewDidAppear
     DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-      self.presentP3AScreenCallout()
-      self.presentBottomBarCallout()
-      self.presentVPNAlertCallout()
-      self.presentDefaultBrowserScreenCallout()
-      self.presentBraveRewardsScreenCallout()
-      self.presentCookieNotificationBlockingCalloutIfNeeded()
+      self.presentFullScreenCallouts()
     }
 
     screenshotHelper.viewIsVisible = true
@@ -1194,6 +1168,24 @@ public class BrowserViewController: UIViewController {
       show(toast: toast, afterWaiting: ButtonToastUX.toastDelay)
     }
     showQueuedAlertIfAvailable()
+    
+    let isPrivateBrowsing = SessionWindow.from(windowId: windowId)?.isPrivate == true
+    var userActivity = view.window?.windowScene?.userActivity
+    if userActivity == nil {
+      userActivity = BrowserState.userActivity(for: windowId, isPrivate: isPrivateBrowsing)
+    } else {
+      userActivity?.targetContentIdentifier = windowId.uuidString
+      userActivity?.addUserInfoEntries(from: ["WindowID": windowId.uuidString,
+                                              "isPrivate": isPrivateBrowsing])
+    }
+    
+    view.window?.windowScene?.userActivity = userActivity
+    view.window?.windowScene?.session.userInfo = ["WindowID": windowId.uuidString,
+                                                  "isPrivate": isPrivateBrowsing]
+    
+    for session in UIApplication.shared.openSessions {
+      UIApplication.shared.requestSceneSessionRefresh(session)
+    }
   }
 
   /// Whether or not to show the playlist onboarding callout this session
@@ -1211,11 +1203,15 @@ public class BrowserViewController: UIViewController {
     screenshotHelper.viewIsVisible = false
     super.viewWillDisappear(animated)
 
-    rewards.ledger?.selectedTabId = 0
+    rewards.rewardsAPI?.selectedTabId = 0
+    view.window?.windowScene?.userActivity = nil
   }
 
   /// A layout guide defining where the favorites and NTP overlay are placed
   let pageOverlayLayoutGuide = UILayoutGuide()
+  
+  /// A single controller per bvc/window. Using one controller per tab or webview causes crashes.
+  var screenTimeViewController: STWebpageController?
 
   override public func updateViewConstraints() {
     readerModeBar?.snp.remakeConstraints { make in
@@ -1226,6 +1222,16 @@ public class BrowserViewController: UIViewController {
       }
       make.height.equalTo(UIConstants.toolbarHeight)
       make.leading.trailing.equalTo(self.view)
+    }
+    
+    if let screenTimeViewController = screenTimeViewController {
+      webViewContainer.addSubview(screenTimeViewController.view)
+      addChild(screenTimeViewController)
+      screenTimeViewController.didMove(toParent: self)
+      
+      screenTimeViewController.view.snp.remakeConstraints {
+        $0.edges.equalTo(webViewContainer)
+      }
     }
     
     webViewContainer.snp.remakeConstraints { make in
@@ -1248,9 +1254,25 @@ public class BrowserViewController: UIViewController {
     header.snp.remakeConstraints { make in
       if self.isUsingBottomBar {
         // Need to check Find In Page Bar is enabled in order to aligh it properly when bottom-bar is enabled
-        if let keyboardHeight = keyboardState?.intersectionHeightForView(self.view), keyboardHeight > 0,
-           (presentedViewController == nil || findInPageBar != nil) {
-          var offset = -keyboardHeight
+        var shouldEvaluateKeyboardConstraints = false
+        var activeKeyboardHeight: CGFloat = 0
+        var searchEngineSettingsDismissed = false
+
+        if let keyboardHeight = keyboardState?.intersectionHeightForView(self.view) {
+          activeKeyboardHeight = keyboardHeight
+        }
+        
+        if let presentedNavigationController = presentedViewController as? ModalSettingsNavigationController,
+           let presentedRootController = presentedNavigationController.viewControllers.first,
+           presentedRootController is SearchSettingsTableViewController {
+          searchEngineSettingsDismissed = true
+        }
+        
+        shouldEvaluateKeyboardConstraints = (activeKeyboardHeight > 0)
+          && (presentedViewController == nil || searchEngineSettingsDismissed || findInPageBar != nil)
+                
+        if shouldEvaluateKeyboardConstraints {
+          var offset = -activeKeyboardHeight
           if !topToolbar.inOverlayMode {
             // Showing collapsed URL bar while the keyboard is up
             offset += toolbarVisibilityViewModel.transitionDistance
@@ -1282,8 +1304,6 @@ public class BrowserViewController: UIViewController {
     footer.snp.remakeConstraints { make in
       make.bottom.equalTo(toolbarLayoutGuide)
       make.leading.trailing.equalTo(self.view)
-      let height = self.toolbar == nil ? 0 : UIConstants.bottomToolbarHeight
-      make.height.equalTo(height)
     }
 
     bottomBarKeyboardBackground.snp.remakeConstraints {
@@ -1354,8 +1374,11 @@ public class BrowserViewController: UIViewController {
         profile: profile,
         dataSource: backgroundDataSource,
         feedDataSource: feedDataSource,
-        rewards: rewards)
-      /// Donate NewTabPage Activity For Custom Suggestions
+        rewards: rewards,
+        privateBrowsingManager: privateBrowsingManager,
+        p3aUtils: braveCore.p3aUtils
+      )
+      // Donate NewTabPage Activity For Custom Suggestions
       let newTabPageActivity =
         ActivityShortcutManager.shared.createShortcutActivity(type: selectedTab.isPrivate ? .newPrivateTab : .newTab)
 
@@ -1381,7 +1404,8 @@ public class BrowserViewController: UIViewController {
       activeNewTabPageViewController = ntpController
 
       addChild(ntpController)
-      view.insertSubview(ntpController.view, belowSubview: header)
+      let subview = isUsingBottomBar ? header : statusBarOverlay
+      view.insertSubview(ntpController.view, belowSubview: subview)
       ntpController.didMove(toParent: self)
 
       ntpController.view.snp.makeConstraints {
@@ -1437,7 +1461,7 @@ public class BrowserViewController: UIViewController {
   public func presentCorrespondingVPNViewController() {
     if BraveSkusManager.keepShowingSessionExpiredState {
       let alert = BraveSkusManager.sessionExpiredStateAlert(loginCallback: { [unowned self] _ in
-        self.openURLInNewTab(BraveUX.braveAccountMainURL, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing,
+        self.openURLInNewTab(.brave.account, isPrivate: self.privateBrowsingManager.isPrivateBrowsing,
                              isPrivileged: false)
       })
       
@@ -1593,13 +1617,42 @@ public class BrowserViewController: UIViewController {
       updateWebViewPageZoom(tab: tab)
     }
   }
+  
+  func showIPFSInterstitialPage(originalURL: URL, visitType: VisitType) {
+    topToolbar.leaveOverlayMode()
 
+    guard let tab = tabManager.selectedTab, let encodedURL = originalURL.absoluteString.addingPercentEncoding(withAllowedCharacters: .alphanumerics), let internalUrl = URL(string: "\(InternalURL.baseUrl)/\(IPFSSchemeHandler.path)?url=\(encodedURL)") else {
+      return
+    }
+    let scriptHandler = tab.getContentScript(name: Web3IPFSScriptHandler.scriptName) as? Web3IPFSScriptHandler
+    scriptHandler?.originalURL = originalURL
+    scriptHandler?.visitType = visitType
+
+    tab.webView?.load(PrivilegedRequest(url: internalUrl) as URLRequest)
+  }
+
+  func showWeb3ServiceInterstitialPage(service: Web3Service, originalURL: URL, visitType: VisitType = .unknown) {
+    topToolbar.leaveOverlayMode()
+
+    guard let tab = tabManager.selectedTab,
+          let encodedURL = originalURL.absoluteString.addingPercentEncoding(withAllowedCharacters: .alphanumerics),
+          let internalUrl = URL(string: "\(InternalURL.baseUrl)/\(Web3DomainHandler.path)?\(Web3NameServiceScriptHandler.ParamKey.serviceId.rawValue)=\(service.rawValue)&url=\(encodedURL)") else {
+      return
+    }
+    let scriptHandler = tab.getContentScript(name: Web3NameServiceScriptHandler.scriptName) as? Web3NameServiceScriptHandler
+    scriptHandler?.originalURL = originalURL
+    scriptHandler?.visitType = visitType
+    
+    tab.webView?.load(PrivilegedRequest(url: internalUrl) as URLRequest)
+  }
+  
   override public func accessibilityPerformEscape() -> Bool {
     if topToolbar.inOverlayMode {
       topToolbar.didClickCancel()
       return true
     } else if let selectedTab = tabManager.selectedTab, selectedTab.canGoBack {
       selectedTab.goBack()
+      resetExternalAlertProperties(selectedTab)
       return true
     }
     return false
@@ -1623,11 +1676,12 @@ public class BrowserViewController: UIViewController {
     }
 
     // Must handle ALL keypaths
-    guard let kp = keyPath, let path = KVOConstants(rawValue: kp) else {
+    guard let kp = keyPath else {
       assertionFailure("Unhandled KVO key: \(keyPath ?? "nil")")
       return
     }
 
+    let path = KVOConstants(keyPath: kp)
     switch path {
     case .estimatedProgress:
       guard tab === tabManager.selectedTab,
@@ -1768,18 +1822,50 @@ public class BrowserViewController: UIViewController {
         break
       }
       
-      let host = tab.webView?.url?.host
+      guard let scheme = tab.webView?.url?.scheme,
+            let host = tab.webView?.url?.host else {
+        tab.secureContentState = .insecure
+        self.updateURLBar()
+        return
+      }
       
-      Task {
+      let port: Int
+      if let urlPort = tab.webView?.url?.port {
+        port = urlPort
+      } else if scheme == "https" {
+        port = 443
+      } else {
+        port = 80
+      }
+      
+      Task.detached {
         do {
-          try await BraveCertificateUtils.evaluateTrust(serverTrust, for: host)
-          tab.secureContentState = .secure
+          let result = BraveCertificateUtility.verifyTrust(serverTrust,
+                                                           host: host,
+                                                           port: port)
+          // Cert is valid!
+          if result == 0 {
+            tab.secureContentState = .secure
+          } else if result == Int32.min {
+            // Cert is valid but should be validated by the system
+            // Let the system handle it and we'll show an error if the system cannot validate it
+            try await BraveCertificateUtils.evaluateTrust(serverTrust, for: host)
+            tab.secureContentState = .secure
+          } else {
+            tab.secureContentState = .insecure
+          }
         } catch {
           tab.secureContentState = .insecure
         }
         
-        self.updateURLBar()
+        Task { @MainActor in
+          self.updateURLBar()
+        }
       }
+    case ._sampledPageTopColor:
+      updateStatusBarOverlayColor()
+    default:
+      assertionFailure("Unhandled KVO key: \(kp)")
     }
   }
 
@@ -1828,6 +1914,17 @@ public class BrowserViewController: UIViewController {
     navigationToolbar.updatePageStatus(isPage)
     updateWebViewPageZoom(tab: tab)
   }
+  
+  public func moveTab(tabId: UUID, to browser: BrowserViewController) {
+    guard let tab = tabManager.allTabs.filter({ $0.id == tabId }).first,
+          let url = tab.url else {
+      return
+    }
+    
+    let isPrivate = tab.isPrivate
+    tabManager.removeTab(tab)
+    browser.tabManager.addTabsForURLs([url], zombie: false, isPrivate: isPrivate)
+  }
 
   public func switchToTabForURLOrOpen(_ url: URL, isPrivate: Bool = false, isPrivileged: Bool, isExternal: Bool = false) {
     if !isExternal {
@@ -1841,7 +1938,7 @@ public class BrowserViewController: UIViewController {
     }
   }
   
-  func switchToTabOrOpen(id: String?, url: URL) {
+  func switchToTabOrOpen(id: UUID?, url: URL) {
     popToBVC()
     
     if let tabID = id, let tab = tabManager.getTabForID(tabID) {
@@ -1849,7 +1946,7 @@ public class BrowserViewController: UIViewController {
     } else if let tab = tabManager.getTabForURL(url) {
       tabManager.selectTab(tab)
     } else {
-      openURLInNewTab(url, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing, isPrivileged: false)
+      openURLInNewTab(url, isPrivate: privateBrowsingManager.isPrivateBrowsing, isPrivileged: false)
     }
   }
 
@@ -1901,6 +1998,25 @@ public class BrowserViewController: UIViewController {
       }
     }
   }
+  
+  func openInNewWindow(url: URL?, isPrivate: Bool) {
+    let activity = BrowserState.userActivity(for: UUID(), isPrivate: isPrivate)
+    
+    if let url = url {
+      activity.addUserInfoEntries(from: ["OpenURL": url])
+    }
+    
+    let options = UIScene.ActivationRequestOptions().then {
+      $0.requestingScene = view.window?.windowScene
+    }
+    
+    UIApplication.shared.requestSceneSessionActivation(nil,
+                                                       userActivity: activity,
+                                                       options: options,
+                                                       errorHandler: { error in
+      Logger.module.error("Error creating new window: \(error)")
+    })
+  }
 
   func clearHistoryAndOpenNewTab() {
     // When PB Only mode is enabled
@@ -1935,11 +2051,11 @@ public class BrowserViewController: UIViewController {
     present(settingsNavigationController, animated: true)
   }
 
-  func popToBVC() {
+  func popToBVC(completion: (() -> Void)? = nil) {
     guard let currentViewController = navigationController?.topViewController else {
       return
     }
-    currentViewController.dismiss(animated: true, completion: nil)
+    currentViewController.dismiss(animated: true, completion: completion)
 
     if currentViewController != self {
       _ = self.navigationController?.popViewController(animated: true)
@@ -1952,7 +2068,7 @@ public class BrowserViewController: UIViewController {
     var activities = [UIActivity]()
 
     // Adding SendTabToSelfActivity conditionally to show device selection screen
-    if !PrivateBrowsingManager.shared.isPrivateBrowsing, !url.isLocal, !InternalURL.isValid(url: url), !url.isReaderModeURL,
+    if !privateBrowsingManager.isPrivateBrowsing, !url.isLocal, !InternalURL.isValid(url: url), !url.isReaderModeURL,
         braveCore.syncAPI.isSendTabToSelfVisible {
       let sendTabToSelfActivity = SendTabToSelfActivity() { [weak self] in
         guard let self = self else { return }
@@ -1980,7 +2096,12 @@ public class BrowserViewController: UIViewController {
     }
     
     let findInPageActivity = FindInPageActivity() { [unowned self] in
-      self.updateFindInPageVisibility(visible: true)
+      if #available(iOS 16.0, *), let findInteraction = self.tabManager.selectedTab?.webView?.findInteraction {
+        findInteraction.searchText = ""
+        findInteraction.presentFindNavigator(showingReplace: false)
+      } else {
+        self.updateFindInPageVisibility(visible: true)
+      }
     }
     
     let pageZoomActivity = PageZoomActivity() { [unowned self] in
@@ -2000,7 +2121,7 @@ public class BrowserViewController: UIViewController {
             FavoritesHelper.add(url: url, title: tab?.displayTitle)
             // Handle App Rating
             // Check for review condition after adding a favorite
-            AppReviewManager.shared.handleAppReview(for: self)
+            AppReviewManager.shared.handleAppReview(for: .revised, using: self)
           })
       }
 
@@ -2106,6 +2227,10 @@ public class BrowserViewController: UIViewController {
 
       activities.append(addSearchEngineActivity)
     }
+    
+    activities.append(ReportWebCompatibilityIssueActivity() { [weak self] in
+      self?.showSubmitReportView(for: url)
+    })
 
     return activities
   }
@@ -2165,7 +2290,7 @@ public class BrowserViewController: UIViewController {
     }
     
     guard let webView = tabManager.selectedTab?.webView else { return }
-    let pageZoomBar = UIHostingController(rootView: PageZoomView(webView: webView))
+    let pageZoomBar = UIHostingController(rootView: PageZoomView(webView: webView, isPrivateBrowsing: privateBrowsingManager.isPrivateBrowsing))
     
     pageZoomBar.rootView.dismiss = { [weak self] in
       guard let self = self else { return }
@@ -2174,12 +2299,14 @@ public class BrowserViewController: UIViewController {
       self.pageZoomBar = nil
     }
     
-    if let findInPageBar = findInPageBar {
-      updateFindInPageVisibility(visible: false)
-      findInPageBar.endEditing(true)
-      findInPageBar.removeFromSuperview()
-      self.findInPageBar = nil
-      updateViewConstraints()
+    if #unavailable(iOS 16.0) {
+      if let findInPageBar = findInPageBar {
+        updateFindInPageVisibility(visible: false)
+        findInPageBar.endEditing(true)
+        findInPageBar.removeFromSuperview()
+        self.findInPageBar = nil
+        updateViewConstraints()
+      }
     }
     
     alertStackView.arrangedSubviews.forEach({
@@ -2200,9 +2327,27 @@ public class BrowserViewController: UIViewController {
     if let currentURL = tab.url {
       let domain = Domain.getPersistedDomain(for: currentURL)
       
-      let zoomLevel = PrivateBrowsingManager.shared.isPrivateBrowsing ? 1.0 : domain?.zoom_level?.doubleValue ?? Preferences.General.defaultPageZoomLevel.value
+      let zoomLevel = privateBrowsingManager.isPrivateBrowsing ? 1.0 : domain?.zoom_level?.doubleValue ?? Preferences.General.defaultPageZoomLevel.value
       tab.webView?.setValue(zoomLevel, forKey: PageZoomView.propertyName)
     }
+  }
+  
+  public override var preferredStatusBarStyle: UIStatusBarStyle {
+    if isUsingBottomBar, let tab = tabManager.selectedTab, tab.url.map(InternalURL.isValid) == false,
+       let color = tab.webView?.sampledPageTopColor {
+      return color.isLight ? .darkContent : .lightContent
+    }
+    return super.preferredStatusBarStyle
+  }
+  
+  func updateStatusBarOverlayColor() {
+    defer { setNeedsStatusBarAppearanceUpdate() }
+    guard isUsingBottomBar, let tab = tabManager.selectedTab, tab.url.map(InternalURL.isValid) == false,
+          let color = tab.webView?.sampledPageTopColor else {
+      statusBarOverlay.backgroundColor = privateBrowsingManager.browserColors.chromeBackground
+      return
+    }
+    statusBarOverlay.backgroundColor = color
   }
 
   func navigateInTab(tab: Tab, to navigation: WKNavigation? = nil) {
@@ -2225,21 +2370,21 @@ public class BrowserViewController: UIViewController {
         webView.evaluateSafeJavaScript(functionName: "\(ReaderModeNamespace).checkReadability", contentWorld: ReaderModeScriptHandler.scriptSandbox)
 
         // Only add history of a url which is not a localhost url
-        if !tab.isPrivate, !url.isReaderModeURL {
+        if !url.isReaderModeURL {
           // The visitType is checked If it is "typed" or not to determine the History object we are adding
           // should be synced or not. This limitation exists on browser side so we are aligning with this
-          if let visitType = typedNavigation.first(where: {
-            $0.key.typedDisplayString == url.typedDisplayString
-          })?.value, visitType == .typed {
-            braveCore.historyAPI.add(url: url, title: tab.title ?? "", dateAdded: Date())
-          } else {
-            braveCore.historyAPI.add(url: url, title: tab.title ?? "", dateAdded: Date(), isURLTyped: false)
+          if !tab.isPrivate {
+            if let visitType = typedNavigation.first(where: {
+              $0.key.typedDisplayString == url.typedDisplayString
+            })?.value, visitType == .typed {
+              braveCore.historyAPI.add(url: url, title: tab.title, dateAdded: Date())
+            } else {
+              braveCore.historyAPI.add(url: url, title: tab.title, dateAdded: Date(), isURLTyped: false)
+            }
           }
           
-          // Saving Tab. Private Mode - not supported yet.
-          if !tab.isPrivate {
-            tabManager.saveTab(tab)
-          }
+          // Saving Tab.
+          tabManager.saveTab(tab)
         }
       }
 
@@ -2247,6 +2392,8 @@ public class BrowserViewController: UIViewController {
     }
 
     if tab === tabManager.selectedTab {
+      updateStatusBarOverlayColor()
+      
       UIAccessibility.post(notification: .screenChanged, argument: nil)
       // must be followed by LayoutChanged, as ScreenChanged will make VoiceOver
       // cursor land on the correct initial element, but if not followed by LayoutChanged,
@@ -2280,7 +2427,7 @@ public class BrowserViewController: UIViewController {
       let qrCodeController = RecentSearchQRCodeScannerController { [weak self] string in
         guard let self = self else { return }
 
-        if let url = URIFixup.getURL(string) {
+        if let url = URIFixup.getURL(string), url.isWebPage(includeDataURIs: false) {
           self.didScanQRCodeWithURL(url)
         } else {
           self.didScanQRCodeWithText(string)
@@ -2319,7 +2466,7 @@ public class BrowserViewController: UIViewController {
           topToolbar.locationContainer.alpha = 1
           topToolbar.actionButtons.forEach { $0.alpha = topToolbar.locationContainer.alpha }
           header.collapsedBarContainerView.alpha = 1 - topToolbar.locationContainer.alpha
-          tabsBar.view.subviews.forEach { $0.alpha = topToolbar.locationContainer.alpha }
+          tabsBar.view.alpha = topToolbar.locationContainer.alpha
           toolbar?.actionButtons.forEach { $0.alpha = topToolbar.locationContainer.alpha }
         }
         animator.startAnimation()
@@ -2342,7 +2489,7 @@ public class BrowserViewController: UIViewController {
         toolbarBottomConstraint?.update(offset: min(footerHeight, max(0, footerHeight * (1 - progress))))
       }
       topToolbar.actionButtons.forEach { $0.alpha = topToolbar.locationContainer.alpha }
-      tabsBar.view.subviews.forEach { $0.alpha = topToolbar.locationContainer.alpha }
+      tabsBar.view.alpha = topToolbar.locationContainer.alpha
       header.collapsedBarContainerView.alpha = 1 - topToolbar.locationContainer.alpha
       toolbar?.actionButtons.forEach { $0.alpha = topToolbar.locationContainer.alpha }
       return
@@ -2357,7 +2504,7 @@ public class BrowserViewController: UIViewController {
       topToolbar.locationContainer.alpha = 0
       toolbarBottomConstraint?.update(offset: footerHeight)
     }
-    tabsBar.view.subviews.forEach { $0.alpha = topToolbar.locationContainer.alpha }
+    tabsBar.view.alpha = topToolbar.locationContainer.alpha
     topToolbar.actionButtons.forEach { $0.alpha = topToolbar.locationContainer.alpha }
     header.collapsedBarContainerView.alpha = 1 - topToolbar.locationContainer.alpha
     toolbar?.actionButtons.forEach { $0.alpha = topToolbar.locationContainer.alpha }
@@ -2369,12 +2516,15 @@ public class BrowserViewController: UIViewController {
   }
 }
 
-extension BrowserViewController: QRCodeViewControllerDelegate {
+extension BrowserViewController {
   func didScanQRCodeWithURL(_ url: URL) {
-    popToBVC()
-    finishEditingAndSubmit(url, visitType: .typed)
+    let overlayText = URLFormatter.formatURL(url.absoluteString, formatTypes: [], unescapeOptions: [])
 
-    if !url.isBookmarklet && !PrivateBrowsingManager.shared.isPrivateBrowsing {
+    popToBVC() {
+      self.topToolbar.enterOverlayMode(overlayText, pasted: false, search: false)
+    }
+
+    if !url.isBookmarklet && !privateBrowsingManager.isPrivateBrowsing {
       RecentSearch.addItem(type: .qrCode, text: nil, websiteUrl: url.absoluteString)
     }
   }
@@ -2383,7 +2533,7 @@ extension BrowserViewController: QRCodeViewControllerDelegate {
     popToBVC()
     submitSearchText(text)
 
-    if !PrivateBrowsingManager.shared.isPrivateBrowsing {
+    if !privateBrowsingManager.isPrivateBrowsing {
       RecentSearch.addItem(type: .qrCode, text: text, websiteUrl: nil)
     }
   }
@@ -2391,13 +2541,13 @@ extension BrowserViewController: QRCodeViewControllerDelegate {
 
 extension BrowserViewController: SettingsDelegate {
   func settingsOpenURLInNewTab(_ url: URL) {
-    let forcedPrivate = PrivateBrowsingManager.shared.isPrivateBrowsing
+    let forcedPrivate = privateBrowsingManager.isPrivateBrowsing
     self.openURLInNewTab(url, isPrivate: forcedPrivate, isPrivileged: false)
   }
 
-  func settingsOpenURLs(_ urls: [URL]) {
+  func settingsOpenURLs(_ urls: [URL], loadImmediately: Bool) {
     let tabIsPrivate = TabType.of(tabManager.selectedTab).isPrivate
-    self.tabManager.addTabsForURLs(urls, zombie: false, isPrivate: tabIsPrivate)
+    self.tabManager.addTabsForURLs(urls, zombie: !loadImmediately, isPrivate: tabIsPrivate)
   }
 }
 
@@ -2415,7 +2565,9 @@ extension BrowserViewController: TabsBarViewControllerDelegate {
   func tabsBarDidSelectTab(_ tabsBarController: TabsBarViewController, _ tab: Tab) {
     if tab == tabManager.selectedTab { return }
     topToolbar.leaveOverlayMode(didCancel: true)
-    updateFindInPageVisibility(visible: false)
+    if #unavailable(iOS 16.0) {
+      updateFindInPageVisibility(visible: false)
+    }
     
     tabManager.selectTab(tab)
   }
@@ -2438,6 +2590,10 @@ extension BrowserViewController: TabsBarViewControllerDelegate {
       break
     }
   }
+  
+  func tabsBarDidSelectAddNewWindow(_ isPrivate: Bool) {
+    self.openInNewWindow(url: nil, isPrivate: isPrivate)
+  }
 }
 
 extension BrowserViewController: TabDelegate {
@@ -2445,14 +2601,13 @@ extension BrowserViewController: TabDelegate {
     webView.frame = webViewContainer.frame
     
     // Observers that live as long as the tab. Make sure these are all cleared in willDeleteWebView below!
-    KVOs.forEach { webView.addObserver(self, forKeyPath: $0.rawValue, options: .new, context: nil) }
+    KVOs.forEach { webView.addObserver(self, forKeyPath: $0.keyPath, options: .new, context: nil) }
     webView.uiDelegate = self
     
     var injectedScripts: [TabContentScript] = [
       ReaderModeScriptHandler(tab: tab),
       ErrorPageHelper(certStore: profile.certStore),
       SessionRestoreScriptHandler(tab: tab),
-      FindInPageScriptHandler(tab: tab),
       PrintScriptHandler(browserController: self, tab: tab),
       CustomSearchScriptHandler(tab: tab),
       NightModeScriptHandler(tab: tab),
@@ -2470,11 +2625,19 @@ extension BrowserViewController: TabDelegate {
       DeAmpScriptHandler(tab: tab),
       SiteStateListenerScriptHandler(tab: tab),
       CosmeticFiltersScriptHandler(tab: tab),
+      URLPartinessScriptHandler(tab: tab),
       FaviconScriptHandler(tab: tab),
+      Web3NameServiceScriptHandler(tab: tab),
+      Web3IPFSScriptHandler(tab: tab),
+      YoutubeQualityScriptHandler(tab: tab),
       
       tab.contentBlocker,
       tab.requestBlockingContentHelper,
     ]
+    
+    if #unavailable(iOS 16.0) {
+      injectedScripts.append(FindInPageScriptHandler(tab: tab))
+    }
     
 #if canImport(BraveTalk)
     injectedScripts.append(BraveTalkScriptHandler(tab: tab, rewards: rewards, launchNativeBraveTalk: { [weak self] tab, room, token in
@@ -2505,14 +2668,18 @@ extension BrowserViewController: TabDelegate {
     
     (tab.getContentScript(name: ReaderModeScriptHandler.scriptName) as? ReaderModeScriptHandler)?.delegate = self
     (tab.getContentScript(name: SessionRestoreScriptHandler.scriptName) as? SessionRestoreScriptHandler)?.delegate = self
-    (tab.getContentScript(name: FindInPageScriptHandler.scriptName) as? FindInPageScriptHandler)?.delegate = self
+    if #unavailable(iOS 16.0) {
+      (tab.getContentScript(name: FindInPageScriptHandler.scriptName) as? FindInPageScriptHandler)?.delegate = self
+    }
     (tab.getContentScript(name: PlaylistScriptHandler.scriptName) as? PlaylistScriptHandler)?.delegate = self
     (tab.getContentScript(name: PlaylistFolderSharingScriptHandler.scriptName) as? PlaylistFolderSharingScriptHandler)?.delegate = self
+    (tab.getContentScript(name: Web3NameServiceScriptHandler.scriptName) as? Web3NameServiceScriptHandler)?.delegate = self
+    (tab.getContentScript(name: Web3IPFSScriptHandler.scriptName) as? Web3IPFSScriptHandler)?.delegate = self
   }
 
   func tab(_ tab: Tab, willDeleteWebView webView: WKWebView) {
     tab.cancelQueuedAlerts()
-    KVOs.forEach { webView.removeObserver(self, forKeyPath: $0.rawValue) }
+    KVOs.forEach { webView.removeObserver(self, forKeyPath: $0.keyPath) }
     toolbarVisibilityViewModel.endScrollViewObservation(webView.scrollView)
     webView.uiDelegate = nil
     webView.removeFromSuperview()
@@ -2550,13 +2717,18 @@ extension BrowserViewController: TabDelegate {
 
   /// Triggered when "Find in Page" is selected on selected text
   func tab(_ tab: Tab, didSelectFindInPageFor selectedText: String) {
-    updateFindInPageVisibility(visible: true)
-    findInPageBar?.text = selectedText
+    if #available(iOS 16.0, *), let findInteraction = tab.webView?.findInteraction {
+      findInteraction.searchText = selectedText
+      findInteraction.presentFindNavigator(showingReplace: false)
+    } else {
+      updateFindInPageVisibility(visible: true)
+      findInPageBar?.text = selectedText
+    }
   }
 
   /// Triggered when "Search with Brave" is selected on selected web text
   func tab(_ tab: Tab, didSelectSearchWithBraveFor selectedText: String) {
-    let engine = profile.searchEngines.defaultEngine()
+    let engine = profile.searchEngines.defaultEngine(forType: tab.isPrivate ? .privateMode : .standard)
 
     guard let url = engine.searchURLForQuery(selectedText) else {
       assertionFailure("If this returns nil, investigate why and add proper handling or commenting")
@@ -2569,7 +2741,7 @@ extension BrowserViewController: TabDelegate {
       isPrivate: tab.isPrivate
     )
     
-    if !PrivateBrowsingManager.shared.isPrivateBrowsing {
+    if !privateBrowsingManager.isPrivateBrowsing {
       RecentSearch.addItem(type: .text, text: selectedText, websiteUrl: url.absoluteString)
     }
   }
@@ -2608,7 +2780,7 @@ extension BrowserViewController: TabDelegate {
     vc.linkTapped = { [unowned self] request in
       tab.rewardsEnabledCallback?(false)
       self.tabManager
-        .addTabAndSelect(request, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
+        .addTabAndSelect(request, isPrivate: privateBrowsingManager.isPrivateBrowsing)
     }
   }
 
@@ -2649,13 +2821,22 @@ extension BrowserViewController: TabDelegate {
       topToolbar.updateWalletButtonState(.inactive)
     }
   }
+  
+  func reloadIPFSSchemeUrl(_ url: URL) {
+    handleIPFSSchemeURL(url, visitType: .unknown)
+  }
 
+  func didReloadTab(_ tab: Tab) {
+    // Resetting External Alert Properties
+    resetExternalAlertProperties(tab)
+  }
+  
   @MainActor
   private func isPendingRequestAvailable() async -> Bool {
-    let privateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
-    /// If we have an open `WalletStore`, use that so we can assign the pending request if the wallet is open,
-    /// which allows us to store the new `PendingRequest` triggering a modal presentation for that request.
-    guard let cryptoStore = self.walletStore?.cryptoStore ?? CryptoStore.from(privateMode: privateMode) else {
+    let privateMode = privateBrowsingManager.isPrivateBrowsing
+    // If we have an open `WalletStore`, use that so we can assign the pending request if the wallet is open,
+    // which allows us to store the new `PendingRequest` triggering a modal presentation for that request.
+    guard let cryptoStore = self.walletStore?.cryptoStore ?? CryptoStore.from(ipfsApi: braveCore.ipfsAPI, privateMode: privateMode) else {
       return false
     }
     if await cryptoStore.isPendingRequestAvailable() {
@@ -2667,6 +2848,12 @@ extension BrowserViewController: TabDelegate {
       return WalletProviderPermissionRequestsManager.shared.hasPendingRequest(for: selectedTabOrigin, coinType: .eth)
     }
     return false
+  }
+  
+  func resetExternalAlertProperties(_ tab: Tab?) {
+    if let tab = tab {
+      tab.resetExternalAlertProperties()
+    }
   }
 }
 
@@ -2680,7 +2867,7 @@ extension BrowserViewController: SearchViewControllerDelegate {
     finishEditingAndSubmit(url, visitType: .typed)
   }
 
-  func searchViewController(_ searchViewController: SearchViewController, didSelectOpenTab tabInfo: (id: String?, url: URL)) {
+  func searchViewController(_ searchViewController: SearchViewController, didSelectOpenTab tabInfo: (id: UUID?, url: URL)) {
     switchToTabOrOpen(id: tabInfo.id, url: tabInfo.url)
   }
   
@@ -2689,7 +2876,7 @@ extension BrowserViewController: SearchViewControllerDelegate {
   }
 
   func presentSearchSettingsController() {
-    let settingsNavigationController = SearchSettingsTableViewController(profile: profile)
+    let settingsNavigationController = SearchSettingsTableViewController(profile: profile, privateBrowsingManager: privateBrowsingManager)
     let navController = ModalSettingsNavigationController(rootViewController: settingsNavigationController)
 
     self.present(navController, animated: true, completion: nil)
@@ -2701,9 +2888,13 @@ extension BrowserViewController: SearchViewControllerDelegate {
 
   func searchViewController(_ searchViewController: SearchViewController, shouldFindInPage query: String) {
     topToolbar.leaveOverlayMode()
-    updateFindInPageVisibility(visible: true)
-    findInPageBar?.text = query
-
+    if #available(iOS 16.0, *), let findInteraction = tabManager.selectedTab?.webView?.findInteraction {
+      findInteraction.searchText = query
+      findInteraction.presentFindNavigator(showingReplace: false)
+    } else {
+      updateFindInPageVisibility(visible: true)
+      findInPageBar?.text = query
+    }
   }
 
   func searchViewControllerAllowFindInPage() -> Bool {
@@ -2748,7 +2939,6 @@ extension BrowserViewController: TabTrayDelegate {
     tabsBar.updateData()
   }
 }
-
 
 extension BrowserViewController: JSPromptAlertControllerDelegate {
   func promptAlertControllerDidDismiss(_ alertController: JSPromptAlertController) {
@@ -2795,7 +2985,7 @@ extension BrowserViewController: ToolbarUrlActionsDelegate {
       updateURLBarWalletButton()
     case .openInNewTab(let isPrivate):
       let tab = tabManager.addTab(PrivilegedRequest(url: url) as URLRequest, afterTab: tabManager.selectedTab, isPrivate: isPrivate)
-      if isPrivate && !PrivateBrowsingManager.shared.isPrivateBrowsing {
+      if isPrivate && !privateBrowsingManager.isPrivateBrowsing {
         tabManager.selectTab(tab)
       } else {
         // If we are showing toptabs a user can just use the top tab bar
@@ -2840,7 +3030,7 @@ extension BrowserViewController: ToolbarUrlActionsDelegate {
 
 extension BrowserViewController: NewTabPageDelegate {
   func navigateToInput(_ input: String, inNewTab: Bool, switchingToPrivateMode: Bool) {
-    let isPrivate = PrivateBrowsingManager.shared.isPrivateBrowsing || switchingToPrivateMode
+    let isPrivate = privateBrowsingManager.isPrivateBrowsing || switchingToPrivateMode
     if inNewTab {
       tabManager.addTabAndSelect(isPrivate: isPrivate)
     }
@@ -2851,11 +3041,23 @@ extension BrowserViewController: NewTabPageDelegate {
     guard let url = favorite.url else { return }
     switch action {
     case .opened(let inNewTab, let switchingToPrivateMode):
-      navigateToInput(
-        url,
-        inNewTab: inNewTab,
-        switchingToPrivateMode: switchingToPrivateMode
-      )
+      if switchingToPrivateMode, Preferences.Privacy.privateBrowsingLock.value {
+        self.askForLocalAuthentication { [weak self] success, error in
+          if success {
+            self?.navigateToInput(
+              url,
+              inNewTab: inNewTab,
+              switchingToPrivateMode: switchingToPrivateMode
+            )
+          }
+        }
+      } else {
+        navigateToInput(
+          url,
+          inNewTab: inNewTab,
+          switchingToPrivateMode: switchingToPrivateMode
+        )
+      }
     case .edited:
       guard let title = favorite.displayTitle, let urlString = favorite.url else { return }
       let editPopup =
@@ -2918,18 +3120,17 @@ extension BrowserViewController: PreferencesObserver {
     case Preferences.General.tabBarVisibility.key:
       updateTabsBarVisibility()
     case Preferences.Privacy.privateBrowsingOnly.key:
-      PrivateBrowsingManager.shared.isPrivateBrowsing = Preferences.Privacy.privateBrowsingOnly.value
+      privateBrowsingManager.isPrivateBrowsing = Preferences.Privacy.privateBrowsingOnly.value
       setupTabs()
       updateTabsBarVisibility()
       updateApplicationShortcuts()
-    case Preferences.General.alwaysRequestDesktopSite.key:
+    case Preferences.UserAgent.alwaysRequestDesktopSite.key:
       tabManager.reset()
       tabManager.reloadSelectedTab()
     case Preferences.General.enablePullToRefresh.key:
       tabManager.selectedTab?.updatePullToRefreshVisibility()
-    case Preferences.Shields.blockAdsAndTracking.key,
+    case ShieldPreferences.blockAdsAndTrackingLevelRaw.key,
       Preferences.Shields.blockScripts.key,
-      Preferences.Shields.blockPhishingAndMalware.key,
       Preferences.Shields.blockImages.key,
       Preferences.Shields.fingerprintingProtection.key,
       Preferences.Shields.useRegionAdBlock.key:
@@ -2937,7 +3138,7 @@ extension BrowserViewController: PreferencesObserver {
     case Preferences.General.defaultPageZoomLevel.key:
       tabManager.allTabs.forEach({
         guard let url = $0.webView?.url else { return }
-        let zoomLevel = PrivateBrowsingManager.shared.isPrivateBrowsing ? 1.0 : Domain.getPersistedDomain(for: url)?.zoom_level?.doubleValue ?? Preferences.General.defaultPageZoomLevel.value
+        let zoomLevel = $0.isPrivate ? 1.0 : Domain.getPersistedDomain(for: url)?.zoom_level?.doubleValue ?? Preferences.General.defaultPageZoomLevel.value
         $0.webView?.setValue(zoomLevel, forKey: PageZoomView.propertyName)
       })
     case Preferences.Shields.httpsEverywhere.key:
@@ -2963,9 +3164,6 @@ extension BrowserViewController: PreferencesObserver {
     case Preferences.Rewards.hideRewardsIcon.key,
       Preferences.Rewards.rewardsToggledOnce.key:
       updateRewardsButtonState()
-    case Preferences.NewTabPage.selectedCustomTheme.key:
-      Preferences.NTP.ntpCheckDate.value = nil
-      backgroundDataSource.startFetching()
     case Preferences.Playlist.webMediaSourceCompatibility.key:
       if UIDevice.isIpad {
         tabManager.allTabs.forEach {
@@ -2978,6 +3176,10 @@ extension BrowserViewController: PreferencesObserver {
         $0.setScript(script: .mediaBackgroundPlay, enabled: Preferences.General.mediaAutoBackgrounding.value)
         $0.webView?.reload()
       }
+    case Preferences.General.youtubeHighQuality.key:
+      tabManager.allTabs.forEach {
+        YoutubeQualityScriptHandler.setEnabled(option: Preferences.General.youtubeHighQuality, for: $0)
+      }
     case Preferences.Playlist.enablePlaylistMenuBadge.key,
       Preferences.Playlist.enablePlaylistURLBarButton.key:
       let selectedTab = tabManager.selectedTab
@@ -2986,7 +3188,7 @@ extension BrowserViewController: PreferencesObserver {
         state: selectedTab?.playlistItemState ?? .none,
         item: selectedTab?.playlistItem)
     case Preferences.PrivacyReports.captureShieldsData.key:
-      PrivacyReportsManager.scheduleProcessingBlockedRequests()
+      PrivacyReportsManager.scheduleProcessingBlockedRequests(isPrivateBrowsing: privateBrowsingManager.isPrivateBrowsing)
       PrivacyReportsManager.scheduleNotification(debugMode: !AppConstants.buildChannel.isPublic)
     case Preferences.PrivacyReports.captureVPNAlerts.key:
       PrivacyReportsManager.scheduleVPNAlertsTask()
@@ -2996,8 +3198,8 @@ extension BrowserViewController: PreferencesObserver {
       notificationsPresenter.removeNotification(with: WalletNotification.Constant.id)
       WalletProviderPermissionRequestsManager.shared.cancelAllPendingRequests(for: [.eth])
       WalletProviderAccountCreationRequestManager.shared.cancelAllPendingRequests(coins: [.eth])
-      let privateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
-      if let cryptoStore = CryptoStore.from(privateMode: privateMode) {
+      let privateMode = privateBrowsingManager.isPrivateBrowsing
+      if let cryptoStore = CryptoStore.from(ipfsApi: braveCore.ipfsAPI, privateMode: privateMode) {
         cryptoStore.rejectAllPendingWebpageRequests()
       }
       updateURLBarWalletButton()
@@ -3007,13 +3209,27 @@ extension BrowserViewController: PreferencesObserver {
       notificationsPresenter.removeNotification(with: WalletNotification.Constant.id)
       WalletProviderPermissionRequestsManager.shared.cancelAllPendingRequests(for: [.sol])
       WalletProviderAccountCreationRequestManager.shared.cancelAllPendingRequests(coins: [.sol])
-      let privateMode = PrivateBrowsingManager.shared.isPrivateBrowsing
-      if let cryptoStore = CryptoStore.from(privateMode: privateMode) {
+      let privateMode = privateBrowsingManager.isPrivateBrowsing
+      if let cryptoStore = CryptoStore.from(ipfsApi: braveCore.ipfsAPI, privateMode: privateMode) {
         cryptoStore.rejectAllPendingWebpageRequests()
       }
       updateURLBarWalletButton()
     case Preferences.Playlist.syncSharedFoldersAutomatically.key:
       syncPlaylistFolders()
+    case Preferences.NewTabPage.backgroundSponsoredImages.key:
+      recordAdsUsageType()
+    case Preferences.Privacy.screenTimeEnabled.key:
+      if Preferences.Privacy.screenTimeEnabled.value {
+        screenTimeViewController = STWebpageController()
+        if let tab = tabManager.selectedTab {
+          recordScreenTimeUsage(for: tab)
+        }
+      } else {
+        screenTimeViewController?.view.removeFromSuperview()
+        screenTimeViewController?.removeFromParent()
+        screenTimeViewController?.suppressUsageRecording = true
+        screenTimeViewController = nil
+      }
     default:
       Logger.module.debug("Received a preference change for an unknown key: \(key, privacy: .public) on \(type(of: self), privacy: .public)")
       break
@@ -3029,8 +3245,44 @@ extension BrowserViewController {
   }
 
   public func handleNavigationPath(path: NavigationPath) {
+    // Remove Default Browser Callout - Do not show scheduled notification
+    // in case an external url is triggered
+    if case .url(let navigatedURL, _) = path {
+      if navigatedURL?.isWebPage(includeDataURIs: false) == true {
+        Preferences.General.defaultBrowserCalloutDismissed.value = true
+        Preferences.DefaultBrowserIntro.defaultBrowserNotificationScheduled.value = true
+        
+        // Remove pending notification if default browser is set brave
+        // Recognized by external link is open
+        if !Preferences.DefaultBrowserIntro.defaultBrowserNotificationIsCanceled.value {
+          cancelScheduleDefaultBrowserNotification()
+        }
+      }
+    }
+    
     executeAfterSetup {
       NavigationPath.handle(nav: path, with: self)
+    }
+  }
+}
+
+extension BrowserViewController {
+  func presentTabReceivedToast(url: URL) {
+    // 'Tab Received' indicator will only be shown in normal browsing
+    if !privateBrowsingManager.isPrivateBrowsing {
+      let toast = ButtonToast(
+        labelText: Strings.Callout.tabReceivedCalloutTitle,
+        image: UIImage(braveSystemNamed: "leo.smartphone.tablet-portrait"),
+        buttonText: Strings.goButtonTittle,
+        completion: { [weak self] buttonPressed in
+          guard let self = self else { return }
+          
+          if buttonPressed {
+            self.tabManager.addTabAndSelect(URLRequest(url: url), isPrivate: false)
+          }
+      })
+      
+      show(toast: toast, duration: ButtonToastUX.toastDismissAfter)
     }
   }
 }
@@ -3087,19 +3339,16 @@ extension BrowserViewController: UIScreenshotServiceDelegate {
 // Privacy reports
 extension BrowserViewController {
   public func openPrivacyReport() {
-    if PrivateBrowsingManager.shared.isPrivateBrowsing {
+    if privateBrowsingManager.isPrivateBrowsing {
       return
     }
     
-    let host = UIHostingController(rootView: PrivacyReportsManager.prepareView())
-    host.rootView.onDismiss = { [weak host] in
-      host?.dismiss(animated: true)
-    }
+    let host = UIHostingController(rootView: PrivacyReportsManager.prepareView(isPrivateBrowsing: privateBrowsingManager.isPrivateBrowsing))
     
     host.rootView.openPrivacyReportsUrl = { [weak self] in
       guard let self = self else { return }
       let tab = self.tabManager.addTab(
-        PrivilegedRequest(url: BraveUX.privacyReportsURL) as URLRequest,
+        PrivilegedRequest(url: .brave.privacyFeatures) as URLRequest,
         afterTab: self.tabManager.selectedTab,
         // Privacy Reports view is unavailable in private mode.
         isPrivate: false)

@@ -4,6 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import SwiftUI
+import Preferences
 
 struct PortfolioAssetView: View {
   var image: AssetIconView
@@ -12,30 +13,51 @@ struct PortfolioAssetView: View {
   let networkName: String
   var amount: String
   var quantity: String
+  let shouldHideBalance: Bool
+  
+  @ObservedObject private var isShowingBalances = Preferences.Wallet.isShowingBalances
+  
+  init(
+    image: AssetIconView,
+    title: String, 
+    symbol: String,
+    networkName: String,
+    amount: String,
+    quantity: String,
+    shouldHideBalance: Bool = false
+  ) {
+    self.image = image
+    self.title = title
+    self.symbol = symbol
+    self.networkName = networkName
+    self.amount = amount
+    self.quantity = quantity
+    self.shouldHideBalance = shouldHideBalance
+  }
 
   var body: some View {
-    HStack {
-      image
-      VStack(alignment: .leading) {
-        Text(title)
-          .font(.footnote)
-          .fontWeight(.semibold)
-          .foregroundColor(Color(.bravePrimary))
-        Text(String.localizedStringWithFormat(Strings.Wallet.userAssetSymbolNetworkDesc, symbol, networkName))
-          .font(.caption)
-          .foregroundColor(Color(.braveLabel))
+    AssetView(
+      image: { image },
+      title: title,
+      symbol: symbol,
+      networkName: networkName,
+      accessoryContent: {
+        Group {
+          if shouldHideBalance && !isShowingBalances.value {
+            Text("****")
+          } else {
+            VStack(alignment: .trailing) {
+              Text(amount.isEmpty ? "0.0" : amount)
+                .fontWeight(.semibold)
+              Text(verbatim: "\(quantity) \(symbol)")
+            }
+            .multilineTextAlignment(.trailing)
+          }
+        }
+        .font(.footnote)
+        .foregroundColor(Color(.braveLabel))
       }
-      Spacer()
-      VStack(alignment: .trailing) {
-        Text(amount.isEmpty ? "0.0" : amount)
-        Text(verbatim: "\(quantity) \(symbol)")
-      }
-      .font(.footnote)
-      .foregroundColor(Color(.braveLabel))
-    }
-    .frame(maxWidth: .infinity)
-    .padding(.vertical, 6)
-    .accessibilityElement()
+    )
     .accessibilityLabel("\(title), \(quantity) \(symbol), \(amount)")
   }
 }
@@ -57,7 +79,7 @@ struct PortfolioAssetView_Previews: PreviewProvider {
 }
 #endif
 
-struct PortfolioNFTAssetView: View {
+struct NFTAssetView: View {
   
   let image: NFTIconView
   let title: String
@@ -66,33 +88,25 @@ struct PortfolioNFTAssetView: View {
   let quantity: String
   
   var body: some View {
-    HStack {
-      image
-      VStack(alignment: .leading) {
-        Text(title)
+    AssetView(
+      image: { image },
+      title: title,
+      symbol: symbol,
+      networkName: networkName,
+      accessoryContent: {
+        Text(quantity)
           .font(.footnote)
-          .fontWeight(.semibold)
-          .foregroundColor(Color(.bravePrimary))
-        Text(String.localizedStringWithFormat(Strings.Wallet.userAssetSymbolNetworkDesc, symbol, networkName))
-          .font(.caption)
           .foregroundColor(Color(.braveLabel))
       }
-      Spacer()
-      Text(quantity)
-        .font(.footnote)
-        .foregroundColor(Color(.braveLabel))
-    }
-    .frame(maxWidth: .infinity)
-    .padding(.vertical, 6)
-    .accessibilityElement()
+    )
     .accessibilityLabel("\(title), \(quantity) \(symbol)")
   }
 }
 
 #if DEBUG
-struct PortfolioNFTAssetView_Previews: PreviewProvider {
+struct NFTAssetView_Previews: PreviewProvider {
   static var previews: some View {
-    PortfolioNFTAssetView(
+    NFTAssetView(
       image: NFTIconView(token: .previewToken, network: .mockMainnet),
       title: "Invisible Friends #3965",
       symbol: "INVSBLE",
@@ -104,3 +118,33 @@ struct PortfolioNFTAssetView_Previews: PreviewProvider {
   }
 }
 #endif
+
+/// AssetView is used to display an asset image, title, symbol and network with an optional accessory view on the right.
+struct AssetView<ImageView: View, AccessoryContent: View>: View {
+  let image: () -> ImageView
+  let title: String
+  let symbol: String
+  let networkName: String
+  @ViewBuilder var accessoryContent: () -> AccessoryContent
+
+  var body: some View {
+    HStack {
+      image()
+      VStack(alignment: .leading) {
+        Text(title)
+          .font(.footnote)
+          .fontWeight(.semibold)
+          .foregroundColor(Color(.bravePrimary))
+        Text(String.localizedStringWithFormat(Strings.Wallet.userAssetSymbolNetworkDesc, symbol, networkName))
+          .font(.caption)
+          .foregroundColor(Color(.braveLabel))
+      }
+      .multilineTextAlignment(.leading)
+      Spacer()
+      accessoryContent()
+    }
+    .frame(maxWidth: .infinity)
+    .padding(.vertical, 6)
+    .accessibilityElement()
+  }
+}

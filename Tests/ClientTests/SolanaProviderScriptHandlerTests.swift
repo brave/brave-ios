@@ -16,7 +16,7 @@ import XCTest
   func testConnectFailure() async {
     let provider: BraveWallet.TestSolanaProvider = .init()
     provider._connect = { params, completion in
-      completion(.internalError, "Internal error", "")
+      completion(.internalError, Strings.Wallet.internalErrorMessage, "")
     }
     let tab = Tab(configuration: .init())
     let solProviderHelper = SolanaProviderScriptHandler(tab: tab)
@@ -31,7 +31,7 @@ import XCTest
       return
     }
     XCTAssertEqual(code, Int32(BraveWallet.SolanaProviderError.internalError.rawValue))
-    XCTAssertEqual(message, "Internal error")
+    XCTAssertEqual(message, Strings.Wallet.internalErrorMessage)
   }
   
   /// Test `connect()`, given no parameters, the success flow will return a tuple `(result: Any?, error: String?)`
@@ -94,7 +94,7 @@ import XCTest
     
     let provider: BraveWallet.TestSolanaProvider = .init()
     provider._signAndSendTransaction = { signTransactionParam, sendOptions, completion in
-      completion(.internalError, "Internal error", [:])
+      completion(.internalError, Strings.Wallet.internalErrorMessage, [:])
     }
     let tab = Tab(configuration: .init())
     let solProviderHelper = SolanaProviderScriptHandler(tab: tab)
@@ -109,7 +109,7 @@ import XCTest
       return
     }
     XCTAssertEqual(code, Int32(BraveWallet.SolanaProviderError.internalError.rawValue))
-    XCTAssertEqual(message, "Internal error")
+    XCTAssertEqual(message, Strings.Wallet.internalErrorMessage)
   }
   
   /// Test `signAndSendTransaction()`, given a json string `{serializedMessage: [Uint8], signatures: [Buffer]}`, the success flow will
@@ -193,7 +193,7 @@ import XCTest
     
     let provider: BraveWallet.TestSolanaProvider = .init()
     provider._signMessage = { _, _, completion in
-      completion(.internalError, "Internal error", [:])
+      completion(.internalError, Strings.Wallet.internalErrorMessage, [:])
     }
     let tab = Tab(configuration: .init())
     let solProviderHelper = SolanaProviderScriptHandler(tab: tab)
@@ -208,7 +208,7 @@ import XCTest
       return
     }
     XCTAssertEqual(code, Int32(BraveWallet.SolanaProviderError.internalError.rawValue))
-    XCTAssertEqual(message, "Internal error")
+    XCTAssertEqual(message, Strings.Wallet.internalErrorMessage)
   }
   
   /// Test `signMessage()`, given a json string `{[[UInt8]]}`, the success flow will return a tuple `(result: Any?, error: String?)`
@@ -289,8 +289,11 @@ import XCTest
     let signature = MojoBase.Value(dictionaryValue: [
       "publicKey": MojoBase.Value(stringValue: kTestPublicKey)
     ])
+    let serializedMessage = MojoBase.Value(
+      listValue: kSerializedMessage.map { MojoBase.Value(intValue: $0) }
+    )
     let transaction = MojoBase.Value(dictionaryValue: [
-      "serializedMessage" : toBuffer(kSerializedMessage),
+      "serializedMessage" : serializedMessage,
       "signatures" : MojoBase.Value(listValue: [signature])
     ])
     guard let args = transaction.jsonString else {
@@ -300,7 +303,7 @@ import XCTest
     
     let provider: BraveWallet.TestSolanaProvider = .init()
     provider._signTransaction = { _, completion in
-      completion(.internalError, "Internal error", [])
+      completion(.internalError, Strings.Wallet.internalErrorMessage, [], .legacy)
     }
     let tab = Tab(configuration: .init())
     let solProviderHelper = SolanaProviderScriptHandler(tab: tab)
@@ -315,17 +318,20 @@ import XCTest
       return
     }
     XCTAssertEqual(code, Int32(BraveWallet.SolanaProviderError.internalError.rawValue))
-    XCTAssertEqual(message, "Internal error")
+    XCTAssertEqual(message, Strings.Wallet.internalErrorMessage)
   }
   
   /// Test `signTransaction()`, given a json string `{serializedMessage: Buffer, signatures: {publicKey: String, signature: Buffer}}`,
   /// the success flow will return a tuple `(result: Any?, error: String?)` with the result as type `String` containing a json array of UInt8
-  func testSignTransactionSuccess() async {
+  func testSignTransactionSuccessLegacyTx() async {
     let signature = MojoBase.Value(dictionaryValue: [
       "publicKey": MojoBase.Value(stringValue: kTestPublicKey)
     ])
+    let serializedMessage = MojoBase.Value(
+      listValue: kSerializedMessage.map { MojoBase.Value(intValue: $0) }
+    )
     let transaction = MojoBase.Value(dictionaryValue: [
-      "serializedMessage" : toBuffer(kSerializedMessage),
+      "serializedMessage" : serializedMessage,
       "signatures" : MojoBase.Value(listValue: [signature])
     ])
     guard let args = transaction.jsonString else {
@@ -335,7 +341,7 @@ import XCTest
     
     let provider: BraveWallet.TestSolanaProvider = .init()
     provider._signTransaction = { [kSerializedTx] _, completion in
-      completion(.success, "", kSerializedTx.map(NSNumber.init(value:)))
+      completion(.success, "", kSerializedTx.map(NSNumber.init(value:)), .legacy)
     }
     let tab = Tab(configuration: .init())
     let solProviderHelper = SolanaProviderScriptHandler(tab: tab)
@@ -343,12 +349,52 @@ import XCTest
     
     let (result, error) = await solProviderHelper.signTransaction(args: args)
     XCTAssertNil(error)
-    guard let result = result as? [NSNumber] else {
+    guard let result = result as? [String: Any] else {
       XCTFail("Unexpected result to signTransaction request")
       return
     }
-    let serializedTx = result.compactMap({ Int32($0.intValue) })
+    let serializedTx = (result["serializedTx"] as? [NSNumber])?.compactMap({ Int32($0.intValue) }) ?? []
     XCTAssertEqual(serializedTx, kSerializedTx)
+    let version = result["version"] as? Int ?? -1
+    XCTAssertEqual(version, BraveWallet.SolanaMessageVersion.legacy.rawValue)
+  }
+  
+  /// Test `signTransaction()`, given a json string `{serializedMessage: Buffer, signatures: {publicKey: String, signature: Buffer}}`,
+  /// the success flow will return a tuple `(result: Any?, error: String?)` with the result as type `String` containing a json array of UInt8
+  func testSignTransactionSuccessVersionedTxV0() async {
+    let signature = MojoBase.Value(dictionaryValue: [
+      "publicKey": MojoBase.Value(stringValue: kTestPublicKey)
+    ])
+    let serializedMessage = MojoBase.Value(
+      listValue: kSerializedMessage.map { MojoBase.Value(intValue: $0) }
+    )
+    let transaction = MojoBase.Value(dictionaryValue: [
+      "serializedMessage" : serializedMessage,
+      "signatures" : MojoBase.Value(listValue: [signature])
+    ])
+    guard let args = transaction.jsonString else {
+      XCTFail("Unexpected test setup")
+      return
+    }
+    
+    let provider: BraveWallet.TestSolanaProvider = .init()
+    provider._signTransaction = { [kSerializedTx] _, completion in
+      completion(.success, "", kSerializedTx.map(NSNumber.init(value:)), .V0)
+    }
+    let tab = Tab(configuration: .init())
+    let solProviderHelper = SolanaProviderScriptHandler(tab: tab)
+    tab.walletSolProvider = provider
+    
+    let (result, error) = await solProviderHelper.signTransaction(args: args)
+    XCTAssertNil(error)
+    guard let result = result as? [String: Any] else {
+      XCTFail("Unexpected result to signTransaction request")
+      return
+    }
+    let serializedTx = (result["serializedTx"] as? [NSNumber])?.compactMap({ Int32($0.intValue) }) ?? []
+    XCTAssertEqual(serializedTx, kSerializedTx)
+    let version = result["version"] as? Int ?? -1
+    XCTAssertEqual(version, BraveWallet.SolanaMessageVersion.V0.rawValue)
   }
   
   /// Test `signAllTransactions()`, given a json string `[{serializedMessage: Buffer, signatures: {publicKey: String, signature: Buffer}}]`,
@@ -357,8 +403,11 @@ import XCTest
     let signature = MojoBase.Value(dictionaryValue: [
       "publicKey": MojoBase.Value(stringValue: kTestPublicKey)
     ])
+    let serializedMessage = MojoBase.Value(
+      listValue: kSerializedMessage.map { MojoBase.Value(intValue: $0) }
+    )
     let transaction = MojoBase.Value(dictionaryValue: [
-      "serializedMessage" : toBuffer(kSerializedMessage),
+      "serializedMessage" : serializedMessage,
       "signatures" : MojoBase.Value(listValue: [signature])
     ])
     guard let args = MojoBase.Value(listValue: [transaction]).jsonString else {
@@ -368,7 +417,7 @@ import XCTest
     
     let provider: BraveWallet.TestSolanaProvider = .init()
     provider._signAllTransactions = { _, completion in
-      completion(.internalError, "Internal error", [])
+      completion(.internalError, Strings.Wallet.internalErrorMessage, [], [])
     }
     let tab = Tab(configuration: .init())
     let solProviderHelper = SolanaProviderScriptHandler(tab: tab)
@@ -383,17 +432,20 @@ import XCTest
       return
     }
     XCTAssertEqual(code, Int32(BraveWallet.SolanaProviderError.internalError.rawValue))
-    XCTAssertEqual(message, "Internal error")
+    XCTAssertEqual(message, Strings.Wallet.internalErrorMessage)
   }
   
   /// Test `signAllTransactions()`, given a json string `[{serializedMessage: Buffer, signatures: {publicKey: String, signature: Buffer}}]`,
   /// the success flow will return a tuple `(result: Any?, error: String?)` with the result as type `String` containing a json 2-dimensional array of Uint8.
-  func testSignAllTransactionsSuccess() async {
+  func testSignAllTransactionsSuccessLegacyTx() async {
     let signature = MojoBase.Value(dictionaryValue: [
       "publicKey": MojoBase.Value(stringValue: kTestPublicKey)
     ])
+    let serializedMessage = MojoBase.Value(
+      listValue: kSerializedMessage.map { MojoBase.Value(intValue: $0) }
+    )
     let transaction = MojoBase.Value(dictionaryValue: [
-      "serializedMessage" : toBuffer(kSerializedMessage),
+      "serializedMessage" : serializedMessage,
       "signatures" : MojoBase.Value(listValue: [signature])
     ])
     guard let args = MojoBase.Value(listValue: [transaction]).jsonString else {
@@ -403,7 +455,12 @@ import XCTest
     
     let provider: BraveWallet.TestSolanaProvider = .init()
     provider._signAllTransactions = { [kSerializedTx] _, completion in
-      completion(.success, "", [kSerializedTx.map(NSNumber.init(value:))])
+      completion(
+        .success,
+        "",
+        [kSerializedTx.map(NSNumber.init(value:))],
+        [NSNumber(value: BraveWallet.SolanaMessageVersion.legacy.rawValue)]
+      )
     }
     let tab = Tab(configuration: .init())
     let solProviderHelper = SolanaProviderScriptHandler(tab: tab)
@@ -411,20 +468,59 @@ import XCTest
     
     let (result, error) = await solProviderHelper.signAllTransactions(args: args)
     XCTAssertNil(error)
-    guard let result = result as? [[NSNumber]] else {
+    guard let result = result as? [[String: Any]] else {
       XCTFail("Unexpected result to signAllTransactions request")
       return
     }
-    let serializedTxs = result.compactMap({ $0.compactMap({ Int32($0.intValue) }) })
+    
+    let serializedTxs = result.compactMap { ($0["serializedTx"] as? [NSNumber])?.compactMap({ Int32($0.intValue) }) }
     XCTAssertEqual(serializedTxs, [kSerializedTx])
+    let versions = result.compactMap { ($0["version"] as? Int) }
+    XCTAssertEqual(versions, [BraveWallet.SolanaMessageVersion.legacy.rawValue])
   }
   
-  /// Helper to create the `Buffer` received from javascript layer after passing through JSON.stringify().
-  private func toBuffer(_ array: [Int32]) -> MojoBase.Value {
-    MojoBase.Value(dictionaryValue: [
-      "type": MojoBase.Value(stringValue: "Buffer"),
-      "data": MojoBase.Value(listValue: array.map(MojoBase.Value.init(intValue:)))
+  /// Test `signAllTransactions()`, given a json string `[{serializedMessage: Buffer, signatures: {publicKey: String, signature: Buffer}}]`,
+  /// the success flow will return a tuple `(result: Any?, error: String?)` with the result as type `String` containing a json 2-dimensional array of Uint8.
+  func testSignAllTransactionsSuccessVersionedTxV0() async {
+    let signature = MojoBase.Value(dictionaryValue: [
+      "publicKey": MojoBase.Value(stringValue: kTestPublicKey)
     ])
+    let serializedMessage = MojoBase.Value(
+      listValue: kSerializedMessage.map { MojoBase.Value(intValue: $0) }
+    )
+    let transaction = MojoBase.Value(dictionaryValue: [
+      "serializedMessage" : serializedMessage,
+      "signatures" : MojoBase.Value(listValue: [signature])
+    ])
+    guard let args = MojoBase.Value(listValue: [transaction]).jsonString else {
+      XCTFail("Unexpected test setup")
+      return
+    }
+    
+    let provider: BraveWallet.TestSolanaProvider = .init()
+    provider._signAllTransactions = { [kSerializedTx] _, completion in
+      completion(
+        .success,
+        "",
+        [kSerializedTx.map(NSNumber.init(value:))],
+        [NSNumber(value: BraveWallet.SolanaMessageVersion.V0.rawValue)]
+      )
+    }
+    let tab = Tab(configuration: .init())
+    let solProviderHelper = SolanaProviderScriptHandler(tab: tab)
+    tab.walletSolProvider = provider
+    
+    let (result, error) = await solProviderHelper.signAllTransactions(args: args)
+    XCTAssertNil(error)
+    guard let result = result as? [[String: Any]] else {
+      XCTFail("Unexpected result to signAllTransactions request")
+      return
+    }
+    
+    let serializedTxs = result.compactMap { ($0["serializedTx"] as? [NSNumber])?.compactMap({ Int32($0.intValue) }) }
+    XCTAssertEqual(serializedTxs, [kSerializedTx])
+    let versions = result.compactMap { ($0["version"] as? Int) }
+    XCTAssertEqual(versions, [BraveWallet.SolanaMessageVersion.V0.rawValue])
   }
   
   private let kTestPublicKey = "test_base58_public_key"

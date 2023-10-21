@@ -12,18 +12,26 @@ import DesignSystem
 
 struct SuggestedNetworkView: View {
   enum Mode: Equatable {
-    case switchNetworks(chainId: String)
-    case addNetwork(BraveWallet.NetworkInfo)
+    case switchNetworks(BraveWallet.SwitchChainRequest)
+    case addNetwork(BraveWallet.AddChainRequest)
   }
   
   var mode: Mode
-  let originInfo: BraveWallet.OriginInfo
+  var originInfo: BraveWallet.OriginInfo {
+    switch mode {
+    case let .addNetwork(request):
+      return request.originInfo
+    case let .switchNetworks(request):
+      return request.originInfo
+    }
+  }
   var cryptoStore: CryptoStore
   @ObservedObject var keyringStore: KeyringStore
   @ObservedObject var networkStore: NetworkStore
   
   @State private var isPresentingNetworkDetails: CustomNetworkModel?
   @State private var customNetworkError: CustomNetworkError?
+  @State private var isLoading: Bool = false
   
   @ScaledMetric private var blockieSize = 24
   private let maxBlockieSize: CGFloat = 72
@@ -31,20 +39,18 @@ struct SuggestedNetworkView: View {
   private let maxFaviconSize: CGFloat = 96
 
   @Environment(\.sizeCategory) private var sizeCategory
-  @Environment(\.openWalletURLAction) private var openWalletURL
+  @Environment(\.openURL) private var openWalletURL
   
   var onDismiss: () -> Void
   
   init(
     mode: Mode,
-    originInfo: BraveWallet.OriginInfo,
     cryptoStore: CryptoStore,
     keyringStore: KeyringStore,
     networkStore: NetworkStore,
     onDismiss: @escaping () -> Void
   ) {
     self.mode = mode
-    self.originInfo = originInfo
     self.cryptoStore = cryptoStore
     self.keyringStore = keyringStore
     self.networkStore = networkStore
@@ -53,10 +59,10 @@ struct SuggestedNetworkView: View {
   
   private var chain: BraveWallet.NetworkInfo? {
     switch mode {
-    case let .addNetwork(chain):
-      return chain
-    case let .switchNetworks(chainId):
-      return networkStore.allChains.first(where: { $0.chainId == chainId })
+    case let .addNetwork(request):
+      return request.networkInfo
+    case let .switchNetworks(request):
+      return networkStore.allChains.first(where: { $0.chainId == request.chainId })
     }
   }
   
@@ -92,7 +98,7 @@ struct SuggestedNetworkView: View {
   @ViewBuilder private var faviconAndOrigin: some View {
     VStack(spacing: 8) {
       Group {
-        if let url = originInfo.origin.url {
+        if let url = URL(string: originInfo.originSpec) {
           FaviconReader(url: url) { image in
             if let image = image {
               Image(uiImage: image)
@@ -107,7 +113,7 @@ struct SuggestedNetworkView: View {
       }
       .frame(width: min(faviconSize, maxFaviconSize), height: min(faviconSize, maxFaviconSize))
       .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
-      Text(urlOrigin: originInfo.origin)
+      Text(originInfo: originInfo)
         .font(.subheadline)
         .foregroundColor(Color(.braveLabel))
         .multilineTextAlignment(.center)
@@ -122,7 +128,7 @@ struct SuggestedNetworkView: View {
         Button(action: {
           UIPasteboard.general.string = keyringStore.selectedAccount.address
         }) {
-          Label(Strings.Wallet.copyAddressButtonTitle, braveSystemImage: "brave.clipboard")
+          Label(Strings.Wallet.copyAddressButtonTitle, braveSystemImage: "leo.copy.plain-text")
             .font(.body)
         }
       } label: {
@@ -149,7 +155,7 @@ struct SuggestedNetworkView: View {
           .multilineTextAlignment(.center)
         if case .addNetwork = mode {
           Button {
-            openWalletURL?(BraveUX.braveWalletNetworkLearnMoreURL)
+            openWalletURL(.brave.support)
           } label: {
             Text(Strings.Wallet.learnMoreButton)
               .foregroundColor(Color(.braveBlurpleTint))
@@ -253,10 +259,20 @@ struct SuggestedNetworkView: View {
             Alert(
               title: Text(error.errorTitle),
               message: Text(error.errorDescription),
-              dismissButton: .default(Text(Strings.OKString))
+              dismissButton: .default(Text(Strings.OKString), action: onDismiss)
             )
           })
     )
+    .onAppear {
+      // this can occur when Add Network is dismissed while still loading...
+      // we need to show loading state again, and handle success/failure response
+      if case let .addNetwork(request) = mode,
+         cryptoStore.addNetworkDappRequestCompletion[request.networkInfo.chainId] != nil {
+        self.isLoading = true
+        // overwrite the completion closure with a new one for this new view instance
+        cryptoStore.addNetworkDappRequestCompletion[request.networkInfo.chainId] = handleAddNetworkCompletion
+      }
+    }
   }
   
   private var actionButtonTitle: String {
@@ -288,28 +304,48 @@ struct SuggestedNetworkView: View {
       }
     }
     .buttonStyle(BraveOutlineButtonStyle(size: .large))
-    Button(action: { // approve
-      handleAction(approved: true)
-    }) {
-      HStack {
-        Image(braveSystemName: "brave.checkmark.circle.fill")
-        Text(actionButtonTitle)
-          .multilineTextAlignment(.center)
+    .disabled(isLoading)
+    WalletLoadingButton(
+      isLoading: isLoading,
+      action: {  // approve
+        handleAction(approved: true)
+      },
+      label: {
+        HStack {
+          Image(braveSystemName: "leo.check.circle-filled")
+          Text(actionButtonTitle)
+            .multilineTextAlignment(.center)
+        }
       }
-    }
+    )
     .buttonStyle(BraveFilledButtonStyle(size: .large))
+    .disabled(isLoading)
   }
   
   private func handleAction(approved: Bool) {
+    isLoading = true
     switch mode {
-    case let .addNetwork(networkInfo):
+    case let .addNetwork(request):
       cryptoStore.handleWebpageRequestResponse(
-        .addNetwork(approved: approved, chainId: networkInfo.chainId)
+        .addNetwork(approved: approved, chainId: request.networkInfo.chainId),
+        completion: handleAddNetworkCompletion
       )
-    case .switchNetworks:
+    case let .switchNetworks(request):
       cryptoStore.handleWebpageRequestResponse(
-        .switchChain(approved: approved, originInfo: originInfo)
+        .switchChain(approved: approved, requestId: request.requestId),
+        completion: { _ in
+          isLoading = false
+          onDismiss()
+        }
       )
+    }
+  }
+  
+  private func handleAddNetworkCompletion(_ error: String?) {
+    isLoading = false
+    if let error, !error.isEmpty {
+      customNetworkError = .failed(errorMessage: error)
+      return
     }
     onDismiss()
   }
@@ -320,16 +356,25 @@ struct SuggestedNetworkView_Previews: PreviewProvider {
   static var previews: some View {
     Group {
       SuggestedNetworkView(
-        mode: .addNetwork(.mockGoerli),
-        originInfo: .init(origin: .init(url: URL(string: "https://app.uniswap.org")!), originSpec: "", eTldPlusOne: "uniswap.org"),
+        mode: .addNetwork(
+          .init(
+            originInfo: .init(originSpec: "https://app.uniswap.org", eTldPlusOne: "uniswap.org"),
+            networkInfo: .mockGoerli
+          )
+        ),
         cryptoStore: .previewStore,
         keyringStore: .previewStoreWithWalletCreated,
         networkStore: .previewStore,
         onDismiss: { }
       )
       SuggestedNetworkView(
-        mode: .switchNetworks(chainId: BraveWallet.GoerliChainId),
-        originInfo: .init(origin: .init(url: URL(string: "https://app.uniswap.org")!), originSpec: "", eTldPlusOne: "uniswap.org"),
+        mode: .switchNetworks(
+          .init(
+            requestId: UUID().uuidString,
+            originInfo: .init(originSpec: "https://app.uniswap.org", eTldPlusOne: "uniswap.org"),
+            chainId: BraveWallet.GoerliChainId
+          )
+        ),
         cryptoStore: .previewStore,
         keyringStore: .previewStoreWithWalletCreated,
         networkStore: .previewStore,

@@ -128,7 +128,7 @@ class SyncAddDeviceViewController: SyncViewController {
   init(title: String, type: SyncDeviceType, syncAPI: BraveSyncAPI) {
     self.syncAPI = syncAPI
     qrCodeView = SyncQRCodeView(syncApi: syncAPI)
-    super.init(nibName: nil, bundle: nil)
+    super.init()
 
     pageTitle = title
     deviceType = type
@@ -151,7 +151,7 @@ class SyncAddDeviceViewController: SyncViewController {
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     
-    if !syncAPI.isInSyncGroup {
+    if !syncAPI.isInSyncGroup && !syncAPI.isSyncFeatureActive && !syncAPI.isInitialSyncFeatureSetupComplete {
       showInitializationError()
     }
   }

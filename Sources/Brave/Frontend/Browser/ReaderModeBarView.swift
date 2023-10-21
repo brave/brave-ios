@@ -5,6 +5,8 @@
 import UIKit
 import SnapKit
 import Shared
+import Preferences
+import Combine
 
 protocol ReaderModeBarViewDelegate: AnyObject {
   func readerModeSettingsTapped(_ view: UIView)
@@ -15,22 +17,30 @@ class ReaderModeBarView: UIView {
 
   private let readerModeButton = UIButton(type: .system).then {
     $0.setTitle(Strings.readerModeButtonTitle, for: .normal)
-    $0.setTitleColor(.braveLabel, for: .normal)
     $0.titleLabel?.font = .preferredFont(forTextStyle: .subheadline)
     $0.accessibilityIdentifier = "ReaderModeBarView.readerModeSettingsButton"
   }
 
   private let settingsButton = UIButton(type: .system).then {
-    $0.setImage(UIImage(braveSystemNamed: "brave.slider.horizontal.3"), for: .normal)
-    $0.tintColor = .braveLabel
+    $0.setImage(UIImage(braveSystemNamed: "leo.tune"), for: .normal)
     $0.accessibilityIdentifier = "ReaderModeBarView.settingsButton"
   }
+  
+  private var privateBrowsingManager: PrivateBrowsingManager
 
-  override init(frame: CGRect) {
-    super.init(frame: frame)
-
-    backgroundColor = .urlBarBackground
-
+  private var cancellables: Set<AnyCancellable> = []
+  private func updateColors() {
+    let browserColors = privateBrowsingManager.browserColors
+    backgroundColor = browserColors.chromeBackground
+    settingsButton.tintColor = browserColors.iconDefault
+    readerModeButton.setTitleColor(browserColors.textPrimary, for: .normal)
+  }
+  
+  init(privateBrowsingManager: PrivateBrowsingManager) {
+    self.privateBrowsingManager = privateBrowsingManager
+    
+    super.init(frame: .zero)
+    
     addSubview(readerModeButton)
     readerModeButton.addTarget(self, action: #selector(tappedSettingsButton), for: .touchUpInside)
     readerModeButton.snp.makeConstraints {
@@ -50,6 +60,17 @@ class ReaderModeBarView: UIView {
       $0.trailing.equalToSuperview().inset(16)
       $0.centerY.equalToSuperview()
     }
+    
+    privateBrowsingManager
+      .$isPrivateBrowsing
+      .removeDuplicates()
+      .receive(on: RunLoop.main)
+      .sink(receiveValue: { [weak self] _ in
+        self?.updateColors()
+      })
+      .store(in: &cancellables)
+    
+    updateColors()
   }
 
   required init?(coder aDecoder: NSCoder) {

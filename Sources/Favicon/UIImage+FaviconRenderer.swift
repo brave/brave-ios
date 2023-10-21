@@ -49,7 +49,7 @@ extension UIImage {
       return false
     }
 
-    guard let cgImage = createScaled(CGSize(width: 48.0, height: 48.0)).cgImage else {
+    guard let cgImage = createScaled(CGSize(width: 48.0, height: 48.0))?.cgImage else {
       return false
     }
 
@@ -98,19 +98,32 @@ extension UIImage {
 
 // MARK: - Rendering
 extension UIImage {
+  private static let maxScaledFaviconSize = 256.0
+  
   /// Renders an image to a canvas with a background colour and passing
   @MainActor
   static func renderFavicon(_ image: UIImage, backgroundColor: UIColor?, shouldScale: Bool) async -> Favicon {
     if let cgImage = image.cgImage {
       let hasTransparentEdges = image.hasTransparentEdges
       
-      var padding = hasTransparentEdges ? 4.0 : 0.0
       var idealSize = image.size
+      var padding = hasTransparentEdges ? 4.0 : 0.0
+      
+      if shouldScale && max(idealSize.width, idealSize.height) > maxScaledFaviconSize {
+        let ratio = maxScaledFaviconSize / max(idealSize.width, idealSize.height)
+        idealSize.width *= ratio
+        idealSize.height *= ratio
+      }
+      
+      if shouldScale && hasTransparentEdges {
+        padding = max(idealSize.width, idealSize.height) * 0.20
+      }
+      
       if shouldScale && max(idealSize.width, idealSize.height) < 64.0 && min(idealSize.width, idealSize.height) > 0 {
         let ratio = 64.0 / min(idealSize.width, idealSize.height)
         idealSize.width *= ratio
         idealSize.height *= ratio
-        padding = hasTransparentEdges ? 10.0 : 0.0
+        padding = hasTransparentEdges ? max(idealSize.width, idealSize.height) * 0.20 : padding
       }
         
       let size = CGSize(
@@ -142,7 +155,7 @@ extension UIImage {
     let imageSize = CGSize(width: 64.0, height: 64.0)
 
     let createBackgroundColor = { (url: URL) -> UIColor in
-      guard let hash = url.baseDomain?.hashValue else {
+      guard let hash = url.baseDomain?.fnv1a else {
         return .gray
       }
       let index = abs(hash) % (UIConstants.defaultColorStrings.count - 1)
@@ -162,7 +175,7 @@ extension UIImage {
     let text = (monogramString ?? FaviconUtils.monogramLetter(
         for: url,
         fallbackCharacter: nil
-      )) as NSString
+    )).uppercased() as NSString
 
     let padding = 28.0
     let finalImage = await drawOnImageContext(size: imageSize) { context, rect in

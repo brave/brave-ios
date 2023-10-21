@@ -4,9 +4,13 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
-import BraveShared
+import Preferences
 import Growth
 import Data
+import BraveShields
+import BraveCore
+import Shared
+import os.log
 
 extension BrowserViewController {
   
@@ -41,7 +45,7 @@ extension BrowserViewController {
       // Q54 On how many domains has the user set the FP setting to be higher (block more) than the default?
       let fingerprintingAboveGlobalCount = Domain.totalDomainsWithFingerprintingProtectionIncreasedFromGlobal()
       UmaHistogramRecordValueToBucket("Brave.Shields.DomainFingerprintSettingsAboveGlobal", buckets: buckets, value: fingerprintingAboveGlobalCount)
-    case .AllOff, .NoScript, .SafeBrowsing:
+    case .AllOff, .NoScript:
       break
     }
   }
@@ -66,7 +70,7 @@ extension BrowserViewController {
   }
   
   func recordVPNUsageP3A(vpnEnabled: Bool) {
-    var usage = P3AFeatureUsage.braveVPNUsage
+    let usage = P3AFeatureUsage.braveVPNUsage
     var braveVPNDaysInMonthUsedStorage = P3ATimedStorage<Int>.braveVPNDaysInMonthUsedStorage
     
     if vpnEnabled {
@@ -90,8 +94,138 @@ extension BrowserViewController {
       ],
       value: braveVPNDaysInMonthUsedStorage.combinedValue
     )
+  }
+  
+  func recordAccessibilityDisplayZoomEnabledP3A() {
+    // Q100 Do you have iOS display zoom enabled?
+    let isDisplayZoomEnabled = UIScreen.main.scale < UIScreen.main.nativeScale
+    UmaHistogramBoolean("Brave.Accessibility.DisplayZoomEnabled", isDisplayZoomEnabled)
+  }
+  
+  func recordAccessibilityDocumentsDirectorySizeP3A() {
+    func fetchDocumentsAndDataSize() -> Int? {
+      let fileManager = FileManager.default
+      
+      var directorySize = 0
+      
+      if let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+        do {
+          if let documentsDirectorySize = try fileManager.directorySize(at: documentsDirectory) {
+            directorySize += Int(documentsDirectorySize / 1024 / 1024)
+          }
+        } catch {
+          Logger.module.error("Cant fetch document directory size")
+          return nil
+        }
+      }
+      
+      let temporaryDirectory = FileManager.default.temporaryDirectory
+      
+      do {
+        if let temporaryDirectorySize = try fileManager.directorySize(at: temporaryDirectory) {
+          directorySize += Int(temporaryDirectorySize / 1024 / 1024)
+        }
+      } catch {
+        Logger.module.error("Cant fetch temporary directory size")
+        return nil
+      }
+      
+      return directorySize
+    }
     
-    usage.recordReturningUsageMetric()
+    let buckets: [Bucket] = [
+      .r(0...50),
+      .r(50...200),
+      .r(200...500),
+      .r(500...1000),
+      .r(1000...),
+    ]
+    
+    // Q103 What is the document directory size in MB?
+    if let documentsSize = fetchDocumentsAndDataSize() {
+      UmaHistogramRecordValueToBucket("Brave.Core.DocumentsDirectorySizeMB", buckets: buckets, value: documentsSize)
+    }
+  }
+
+  func recordGeneralBottomBarLocationP3A() {
+    if UIDevice.isIpad {
+      return
+    }
+      
+    enum Answer: Int, CaseIterable {
+      case top = 0
+      case bottom = 1
+    }
+    
+    // Q101 Which location Bottom bar being used?
+    let answer: Answer = Preferences.General.isUsingBottomBar.value ? .bottom : .top
+    UmaHistogramEnumeration("Brave.General.BottomBarLocation", sample: answer)
+  }
+  
+  func recordTimeBasedNumberReaderModeUsedP3A(activated: Bool) {
+    var storage = P3ATimedStorage<Int>.readerModeActivated
+    if activated {
+      storage.add(value: 1, to: Date())
+    }
+    
+    // Q102- How many times did you use reader mode in the last 7 days?
+    UmaHistogramRecordValueToBucket(
+      "Brave.ReaderMode.NumberReaderModeActivated",
+      buckets: [
+        0,
+        .r(1...5),
+        .r(5...20),
+        .r(20...50),
+        .r(51...)
+      ],
+      value: storage.combinedValue
+    )
+  }
+  
+  func recordAdsUsageType() {
+    enum Answer: Int, CaseIterable {
+      case none = 0
+      case ntpOnly = 1
+      case pushOnly = 2
+      case ntpAndPush = 3
+    }
+    var answer: Answer = .none
+    if rewards.ads.isEnabled && Preferences.NewTabPage.backgroundSponsoredImages.value {
+      answer = .ntpAndPush
+    } else if rewards.ads.isEnabled {
+      answer = .pushOnly
+    } else if Preferences.NewTabPage.backgroundSponsoredImages.value {
+      answer = .ntpOnly
+    }
+    UmaHistogramEnumeration("Brave.Rewards.AdTypesEnabled", sample: answer)
+  }
+  
+  func recordNavigationActionP3A(isNavigationActionForward: Bool) {
+    var navigationActionStorage = P3ATimedStorage<Int>.navigationActionPerformedStorage
+    var forwardNavigationActionStorage = P3ATimedStorage<Int>.forwardNavigationActionPerformed
+    
+    navigationActionStorage.add(value: 1, to: Date())
+    let newNavigationActionStorage = navigationActionStorage.combinedValue
+    
+    if isNavigationActionForward {
+      forwardNavigationActionStorage.add(value: 1, to: Date())
+    }
+    
+    if newNavigationActionStorage > 0 {
+      let navigationForwardPercent = Int((Double(forwardNavigationActionStorage.combinedValue) / Double(newNavigationActionStorage)) * 100.0)
+      UmaHistogramRecordValueToBucket(
+        "Brave.Toolbar.ForwardNavigationAction",
+        buckets: [
+          .r(0..<1),
+          .r(1..<3),
+          .r(3..<5),
+          .r(5..<10),
+          .r(10..<20),
+          .r(20...)
+        ],
+        value: navigationForwardPercent
+      )
+    }
   }
 }
 
@@ -107,4 +241,7 @@ extension P3ATimedStorage where Value == Int {
   /// Holds timed storage for question 21 (`Brave.Savings.BandwidthSavingsMB`)
   fileprivate static var dataSavedStorage: Self { .init(name: "data-saved", lifetimeInDays: 7) }
   fileprivate static var braveVPNDaysInMonthUsedStorage: Self { .init(name: "vpn-days-in-month-used", lifetimeInDays: 30) }
+  fileprivate static var readerModeActivated: Self { .init(name: "reader-mode-activated", lifetimeInDays: 7) }
+  fileprivate static var navigationActionPerformedStorage: Self { .init(name: "navigation-action-performed", lifetimeInDays: 7) }
+  fileprivate static var forwardNavigationActionPerformed: Self { .init(name: "forward-navigation-action-performed", lifetimeInDays: 7) }
 }

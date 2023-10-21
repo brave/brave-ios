@@ -6,8 +6,8 @@
 import WidgetKit
 import SwiftUI
 import Strings
-import BraveShared
 import BraveWidgetsModels
+import FaviconModels
 
 struct FavoritesWidget: Widget {
   var body: some WidgetConfiguration {
@@ -17,6 +17,9 @@ struct FavoritesWidget: Widget {
     .configurationDisplayName(Strings.Widgets.favoritesWidgetTitle)
     .description(Strings.Widgets.favoritesWidgetDescription)
     .supportedFamilies([.systemMedium, .systemLarge])
+#if swift(>=5.9)
+    .contentMarginsDisabled()
+#endif
   }
 }
 
@@ -82,7 +85,7 @@ private struct FavoritesView: View {
       }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(Color(UIColor.secondaryBraveBackground))
+    .widgetBackground { Color(UIColor.secondaryBraveBackground) }
   }
 }
 
@@ -99,10 +102,8 @@ private struct FavoritesGridView: View {
       return 8
     case .systemLarge:
       return 16
-    case .systemSmall, .systemExtraLarge:
+    default:
       assertionFailure("widget family isn't supported")
-      return 0
-    @unknown default:
       return 0
     }
   }
@@ -123,11 +124,12 @@ private struct FavoritesGridView: View {
   }
 
   private var placeholderOrPrivacyRedaction: Bool {
-    if #available(iOS 15, *) {
-      return redactionReasons.contains(.placeholder) || redactionReasons.contains(.privacy)
-    } else {
-      return redactionReasons.contains(.placeholder)
-    }
+    redactionReasons.contains(.placeholder) || redactionReasons.contains(.privacy)
+  }
+  
+  func image(for favicon: Favicon) -> UIImage? {
+    guard let image = favicon.image else { return nil }
+    return image.preparingThumbnail(of: CGSize(width: 128, height: 128))
   }
 
   var body: some View {
@@ -138,7 +140,7 @@ private struct FavoritesGridView: View {
             destination: favorite.url,
             label: {
               Group {
-                if let attributes = favorite.favicon, let image = attributes.image {
+                if let attributes = favorite.favicon, let image = image(for: attributes) {
                   FaviconImage(image: image, contentMode: .scaleAspectFit, includePadding: false)
                     .background(Color(attributes.backgroundColor))
                 } else {
@@ -155,7 +157,7 @@ private struct FavoritesGridView: View {
               .background(Color(UIColor.braveBackground).opacity(0.05).clipShape(itemShape))
               .overlay(
                 itemShape
-                  .strokeBorder(Color(UIColor.braveSeparator).opacity(0.1), lineWidth: pixelLength)
+                  .strokeBorder(Color(UIColor.braveLabel).opacity(0.2), lineWidth: pixelLength)
               )
               .padding(widgetFamily == .systemMedium ? 4 : 0)
             })

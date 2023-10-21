@@ -5,7 +5,7 @@
 
 import SwiftUI
 import Shared
-import BraveShared
+import Preferences
 import Data
 import CoreData
 import BraveUI
@@ -113,7 +113,6 @@ struct PageZoomSettingsView: View {
       }
     }
     .listBackgroundColor(Color(UIColor.braveGroupedBackground))
-    .navigationTitle(Strings.PageZoom.settingsTitle)
     .navigationBarTitleDisplayMode(.inline)
     .listStyle(.insetGrouped)
   }

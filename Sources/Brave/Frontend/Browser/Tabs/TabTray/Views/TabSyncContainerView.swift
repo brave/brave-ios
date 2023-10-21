@@ -28,7 +28,7 @@ extension TabTrayController {
     override init(frame: CGRect) {
       super.init(frame: frame)
       
-      backgroundColor = .braveBackground
+      backgroundColor = .clear
       
       addSubview(tableView)
       tableView.snp.makeConstraints { make in
@@ -38,20 +38,18 @@ extension TabTrayController {
       tableView.do {
         $0.register(TabSyncTableViewCell.self)
         $0.registerHeaderFooter(TabSyncHeaderView.self)
-        $0.backgroundColor = .secondaryBraveBackground
+        $0.backgroundColor = .clear
         $0.estimatedRowHeight = SiteTableViewControllerUX.rowHeight
         $0.estimatedSectionHeaderHeight = SiteTableViewControllerUX.rowHeight
         $0.separatorColor = .braveSeparator
         $0.cellLayoutMarginsFollowReadableWidth = false
-        if #available(iOS 15.0, *) {
-          $0.sectionHeaderTopPadding = UX.sectionTopPadding
-        }
+        $0.sectionHeaderTopPadding = UX.sectionTopPadding
       }
       
       let tableTitleLabel = UILabel().then {
         $0.textColor = .braveLabel
         $0.textAlignment = .left
-        $0.font = .preferredFont(forTextStyle: .title2, weight: .bold)
+        $0.font = .preferredFont(for: .title2, weight: .bold)
         $0.text = Strings.OpenTabs.openTabsListTableHeaderTitle
       }
                  

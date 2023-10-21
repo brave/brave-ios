@@ -9,7 +9,7 @@ import Shared
 import BraveShared
 import os.log
 
-extension BraveLedger {
+extension BraveRewardsAPI {
 
   public var isLedgerTransferExpired: Bool {
     if Locale.current.regionCode != "JP" {
@@ -28,30 +28,27 @@ extension BraveLedger {
     }
     return now >= deadlineDate
   }
-  
-  // TODO: Remove Fake transferrableAmount function while changing legacy wallet transfer
-  public func transferrableAmount(_ completion: @escaping (Int) -> Void) {
-    completion(0)
-  }
 
-  public func listAutoContributePublishers(_ completion: @escaping (_ publishers: [Ledger.PublisherInfo]) -> Void) {
-    let filter: Ledger.ActivityInfoFilter = {
-      let sort = Ledger.ActivityInfoFilterOrderPair().then {
-        $0.propertyName = "percent"
-        $0.ascending = false
+  public func listAutoContributePublishers(_ completion: @escaping (_ publishers: [BraveCore.BraveRewards.PublisherInfo]) -> Void) {
+    fetchAutoContributeProperties { autoContributeProperties in
+      let filter: BraveCore.BraveRewards.ActivityInfoFilter = {
+        let sort = BraveCore.BraveRewards.ActivityInfoFilterOrderPair().then {
+          $0.propertyName = "percent"
+          $0.ascending = false
+        }
+        let filter = BraveCore.BraveRewards.ActivityInfoFilter().then {
+          $0.id = ""
+          $0.excluded = .filterAllExceptExcluded
+          $0.percent = 1  // exclude 0% sites.
+          $0.orderBy = [sort]
+          $0.nonVerified = false
+          $0.reconcileStamp = autoContributeProperties?.reconcileStamp ?? 0
+        }
+        return filter
+      }()
+      self.listActivityInfo(fromStart: 0, limit: 0, filter: filter) { list in
+        completion(list)
       }
-      let filter = Ledger.ActivityInfoFilter().then {
-        $0.id = ""
-        $0.excluded = .filterAllExceptExcluded
-        $0.percent = 1  // exclude 0% sites.
-        $0.orderBy = [sort]
-        $0.nonVerified = allowUnverifiedPublishers
-        $0.reconcileStamp = autoContributeProperties?.reconcileStamp ?? 0
-      }
-      return filter
-    }()
-    listActivityInfo(fromStart: 0, limit: 0, filter: filter) { list in
-      completion(list)
     }
   }
 
@@ -69,11 +66,9 @@ extension BraveLedger {
         return
       }
 
-      self.minimumVisitDuration = 8
-      self.minimumNumberOfVisits = 1
-      self.allowVideoContributions = true
-      self.allowUnverifiedPublishers = false
-      self.contributionAmount = Double.greatestFiniteMagnitude
+      self.setMinimumVisitDuration(8)
+      self.setMinimumNumberOfVisits(1)
+      self.setContributionAmount(Double.greatestFiniteMagnitude)
 
       let group = DispatchGroup()
       var success = true
@@ -133,7 +128,7 @@ extension BraveLedger {
     }
   }
 
-  @MainActor public func claimPromotion(_ promotion: Ledger.Promotion) async -> Bool {
+  @MainActor public func claimPromotion(_ promotion: BraveCore.BraveRewards.Promotion) async -> Bool {
     guard let paymentId = await fetchPaymentId() else {
       return false
     }
@@ -154,7 +149,7 @@ extension BraveLedger {
     }
     return await withCheckedContinuation { c in
       self.claimPromotion(promotion.id, publicKey: attestation.publicKeyHash) { result, nonce in
-        if result != .ledgerOk {
+        if result != .ok {
           c.resume(returning: false)
           return
         }
@@ -166,7 +161,7 @@ extension BraveLedger {
           solution.blob = try verification.attestationBlob.bsonData().base64EncodedString()
           
           self.attestPromotion(promotion.id, solution: solution) { result, promotion in
-            if result == .ledgerOk {
+            if result == .ok {
               self.updatePendingAndFinishedPromotions {
                 c.resume(returning: true)
               }

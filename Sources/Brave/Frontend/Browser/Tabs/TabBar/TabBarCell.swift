@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
-import BraveShared
+import Preferences
 import Combine
 
 class TabBarCell: UICollectionViewCell {
@@ -23,14 +23,12 @@ class TabBarCell: UICollectionViewCell {
     button.imageEdgeInsets.left = 6
     return button
   }()
-
-  private let separatorLine = UIView().then {
-    $0.backgroundColor = .urlBarSeparator
-  }
-
-  let separatorLineRight = UIView().then {
-    $0.backgroundColor = .urlBarSeparator
-    $0.isHidden = true
+  
+  private let highlightView = UIView().then {
+    $0.layer.cornerRadius = 4
+    $0.layer.cornerCurve = .continuous
+    $0.layer.shadowOffset = CGSize(width: 0, height: 1)
+    $0.layer.shadowRadius = 2
   }
 
   var currentIndex: Int = -1 {
@@ -39,54 +37,41 @@ class TabBarCell: UICollectionViewCell {
     }
   }
   weak var tab: Tab?
-  weak var tabManager: TabManager?
+  weak var tabManager: TabManager? {
+    didSet {
+      updateColors()
+      privateModeCancellable = tabManager?.privateBrowsingManager
+        .$isPrivateBrowsing
+        .removeDuplicates()
+        .receive(on: RunLoop.main)
+        .sink(receiveValue: { [weak self] _ in
+          self?.updateColors()
+        })
+    }
+  }
 
   var closeTabCallback: ((Tab) -> Void)?
   private var cancellables: Set<AnyCancellable> = []
 
-  private let deselectedOverlayView = UIView().then {
-    $0.backgroundColor = UIColor {
-      if $0.userInterfaceStyle == .dark {
-        return UIColor.black.withAlphaComponent(0.25)
-      }
-      return UIColor.black.withAlphaComponent(0.1)
-    }
-  }
-
   override init(frame: CGRect) {
     super.init(frame: frame)
-    backgroundColor = Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
     
-    [deselectedOverlayView, closeButton, titleLabel, separatorLine, separatorLineRight].forEach { contentView.addSubview($0) }
+    [highlightView, closeButton, titleLabel].forEach { contentView.addSubview($0) }
     initConstraints()
     updateFont()
     
     isSelected = false
-    privateModeCancellable = PrivateBrowsingManager.shared
-      .$isPrivateBrowsing
-      .removeDuplicates()
-      .sink(receiveValue: { [weak self] isPrivateBrowsing in
-        self?.updateColors(isPrivateBrowsing)
-      })
-    
-    Preferences.General.nightModeEnabled.objectWillChange
-      .receive(on: RunLoop.main)
-      .sink { [weak self] _ in
-        self?.updateColors(PrivateBrowsingManager.shared.isPrivateBrowsing)
-      }
-      .store(in: &cancellables)
   }
 
   private var privateModeCancellable: AnyCancellable?
-  private func updateColors(_ isPrivateBrowsing: Bool) {
-    if isPrivateBrowsing {
-      overrideUserInterfaceStyle = .dark
-      backgroundColor = .privateModeBackground
-    } else {
-      overrideUserInterfaceStyle = DefaultTheme(
-        rawValue: Preferences.General.themeNormalMode.value)?.userInterfaceStyleOverride ?? .unspecified
-      backgroundColor = Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
-    }
+  private func updateColors() {
+    let browserColors: any BrowserColors = tabManager?.privateBrowsingManager.browserColors ?? .standard
+    backgroundColor = browserColors.tabBarTabBackground
+    highlightView.backgroundColor = isSelected ? browserColors.tabBarTabActiveBackground : .clear
+    highlightView.layer.shadowOpacity = isSelected ? 0.05 : 0.0
+    highlightView.layer.shadowColor = UIColor.black.cgColor
+    closeButton.tintColor = browserColors.iconDefault
+    titleLabel.textColor = isSelected ? browserColors.textPrimary : browserColors.textSecondary
   }
 
   required init?(coder aDecoder: NSCoder) {
@@ -94,10 +79,10 @@ class TabBarCell: UICollectionViewCell {
   }
 
   private func initConstraints() {
-    deselectedOverlayView.snp.makeConstraints {
-      $0.edges.equalToSuperview()
+    highlightView.snp.makeConstraints {
+      $0.edges.equalToSuperview().inset(2)
     }
-
+    
     titleLabel.snp.makeConstraints { make in
       make.top.bottom.equalTo(self)
       make.left.equalTo(self).inset(16)
@@ -109,20 +94,6 @@ class TabBarCell: UICollectionViewCell {
       make.right.equalTo(self).inset(2)
       make.width.equalTo(30)
     }
-
-    separatorLine.snp.makeConstraints { make in
-      make.left.equalTo(self)
-      make.width.equalTo(0.5)
-      make.height.equalTo(self)
-      make.centerY.equalTo(self.snp.centerY)
-    }
-
-    separatorLineRight.snp.makeConstraints { make in
-      make.right.equalTo(self)
-      make.width.equalTo(0.5)
-      make.height.equalTo(self)
-      make.centerY.equalTo(self.snp.centerY)
-    }
   }
 
   override var isSelected: Bool {
@@ -133,21 +104,16 @@ class TabBarCell: UICollectionViewCell {
 
   func configure() {
     if isSelected {
-      titleLabel.font = UIFont.systemFont(ofSize: 12, weight: UIFont.Weight.semibold)
       titleLabel.alpha = 1.0
-      titleLabel.textColor = .bravePrimary
       closeButton.isHidden = false
-      deselectedOverlayView.isHidden = true
     }
     // Prevent swipe and release outside- deselects cell.
     else if currentIndex != tabManager?.currentDisplayedIndex {
-      titleLabel.font = UIFont.systemFont(ofSize: 12)
       titleLabel.alpha = 0.8
-      titleLabel.textColor = .braveLabel
       closeButton.isHidden = true
-      deselectedOverlayView.isHidden = false
     }
     updateFont()
+    updateColors()
   }
   
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -177,5 +143,11 @@ class TabBarCell: UICollectionViewCell {
       strongSelf.titleUpdateScheduled = false
       strongSelf.titleLabel.text = tab.displayTitle
     }
+  }
+  
+  override func layoutSubviews() {
+    super.layoutSubviews()
+    
+    highlightView.layer.shadowPath = UIBezierPath(roundedRect: highlightView.bounds, cornerRadius: 4).cgPath
   }
 }

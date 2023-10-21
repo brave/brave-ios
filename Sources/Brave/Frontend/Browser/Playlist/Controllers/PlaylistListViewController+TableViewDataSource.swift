@@ -11,9 +11,10 @@ import AVFoundation
 import Data
 import Shared
 import BraveUI
-import BraveShared
+import Preferences
 import Favicon
 import os.log
+import Playlist
 
 // MARK: UITableViewDataSource
 
@@ -26,7 +27,7 @@ extension PlaylistListViewController: UITableViewDataSource {
 
   func getAssetDurationFormatted(item: PlaylistInfo, _ completion: @escaping (String) -> Void) {
     PlaylistManager.shared.getAssetDuration(item: item) { duration in
-      let domain = URL(string: item.pageSrc)?.baseDomain ?? "0\(Strings.shieldsTimeStatsSeconds)"
+      let domain = URL(string: item.pageSrc)?.baseDomain ?? "0\(Strings.Shields.shieldsTimeStatsSeconds)"
       if let duration = duration {
         if duration.isInfinite {
           // Live video/audio
@@ -94,7 +95,7 @@ extension PlaylistListViewController: UITableViewDataSource {
       cell.do {
         $0.showsReorderControl = false
         $0.setTitle(title: item.name)
-        $0.setDetails(details: URL(string: item.pageSrc)?.baseDomain ?? "0\(Strings.shieldsTimeStatsSeconds)")
+        $0.setDetails(details: URL(string: item.pageSrc)?.baseDomain ?? "0\(Strings.Shields.shieldsTimeStatsSeconds)")
         $0.setContentSize(parentController: self)
         
         if let url = URL(string: item.pageSrc) {
@@ -119,7 +120,7 @@ extension PlaylistListViewController: UITableViewDataSource {
     cell.do {
       $0.showsReorderControl = false
       $0.titleLabel.text = item.name
-      $0.detailLabel.text = URL(string: item.pageSrc)?.baseDomain ?? "0\(Strings.shieldsTimeStatsSeconds)"
+      $0.detailLabel.text = URL(string: item.pageSrc)?.baseDomain ?? "0\(Strings.Shields.shieldsTimeStatsSeconds)"
       $0.contentView.backgroundColor = .clear
       $0.backgroundColor = .clear
       $0.iconView.image = nil
@@ -215,7 +216,7 @@ extension PlaylistListViewController: UITableViewDataSource {
               let folderId = folder.uuid
         else { return nil }
         
-        let syncAction = UIAction(title: Strings.PlaylistFolderSharing.syncNowMenuTitle, image: UIImage(braveSystemNamed: "brave.arrow.triangle.2.circlepath")?.template) { _ in
+        let syncAction = UIAction(title: Strings.PlaylistFolderSharing.syncNowMenuTitle, image: UIImage(braveSystemNamed: "leo.refresh")?.template) { _ in
           guard let sharedFolderUrl = folder.sharedFolderUrl else {
             Logger.module.error("Invalid Playlist Shared Folder URL")
             return
@@ -235,11 +236,11 @@ extension PlaylistListViewController: UITableViewDataSource {
           }
         }
         
-        let editAction = UIAction(title: Strings.PlaylistFolderSharing.editMenuTitle, image: UIImage(braveSystemNamed: "brave.edit")?.template) { [unowned self] _ in
+        let editAction = UIAction(title: Strings.PlaylistFolderSharing.editMenuTitle, image: UIImage(braveSystemNamed: "leo.edit.pencil")?.template) { [unowned self] _ in
           self.onEditItems()
         }
         
-        let renameAction = UIAction(title: Strings.PlaylistFolderSharing.renameMenuTitle, image: UIImage(braveSystemNamed: "brave.letter.folder")?.template) { [unowned self] _ in
+        let renameAction = UIAction(title: Strings.PlaylistFolderSharing.renameMenuTitle, image: UIImage(braveSystemNamed: "leo.folder.text")?.template) { [unowned self] _ in
           let folderID = folder.objectID
           var editView = PlaylistEditFolderView(currentFolder: folderID, currentFolderTitle: folder.title ?? "")
 
@@ -293,7 +294,7 @@ extension PlaylistListViewController: UITableViewDataSource {
           }
         }
         
-        let saveOfflineAction = UIAction(title: Strings.PlaylistFolderSharing.saveOfflineDataMenuTitle, image: UIImage(braveSystemNamed: "brave.cloud.and.arrow.down")?.template) { [unowned self] _ in
+        let saveOfflineAction = UIAction(title: Strings.PlaylistFolderSharing.saveOfflineDataMenuTitle, image: UIImage(braveSystemNamed: "leo.cloud.download")?.template) { [unowned self] _ in
           folder.playlistItems?.forEach {
             PlaylistManager.shared.download(item: PlaylistInfo(item: $0))
           }
@@ -301,7 +302,7 @@ extension PlaylistListViewController: UITableViewDataSource {
           self.tableView.reloadData()
         }
         
-        let deleteOfflineAction = UIAction(title: Strings.PlaylistFolderSharing.deleteOfflineDataMenuTitle, image: UIImage(braveSystemNamed: "brave.cloud.slash")?.template) { [unowned self] _ in
+        let deleteOfflineAction = UIAction(title: Strings.PlaylistFolderSharing.deleteOfflineDataMenuTitle, image: UIImage(braveSystemNamed: "leo.cloud.off")?.template) { [unowned self] _ in
           folder.playlistItems?.forEach {
             PlaylistManager.shared.deleteCache(item: PlaylistInfo(item: $0))
           }
@@ -309,7 +310,7 @@ extension PlaylistListViewController: UITableViewDataSource {
           self.tableView.reloadData()
         }
         
-        let deleteAction = UIAction(title: Strings.PlaylistFolderSharing.deletePlaylistMenuTitle, image: UIImage(braveSystemNamed: "brave.trash")?.template, attributes: .destructive) { [unowned self] _ in
+        let deleteAction = UIAction(title: Strings.PlaylistFolderSharing.deletePlaylistMenuTitle, image: UIImage(braveSystemNamed: "leo.trash")?.template, attributes: .destructive) { [unowned self] _ in
           
           PlaylistManager.shared.delete(folder: folder) { success in
             if success {

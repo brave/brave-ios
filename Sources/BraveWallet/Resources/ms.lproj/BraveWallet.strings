@@ -10,6 +10,9 @@
 /* The title displayed on the account details screen */
 "wallet.accountDetailsTitle" = "Butiran Akaun";
 
+/* The error shown below the account name field when adding or renaming a wallet account if the length is longer than 30 characters. */
+"wallet.accountNameLengthError" = "Nama akaun mestilah tidak melebihi 30 aksara";
+
 /* A button title for displaying their accounts private key */
 "wallet.accountPrivateKey" = "Kunci Peribadi";
 
@@ -27,6 +30,15 @@
 
 /* The title of the button at the bottom of Swap Screen, when the sell token is erc20 and it has not been activated its allowance. %@ will be replaced with the sell token's symbol such as 'DAI' or 'USDC' */
 "wallet.activateToken" = "Aktifkan Token %@";
+
+/* The description when showing no transactions inside Activity tab. */
+"wallet.activityPageEmptyDescription" = "Setelah anda membuat transaksi, anda akan dapat melihat transaksi ini di sini.";
+
+/* The title when showing no transactions inside Activity tab. */
+"wallet.activityPageEmptyTitle" = "Tiada transaksi untuk dilihat lagi";
+
+/* The title of the tab that will display user's transaction activity for all accounts. */
+"wallet.activityPageTitle" = "Aktiviti";
 
 /* The title of the button which when tapped will add a new account to the users list of crypto accounts. It will be used as the title of the navigation bar item button on the top right of the add custom token scree. */
 "wallet.addAccountAddButton" = "Tambah";
@@ -88,8 +100,11 @@
 /* The title of the button that is displayed under the total gas fee in the confirmation transaction screen. Users can click it to go to advanced settings screen. */
 "wallet.advancedSettingsTransaction" = "Tetapan lanjutan";
 
-/* The title of the option to filter by all networks, displayed in a view to filter assets between 'All Networks' or a specific Crypto network. */
-"wallet.allNetworksTitle" = "Semua Rangkaian";
+/* The label of badge beside the filter option that allows users to select which accounts to filter assets by, when all accounts are selected. Used in Portfolio/NFT filters and display settings. */
+"wallet.allAccountsLabel" = "Semua akaun";
+
+/* The label of badge beside the filter option that allows users to select which networks to filter assets by, when all networks are selected. Used in Portfolio/NFT filters and display settings. */
+"wallet.allNetworksLabel" = "Semua rangkaian";
 
 /* A title displayed above two numbers (the amount and transaction fee) showing the user the breakdown of the amount transferred and transaction fee for any Solana transaction. The \"+\" is a literal plus as the label below will show such as \"0.004 SOL + 0.00064 SOL\" */
 "wallet.amountAndFee" = "Amaun + Yuran";
@@ -111,6 +126,9 @@
 
 /* The title which is displayed above a list of assets/tokens */
 "wallet.assetsTitle" = "Aset";
+
+/* The title of the sort option that sorts alphabetically from A to Z. Used in Portfolio/NFT filters and display settings. */
+"wallet.aToZSortOption" = "A hingga Z";
 
 /* The description of the alert that will show up when users click on `Bridge to Aurora` button inside asset details screen for tokens that support briding to `Aurora`. This will displayed right below `auroraBridgeAlertTitle`. */
 "wallet.auroraBridgeAlertDescription" = "Rainbow Bridge adalah perkhidmatan bebas yang membantu anda menghubung aset ke seluruh rangkaian dan menggunakan kripto anda pada rangkaian lain dan ekosistem DApp. Penghubungan aset kepada rangkaian lain mempunyai beberapa risiko.";
@@ -139,20 +157,20 @@
 /* The title that will be displayed when long-pressing the back button in the navigation bar. As in the a list of words to recovery your account on another device/wallet */
 "wallet.backupRecoveryPhraseBackButtonTitle" = "Frasa Pemulihan";
 
-/* The disclaimer next to a toggle that the user must acknowledge before proceeding */
-"wallet.backupRecoveryPhraseDisclaimer" = "Saya sudah simpan catatan frasa saya di tempat yang selamat.";
-
 /* The subtitle of the backup recovery phrase screen */
-"wallet.backupRecoveryPhraseSubtitle" = "Catat atau salin perkataan ini dalam tertib yang sama seperti yang ditunjukkan di bawah, kemudian simpan di tempat yang selamat. Frasa pemulihan anda adalah satu-satunya cara untuk mendapatkan kembali capaian akaun anda sekiranya terlupa kata laluan, peranti hilang atau dicuri, atau anda ingin menukar dompet.";
+"wallet.backupRecoveryPhraseSubtitle" = "Frasa pemulihan anda ialah kunci untuk mengakses dompet anda sekiranya anda terlupa kata laluan anda atau kehilangan peranti anda.\n\nSimpan di tempat selamat yang tidak boleh diakses oleh orang lain dan elakkan daripada berkongsi maklumat itu dengan sesiapa.";
 
 /* The title of the backup recovery phrase screen */
-"wallet.backupRecoveryPhraseTitle" = "Frasa pemulihan anda";
+"wallet.backupRecoveryPhraseTitle" = "Simpan Frasa Pemulihan";
 
-/* The first part of the warning displayed on the backup recovery phrase page. As in to pay attention to the following text */
-"wallet.backupRecoveryPhraseWarningPartOne" = "AMARAN:";
+/* The title of the button that user will tap to skip the verifying recovery phrases step. */
+"wallet.backupSkipButtonTitle" = "Saya akan sandarkan kemudian";
 
-/* The second part of the warning displayed on the backup recovery phrase page. */
-"wallet.backupRecoveryPhraseWarningPartTwo" = "Jangan sekali-kali kongsikan frasa pemulihan anda. Sesiapa yang tahu frasa ini boleh mengambil aset anda selama-lamanya.";
+/* The sub-title on the pop up when user decides to skip backup recovery phrases. */
+"wallet.backupSkipPromptSubTitle" = "Untuk memastikan akaun anda selamat, pastikan anda membuat sandaran frasa pemulihan anda.";
+
+/* The title on the pop up when user decides to skip backup recovery phrases. */
+"wallet.backupSkipPromptTitle" = "Anda boleh melangkau langkah ini sekarang tetapi anda masih perlu membuat sandaran frasa pemulihan anda demi memastikan keselamatan akaun.";
 
 /* The title that will be displayed when long-pressing the back button in the navigation bar */
 "wallet.backupWalletBackButtonTitle" = "Sandarkan Dompet";
@@ -172,8 +190,8 @@
 /* The message displayed on the crypto tab if you have not yet completed the backup process */
 "wallet.backupWalletWarningMessage" = "Sandarkan dompet anda sekarang untuk melindungi aset kripto anda dan memastikan anda tidak sekali-kali akan kehilangan capaian.";
 
-/* The button title that enables the biometric unlock feature */
-"wallet.biometricsSetupEnableButtonTitle" = "Dayakan";
+/* The button title that enables the biometric unlock feature. %@` will be replaced with the biometric type name of the current device. */
+"wallet.biometricsSetupEnableButtonTitle" = "Gunakan %@";
 
 /* The message of an alert when the user has an error setting up biometric unlock */
 "wallet.biometricsSetupErrorMessage" = "Terdapat ralat semasa cuba mendayakan proses buka kunci biometrik. Sila cuba lagi nanti.";
@@ -181,8 +199,17 @@
 /* The title of an alert when the user has an error setting up biometric unlock */
 "wallet.biometricsSetupErrorTitle" = "Gagal mendayakan proses buka kunci biometrik.";
 
-/* The title shown when a user is asked if they would like to setup biometric unlock */
-"wallet.biometricsSetupTitle" = "Buka kunci Brave Wallet menggunakan Face ID, Touch ID atau kata laluan anda.";
+/* Type of biometrics. This will be used in Biometric setup screen. */
+"wallet.biometricsSetupFaceId" = "ID Muka";
+
+/* The sub-title shown when a user is asked if they would like to setup biometric unlock. `%@` will be replaced with the biometric type name of the current device. */
+"wallet.biometricsSetupSubTitle" = "Adakah anda ingin menggunakan %@ untuk membuka kunci Dompet Brave?";
+
+/* The title shown when a user is asked if they would like to setup biometric unlock. `%@` will be replaced with the biometric type name of the current device. */
+"wallet.biometricsSetupTitle" = "Buka kunci Dompet Brave dengan %@";
+
+/* Type of biometrics. This will be used in Biometric setup screen. */
+"wallet.biometricsSetupTouchId" = "ID Sentuhan";
 
 /* A disclaimer that appears at the bottom of an swap screen which discloses the fixed Brave fee included in the swap quotes. '%@' will be replaced by a percentage. For example: 'Quote includes a 0.875% Brave fee' */
 "wallet.braveSwapFeeDisclaimer" = "Sebut harga termasuk %@ yuran Brave.";
@@ -199,8 +226,26 @@
 /* The y-axis label on an asset or portfolio chart describing that y-axis values are based on the price at a given date */
 "wallet.chartAxisPriceLabel" = "Harga";
 
+/* The description of one of the 'Coinbase Pay' provider. */
+"wallet.coinbaseNetworkProviderDescription" = "Beli dengan nama paling dipercayai dalam kripto.";
+
 /* A disclaimer that appears at the bottom of an asset detail screen which shows prices and price history. CoinGecko is a third-party product. */
 "wallet.coinGeckoDisclaimer" = "Data harga dikuasakan oleh CoinGecko";
+
+/* The title of the 24h volume of this coin from market. */
+"wallet.coinMarket24HVolume" = "Kelantangan 24j";
+
+/* The message will be displayed when there is no coin market loaded or having an error. */
+"wallet.coinMarketEmptyMsg" = "Tiada maklumat pasaran tersedia lagi";
+
+/* The header title of the section that display coin market information. */
+"wallet.coinMarketInformation" = "Maklumat";
+
+/* The title of the market cap of this coin from market. */
+"wallet.coinMarketMarketCap" = "Modal Pasaran";
+
+/* The title of the rank of this coin from market. */
+"wallet.coinMarketRank" = "Pangkat";
 
 /* One of the coin types for users to create an account in Ethereum mainnet or any EVM networks. */
 "wallet.coinTypeEthereum" = "Ethereum";
@@ -253,6 +298,18 @@
 /* The warning shown on transaction confirmation for an ERC 20 Approve transaction when the proposed allowance is unlimited. */
 "wallet.confirmationViewUnlimitedWarning" = "Kelulusan tanpa had diminta";
 
+/* A title of a button which will close this transaction status view. */
+"wallet.confirmedTransactionCloseButtonTitle" = "Tutup";
+
+/* A description explains confirmed transaction has been included in a block. */
+"wallet.confirmedTransactionDescription" = "Transaksi telah berjaya dimasukkan dalam sekatan. Untuk mengelakkan risiko perbelanjaan berganda, kami mengesyorkan supaya anda menunggu pengesahan sekatan.";
+
+/* A title of a button which can open a confirmed transaction details screen. */
+"wallet.confirmedTransactionReceiptButtonTitle" = "Resit";
+
+/* A title of transaction confirmed status view indicating this transaction has been included in a block. */
+"wallet.confirmedTransactionTitle" = "Transaksi Selesai";
+
 /* The title displayed in the navigation of the confirmation view where a user tries to remove a secondary account. */
 "wallet.confirmPasswordTitle" = "Sahkan Kata Laluan";
 
@@ -268,11 +325,14 @@
 /* The accessibility label for the contract address of a token / asset. */
 "wallet.contractAddressAccessibilityLabel" = "Alamat Kontrak";
 
+/* A button title that user has clicked to copy some data to the users clipboard */
+"wallet.copiedToPasteboard" = "Disalin";
+
 /* The button title that appears when long-pressing a wallet address that will copy said address to the users clipboard */
 "wallet.copyAddressButtonTitle" = "Salin Alamat";
 
 /* A button title that when tapped will copy some data to the users clipboard */
-"wallet.copyToPasteboard" = "Salin";
+"wallet.copyToPasteboard" = "Ketik untuk salin";
 
 /* The message of the alert shown when a user switches to a network they do not have an account for yet. */
 "wallet.createAccountAlertMessage" = "Cipta akaun sekarang?";
@@ -283,11 +343,20 @@
 /* The title that will be displayed when long-pressing the back button in the navigation bar. As to make up a new password to create a wallet */
 "wallet.createWalletBackButtonTitle" = "Cipta Kata Laluan";
 
+/* The sub-title of the create wallet screen */
+"wallet.createWalletSubTitle" = "Anda perlu menggunakan kata laluan ini untuk mengakses dompet anda.";
+
 /* The title of the create wallet screen */
-"wallet.createWalletTitle" = "Lindungi aset kripto anda dengan kata laluan";
+"wallet.createWalletTitle" = "Cipta Kata Laluan";
 
 /* The title of the crypto tab */
 "wallet.cryptoTitle" = "Brave Wallet";
+
+/* The navigation title of the screen for users to customize ipfs public gateway address for NFT. */
+"wallet.customizeIPFSNFTPublicGatewayNavTitle" = "Sesuaikan Get Laluan IPFS untuk NFT";
+
+/* The navigation title of the screen for users to customize ipfs public gateway address. */
+"wallet.customizeIPFSPublicGatewayNavTitle" = "Sesuaikan Get Laluan IPFS";
 
 /* The title above the input fields for users to input network block explorer urls in Custom Network Details Screen. */
 "wallet.customNetworkBlockExplorerUrlsTitle" = "Sekat URL explorer";
@@ -356,7 +425,7 @@
 "wallet.customTokenNetworkHeader" = "Pilih rangkaian";
 
 /* The title displayed on the add custom token screen */
-"wallet.customTokenTitle" = "Tersuai";
+"wallet.customTokenTitle" = "Tambah Aset Tersuai";
 
 /* The title of the notification which will prompt at the top of the browser when users are visiting web3 site that is not yet connected with Brave Wallet. The '%@' will be the site attempting to connect. For example: \"app.uniswap.org wants to interact with Brave Wallet\" */
 "wallet.dappsConnectionNotificationOriginTitle" = "%@ mahu berinteraksi dengan Dompet Brave";
@@ -463,6 +532,9 @@
 /* The title of the option inside the context menu for custom asset row in edit user asset screen. Or the title of the option inside the context menu for custom network row which is not being currently selected in networks list screen. */
 "wallet.delete" = "Padam";
 
+/* The title of a button that Deselects all visible options. */
+"wallet.deselectAllButtonTitle" = "Nyahpilih Semua";
+
 /* A button title which when pressed displays a new screen with additional details/information */
 "wallet.detailsButtonTitle" = "Butiran";
 
@@ -538,6 +610,42 @@
 /* The button title for showing the screen to change what assets are visible */
 "wallet.editVisibleAssetsButtonTitle" = "Edit Aset Tampak";
 
+/* Title on the button that users can click to enable Brave to resolve the ENS domain they entered. */
+"wallet.ensDomainInterstitialPageButtonProceed" = "Teruskan penggunaan pelayan Infura";
+
+/* Description displayed when users chose Brave to ask them if they want the ENS to be resolved every time they enter one. The first '%@' will be replaced with a link to Infura's terms of use page. The second '%@' will be replaced with the value of 'Web3DomainInterstitialPageTAndU'. The third '%@' will be replaced with a link to Infura's privacy policy page. The last '%@' will be replaced with the value of 'Web3DomainInterstitialPagePrivacyPolicy'. */
+"wallet.ensDomainInterstitialPageDescription" = "Brave akan menggunakan Infura untuk menyelesaikan nama domain .eth yang terdapat pada Ethereum Name Service (ENS). Brave menyembunyikan alamat IP anda. Jika anda mendayakan ciri ini, Infura dapat lihat bahawa ada orang cuba melawat domain .eth ini tetapi setakat itu sahaja. Lihat <a href=%1$@>%2$@</a> dan <a href=%3$@>%4$@</a> Infura.";
+
+/* Title displayed when users chose Brave to ask them if they want the ENS domain to be resolved every time they enter one. */
+"wallet.ensDomainInterstitialPageTitle" = "Mengaktifkan sokongan Ethereum Name Service (ENS) di Brave?";
+
+/* Title on the button that users can click to enable Brave to resolve the ENS offchain lookup for the domain they entered. */
+"wallet.ensOffchainDomainInterstitialPageButtonProceed" = "Teruskan dengan carian luar rantaian";
+
+/* Description displayed when users chose Brave to ask them if they want the ENS to be resolved every time they enter one. The first '%@' will be replaced with a link to Brave Wallet's offchain lookup privacy considerations. The second '%@' will be replaced with the value of 'ensOffchainDomainInterstitialLearnMore'. */
+"wallet.ensOffchainDomainInterstitialPageDescription" = "Nama domain .eth ini disimpan secara luar rantaian dan akan diselesaikan oleh get laluan pihak ketiga. Jika anda mendayakan carian luar rantaian ENS, get laluan pihak ketiga akan dapat lihat bahawa anda cuba melawat domain .eth tersebut. <a href=%1$@>%2$@</a>.";
+
+/* Title displayed when users chose Brave to ask them if they want the ENS Offchain domain to be resolved every time they enter one. */
+"wallet.ensOffchainDomainInterstitialPageTitle" = "Dayakan sokongan carian luar rantaian Ethereum Name Service (ENS) di Brave?";
+
+/* Button title when requesting to do an ENS off chain lookup. */
+"wallet.ensOffchainGatewayButton" = "Gunakan Domain ENS";
+
+/* Description shown send address / ENS domain when requesting to do an ENS off chain lookup. */
+"wallet.ensOffchainGatewayDesc" = "Nampaknya anda telah memasukkan alamat ENS. Kami perlu menggunakan penyelesai pihak ketiga untuk menyelesaikan permintaan ini. Langkah ini dapat memastikan domain .eth anda tidak dibocorkan dan transaksi anda selamat.";
+
+/* Title shown send address / ENS domain when requesting to do an ENS off chain lookup. */
+"wallet.ensOffchainGatewayTitle" = "Brave menyokong penggunaan get laluan luar rantaian untuk menyelesaikan domain .eth.";
+
+/* The description for the options to allow Ethereum Name service domain names offchain. '%@' will be replaced with a url to explain more about ENS offchain lookup. */
+"wallet.ensOffchainResolveMethodDescription" = "[Ketahui lebih lanjut](%@) tentang pertimbangan privasi carian luar rantaian ENS.";
+
+/* The title for the options to allow Ethereum Name service domain names offchain. */
+"wallet.ensOffchainResolveMethodTitle" = "Benarkan Carian Luar Rantaian ENS";
+
+/* The title for the options to resolve Ethereum Name service domain names. */
+"wallet.ensResolveMethodTitle" = "Selesaikan Nama Domain Ethereum Name Service (ENS)";
+
 /* A placeholder for the text field that users will input the custom token address */
 "wallet.enterAddress" = "Masukkan alamat";
 
@@ -577,6 +685,24 @@
 /* The message of an alert when the user attempted to remove custom network and it fails for some reason */
 "wallet.failedToRemoveCustomNetworkErrorMessage" = "Gagal mengalih keluar rangkaian.\nSila cuba lagi.";
 
+/* A description explains transaction is failed. */
+"wallet.failedTransactionDescription" = "Transaksi gagal disebabkan pergerakan harga yang besar. Naikkan toleransi gelinciran untuk berjaya pada pergerakan harga yang lebih besar.";
+
+/* A description of the view that will display the error message. */
+"wallet.failedTransactionErrorViewDescription" = "Sila simpan mesej ralat untuk rujukan masa hadapan.";
+
+/* A title of the view that will display the error message. */
+"wallet.failedTransactionErrorViewTitle" = "Mesej Ralat";
+
+/* A title of transaction failed status view indicating this transaction has not been included in a block. */
+"wallet.failedTransactionTitle" = "Transaksi Gagal";
+
+/* A title of a button which will a new view to display the error. */
+"wallet.failedTransactionViewErrorButtonTitle" = "Paparkan Ralat";
+
+/* The title of the modal for filtering Portfolio and NFT views. */
+"wallet.filtersAndDisplaySettings" = "Tetapan Penapis dan Paparan";
+
 /* A title above a text field for inputting the gas amount limit */
 "wallet.gasAmountLimit" = "Had jumlah gas";
 
@@ -613,8 +739,44 @@
 /* A title of the view shown over a dapps website that requests the users public encryption key. */
 "wallet.getEncryptionPublicKeyRequestTitle" = "Permintaan Kunci Penyulitan Awam";
 
+/* The title of the sort option that groups assets by each account. Used in Portfolio/NFT filters and display settings. */
+"wallet.groupByAccountsOptionTitle" = "Akaun";
+
+/* The description label of the sort option that groups assets by the selected filter value, shown below the title. Used in Portfolio/NFT filters and display settings. */
+"wallet.groupByDescription" = "Kumpulkan aset mengikut";
+
+/* The title of the sort option that groups assets by each network. Used in Portfolio/NFT filters and display settings. */
+"wallet.groupByNetworksOptionTitle" = "Rangkaian";
+
+/* The title of the sort option that does not group assets. Used in Portfolio/NFT filters and display settings. */
+"wallet.groupByNoneOptionTitle" = "Tiada";
+
+/* The label of the sort option that groups assets by the selected filter value. Used in Portfolio/NFT filters and display settings. */
+"wallet.groupByTitle" = "Kumpulkan Mengikut";
+
+/* The title of the Help Center option inside the menu when user clicks the three dots button beside assets search button or on wallet panel. */
+"wallet.helpCenter" = "Pusat Bantuan";
+
 /* A button title that will redact a private key on the screen */
 "wallet.hidePrivateKeyButtonTitle" = "Sembunyikan Kunci Peribadi";
+
+/* The description label of the filter option that hides assets if their fiat value is below $0.05, shown below the title. Used in Portfolio/NFT filters and display settings. */
+"wallet.hideSmallBalancesDescription" = "Aset bernilai kurang daripada $0.05";
+
+/* The label of the filter option that hides assets if their fiat value is below $0.05. Used in Portfolio/NFT filters and display settings. */
+"wallet.hideSmallBalancesTitle" = "Sembunyikan Baki Kecil";
+
+/* The description label of the filter option that hides NFTs if they are not owned by the user. Used in Portfolio/NFT filters and display settings. */
+"wallet.hideUnownedNFTsDescription" = "Sembunyikan NFT yang tiada baki";
+
+/* The label of the filter option that hides NFTs if they are not owned by the user. Used in Portfolio/NFT filters and display settings. */
+"wallet.hideUnownedNFTsTitle" = "Sembunyikan yang Tidak Dimiliki";
+
+/* The title of a button that updates the filter to hide tokens with zero balances. */
+"wallet.hideZeroBalances" = "Sembunyikan Baki Sifar";
+
+/* The title of the sort option that sorts highest value to lowest value. Used in Portfolio/NFT filters and display settings. */
+"wallet.highToLowSortOption" = "Tinggi hingga Rendah";
 
 /* A title above a text field that is used to enter a password */
 "wallet.importAccountOriginPasswordTitle" = "Kata Laluan Asal";
@@ -655,11 +817,47 @@
 /* An error message displayed when the user doesn't have enough liquidity to proceed with a transaction. */
 "wallet.insufficientLiquidity" = "Kekurangan mudah tunai";
 
+/* The title of a button that Deselects all visible options. */
+"wallet.internalErrorMessage" = "Ralat dalaman telah berlaku";
+
+/* A title will displayed in the IPFS error page when IPFS is disabled. */
+"wallet.ipfsErrorTitle" = "Tapak ini tidak dapat dicapai";
+
+/* The navigation title of the screen for users to customize NFT gateway. */
+"wallet.ipfsPublicGatewayAddressNFTTitle" = "Alamat Get Laluan Umum IPFS untuk NFT";
+
+/* The navigation title of the screen for users to customize IPFS public gateway. */
+"wallet.ipfsPublicGatewayAddressTitle" = "Alamat Get Laluan Umum IPFS";
+
+/* The description for the options to allow to resolve IPFS scheme urls. '%@' will be replaced with a url to explain more about IPFS gateway privacy. */
+"wallet.ipfsResolveMethodDescription" = "[Ketahui lebih lanjut](%@) tentang pertimbangan privasi get laluan IPFS.";
+
+/* The title of the section under Web3 settings for users to pick an option to resolve IPFS Resources. */
+"wallet.ipfsResourcesOptionsTitle" = "Selesaikan Sumber IPFS";
+
+/* The header of the section under Web3 settings for IPFS NFT gateway setting. */
+"wallet.ipfsSettingsHeader" = "IPFS";
+
 /* Button to learn more about incomplete/pending wallet transactions. Or learn more about adding/switching networks in a dapp request view */
 "wallet.learnMoreButton" = "Ketahui Lebih Lanjut";
 
+/* The description of the screen for user to understand the responsibility and the terms of use before setting up a wallet. */
+"wallet.legalDescription" = "Kami memerlukan anda mengakui item berikut";
+
+/* For users to check indicates they have read and agree to the Terms of Use before setting up a wallet. */
+"wallet.legalTermOfUse" = "Saya telah membaca dan bersetuju dengan [Syarat Penggunaan](%@)";
+
+/* The title of the screen for user to understand the responsibility and the terms of use before setting up a wallet. */
+"wallet.legalTitle" = "Sebelum Kita Bermula";
+
+/* The responsibility explained in screen for users to check indicates they understand before setting up a wallet. */
+"wallet.legalUserResponsibility" = "Saya faham ini ialah dompet penjagaan sendiri, dan saya seorang sahaja yang bertanggungjawab ke atas sebarang dana, aset atau akaun yang berkaitan, dan untuk mengambil tindakan yang sewajarnya untuk menjamin, melindungi dan membuat sandaran dompet saya. Saya faham bahawa Brave tidak boleh mengakses dompet saya atau membalikkan transaksi bagi pihak saya, dan frasa pemulihan saya ialah SATU-SATUNYA cara untuk mendapatkan semula akses sekiranya kata laluan hilang, peranti dicuri atau keadaan yang serupa.";
+
 /* The title of the lock option inside the menu when user clicks the three dots button beside assets search button. */
 "wallet.lock" = "Kunci";
+
+/* The title of the sort option that sorts lowest value to highest value. Used in Portfolio/NFT filters and display settings. */
+"wallet.lowToHighSortOption" = "Rendah hingga Tinggi";
 
 /* The amount of current permitted wallet accounts to the dapp site. It is displayed below the origin url of the dapp site in manage site connections screen. '%lld' refers to a number, %@ is `account` for singular and `accounts` for plural (for example \"1 account\" or \"2 accounts\") */
 "wallet.manageSiteConnectionsAccount" = "%1$lld %2$@";
@@ -691,6 +889,9 @@
 /* The title of the button on the screen to manage web3 sites account connections that will show an alert to remove all connected website permissions. */
 "wallet.manageSiteConnectionsRemoveAll" = "Alih Keluar Semua";
 
+/* The page title that will display the top 250 tokens from the market via CoinGecko */
+"wallet.marketPageTitle" = "Pasaran";
+
 /* The highest the user will pay in a gas fee based on the entered gas fee details or predefined option. It is displayed above the amount */
 "wallet.maximumGasFee" = "Yuran maksimum";
 
@@ -701,7 +902,7 @@
 "wallet.module" = "Brave Wallet";
 
 /* The title displayed on the view to filter by a network / all networks. */
-"wallet.networkFilterTitle" = "Pilih Penapis Rangkaian";
+"wallet.networkFilterTitle" = "Pilih Rangkaian";
 
 /* The footer beneath the networks title in settings screen. */
 "wallet.networkFooter" = "Penyesuaian rangkaian dompet";
@@ -715,17 +916,26 @@
 /* A placeholder in Buy Screen, when user switched to a network that Brave currently doesn't support token purchasing. */
 "wallet.networkNotSupportedForBuyToken" = "Pembelian tidak disokong untuk rangkaian terpilih";
 
+/* The title of the section for primary networks in the network selection view. */
+"wallet.networkSelectionPrimaryNetworks" = "Rangkaian Utama";
+
 /* The title of the section for secondary networks in the network selection view. */
 "wallet.networkSelectionSecondaryNetworks" = "Rangkaian Kedua";
 
 /* A VoiceOver label that will be read out when a user focuses on the show test networks button in the network selection view. \"%@\" will be replaced with the network name such as \"Solana\" or \"Ethereum\" */
 "wallet.networkSelectionTestnetAccessibilityLabel" = "Lihat rangkaian ujian %@";
 
+/* The title of the section for test networks in the network selection view. */
+"wallet.networkSelectionTestNetworks" = "Rangkaian Ujian";
+
 /* The title of the to select a network from the available networks */
 "wallet.networkSelectionTitle" = "Pilih Rangkaian";
 
 /* The label that is shown above the URL for the network on a request to switch networks or add a new network from a dapps website. */
 "wallet.networkURLTitle" = "URL Rangkaian";
+
+/* A placeholder string that will be used on password text fields to create a new wallet */
+"wallet.newPasswordPlaceholder" = "Masukkan kata laluan baharu";
 
 /* A text displayed below the account address in new site connection confirmation step, in order to make sure users double check the account address they are going to allow the dapp to connect with. */
 "wallet.newSiteConnectConfirmationMessage" = "Lihat alamat akaun anda yang dibenarkan (diperlukan)";
@@ -772,6 +982,36 @@
 /* The title an entry that will be displayed in NFT detail. This entry to display this NFT's token standard */
 "wallet.nftDetailTokenStandard" = "Standard token";
 
+/* The title of the alert that asks users either to enable NFT discovery or import manually. `SimpleHash` is the third-party service name, so it does not need to be translated. */
+"wallet.nftDiscoveryCalloutDescription" = "Brave Wallet boleh menggunakan perkhidmatan pihak ketiga untuk memaparkan NFT anda secara automatik. Brave akan berkongsi alamat dompet anda dengan SimpleHash untuk menyediakan perkhidmatan ini. Ketahui lebih lanjut.";
+
+/* This is the same `Learn more` at the end of `nftDiscoveryCalloutDescription`, but we need a separat translation to detect the range of it in order to build some attributed strings. */
+"wallet.nftDiscoveryCalloutDescriptionLearnMore" = "Ketahui lebih lanjut";
+
+/* The title of the button that user clicks to disable NFT discovery. */
+"wallet.nftDiscoveryCalloutDisable" = "Tidak, terima kasih, saya akan membuat secara manual";
+
+/* The title of the button that user clicks to enable NFT discovery. */
+"wallet.nftDiscoveryCalloutEnable" = "Ya, teruskan";
+
+/* The title of the alert that asks users either to enable NFT discovery or import manually. */
+"wallet.nftDiscoveryCalloutTitle" = "Mahu NFT anda dipaparkan secara automatik?";
+
+/* The title of the button that user clicks to add his/her first NFT */
+"wallet.nftEmptyImportNFT" = "Import NFT";
+
+/* Description of the NFT Gateway setting */
+"wallet.nftGatewayLongDescription" = "Get laluan IPFS sah patut disediakan. Get laluan yang disediakan akan diperiksa dari segi keupayaan untuk memuatkan sumber IPFS.";
+
+/* The description of the empty state inside NFT tab. */
+"wallet.nftPageEmptyDescription" = "Bersedia untuk menambah sesuatu? Hanya ketik butang di bawah untuk mengimport.";
+
+/* The title of the empty state inside NFT tab. */
+"wallet.nftPageEmptyTitle" = "Belum ada NFT di sini.";
+
+/* The title of the tab that will display user's visible NFT assets. */
+"wallet.nftPageTitle" = "NFT";
+
 /* The title which is displayed above a list of NFTs. 'NFT' is an acronym for Non-Fungible Token. */
 "wallet.nftsTitle" = "NFT";
 
@@ -790,17 +1030,35 @@
 /* The empty state displayed when the user has no transactions associated with an account */
 "wallet.noTransactions" = "Tiada Transaksi";
 
+/* The title of the button in the last step for user to create a new wallet. This will direct users to the wallet portfolio screen. */
+"wallet.onboardingCompletedButtonTitle" = "Sila ke portfolio saya";
+
+/* The subtitle of the last step of creating a new wallet. */
+"wallet.onbordingCompletedSubTitle" = "Dompet Brave anda sedia digunakan.";
+
+/* The title of the last step of creating a new wallet. */
+"wallet.onbordingCompletedTitle" = "Anda sudah bersedia!";
+
 /* The label read out when a user is using VoiceOver and highlights the ellipsis button on the portfolio page */
 "wallet.otherWalletActionsAccessibilityTitle" = "Tindakan dompet yang lain";
 
 /* The error message displayed when a user enters a password that does not meet the requirements */
-"wallet.passwordDoesNotMeetRequirementsError" = "Kata laluan mestilah sekurang-kurangnya 7 aksara, dan mengandungi sekurang-kurangnya satu huruf, satu nombor, dan satu aksara khas.";
+"wallet.passwordDoesNotMeetRequirementsError" = "Kata laluan mestilah sekurang-kurangnya 8 aksara.";
 
 /* A placeholder string that will be used on password text fields */
-"wallet.passwordPlaceholder" = "Kata laluan";
+"wallet.passwordPlaceholder" = "Masukkan kata laluan";
 
 /* The error displayed when entering two passwords that do not match that are expected to match */
 "wallet.passwordsDontMatchError" = "Kata laluan yang disahkan itu tidak sepadan";
+
+/* A label will be displayed beside input password when it is considered as a medium password */
+"wallet.passwordStatusMedium" = "Sederhana";
+
+/* A label will be displayed beside input password when it is considered as a strong password */
+"wallet.passwordStatusStrong" = "Kuat";
+
+/* A label will be displayed beside input password when it is considered as a weak password */
+"wallet.passwordStatusWeak" = "Lemah";
 
 /* A button title that when tapped will paste some data from the users clipboard to a text field */
 "wallet.pasteFromPasteboard" = "Tampal";
@@ -813,6 +1071,12 @@
 
 /* A title above a text field for inputting the per-gas tip limit in Gwei */
 "wallet.perGasTipLimit" = "Had tip setiap gas (Gwei)";
+
+/* The title of the empty state in Portfolio when no assets are shown. */
+"wallet.portfolioEmptyStateDescription" = "Buat deposit atau beli token untuk bermula. Jika token tidak kelihatan daripada akaun yang diimport, semak penapis dan tetapan paparan. Token tidak diketahui mungkin perlu ditambah sebagai aset tersuai.";
+
+/* The title of the empty state in Portfolio when no assets are shown. */
+"wallet.portfolioEmptyStateTitle" = "Tiada aset yang tersedia";
 
 /* The title of the portfolio page in the Crypto tab */
 "wallet.portfolioPageTitle" = "Portfolio";
@@ -871,8 +1135,11 @@
 /* A button on an account screen which when pressed presents a new screen to  rename the account */
 "wallet.renameButtonTitle" = "Namakan semula";
 
+/* A label will be displayed when the repeat password field input is matched with the password field. */
+"wallet.repeatedPasswordMatch" = "Sepadan!";
+
 /* A placeholder string that will be used on repeat password text fields */
-"wallet.repeatedPasswordPlaceholder" = "Sahkan kata laluan";
+"wallet.repeatedPasswordPlaceholder" = "Masukkan semula kata laluan";
 
 /* The title that will be displayed when long-pressing the back button in the navigation bar. As to gain access to your assets from a different device */
 "wallet.restoreWalletBackButtonTitle" = "Pulihkan Dompet";
@@ -880,8 +1147,11 @@
 /* The button title for showing the restore wallet screen. As in to use your recovery phrase to bring a wallet into Brave */
 "wallet.restoreWalletButtonTitle" = "Pulihkan";
 
-/* A toggle label to ask the user if their 24-word phrase is a legacy Brave crypto wallet */
-"wallet.restoreWalletImportFromLegacyBraveWallet" = "Import daripada dompet kripto Brave legasi?";
+/* A button title when 12 recovery-word grids are displayed for users to restore regular wallet. Users can click this button to display the 24 recovery-word grids to restore legacy wallet. */
+"wallet.restoreWalletImportFromLegacyBraveWallet" = "Saya mempunyai frasa pemulihan 24 perkataan";
+
+/* A button title when 24 recovery-word grids are displayed for users to restore legacy wallet. Users can click this button to display the 12 recovery-word grids to restore regular wallet. */
+"wallet.restoreWalletImportFromRegularBraveWallet" = "Saya mempunyai frasa pemulihan 12 perkataan";
 
 /* A title displayed above 2 text fields for entering a new wallet password */
 "wallet.restoreWalletNewPasswordTitle" = "Kata Laluan Baharu";
@@ -889,17 +1159,17 @@
 /* The error message displayed when a user enters an invalid phrase to restore from. By phrase we mean 'recovery phrase' or 'recovery mnemonic' */
 "wallet.restoreWalletPhraseInvalidError" = "Frasa pemulihan tidak sah";
 
-/* The placeholder on the mneomic/recovery phrase text field */
-"wallet.restoreWalletPhrasePlaceholder" = "Masukkan frasa pemulihan anda";
+/* The placeholder on the mneomic/recovery phrase text field of each grid. */
+"wallet.restoreWalletPhrasePlaceholder" = "Perkataan #%d";
 
 /* A toggle label that will enable or disable visibility of the contents in the recovery phrase text field */
 "wallet.restoreWalletShowRecoveryPhrase" = "Tunjukkan Frasa Pemulihan";
 
 /* The subtitle on the restore wallet screen. */
-"wallet.restoreWalletSubtitle" = "Masukkan frasa pemulihan anda untuk memulihkan akaun kripto dompet Brave anda.";
+"wallet.restoreWalletSubtitle" = "Anda boleh menampal seluruh frasa pemulihan ke dalam mana-mana medan.";
 
 /* The title on the restore wallet screen. */
-"wallet.restoreWalletTitle" = "Pulihkan Akaun Kripto";
+"wallet.restoreWalletTitle" = "Import Dompet Sedia Ada";
 
 /* The description of one of the 'Sardine' provider. */
 "wallet.sardineProviderDescription" = "Beli segera dengan akaun bank anda. Fi lebih rendah.";
@@ -912,6 +1182,9 @@
 
 /* A button title for saving the users selected gas fee options. Or to save a custom nonce value. Or to save a custom network */
 "wallet.saveButtonTitle" = "Simpan";
+
+/* The title of the label of the button to save all changes. Used in Portfolio/NFT filters and display settings. */
+"wallet.saveChangesButtonTitle" = "Simpan Perubahan";
 
 /* A description for a QR code icon which brings up the camera to read ETH addresses encoded as QR codes */
 "wallet.scanQRCodeAccessibilityLabel" = "Imbas kod QR";
@@ -928,14 +1201,35 @@
 /* A title above a list of crypto accounts that are imported */
 "wallet.secondaryCryptoAccountsTitle" = "Akaun Sekunder";
 
+/* The description label of the filter option that allows users to select which accounts to filter assets by, shown below the title. Used in Portfolio/NFT filters and display settings. */
+"wallet.selectAccountsDescription" = "Pilih akaun untuk tapis mengikut";
+
+/* The label of the filter option that allows users to select which accounts to filter assets by. Used in Portfolio/NFT filters and display settings. */
+"wallet.selectAccountsTitle" = "Pilih Akaun";
+
 /* The title of the account selection screen. Will show above a list of accounts the user may pick from */
 "wallet.selectAccountTitle" = "Pilih Akaun";
+
+/* The title of a button that Selects all visible options. */
+"wallet.selectAllButtonTitle" = "Pilih Semua";
 
 /* The accessibility label for the selected account picker */
 "wallet.selectedAccount" = "Akaun Dipilih";
 
 /* The accessibility label for the ethereum network picker */
 "wallet.selectedNetwork" = "Rangkaian Dipilih";
+
+/* The description label of the filter option that allows users to select which networks to filter assets by, shown below the title. Used in Portfolio/NFT filters and display settings. */
+"wallet.selectNetworksDescription" = "Pilih rangkaian untuk tapis mengikut";
+
+/* The label of the filter option that allows users to select which networks to filter assets by. Used in Portfolio/NFT filters and display settings. */
+"wallet.selectNetworksTitle" = "Pilih Rangkaian";
+
+/* The description of the view that lets the user select a token & account at the same time in the Send crypto view when there are no available tokens. */
+"wallet.selectTokenToSendNoTokens" = "Tiada token yang tersedia";
+
+/* The title of the view that lets the user select a token & account at the same time in the Send crypto view. */
+"wallet.selectTokenToSendTitle" = "Pilih Token untuk Dihantar";
 
 /* As in sending cryptocurrency to another account */
 "wallet.send" = "Hantar";
@@ -958,8 +1252,11 @@
 /* The description of a send button on the buy/send/swap modal */
 "wallet.sendDescription" = "Hantar kripto atau pindahkan daripada satu akaun ke akaun yang lain.";
 
-/* An error that appears below the send crypto address text field, when the input `To` domain/url that we cannot resolve to a wallet address. Ex. `Stephen.sol` */
-"wallet.sendErrorDomainNotRegistered" = "%@ tidak berdaftar";
+/* An error that appears below the send crypto address text field, when the input `To` domain/url that we cannot resolve to a wallet address. The '%@' will be replaced with the coin type Ex. `Domain doesn\'t have a linked ETH address` */
+"wallet.sendErrorDomainNotRegistered" = "Domain tidak mempunyai alamat %@ yang dipautkan";
+
+/* An error that appears below the send crypto address text field, when the input `To` Filecoin address that is invalid */
+"wallet.sendErrorInvalidRecipientAddress" = "Alamat penerima tidak sah";
 
 /* A placeholder of the address text field. */
 "wallet.sendToCryptoAddressPlaceholder" = "Masukkan alamat";
@@ -985,6 +1282,9 @@
 /* As in sent cryptocurrency from one asset to another */
 "wallet.sent" = "Dihantar";
 
+/* Title of the set IPFS gateway button */
+"wallet.setGatewayButtonTitle" = "Tetapkan";
+
 /* The title of the settings option inside the menu when user clicks the three dots button beside assets search button. */
 "wallet.settings" = "Tetapan";
 
@@ -1001,7 +1301,7 @@
 "wallet.settingsNetworkButtonTitle" = "Rangkaian";
 
 /* The title of a button that will reset the wallet. As in to erase the users wallet from the device */
-"wallet.settingsResetButtonTitle" = "Tetapkan semula";
+"wallet.settingsResetButtonTitle" = "Tetapkan Semula dan Kosongkan Data Dompet";
 
 /* The title of a button that will reset transaction and nonce information. As in to erase the users transaction history and reset nonce value starting from 0x0 */
 "wallet.settingsResetTransactionAlertButtonTitle" = "Tetapkan semula";
@@ -1033,11 +1333,32 @@
 /* The button title to continue to the next step on the 'setup crypto' screen. As in to begin the process of creating a wallet/setting up the cryptocurrency feature */
 "wallet.setupCryptoButtonTitle" = "Mulakan";
 
+/* The subtitle displayed in the section for user that need to create a brand new wallet */
+"wallet.setupCryptoCreateNewSubTitle" = "Mulakan dengan Dompet Brave dalam masa beberapa minit.";
+
+/* The title displayed in the section for user that need to create a brand new wallet */
+"wallet.setupCryptoCreateNewTitle" = "Perlukan dompet baharu?";
+
+/* The disclaimer text at the bottom of the first step of onboarding flow. */
+"wallet.setupCryptoDisclaimer" = "©2023 Brave Software Inc. Brave dan logo Brave ialah tanda dagangan Brave. Nama dan logo produk lain mungkin merupakan tanda dagangan syarikat masing-masing. Hak cipta terpelihara.";
+
+/* The subtitle displayed in the section for user that need to restore an existed wallet */
+"wallet.setupCryptoRestoreSubTitle" = "Import dompet anda yang sedia ada.";
+
+/* The title displayed in the section for user that need to restore an existed wallet */
+"wallet.setupCryptoRestoreTitle" = "Sudah memiliki dompet?";
+
 /* The subtitle displayed on the 'setup crypto' onboarding screen */
-"wallet.setupCryptoSubtitle" = "Simpan aset kripto dalam jagaan anda dan jejaki prestasi portfolio. Semuanya terus daripada pelayar privasi Brave.";
+"wallet.setupCryptoSubtitle" = "Kawal kripto dan NFT anda. Dompet Wallet menyokong Ethereum, rantaian EVM, Solana dan pelbagai lagi.";
 
 /* The title displayed on the 'setup crypto' onboarding screen */
-"wallet.setupCryptoTitle" = "Selamat datang ke Brave Wallet baharu";
+"wallet.setupCryptoTitle" = "Natif penyemak imbas\nPenjagaan sendiri.\nDan berbilang rantaian.";
+
+/* The description label of the filter option that hides the network logo on NFTs displayed in the grid. Used in NFT filters and display settings. */
+"wallet.showNFTNetworkLogoDescription" = "Paparkan logo rangkaian pada NFT";
+
+/* The label of the filter option that hides the network logo on NFTs displayed in the grid. Used in NFT filters and display settings. */
+"wallet.showNFTNetworkLogoTitle" = "Logo Rangkaian";
 
 /* A button title that will make a private key visible on the screen */
 "wallet.showPrivateKeyButtonTitle" = "Tunjukkan Kunci Peribadi";
@@ -1045,17 +1366,32 @@
 /* A label beside the toggle for showing / hiding test networks in the Networks screen of Wallet settings */
 "wallet.showTestNetworksTitle" = "Paparkan Rangkaian Ujian";
 
+/* The title of a button that updates the filter to show tokens with zero balances. */
+"wallet.showZeroBalances" = "Paparkan Baki Sifar";
+
 /* The title of the button used to sign a message request on the signature request view. */
 "wallet.sign" = "Tandatangan";
 
 /* The title of the view shown over a dapps website that requests the user sign all displayed transactions. */
 "wallet.signAllTransactionsTitle" = "Tandatangan Semua Transaksi";
 
+/* A title displayed inside the text view in Signature Request View above the request's domain information. */
+"wallet.signatureRequestDomainTitle" = "Domain";
+
+/* A title displayed inside the text view in Signature Request View above the request's message. */
+"wallet.signatureRequestMessageTitle" = "Mesej";
+
 /* A subtitle of the view shown over a dapps website that requests the user sign a message. */
 "wallet.signatureRequestSubtitle" = "Tandatangan anda sedang diminta";
 
 /* A title of the view shown over a dapps website that requests the user sign a message. */
 "wallet.signatureRequestTitle" = "Tandatangan Diminta";
+
+/* A description explains signed transaction will be sent to network by dapps and awaits confirmation. */
+"wallet.signedTransactionDescription" = "Transaksi telah ditandatangani dan akan dihantar ke rangkaian oleh dapp dan menunggu pengesahan.";
+
+/* A title of transaction signed status view indicating this transaction has been signed. */
+"wallet.signedTransactionTitle" = "Transaksi Ditandatangani";
 
 /* A warning message to tell users that the sign request message contains consecutive new-line characters. */
 "wallet.signMessageConsecutiveNewlineWarning" = "Aksara baris baru yang berturutan dikesan!";
@@ -1077,6 +1413,15 @@
 
 /* The button title to skip recovery phrase backup */
 "wallet.skipButtonTitle" = "Langkau";
+
+/* Title on the button that users can click to enable Brave to resolve the SNS domain they entered. */
+"wallet.snsDomainInterstitialPageButtonProceed" = "Teruskan penggunaan pelayan Syndica";
+
+/* Description displayed when users chose Brave to ask them if they want the SNS to be resolved every time they enter one. The first '%@' will be replaced with a link to Syndica's terms of use page. The second '%@' will be replaced with the value of 'snsDomainInterstitialPageTAndU'. The third '%@' will be replaced with a link to Syndica's privacy policy page. The last '%@' will be replaced with the value of 'snsDomainInterstitialPagePrivacyPolicy'. */
+"wallet.snsDomainInterstitialPageDescription" = "Brave akan menggunakan Syndica untuk menyelesaikan nama doman .sol. Brave menyembunyikan alamat IP anda. Jika anda mendayakan ciri ini, Syndica dapat lihat bahawa ada orang cuba melawat domain .sol ini tetapi setakat itu sahaja. Lihat <a href=%1$@>%2$@</a> dan <a href=%3$@>%4$@</a> Syndica.";
+
+/* Title displayed when users chose Brave to ask them if they want the SNS to be resolved every time they enter one. */
+"wallet.snsDomainInterstitialPageTitle" = "Mengaktifkan sokongan Solana Name Service (SNS) di Brave?";
 
 /* The title displayed above the System Program AdvanceNonceAccount instruction type for Solana Instruction details. */
 "wallet.solanaAdvanceNonceAccountInstructionName" = "Lanjutkan Akaun Nonce";
@@ -1151,7 +1496,13 @@
 "wallet.solanaInitializeNonceAccountInstructionName" = "Mulakan Akaun Nonce";
 
 /* The label displayed beside the Accounts for an instruction type we don't support decoding. Ex. \"Accounts: <solana_public_key>\" */
-"wallet.solanaInstructionAccounts" = "Id Atur Cara";
+"wallet.solanaInstructionAccounts" = "Akaun";
+
+/* The label displayed beside the address for the Address Lookup Table Account. Ex. \"Address Lookup Table Account: B1A2...\" */
+"wallet.solanaInstructionAddressLookupAcc" = "Akaun Jadiual Carian Alamat";
+
+/* The label displayed beside the address for the Address Lookup Table Account. Ex. \"Address Lookup Table Index: 1\" */
+"wallet.solanaInstructionAddressLookupIndex" = "Indeks Jadual Carian Alamat";
 
 /* The label displayed beside the Data for an instruction type we don't support decoding. Ex. \"Data: [1, 20, 3, 5, 50]]\" */
 "wallet.solanaInstructionData" = "Data";
@@ -1176,6 +1527,9 @@
 
 /* The warning message to let users understand the risk of using Brave Wallet to sign any transaction. */
 "wallet.solanaSignTransactionWarning" = "Harap maklum bahawa Brave tidak dapat mengesahkan kesan daripada penandatanganan anda. Tandatangan boleh membenarkan hampir semua operasi dalam akaun anda atau bagi pihak anda, termasuk (tetapi tidak terhad kepada) memberikan kawalan sepenuhnya terhadap akaun dan aset kripto anda kepada laman web yang membuat permintaan tersebut. Hanya tandatangan jika anda pasti dengan tindakan ini dan mempercayai laman web tersebut.";
+
+/* The title displayed above the value of a Solana swap transaction in transaction confirmation view, transaction details view and transaction summary rows. */
+"wallet.solanaSwapTransactionTitle" = "Tukar Transaksi";
 
 /* The title displayed above the Token Program Sync Native instruction type for Solana Instruction details. */
 "wallet.solanaSyncNativeInstructionName" = "Segerakkan Asli";
@@ -1207,8 +1561,41 @@
 /* The title displayed above the System Program WithdrawNonceAccount instruction type for Solana Instruction details. */
 "wallet.solanaWithdrawNonceAccountInstructionName" = "Keluarkan Akaun Nonce";
 
+/* The description label of the sort option that sorts assets by their fiat value, shown below the title. Used in Portfolio/NFT filters and display settings. */
+"wallet.sortAssetsDescription" = "Isi mengikut nilai rata atau nama";
+
+/* The label of the sort option that sorts assets by their fiat value. Used in Portfolio/NFT filters and display settings. */
+"wallet.sortAssetsTitle" = "Isih Aset";
+
+/* The description of one of the 'Stripe' provider. */
+"wallet.stripeNetworkProviderDescription" = "Bayar dengan kredit, debit, akaun bank.";
+
+/* The name of one of the on ramp providers where the first '%@' is `Link` and second '%@' is `Stripe` product names. */
+"wallet.stripeNetworkProviderName" = "%1$@ by %2$@";
+
+/* A description explains submitted transaction has been sent to the netwokr and awaits confirmation. */
+"wallet.submittedTransactionDescription" = "Transaksi berjaya dihantar ke rangkaian dan menunggu pengesahan.";
+
+/* A title of transaction signed status view indicating this transaction has been submitted to the network. */
+"wallet.submittedTransactionTitle" = "Transaksi telah Diserahkan";
+
 /* As in swapping cryptocurrency from one asset to another */
 "wallet.swap" = "Tukar";
+
+/* The description displayed below the name of the token being swapped from and to. Tthe '%@' will be the token's network name. */
+"wallet.swapConfirmationNetworkDesc" = "pada %@";
+
+/* A title displayed in transaction confirmation above the network / gas fee for a Swap transaction. */
+"wallet.swapConfirmationNetworkFee" = "Yuran Rangkaian";
+
+/* A title displayed in transaction confirmation navigation bar for a Swap transaction. */
+"wallet.swapConfirmationTitle" = "Sahkan Pesanan";
+
+/* A title displayed in transaction confirmation above the token being swapped for in a Swap transaction. */
+"wallet.swapConfirmationYoullReceive" = "Anda akan menerima";
+
+/* A title displayed in transaction confirmation above the token being swapped from in a Swap transaction. */
+"wallet.swapConfirmationYouSpend" = "Anda telah berbelanja";
 
 /* A title above the amount of asset you will receive from the swap. '%@' will be replaced with a token symbol such as 'ETH' or 'BAT' */
 "wallet.swapCryptoAmountReceivingTitle" = "Jumlah diterima dalam %@ (anggaran)";
@@ -1240,11 +1627,11 @@
 /* The description of a swap button on the buy/send/swap modal */
 "wallet.swapDescription" = "Tukar token dengan aset";
 
-/* A longer disclaimer about the DEX aggrigator used by Brave for swap transactions. '0x' is a company name. 'DEX aggregator' is a type of blockchain-based service (decentralized exchange). 'ONLY' is emphasized to show importance of 0x's data usage. */
-"wallet.swapDexAggrigatorDisclaimer" = "0x akan memproses alamat Ethereum dan alamat IP untuk memenuhi transaksi (termasuk mendapatkan sebut harga). 0x HANYA akan menggunakan data ini untuk tujuan memproses transaksi.";
+/* A longer disclaimer about the DEX aggrigator used by Brave for swap transactions. The first '%@' is a company name. 'DEX aggregator' is a type of blockchain-based service (decentralized exchange). 'ONLY' is emphasized to show importance of the company's data usage. */
+"wallet.swapDexAggrigatorDisclaimer" = "%1$@ akan memproses alamat %2$@ dan alamat IP untuk memenuhi transaksi (termasuk mendapatkan sebut harga). %3$@ akan HANYA menggunakan data ini untuk tujuan memproses transaksi.";
 
-/* A disclaimer note shown on the Swap screen. '0x' is a company name. 'DEX aggregator' is a type of blockchain-based service (decentralized exchange) */
-"wallet.swapDexAggrigatorNote" = "Brave menggunakan 0x sebagai penggabung DEX.";
+/* A disclaimer note shown on the Swap screen. '%@' will be replaced by a company name, ex. '0x' / 'Jupiter'. 'DEX aggregator' is a type of blockchain-based service (decentralized exchange) */
+"wallet.swapDexAggrigatorNote" = "Brave menggunakan %@ sebagai pengagregat DEX.";
 
 /* The 'Limit' order type. Limit orders only execute when the price requirements are met */
 "wallet.swapLimitOrderType" = "Had";
@@ -1351,6 +1738,9 @@
 /* A status that explains that the transaction has been rejected by the user */
 "wallet.transactionStatusRejected" = "Ditolak";
 
+/* A status that explains that the transaction has been signed. */
+"wallet.transactionStatusSigned" = "Ditandatangani";
+
 /* A status that explains that the transaction has been submitted to the blockchain */
 "wallet.transactionStatusSubmitted" = "Diserahkan";
 
@@ -1378,6 +1768,27 @@
 /* A title shown for a erc 20 transfer. The first '%@' becomes the symbol for the cryptocurrency For example: \"Sent ETH\" */
 "wallet.transactionUnknownSendTitle" = "Dihantar %@";
 
+/* The description of one of the 'Transak' provider. */
+"wallet.transakProviderDescription" = "Beli segera dengan akaun bank anda. Fi lebih rendah.";
+
+/* The name of one of the on ramp provider. */
+"wallet.transakProviderName" = "Transak";
+
+/* The short name of one of the on ramp provider. */
+"wallet.transakProviderShortName" = "Transak";
+
+/* Description displayed when users chose Brave to ask them if they want the Unstoppable Domains to be resolved every time they enter one. The first '%@' will be replaced with a list of supported TLDs like '.x' or '.bitcoin'. The second '%@' be replaced with a link to Infura's terms of use page. The third '%@' will be replaced with the value of 'Web3DomainInterstitialPageTAndU'. The fourth '%@' will be replaced with a link to Infura's privacy policy page. The last '%@' will be replaced with the value of 'Web3DomainInterstitialPagePrivacyPolicy'. */
+"wallet.udDomainInterstitialPageDescription" = "Brave akan menggunakan Infura untuk menyelesaikan nama domain .crypto (dan juga %1$@) yang terdapat pada Domain yang Tidak Dapat Dihentikan. Brave menyembunyikan alamat IP anda. Jika anda mendayakan ciri ini, Infura dapat lihat bahawa ada orang cuba melawat domain ini tetapi setakat itu sahaja. Lihat <a href=%2$@>%3$@</a> dan <a href=%4$@>%5$@</a> Infura.";
+
+/* Title displayed when users chose Brave to ask them if they want the Unstoppable Domains domain to be resolved every time they enter one. */
+"wallet.udDomainInterstitialPageTitle" = "Mengaktifkan sokongan Domain yang tidak dapat Dihentikan di Brave?";
+
+/* The description for the options to allow Unstoppable Domain domain names. '%@' will be replaced with a url to explain more about Unstoppable Domains. */
+"wallet.udResolveMethodDescription" = "[Ketahui lebih lanjut](%@) tentang pertimbangan privasi Domain yang Tidak Dapat Dihentikan.";
+
+/* The title for the options to resolve Unstoppable Domains domain names. */
+"wallet.udResolveMethodTitle" = "Selesaikan Nama Domain bagi Domain yang Tidak Dapat Dihentikan";
+
 /* An error message displayed when an unspecified problem occurs. */
 "wallet.unknownError" = "Ralat tidak diketahui";
 
@@ -1390,14 +1801,14 @@
 /* The description displayed below the token name on each row for the user assets. The first '%@' will be the token symbol, and the second '%@' will be the token's network name. */
 "wallet.userAssetSymbolNetwork" = "%1$@ pada %2$@";
 
-/* The button title to verify if the user has put all recovery words in the right order */
-"wallet.verifyButtonTitle" = "Sahkan";
+/* The error message when input phrase does not match the correct one. */
+"wallet.verifyRecoveryPhraseError" = "Frasa pemulihan tidak sepadan.";
 
-/* The subtitle of the verify recovery phrase screen */
-"wallet.verifyRecoveryPhraseSubtitle" = "Pilih perkataan dalam frasa pemulihan anda mengikut tertib yang betul.";
+/* The sub-title of the screen that user will verify his/her recovery phrase. */
+"wallet.verifyRecoveryPhraseSubTitle" = "Masukkan perkataan dalam **kedudukan %d** daripada frasa pemulihan anda.";
 
-/* The title of the verify recovery phrase screen */
-"wallet.verifyRecoveryPhraseTitle" = "Sahkan frasa pemulihan";
+/* The title of the screen that user will verify his/her recovery phrase. */
+"wallet.verifyRecoveryPhraseTitle" = "Mari Kita Semak";
 
 /* The title for the button to view details about the network the dapp site is requesting the user switch to, or the network the dapp website is requesting the user add. */
 "wallet.viewDetails" = "Lihat Butiran";
@@ -1407,6 +1818,9 @@
 
 /* A button title to view a given transaction on the block explorer for the current network/chain. */
 "wallet.viewOnBlockExplorer" = "Lihat pada penjelajah sekatan";
+
+/* A button title when a user will tap to reveal the recovery phrases. */
+"wallet.viewRecoveryPhraseButtonTitle" = "Lihat frasa pemulihan saya";
 
 /* The title shown on the menu to access Brave Wallet */
 "wallet.wallet" = "Dompet";
@@ -1432,11 +1846,50 @@
 /* The title of the button in wallet panel when wallet is locked. Users can click it to open full screen unlock wallet screen. */
 "wallet.walletPanelUnlockWallet" = "Buka kunci dompet";
 
-/* The value shown when selecting the default wallet as none / no wallet in wallet settings. */
+/* The value shown when selecting the default wallet as none / no wallet in wallet settings, or when grouping Portfolio assets. */
 "wallet.walletTypeNone" = "Tiada";
 
 /* The message of a confirmation dialog when attempting to remove an account. Or the title of a confirmation dialog when attempting to remove all wallet connection for one or more websites */
 "wallet.warningAlertConfirmation" = "Anda pasti?";
+
+/* The title shown on the settings menu to Web3 settings. */
+"wallet.web3" = "Web3";
+
+/* Title on the button that users can click to disable Brave to resolve the ENS/SNS domain they entered. */
+"wallet.web3DomainInterstitialPageButtonDisable" = "Nyahdayakan";
+
+/* Hyper link copy displayed as part of 'snsDomainInterstitialPageDescription'. It will redirect user to the privay policy webpage of the server that Brave uses to resolve SNS domain. */
+"wallet.web3DomainInterstitialPagePrivacyPolicy" = "dasar privasi";
+
+/* Hyper link copy displayed as part of 'snsDomainInterstitialPageDescription'. It will redirect user to the 'terms of use' webpage of the server that Brave uses to resolve SNS domain. */
+"wallet.web3DomainInterstitialPageTAndU" = "syarat penggunaan";
+
+/* One of the options for Brave to handle Ethereum/Solana Name Service domain name and IPFS scheme url. 'Ask' means Brave will ask user first before enable or disable resolving ENS/SNS domain name and IPFS scheme url. */
+"wallet.web3DomainOptionAsk" = "Tanya";
+
+/* One of the options for Brave to handle Ethereum/Solana Name Service domain name and IPFS scheme url. 'Disabled' means Brave will disable resolving ENS/SNS domain name and IPFS scheme url. */
+"wallet.web3DomainOptionDisabled" = "Dinyahaktif";
+
+/* One of the options for Brave to handle Ethereum/Solana Name Service domain name and IPFS scheme url. 'Enabled' means Brave will enable resolving ENS/SNS domain name and IPFS scheme url. */
+"wallet.web3DomainOptionEnabled" = "Mendayakan";
+
+/* The header for the options to resolve Solana Name service domain names. */
+"wallet.web3DomainOptionsHeader" = "Domain Web3";
+
+/* The title for the options to resolve Solana Name service domain names. */
+"wallet.web3DomainOptionsTitle" = "Selesaikan Nama Domain Solana Name Service (SNS)";
+
+/* A brief explaination of IPFS on privacy. The first '%@' will be replaced with a link to a Brave article that explains how does IPFS impact users' privacy in details. The second '%@' will be replaced with 'web3IPFSInterstitialIPFSPrivacyLearnMore'. */
+"wallet.web3IPFSInterstitialIPFSPrivacy" = "IPFS (Sistem Fail InterPlanetary) ialah rangkaian awam untuk penyimpanan dan penghantaran data rakan-ke-rakan. Protokol ini mempunyai pertimbangan privasi yang berbeza daripada HTTP(S). <a href=%1$@>%2$@</a>";
+
+/* A brief explaination of resolving IPFS scheme url using a public gateway. */
+"wallet.web3IPFSInterstitialIPFSPublicGateway" = "Melindungi alamat IP dan kandungan anda yang anda minta daripada bakal pemerhati pihak ketiga, tetapi bukan daripada pengendali get laluan awam. Pengendali get laluan awam bertanggungjawab memastikan kandungan yang disampaikan kepada anda melalui get laluan merupakan kandungan yang anda minta. Selain itu, peranti anda tidak menyumbang kepada rangkaian IPFS awam.";
+
+/* The title of the IPFS interstitial page for user to set the preference of IPFS scheme url handling. */
+"wallet.web3IPFSInterstitialIPFSTitle" = "Tetapkan keutamaan IPFS anda";
+
+/* The title of the button that user will click to let Brave to resolve IPFS shceme url. */
+"wallet.web3IPFSInterstitialProceedButton" = "Gunakan Get Laluan Awam";
 
 /* The title for the entry displaying the preferred option to allow web3 sites to access the Ethereum provider API. */
 "wallet.web3PreferencesAllowEthProviderAccess" = "Tapak Boleh Meminta Akses kepada Dompet Ethereum Anda";
@@ -1458,4 +1911,19 @@
 
 /* The section title for users to set up preferences for interation with web3 sites. */
 "wallet.web3PreferencesSectionTitle" = "Keutamaan Web3";
+
+/* The title of the toggle for user to enable/disable NFT discovery inside Web3 settings. */
+"wallet.web3SettingsEnableNFTDiscovery" = "Dayakan Penemuan NFT";
+
+/* The footer of the toggle for user to enable/disable NFT discovery inside Web3 settings. */
+"wallet.web3SettingsEnableNFTDiscoveryFooter" = "Tambah NFT yang anda miliki secara automatik kepada Wallet dengan menggunakan API pihak ketiga. [Ketahui lebih lanjut](%@)";
+
+/* Description of the wrong IPFS gateway alert */
+"wallet.wrongGatewayAlertDescription" = "Url tidak sah telah diberikan. Get laluan sepatutnya boleh menyelesaikan sumber IPFS.";
+
+/* Title of the wrong IPFS gateway alert */
+"wallet.wrongGatewayAlertTitle" = "Gagal untuk menetapkan get laluan";
+
+/* The title of the sort option that sorts alphabetically from Z to A. Used in Portfolio/NFT filters and display settings. */
+"wallet.zToASortOption" = "Z hingga A";
 

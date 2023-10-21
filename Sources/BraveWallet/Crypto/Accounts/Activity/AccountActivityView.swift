@@ -19,7 +19,7 @@ struct AccountActivityView: View {
   @State private var transactionDetails: TransactionDetailsStore?
   
   @Environment(\.presentationMode) @Binding private var presentationMode
-  @Environment(\.openWalletURLAction) private var openWalletURL
+  @Environment(\.openURL) private var openWalletURL
 
   private struct DetailsPresentation: Identifiable {
     var inEditMode: Bool
@@ -61,42 +61,42 @@ struct AccountActivityView: View {
         header: WalletListHeaderView(title: Text(Strings.Wallet.assetsTitle))
       ) {
         Group {
-          if activityStore.userVisibleAssets.isEmpty {
+          if activityStore.userAssets.isEmpty {
             emptyTextView(Strings.Wallet.noAssets)
           } else {
-            ForEach(activityStore.userVisibleAssets) { asset in
+            ForEach(activityStore.userAssets) { asset in
               PortfolioAssetView(
                 image: AssetIconView(
                   token: asset.token,
                   network: asset.network,
-                  shouldShowNativeTokenIcon: true
+                  shouldShowNetworkIcon: true
                 ),
                 title: asset.token.name,
                 symbol: asset.token.symbol,
                 networkName: asset.network.chainName,
-                amount: activityStore.currencyFormatter.string(from: NSNumber(value: (Double(asset.price) ?? 0) * asset.decimalBalance)) ?? "",
-                quantity: String(format: "%.04f", asset.decimalBalance)
+                amount: asset.fiatAmount(currencyFormatter: activityStore.currencyFormatter),
+                quantity: asset.quantity
               )
             }
           }
         }
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
       }
-      if !activityStore.userVisibleNFTs.isEmpty {
+      if !activityStore.userNFTs.isEmpty {
         Section(content: {
           Group {
-            ForEach(activityStore.userVisibleNFTs) { nftAsset in
-              PortfolioNFTAssetView(
+            ForEach(activityStore.userNFTs) { nftAsset in
+              NFTAssetView(
                 image: NFTIconView(
                   token: nftAsset.token,
                   network: nftAsset.network,
                   url: nftAsset.nftMetadata?.imageURL,
-                  shouldShowNativeTokenIcon: true
+                  shouldShowNetworkIcon: true
                 ),
                 title: nftAsset.token.nftTokenTitle,
                 symbol: nftAsset.token.symbol,
                 networkName: nftAsset.network.chainName,
-                quantity: "\(nftAsset.balance)"
+                quantity: "\(nftAsset.balanceForAccounts[activityStore.account.address] ?? 0)"
               )
             }
           }
@@ -121,9 +121,9 @@ struct AccountActivityView: View {
               .contextMenu {
                 if !txSummary.txHash.isEmpty {
                   Button(action: {
-                    if let baseURL = self.networkStore.selectedChain.blockExplorerUrls.first.map(URL.init(string:)),
-                       let url = baseURL?.appendingPathComponent("tx/\(txSummary.txHash)") {
-                      openWalletURL?(url)
+                    if let txNetwork = self.networkStore.allChains.first(where: { $0.chainId == txSummary.txInfo.chainId }),
+                       let url = txNetwork.txBlockExplorerLink(txHash: txSummary.txHash, for: txNetwork.coin) {
+                      openWalletURL(url)
                     }
                   }) {
                     Label(Strings.Wallet.viewOnBlockExplorer, systemImage: "arrow.up.forward.square")
@@ -164,8 +164,7 @@ struct AccountActivityView: View {
           }
         }
     )
-    .onReceive(keyringStore.$allKeyrings) { allKeyrings in
-      let allAccounts = allKeyrings.flatMap(\.accountInfos)
+    .onReceive(keyringStore.$allAccounts) { allAccounts in
       if !allAccounts.contains(where: { $0.address == accountInfo.address }) {
         // Account was deleted
         detailsPresentation = nil
@@ -199,7 +198,7 @@ private struct AccountActivityHeaderView: View {
       HStack {
         Button(action: { action(false) }) {
           HStack {
-            Image(braveSystemName: "brave.qr-code")
+            Image(braveSystemName: "leo.qr.code")
               .font(.body)
             Text(Strings.Wallet.detailsButtonTitle)
               .font(.footnote.weight(.bold))
@@ -207,7 +206,7 @@ private struct AccountActivityHeaderView: View {
         }
         Button(action: { action(true) }) {
           HStack {
-            Image(braveSystemName: "brave.edit")
+            Image(braveSystemName: "leo.edit.pencil")
               .font(.body)
             Text(Strings.Wallet.renameButtonTitle)
               .font(.footnote.weight(.bold))

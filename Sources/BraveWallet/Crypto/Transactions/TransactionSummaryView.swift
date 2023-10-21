@@ -63,7 +63,7 @@ struct TransactionSummaryView: View {
           .foregroundColor(Color(.bravePrimary))
         if let gasFee = summary.gasFee {
           HStack(spacing: 4) {
-            Image(braveSystemName: "brave.coins.4")
+            Image(braveSystemName: "leo.coins.alt2")
             Text(
               String.localizedStringWithFormat(
                 Strings.Wallet.transactionSummaryFee,
@@ -131,6 +131,8 @@ extension BraveWallet.TransactionStatus {
       return Strings.Wallet.transactionStatusError
     case .dropped:
       return Strings.Wallet.transactionStatusDropped
+    case .signed:
+      return Strings.Wallet.transactionStatusSigned
     @unknown default:
       return Strings.Wallet.transactionStatusUnknown
     }
@@ -141,7 +143,7 @@ extension BraveWallet.TransactionStatus {
       return Color(.braveSuccessLabel)
     case .rejected, .error, .dropped:
       return Color(.braveErrorLabel)
-    case .submitted:
+    case .submitted, .signed:
       return Color(.braveWarningLabel)
     case .unapproved:
       return Color(.secondaryButtonTint)

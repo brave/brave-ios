@@ -12,31 +12,68 @@ import os.log
 public actor AdblockResourceDownloader: Sendable {
   public static let shared = AdblockResourceDownloader()
   
-  /// A formatter that is used to format a version number
-  private let fileVersionDateFormatter: DateFormatter = {
-    let dateFormatter = DateFormatter()
-    dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-    dateFormatter.dateFormat = "yyyy.MM.dd.HH.mm.ss"
-    dateFormatter.timeZone = TimeZone(secondsFromGMT: 0)
-    return dateFormatter
-  }()
+  /// All the different resources this downloader handles
+  static let handledResources: [BraveS3Resource] = [
+    .adBlockRules, .debounceRules
+  ]
+  
+  /// A list of old resources that need to be deleted so as not to take up the user's disk space
+  private static let deprecatedResources: [BraveS3Resource] = [.deprecatedGeneralCosmeticFilters]
   
   /// The resource downloader that will be used to download all our resoruces
-  private let resourceDownloader: ResourceDownloader
-  /// All the resources that this downloader handles
-  private let handledResources: [ResourceDownloader.Resource] = [.genericContentBlockingBehaviors, .generalCosmeticFilters]
+  private let resourceDownloader: ResourceDownloader<BraveS3Resource>
 
   init(networkManager: NetworkManager = NetworkManager()) {
     self.resourceDownloader = ResourceDownloader(networkManager: networkManager)
   }
   
-  /// Load the cached data and await the results
-  public func loadCachedData() async {
-    await withTaskGroup(of: Void.self) { group in
-      for resource in handledResources {
-        group.addTask {
-          await self.loadCachedData(for: resource)
+  /// This will load cached and bundled data for the allowed modes.
+  func loadCachedAndBundledDataIfNeeded(allowedModes: Set<ContentBlockerManager.BlockingMode>) async {
+    guard !allowedModes.isEmpty else { return }
+    await loadCachedDataIfNeeded(allowedModes: allowedModes)
+    await loadBundledDataIfNeeded(allowedModes: allowedModes)
+  }
+  
+  /// This will load bundled data for the given content blocking modes. But only if the files are not already compiled.
+  private func loadBundledDataIfNeeded(allowedModes: Set<ContentBlockerManager.BlockingMode>) async {
+    // Compile bundled blocklists but only if we don't have anything already loaded.
+    await ContentBlockerManager.GenericBlocklistType.allCases.asyncConcurrentForEach { genericType in
+      let blocklistType = ContentBlockerManager.BlocklistType.generic(genericType)
+      let modes = await blocklistType.allowedModes.asyncFilter { mode in
+        guard allowedModes.contains(mode) else { return false }
+        // Non .blockAds can be recompiled safely because they are never replaced by downloaded files
+        if genericType != .blockAds { return true }
+        
+        // .blockAds is special because it can be replaced by a downloaded file.
+        // Hence we need to first check if it already exists.
+        if await ContentBlockerManager.shared.hasRuleList(for: blocklistType, mode: mode) {
+          return false
+        } else {
+          return true
         }
+      }
+      
+      do {
+        try await ContentBlockerManager.shared.compileBundledRuleList(for: genericType, modes: modes)
+      } catch {
+        assertionFailure("A bundled file should not fail to compile")
+      }
+    }
+  }
+  
+  /// Load the cached data and await the results
+  private func loadCachedDataIfNeeded(allowedModes: Set<ContentBlockerManager.BlockingMode>) async {
+    // Here we load downloaded resources if we need to
+    await Self.handledResources.asyncConcurrentForEach { resource in
+      do {
+        // Check if we have cached results for the given resource
+        if let cachedResult = try resource.cachedResult() {
+          await self.handle(downloadResult: cachedResult, for: resource, allowedModes: allowedModes)
+        }
+      } catch {
+        ContentBlockerManager.log.error(
+          "Failed to load cached data for resource \(resource.cacheFileName): \(error)"
+        )
       }
     }
   }
@@ -45,64 +82,99 @@ public actor AdblockResourceDownloader: Sendable {
   public func startFetching() {
     let fetchInterval = AppConstants.buildChannel.isPublic ? 6.hours : 10.minutes
     
-    for resource in handledResources {
+    for resource in Self.handledResources {
       startFetching(resource: resource, every: fetchInterval)
+    }
+    
+    // Remove any old files
+    // We can remove this code in some not-so-distant future
+    for resource in Self.deprecatedResources {
+      do {
+        try resource.removeCacheFolder()
+      } catch {
+        ContentBlockerManager.log.error(
+          "Failed to removed deprecated file \(resource.cacheFileName): \(error)"
+        )
+      }
     }
   }
   
   /// Start fetching the given resource at regular intervals
-  private func startFetching(resource: ResourceDownloader.Resource, every fetchInterval: TimeInterval) {
+  private func startFetching(resource: BraveS3Resource, every fetchInterval: TimeInterval) {
     Task { @MainActor in
-      if let fileURL = ResourceDownloader.downloadedFileURL(for: resource) {
-        let date = try ResourceDownloader.creationDate(for: resource)
-        await self.handle(downloadedFileURL: fileURL, for: resource, date: date)
-      }
-      
       for try await result in await self.resourceDownloader.downloadStream(for: resource, every: fetchInterval) {
         switch result {
         case .success(let downloadResult):
-          await self.handle(downloadedFileURL: downloadResult.fileURL, for: resource, date: downloadResult.date)
+          await self.handle(
+            downloadResult: downloadResult, for: resource,
+            allowedModes: Set(ContentBlockerManager.BlockingMode.allCases)
+          )
         case .failure(let error):
-          Logger.module.error("\(error.localizedDescription)")
+          ContentBlockerManager.log.error("Failed to fetch resource `\(resource.cacheFileName)`: \(error.localizedDescription)")
         }
       }
     }
   }
   
-  /// Load cached data for the given resource. Ensures this is done on the MainActor
-  private func loadCachedData(for resource: ResourceDownloader.Resource) async {
-    if let fileURL = ResourceDownloader.downloadedFileURL(for: resource) {
-      let date = try? ResourceDownloader.creationDate(for: resource)
-      await handle(downloadedFileURL: fileURL, for: resource, date: date)
-    }
-  }
-  
   /// Handle the downloaded file url for the given resource
-  private func handle(downloadedFileURL: URL, for resource: ResourceDownloader.Resource, date: Date?) async {
-    let version = date != nil ? fileVersionDateFormatter.string(from: date!) : nil
-    
+  private func handle(downloadResult: ResourceDownloader<BraveS3Resource>.DownloadResult, for resource: BraveS3Resource, allowedModes: Set<ContentBlockerManager.BlockingMode>) async {
     switch resource {
-    case .genericFilterRules:
-      await AdBlockEngineManager.shared.add(
-        resource: AdBlockEngineManager.Resource(type: .ruleList, source: .adBlock),
-        fileURL: downloadedFileURL,
-        version: version
-      )
+    case .adBlockRules:
+      let blocklistType = ContentBlockerManager.BlocklistType.generic(.blockAds)
+      let modes = await blocklistType.allowedModes.asyncFilter { mode in
+        guard allowedModes.contains(mode) else { return false }
+        if downloadResult.isModified { return true }
+        
+        // If the file wasn't modified, make sure we have something compiled.
+        // We should, but this can be false during upgrades if the identifier changed for some reason.
+        if await ContentBlockerManager.shared.hasRuleList(for: blocklistType, mode: mode) {
+          ContentBlockerManager.log.debug("Rule list already compiled for `\(blocklistType.makeIdentifier(for: mode))`")
+          return false
+        } else {
+          return true
+        }
+      }
+
+      // No modes are needed to be compiled
+      guard !modes.isEmpty else { return }
       
-    case .generalCosmeticFilters:
-      await AdBlockEngineManager.shared.add(
-        resource: AdBlockEngineManager.Resource(type: .dat, source: .cosmeticFilters),
-        fileURL: downloadedFileURL,
-        version: version
-      )
+      do {
+        guard let filterSet = try resource.downloadedString() else {
+          assertionFailure("This file was downloaded successfully so it should not be nil")
+          return
+        }
+        
+        let result = try AdblockEngine.contentBlockerRules(fromFilterSet: filterSet)
+        
+        // try to compile
+        try await ContentBlockerManager.shared.compile(
+          encodedContentRuleList: result.rulesJSON, for: blocklistType,
+          modes: modes
+        )
+      } catch {
+        ContentBlockerManager.log.error(
+          "Failed to compile rule lists for `\(blocklistType.debugDescription)`: \(error.localizedDescription)"
+        )
+      }
       
-    case .genericContentBlockingBehaviors:
-      await ContentBlockerManager.shared.set(resource: ContentBlockerManager.Resource(
-        url: downloadedFileURL,
-        sourceType: .downloaded(version: version)
-      ), for: .general(.blockAds))
+    case .debounceRules:
+      // We don't want to setup the debounce rules more than once for the same cached file
+      guard downloadResult.isModified || DebouncingService.shared.matcher == nil else {
+        return
+      }
       
-    default:
+      do {
+        guard let data = try resource.downloadedData() else {
+          assertionFailure("We just downloaded this file, how can it not be there?")
+          return
+        }
+        
+        try DebouncingService.shared.setup(withRulesJSON: data)
+      } catch {
+        ContentBlockerManager.log.error("Failed to setup debounce rules: \(error.localizedDescription)")
+      }
+      
+    case .deprecatedGeneralCosmeticFilters:
       assertionFailure("Should not be handling this resource type")
     }
   }

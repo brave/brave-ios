@@ -45,6 +45,8 @@ class OpenSearchEngine: NSObject, NSSecureCoding {
       return "Yandex"
     case EngineNames.brave.lowercased():
       return "Brave Search"
+    case "naver".lowercased():
+      return "네이버"
     default:
       return shortName
     }
@@ -53,7 +55,7 @@ class OpenSearchEngine: NSObject, NSSecureCoding {
   let image: UIImage
   let isCustomEngine: Bool
   let searchTemplate: String
-  fileprivate let suggestTemplate: String?
+  let suggestTemplate: String?
 
   fileprivate let SearchTermComponent = "{searchTerms}"
   fileprivate let LocaleTermComponent = "{moz:locale}"

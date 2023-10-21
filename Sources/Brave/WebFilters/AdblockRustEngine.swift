@@ -14,11 +14,7 @@ extension AdblockEngine {
   /// Check the rust engine if the request should be blocked given the `sourceURL` and `resourceType`.
   ///
   /// - Warning: You must provide a absolute URL (i.e. containing a host) fo r `requestURL` and `sourceURL`
-  public func shouldBlock(requestURL: URL, sourceURL: URL, resourceType: ResourceType) -> Bool {
-    // Compare the etld+1 of requestURL and sourceURL.
-    // Note: `baseDomain` returns etld+1
-    let isThirdParty = requestURL.baseDomain != sourceURL.baseDomain
-    
+  public func shouldBlock(requestURL: URL, sourceURL: URL, resourceType: ResourceType, isAggressive: Bool) -> Bool {
     guard requestURL.scheme != "data" else {
       // TODO: @JS Investigate if we need to deal with data schemes and if so, how?
       return false
@@ -29,9 +25,24 @@ extension AdblockEngine {
       return false
     }
     
-    guard let requestHost = requestURL.host, let sourceHost = sourceURL.host else {
-      assertionFailure("You must provide absolute paths for `requestURL` and `sourceURL`")
+    guard let requestDomain = requestURL.baseDomain, let sourceDomain = sourceURL.baseDomain else {
       return false
+    }
+    
+    guard let requestHost = requestURL.host, let sourceHost = sourceURL.host else {
+      return false
+    }
+    
+    // The content blocker rule for third party is the following:
+    // "third-party triggers if the resource isn’t from the same domain as the main page resource"
+    let isThirdParty = requestDomain != sourceDomain
+    
+    if !isAggressive {
+      // If we have standard mode for this engine,
+      // we don't block first party ads
+      guard isThirdParty else {
+        return false
+      }
     }
     
     return matches(

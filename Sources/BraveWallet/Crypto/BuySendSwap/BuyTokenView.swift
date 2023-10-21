@@ -14,7 +14,7 @@ struct BuyTokenView: View {
   @ObservedObject var networkStore: NetworkStore
   @ObservedObject var buyTokenStore: BuyTokenStore
 
-  @State private var showProviderSelection = false
+  @State private var isShowingProviderSelection = false
   
   var onDismiss: (() -> Void)
 
@@ -33,11 +33,11 @@ struct BuyTokenView: View {
           Section(
             header: WalletListHeaderView(title: Text(Strings.Wallet.buy))
           ) {
-            NavigationLink(destination: BuyTokenSearchView(buyTokenStore: buyTokenStore, network: networkStore.selectedChain)
+            NavigationLink(destination: BuyTokenSearchView(buyTokenStore: buyTokenStore, network: networkStore.defaultSelectedChain)
             ) {
               HStack {
                 if let token = buyTokenStore.selectedBuyToken {
-                  AssetIconView(token: token, network: networkStore.selectedChain, length: 26)
+                  AssetIconView(token: token, network: networkStore.defaultSelectedChain, length: 26)
                 }
                 Text(buyTokenStore.selectedBuyToken?.symbol ?? "BAT")
                   .font(.title3.weight(.semibold))
@@ -52,13 +52,17 @@ struct BuyTokenView: View {
           ) {
             HStack {
               Menu {
-                ForEach(buyTokenStore.supportedCurrencies) { currency in
-                  Button {
-                    buyTokenStore.selectedCurrency = currency
-                  } label: {
-                    Text(currency.currencyCode)
-                  }
-                }
+                Picker(
+                  selection: $buyTokenStore.selectedCurrency,
+                  content: {
+                    ForEach(buyTokenStore.supportedCurrencies) { currency in
+                      Text(currency.currencyCode)
+                        .foregroundColor(Color(.secondaryBraveLabel))
+                        .tag(currency)
+                    }
+                  },
+                  label: { EmptyView() } // `Menu` label is used instead
+                )
               } label: {
                 HStack(spacing: 4) {
                   Text(buyTokenStore.selectedCurrency.symbol)
@@ -68,11 +72,9 @@ struct BuyTokenView: View {
                     .imageScale(.small)
                     .foregroundColor(Color(.secondaryBraveLabel))
                 }
+                .padding(.vertical, 4)
               }
-              TextField(
-                String.localizedStringWithFormat(Strings.Wallet.amountInCurrency, buyTokenStore.selectedCurrency.currencyCode),
-                text: $buyTokenStore.buyAmount
-              )
+              TextField("0", text: $buyTokenStore.buyAmount)
                 .keyboardType(.decimalPad)
             }
             .listRowBackground(Color(.secondaryBraveGroupedBackground))
@@ -80,7 +82,7 @@ struct BuyTokenView: View {
           Section(
             header: HStack {
               Button(action: {
-                showProviderSelection = true
+                isShowingProviderSelection = true
               }) {
                 Text(Strings.Wallet.purchaseMethodButtonTitle)
               }
@@ -120,7 +122,7 @@ struct BuyTokenView: View {
       )
       .background(
         NavigationLink(
-          isActive: $showProviderSelection,
+          isActive: $isShowingProviderSelection,
           destination: {
             BuyProviderSelectionView(
               buyTokenStore: buyTokenStore,

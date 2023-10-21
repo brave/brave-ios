@@ -5,10 +5,10 @@
 
 import SwiftUI
 import WidgetKit
-import Strings
-import BraveShared
 import Intents
 import BraveWidgetsModels
+import BraveShared
+import Strings
 
 struct ShortcutsWidget: Widget {
   var body: some WidgetConfiguration {
@@ -22,6 +22,9 @@ struct ShortcutsWidget: Widget {
     .configurationDisplayName(Strings.Widgets.shortcutsWidgetTitle)
     .description(Strings.Widgets.shortcutsWidgetDescription)
     .supportedFamilies([.systemMedium])
+#if swift(>=5.9)
+    .contentMarginsDisabled()
+#endif
   }
 }
 
@@ -121,11 +124,11 @@ extension WidgetShortcut {
       return Strings.Widgets.shortcutsPrivateTabButton
     // Reusing localized strings for few items here.
     case .bookmarks:
-      return Strings.bookmarksMenuItem
+      return Strings.Widgets.bookmarksMenuItem
     case .history:
-      return Strings.historyMenuItem
+      return Strings.Widgets.historyMenuItem
     case .downloads:
-      return Strings.downloadsMenuItem
+      return Strings.Widgets.downloadsMenuItem
     case .playlist:
       // We usually use `Brave Playlist` to describe this feature.
       // Here we try to be more concise and use 'Playlist' word only.
@@ -135,7 +138,9 @@ extension WidgetShortcut {
     case .wallet:
       return Strings.Widgets.walletShortcutTitle
     case .scanQRCode:
-      return Strings.QRCode
+      return Strings.Widgets.QRCode
+    case .braveNews:
+      return Strings.Widgets.braveNews
     @unknown default:
       assertionFailure()
       return ""
@@ -148,23 +153,25 @@ extension WidgetShortcut {
       assertionFailure()
       return Image(systemName: "xmark.octagon")
     case .newTab:
-      return Image(braveSystemName: "brave.plus")
+      return Image(braveSystemName: "leo.plus.add")
     case .newPrivateTab:
-      return Image(braveSystemName: "brave.sunglasses")
+      return Image(braveSystemName: "leo.product.private-window")
     case .bookmarks:
-      return Image(braveSystemName: "brave.book")
+      return Image(braveSystemName: "leo.product.bookmarks")
     case .history:
-      return Image(braveSystemName: "brave.history")
+      return Image(braveSystemName: "leo.history")
     case .downloads:
-      return Image(braveSystemName: "brave.arrow.down.to.line")
+      return Image(braveSystemName: "leo.download")
     case .playlist:
-      return Image(braveSystemName: "brave.playlist")
+      return Image(braveSystemName: "leo.product.playlist")
     case .search:
-      return Image(braveSystemName: "brave.magnifyingglass")
+      return Image(braveSystemName: "leo.search")
     case .wallet:
-      return Image(braveSystemName: "brave.wallet")
+      return Image(braveSystemName: "leo.product.brave-wallet")
     case .scanQRCode:
-      return Image(braveSystemName: "brave.qr-code")
+      return Image(braveSystemName: "leo.qr.code")
+    case .braveNews:
+      return Image(braveSystemName: "leo.product.brave-news")
     @unknown default:
       assertionFailure()
       return Image(systemName: "xmark.octagon")
@@ -179,7 +186,7 @@ private struct ShortcutsView: View {
     VStack(spacing: 8) {
       // TODO: Would be nice to export handling this url to `BraveShared`.
       // Now it's hardcoded here and in `NavigationRouter`.
-      if let url = URL(string: "\(BraveUX.appURLScheme)://shortcut?path=0") {
+      if let url = URL(string: "\(AppURLScheme.appURLScheme)://shortcut?path=0") {
         Link(
           destination: url,
           label: {
@@ -200,7 +207,7 @@ private struct ShortcutsView: View {
       HStack(spacing: 8) {
         ForEach(slots, id: \.self) { shortcut in
           ShortcutLink(
-            url: "\(BraveUX.appURLScheme)://shortcut?path=\(shortcut.rawValue)",
+            url: "\(AppURLScheme.appURLScheme)://shortcut?path=\(shortcut.rawValue)",
             text: shortcut.displayString,
             image: {
               shortcut.image
@@ -210,12 +217,20 @@ private struct ShortcutsView: View {
       .frame(maxHeight: .infinity)
     }
     .padding(8)
-    .background(Color(UIColor.secondaryBraveBackground))
+    .widgetBackground { Color(UIColor.secondaryBraveBackground) }
   }
 }
 
 // MARK: - Previews
 
+#if swift(>=5.9)
+@available(iOS 17.0, *)
+#Preview(as: .systemMedium, widget: {
+  ShortcutsWidget()
+}, timeline: {
+  ShortcutEntry(date: .now, shortcutSlots: [.newTab, .newPrivateTab, .bookmarks])
+})
+#else
 #if DEBUG
 struct ShortcutsWidget_Previews: PreviewProvider {
   static var previews: some View {
@@ -227,4 +242,5 @@ struct ShortcutsWidget_Previews: PreviewProvider {
       .previewContext(WidgetPreviewContext(family: .systemMedium))
   }
 }
+#endif
 #endif

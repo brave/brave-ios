@@ -4,20 +4,64 @@ import UIKit
 import Shared
 import BraveShared
 import Data
+import LocalAuthentication
+import Combine
 
-class RoundInterfaceView: UIView {
-  override func layoutSubviews() {
-    super.layoutSubviews()
-    layer.cornerRadius = min(bounds.height, bounds.width) / 2.0
-  }
-}
+class SyncViewController: AuthenticationController {
 
-class SyncViewController: UIViewController {
+  private let isModallyPresented: Bool
+  private let dismissPresenter: Bool
+  private var localAuthObservers = Set<AnyCancellable>()
 
-  override func viewDidLoad() {
-    super.viewDidLoad()
+  // MARK: Lifecycle
+  
+  /// Constructor for Sync View Controller that enables
+  /// functionality related with local authentication and internet connection
+  /// - Parameters:
+  ///   - windowProtection: WindowProtection for passcode window functionality
+  ///   - requiresAuthentication: Boolean determines viewing the screen requires local auth
+  ///   - isAuthenticationCancellable: Determines if the niometric authentication has cancel function
+  ///   - isModallyPresented: Checks  if view controller presented modally in order to determine dismiss type
+  ///   - dismissPresenter: Boolean that determines cancel functionality dismisses the presented controller
+  init(windowProtection: WindowProtection? = nil,
+       requiresAuthentication: Bool = false,
+       isAuthenticationCancellable: Bool = true,
+       isModallyPresented: Bool = false,
+       dismissPresenter: Bool = true) {
+    self.isModallyPresented = isModallyPresented
+    self.dismissPresenter = dismissPresenter
+    super.init(windowProtection: windowProtection, requiresAuthentication: requiresAuthentication)
     
+    windowProtection?.isCancellable = isAuthenticationCancellable
+    
+    windowProtection?.cancelPressed
+      .sink { [weak self] _ in
+        if dismissPresenter {
+          self?.dismissSyncController()
+        }
+      }.store(in: &localAuthObservers)
+  }
+
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
+  override func viewDidLoad() {
     view.backgroundColor = .secondaryBraveBackground
+  }
+  
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    
+    if requiresAuthentication {
+      askForAuthentication(viewType: .sync) { [weak self] success, error in
+        guard let self else { return }
+        
+        if !success, error != .userCancel {
+          self.dismissSyncController()
+        }
+      }
+    }
   }
 
   /// Perform a block of code only if user has a network connection, shows an error alert otherwise.
@@ -29,5 +73,13 @@ class SyncViewController: UIViewController {
     }
 
     code()
+  }
+  
+  private func dismissSyncController() {
+    if isModallyPresented {
+      self.dismiss(animated: true)
+    } else {
+      self.navigationController?.popViewController(animated: true)
+    }
   }
 }

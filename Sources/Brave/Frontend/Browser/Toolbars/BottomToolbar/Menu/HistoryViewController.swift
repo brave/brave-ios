@@ -5,6 +5,7 @@
 import Foundation
 import Shared
 import BraveShared
+import Preferences
 import Storage
 import Data
 import CoreData
@@ -12,6 +13,7 @@ import BraveCore
 import Favicon
 import UIKit
 import DesignSystem
+import ScreenTime
 
 class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol {
 
@@ -60,11 +62,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
 
     tableView.do {
       $0.accessibilityIdentifier = "History List"
-      #if swift(>=5.5)
-      if #available(iOS 15.0, *) {
-        $0.sectionHeaderTopPadding = 5
-      }
-      #endif
+      $0.sectionHeaderTopPadding = 5
     }
 
     navigationItem.do {
@@ -72,7 +70,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
         $0.searchController = searchController
         $0.hidesSearchBarWhenScrolling = false
         $0.rightBarButtonItem =
-          UIBarButtonItem(image: UIImage(braveSystemNamed: "brave.trash")!.template, style: .done, target: self, action: #selector(performDeleteAll))
+          UIBarButtonItem(image: UIImage(braveSystemNamed: "leo.trash")!.template, style: .done, target: self, action: #selector(performDeleteAll))
       }
     }
 
@@ -235,19 +233,18 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
       $0.setLines(historyItem.title, detailText: historyItem.url.absoluteString)
 
       $0.imageView?.contentMode = .scaleAspectFit
-      $0.imageView?.image = Favicon.defaultImage
-      $0.imageView?.layer.borderColor = BraveUX.faviconBorderColor.cgColor
-      $0.imageView?.layer.borderWidth = BraveUX.faviconBorderWidth
+      $0.imageView?.layer.borderColor = FaviconUX.faviconBorderColor.cgColor
+      $0.imageView?.layer.borderWidth = FaviconUX.faviconBorderWidth
       $0.imageView?.layer.cornerRadius = 6
       $0.imageView?.layer.cornerCurve = .continuous
       $0.imageView?.layer.masksToBounds = true
 
       let domain = Domain.getOrCreate(
         forUrl: historyItem.url,
-        persistent: !PrivateBrowsingManager.shared.isPrivateBrowsing)
+        persistent: !isPrivateBrowsing)
 
       if domain.url?.asURL != nil {
-        cell.imageView?.loadFavicon(for: historyItem.url, monogramFallbackCharacter: historyItem.title?.first)
+        cell.imageView?.loadFavicon(for: historyItem.url, isPrivateBrowsing: isPrivateBrowsing)
       } else {
         cell.imageView?.clearMonogramFavicon()
         cell.imageView?.image = Favicon.defaultImage
@@ -263,6 +260,11 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
     }
 
     if let url = URL(string: historyItem.url.absoluteString) {
+      // Donate Custom Intent Open Website
+      if url.isSecureWebPage(), !isPrivateBrowsing {
+        ActivityShortcutManager.shared.donateCustomIntent(for: .openHistory, with: url.absoluteString)
+      }
+      
       dismiss(animated: true) {
         self.toolbarUrlActionsDelegate?.select(url: url, visitType: .typed)
       }
@@ -292,6 +294,13 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
       // Reoving a history item should remove its corresponded Recently Closed item
       RecentlyClosed.remove(with: historyItem.url.absoluteString)
       
+      do {
+        let screenTimeHistory = try STWebHistory(bundleIdentifier: Bundle.main.bundleIdentifier!)
+        screenTimeHistory.deleteHistory(for: historyItem.url)
+      } catch {
+        assertionFailure("STWebHistory could not be initialized: \(error)")
+      }
+      
       if isHistoryBeingSearched {
         reloadDataAndShowLoading(with: searchQuery)
       } else {
@@ -319,8 +328,16 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
       let newPrivateTabAction = UIAction(
         title: Strings.openNewPrivateTabButtonTitle,
         image: UIImage(systemName: "plus.square.fill.on.square.fill"),
-        handler: UIAction.deferredActionHandler { _ in
-          self.toolbarUrlActionsDelegate?.openInNewTab(historyItemURL, isPrivate: true)
+        handler: UIAction.deferredActionHandler { [unowned self] _ in
+          if !isPrivateBrowsing, Preferences.Privacy.privateBrowsingLock.value {
+            self.askForLocalAuthentication { [weak self] success, error in
+              if success {
+                self?.toolbarUrlActionsDelegate?.openInNewTab(historyItemURL, isPrivate: true)
+              }
+            }
+          } else {
+            self.toolbarUrlActionsDelegate?.openInNewTab(historyItemURL, isPrivate: true)
+          }
         })
 
       let copyAction = UIAction(
@@ -339,7 +356,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
 
       var newTabActionMenu: [UIAction] = [openInNewTabAction]
 
-      if !PrivateBrowsingManager.shared.isPrivateBrowsing {
+      if !isPrivateBrowsing {
         newTabActionMenu.append(newPrivateTabAction)
       }
 

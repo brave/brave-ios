@@ -6,7 +6,7 @@
 import SwiftUI
 import BraveCore
 
-class TransactionDetailsStore: ObservableObject {
+class TransactionDetailsStore: ObservableObject, WalletObserverStore {
   
   let transaction: BraveWallet.TransactionInfo
   @Published private(set) var parsedTransaction: ParsedTransaction?
@@ -35,9 +35,12 @@ class TransactionDetailsStore: ObservableObject {
   private let assetRatioService: BraveWalletAssetRatioService
   private let blockchainRegistry: BraveWalletBlockchainRegistry
   private let solanaTxManagerProxy: BraveWalletSolanaTxManagerProxy
+  private let assetManager: WalletUserAssetManagerType
   /// Cache for storing `BlockchainToken`s that are not in user assets or our token registry.
   /// This could occur with a dapp creating a transaction.
   private var tokenInfoCache: [String: BraveWallet.BlockchainToken] = [:]
+  
+  var isObserving: Bool = false
   
   init(
     transaction: BraveWallet.TransactionInfo,
@@ -46,7 +49,8 @@ class TransactionDetailsStore: ObservableObject {
     rpcService: BraveWalletJsonRpcService,
     assetRatioService: BraveWalletAssetRatioService,
     blockchainRegistry: BraveWalletBlockchainRegistry,
-    solanaTxManagerProxy: BraveWalletSolanaTxManagerProxy
+    solanaTxManagerProxy: BraveWalletSolanaTxManagerProxy,
+    userAssetManager: WalletUserAssetManagerType
   ) {
     self.transaction = transaction
     self.keyringService = keyringService
@@ -55,6 +59,7 @@ class TransactionDetailsStore: ObservableObject {
     self.assetRatioService = assetRatioService
     self.blockchainRegistry = blockchainRegistry
     self.solanaTxManagerProxy = solanaTxManagerProxy
+    self.assetManager = userAssetManager
     
     walletService.defaultBaseCurrency { [self] currencyCode in
       self.currencyCode = currencyCode
@@ -64,14 +69,19 @@ class TransactionDetailsStore: ObservableObject {
   func update() {
     Task { @MainActor in
       let coin = transaction.coin
-      let network = await rpcService.network(coin)
+      let networksForCoin = await rpcService.allNetworks(coin)
+      guard let network = networksForCoin.first(where: { $0.chainId == transaction.chainId }) else {
+        // Transactions should be removed if their network is removed
+        // https://github.com/brave/brave-browser/issues/30234
+        assertionFailure("The NetworkInfo for the transaction's chainId (\(transaction.chainId)) is unavailable")
+        return
+      }
       self.network = network
-      let keyring = await keyringService.keyringInfo(coin.keyringId)
       var allTokens: [BraveWallet.BlockchainToken] = await blockchainRegistry.allTokens(network.chainId, coin: network.coin) + tokenInfoCache.map(\.value)
-      let userVisibleTokens: [BraveWallet.BlockchainToken] = await walletService.userAssets(network.chainId, coin: network.coin)
+      let userAssets: [BraveWallet.BlockchainToken] = assetManager.getAllUserAssetsInNetworkAssets(networks: [network], includingUserDeleted: true).flatMap { $0.tokens }
       let unknownTokenContractAddresses = transaction.tokenContractAddresses
         .filter { contractAddress in
-          !userVisibleTokens.contains(where: { $0.contractAddress(in: network).caseInsensitiveCompare(contractAddress) == .orderedSame })
+          !userAssets.contains(where: { $0.contractAddress(in: network).caseInsensitiveCompare(contractAddress) == .orderedSame })
           && !allTokens.contains(where: { $0.contractAddress(in: network).caseInsensitiveCompare(contractAddress) == .orderedSame })
           && !tokenInfoCache.keys.contains(where: { $0.caseInsensitiveCompare(contractAddress) == .orderedSame })
         }
@@ -84,7 +94,7 @@ class TransactionDetailsStore: ObservableObject {
       }
       
       let priceResult = await assetRatioService.priceWithIndividualRetry(
-        userVisibleTokens.map { $0.assetRatioId.lowercased() },
+        userAssets.map { $0.assetRatioId.lowercased() },
         toAssets: [currencyFormatter.currencyCode],
         timeframe: .oneDay
       )
@@ -93,12 +103,13 @@ class TransactionDetailsStore: ObservableObject {
       }
       var solEstimatedTxFee: UInt64?
       if transaction.coin == .sol {
-        (solEstimatedTxFee, _, _) = await solanaTxManagerProxy.estimatedTxFee(transaction.id)
+        (solEstimatedTxFee, _, _) = await solanaTxManagerProxy.estimatedTxFee(network.chainId, txMetaId: transaction.id)
       }
+      let allAccounts = await keyringService.allAccounts().accounts
       guard let parsedTransaction = transaction.parsedTransaction(
         network: network,
-        accountInfos: keyring.accountInfos,
-        visibleTokens: userVisibleTokens,
+        accountInfos: allAccounts,
+        userAssets: userAssets,
         allTokens: allTokens,
         assetRatios: assetRatios,
         solEstimatedTxFee: solEstimatedTxFee,
@@ -155,6 +166,16 @@ class TransactionDetailsStore: ObservableObject {
       case let .solDappTransaction(details):
         self.title = Strings.Wallet.solanaDappTransactionTitle
         self.value = details.fromAmount
+      case let .solSwapTransaction(details):
+        self.title = Strings.Wallet.solanaSwapTransactionTitle
+        self.value = details.fromAmount
+      case let .filSend(details):
+        self.title = Strings.Wallet.sent
+        self.value = String(format: "%@ %@", details.sendAmount, details.sendToken?.symbol ?? "")
+        self.fiat = details.sendFiat
+        if let sendToken = details.sendToken, let tokenPrice = assetRatios[sendToken.assetRatioId.lowercased()] {
+          self.marketPrice = currencyFormatter.string(from: NSNumber(value: tokenPrice)) ?? "$0.00"
+        }
       case .other:
         break
       }

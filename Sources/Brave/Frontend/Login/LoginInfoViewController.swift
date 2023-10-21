@@ -6,10 +6,10 @@
 import Foundation
 import Storage
 import Shared
-import SwiftKeychainWrapper
 import BraveCore
 import UIKit
 import BraveUI
+import Combine
 
 class LoginInfoViewController: LoginAuthViewController {
 
@@ -49,6 +49,7 @@ class LoginInfoViewController: LoginAuthViewController {
 
   private var credentials: PasswordForm {
     didSet {
+      navigationItem.rightBarButtonItem?.isEnabled = !credentials.isBlockedByUser
       tableView.reloadData()
     }
   }
@@ -68,6 +69,8 @@ class LoginInfoViewController: LoginAuthViewController {
 
     return dateFormatter.string(from: credentials.dateCreated ?? Date())
   }
+
+  private var localAuthObservers = Set<AnyCancellable>()
 
   // MARK: Lifecycle
 
@@ -119,6 +122,7 @@ class LoginInfoViewController: LoginAuthViewController {
     navigationItem.do {
       $0.title = URL(string: credentials.signOnRealm)?.baseDomain ?? ""
       $0.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .edit, target: self, action: #selector(edit))
+      $0.rightBarButtonItem?.isEnabled = !credentials.isBlockedByUser
     }
 
     tableView.do {
@@ -129,11 +133,7 @@ class LoginInfoViewController: LoginAuthViewController {
       $0.tableFooterView = SettingsTableSectionHeaderFooterView(
         frame: CGRect(width: tableView.bounds.width, height: 1.0))
       $0.estimatedRowHeight = 44.0
-      #if swift(>=5.5)
-      if #available(iOS 15.0, *) {
-        $0.sectionHeaderTopPadding = 0
-      }
-      #endif
+      $0.sectionHeaderTopPadding = 0
     }
   }
 }
@@ -250,12 +250,11 @@ extension LoginInfoViewController {
   }
 
   override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    switch section {
-    case Section.information.rawValue:
-      return InfoItem.allCases.count
-    default:
+    guard section == Section.information.rawValue else {
       return 1
     }
+    
+  return credentials.isBlockedByUser ? 1 : InfoItem.allCases.count
   }
 
   override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -290,7 +289,7 @@ extension LoginInfoViewController {
 extension LoginInfoViewController {
 
   @objc private func edit() {
-    askForAuthentication() { [weak self] status in
+    askForAuthentication() { [weak self] status, _ in
       guard let self = self, status else { return }
       
       self.isEditingFieldData = true
@@ -413,7 +412,7 @@ extension LoginInfoViewController: LoginInfoTableViewCellDelegate {
   }
 
   func didSelectReveal(_ cell: LoginInfoTableViewCell, completion: ((Bool) -> Void)?) {
-    askForAuthentication() { status in
+    askForAuthentication() { status, _ in
       completion?(status)
     }
   }
@@ -428,7 +427,7 @@ extension LoginInfoViewController: LoginInfoTableViewCellDelegate {
     }
     
     if authenticationRequired {
-      askForAuthentication() { status in
+      askForAuthentication() { status, _ in
         if status {
           addPasswordToPasteBoardWithExpiry()
         }

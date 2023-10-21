@@ -5,6 +5,7 @@
 
 import Foundation
 import UIKit
+import LocalAuthentication
 
 extension UIWindowScene {
   /// A single scene should only have ONE browserViewController
@@ -24,5 +25,33 @@ extension UIWindowScene {
   /// Returns the first instance of `BrowserViewController` that is found in the current scene
   public var browserViewController: BrowserViewController? {
     return browserViewControllers.first
+  }
+  
+  /// Returns the browser colors of the current window scene
+  var browserColors: any BrowserColors {
+    if let bvc = browserViewController, bvc.privateBrowsingManager.isPrivateBrowsing {
+      return .privateMode
+    }
+    return .standard
+  }
+}
+
+extension UIViewController {
+  func askForLocalAuthentication(viewType: AuthViewType = .general, completion: ((Bool, LAError.Code?) -> Void)? = nil) {
+    guard let windowProtection = currentScene?.browserViewController?.windowProtection else {
+      completion?(false, nil)
+      return
+    }
+
+    // No Pincode set on device
+    // Local Authentication is not necesseary
+    if !windowProtection.isPassCodeAvailable {
+      completion?(true, nil)
+    } else {
+      windowProtection.presentAuthenticationForViewController(
+        determineLockWithPasscode: false, viewType: viewType) { status, error in
+          completion?(status, error)
+      }
+    }
   }
 }

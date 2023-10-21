@@ -9,14 +9,15 @@ import MediaPlayer
 import CarPlay
 import Shared
 import Data
-import BraveShared
+import Preferences
 import os.log
+import Playlist
 
 /// Lightweight class that manages a single MediaPlayer item
 /// The MediaPlayer is then passed to any controller that needs to use it.
 public class PlaylistCarplayManager: NSObject {
   private var carPlayStatusObservers = [Any]()
-  private weak var mediaPlayer: MediaPlayer?
+  private(set) weak var mediaPlayer: MediaPlayer?
   private(set) var isCarPlayAvailable = false
 
   private var carPlayController: PlaylistCarplayController?
@@ -24,10 +25,11 @@ public class PlaylistCarplayManager: NSObject {
   private var carplaySessionConfiguration: CPSessionConfiguration?
   let onCarplayUIChangedToRoot = PassthroughSubject<Void, Never>()
 
-  public var browserController: BrowserViewController?
+  public weak var browserController: BrowserViewController?
 
   var currentlyPlayingItemIndex = -1
   var currentPlaylistItem: PlaylistInfo?
+  var isPlaylistControllerPresented = false
 
   // When Picture-In-Picture is enabled, we need to store a reference to the controller to keep it alive, otherwise if it deallocates, the system automatically kills Picture-In-Picture.
   var playlistController: PlaylistViewController? {
@@ -51,6 +53,16 @@ public class PlaylistCarplayManager: NSObject {
       }
     }
   }
+  
+  public func destroyPiP() {
+    // This is the only way to have the system kill picture in picture as the restoration controller is deallocated
+    // And that means the video is deallocated, its AudioSession is stopped, and the Picture-In-Picture controller is deallocated.
+    // This is because `AVPictureInPictureController` is NOT a view controller and there is no way to dismiss it
+    // other than to deallocate the restoration controXller.
+    // We could also call `AVPictureInPictureController.stopPictureInPicture` BUT we'd still have to deallocate all resources.
+    // At least this way, we deallocate both AND pip is stopped in the destructor of `PlaylistViewController->ListController`
+    playlistController = nil
+  }
 
   // There can only ever be one instance of this class
   // Because there can only be a single AudioSession and MediaPlayer
@@ -72,28 +84,18 @@ public class PlaylistCarplayManager: NSObject {
     // Setup Playlist Download Resume Session
     PlaylistManager.shared.restoreSession()
 
-    // REFACTOR to support multiple windows.
-    // OR find a way to get WebKit to load `Youtube` and other sites WITHOUT having to be in the view hierarchy..
-    var currentWindow = browserController?.view.window
-
-    // BrowserController can actually be null when CarPlay is launched by the system
-    // The only such window that will be available is the actual CarPlay window
-    // So that's the window we need to use
-    // This does NOT break Multi-Window because we don't actually have multiple windows running
-    // when there is no browser controller. There is only a single CarPlay window.
-    if currentWindow == nil {
-      currentWindow =
-        UIApplication.shared.connectedScenes
-        .filter({ $0.activationState == .foregroundActive })
-        .compactMap({ $0 as? UIWindowScene })
-        .first?.windows
-        .filter({ $0.isKeyWindow }).first
-    }
+    // REFACTOR to find a way to get WebKit to load `Youtube` and other sites WITHOUT having to be in the view hierarchy..
+    let currentWindow =
+      UIApplication.shared.connectedScenes
+      .filter({ $0.activationState == .foregroundActive })
+      .compactMap({ $0 as? UIWindowScene })
+      .first?.windows
+      .filter({ $0.isKeyWindow }).first
 
     // If there is no media player, create one,
     // pass it to the car-play controller
     let mediaPlayer = self.mediaPlayer ?? MediaPlayer()
-    let mediaStreamer = PlaylistMediaStreamer(playerView: currentWindow ?? UIView())
+    let mediaStreamer = PlaylistMediaStreamer(playerView: currentWindow ?? UIView(), webLoaderFactory: LivePlaylistWebLoaderFactory())
 
     // Construct the CarPlay UI
     let carPlayController = PlaylistCarplayController(
@@ -125,7 +127,8 @@ public class PlaylistCarplayManager: NSObject {
         profile: browserController?.profile,
         mediaPlayer: mediaPlayer,
         initialItem: initialItem,
-        initialItemPlaybackOffset: initialItemPlaybackOffset)
+        initialItemPlaybackOffset: initialItemPlaybackOffset,
+        isPrivateBrowsing: browserController?.privateBrowsingManager.isPrivateBrowsing == true)
     self.mediaPlayer = mediaPlayer
     return playlistController
   }

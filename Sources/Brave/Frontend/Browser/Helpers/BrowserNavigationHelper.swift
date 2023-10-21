@@ -45,7 +45,7 @@ class BrowserNavigationHelper {
     let vc = BookmarksViewController(
       folder: bvc.bookmarkManager.lastVisitedFolder(),
       bookmarkManager: bvc.bookmarkManager,
-      isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing)
+      isPrivateBrowsing: bvc.privateBrowsingManager.isPrivateBrowsing)
     vc.toolbarUrlActionsDelegate = bvc
 
     open(vc, doneButton: DoneButton(style: .done, position: .right))
@@ -58,7 +58,7 @@ class BrowserNavigationHelper {
   func openHistory() {
     guard let bvc = bvc else { return }
     let vc = HistoryViewController(
-      isPrivateBrowsing: PrivateBrowsingManager.shared.isPrivateBrowsing,
+      isPrivateBrowsing: bvc.privateBrowsingManager.isPrivateBrowsing,
       historyAPI: bvc.braveCore.historyAPI,
       tabManager: bvc.tabManager)
     vc.toolbarUrlActionsDelegate = bvc
@@ -70,19 +70,19 @@ class BrowserNavigationHelper {
     guard let bvc = bvc else { return }
     dismissView()
 
-    @MainActor @Sendable func share(url: URL) {
-      bvc.presentActivityViewController(
-        url,
-        tab: url.isFileURL ? nil : bvc.tabManager.selectedTab,
-        sourceView: bvc.view,
-        sourceRect: bvc.view.convert(bvc.topToolbar.menuButton.frame, from: bvc.topToolbar.menuButton.superview),
-        arrowDirection: [.up]
-      )
-    }
-
     guard let tab = bvc.tabManager.selectedTab, let url = tab.url else { return }
     
     Task { @MainActor in
+      @MainActor func share(url: URL) {
+        bvc.presentActivityViewController(
+          url,
+          tab: url.isFileURL ? nil : bvc.tabManager.selectedTab,
+          sourceView: bvc.view,
+          sourceRect: bvc.view.convert(bvc.topToolbar.menuButton.frame, from: bvc.topToolbar.menuButton.superview),
+          arrowDirection: [.up]
+        )
+      }
+      
       if let temporaryDocument = tab.temporaryDocument {
         let tempDocURL = await temporaryDocument.getURL()
         // If we successfully got a temp file URL, share it like a downloaded file,
@@ -104,7 +104,7 @@ class BrowserNavigationHelper {
   }
 
   func openPlaylist() {
-    bvc?.openPlaylist(tab: nil, item: nil, playbackOffset: 0.0)
+    bvc?.openPlaylist(tab: nil, item: nil)
   }
   
   func openWallet() {

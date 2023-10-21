@@ -4,7 +4,7 @@
 
 import XCTest
 import CoreData
-import DataTestsUtils
+import TestHelpers
 @testable import Data
 
 class DataControllerTests: CoreDataTestCase {
@@ -26,16 +26,8 @@ class DataControllerTests: CoreDataTestCase {
     let tabFR = NSFetchRequest<NSFetchRequestResult>(entityName: String(describing: TabMO.self))
     XCTAssertEqual(try! viewContext.count(for: tabFR), 0)
 
-    // FaviconMO class name is different from its model(probably due to firefox having favicon class already)
-    // Need to use hardcoded string here.
-    let faviconFR = NSFetchRequest<NSFetchRequestResult>(entityName: "Favicon")
-    XCTAssertEqual(try! viewContext.count(for: faviconFR), 0)
-
     let domainFR = NSFetchRequest<NSFetchRequestResult>(entityName: String(describing: Domain.self))
     XCTAssertEqual(try! viewContext.count(for: domainFR), 0)
-
-    let historyFR = NSFetchRequest<NSFetchRequestResult>(entityName: String(describing: History.self))
-    XCTAssertEqual(try! viewContext.count(for: historyFR), 0)
   }
 
   func testSavingMainContext() {

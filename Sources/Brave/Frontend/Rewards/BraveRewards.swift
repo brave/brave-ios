@@ -5,7 +5,7 @@
 
 import Foundation
 import BraveCore
-import BraveShared
+import Preferences
 import Combine
 import DeviceCheck
 import Shared
@@ -23,17 +23,13 @@ public class BraveRewards: NSObject {
   }
 
   private(set) var ads: BraveAds
-  private(set) var ledger: BraveLedger?
-  var ledgerServiceDidStart: ((BraveLedger) -> Void)?
+  private(set) var rewardsAPI: BraveRewardsAPI?
+  var rewardsServiceDidStart: ((BraveRewardsAPI) -> Void)?
 
   private let configuration: Configuration
 
-  init(configuration: Configuration, buildChannel: Ads.BuildChannelInfo?) {
+  public init(configuration: Configuration) {
     self.configuration = configuration
-
-    if let channel = buildChannel {
-      BraveAds.buildChannelInfo = channel
-    }
 
     ads = BraveAds(stateStoragePath: configuration.storageURL.appendingPathComponent("ads").path)
 
@@ -50,44 +46,52 @@ public class BraveRewards: NSObject {
     if Preferences.Rewards.adsEnabledTimestamp.value == nil, ads.isEnabled {
       Preferences.Rewards.adsEnabledTimestamp.value = Date()
     }
-    reportLastAdsUsageP3A()
   }
 
-  func startLedgerService(_ completion: (() -> Void)?) {
-    if ledger != nil {
+  func startRewardsService(_ completion: (() -> Void)?) {
+    if rewardsAPI != nil {
       // Already started
       completion?()
       return
     }
     let storagePath = configuration.storageURL.appendingPathComponent("ledger").path
-    ledger = BraveLedger(stateStoragePath: storagePath)
-    ledger?.initializeLedgerService { [weak self] in
-      guard let self = self, let ledger = self.ledger else { return }
+    rewardsAPI = BraveRewardsAPI(stateStoragePath: storagePath)
+    rewardsAPI?.initializeRewardsService { [weak self] in
+      guard let self = self, let rewardsAPI = self.rewardsAPI else { return }
       if self.ads.isEnabled {
-        if self.ads.isAdsServiceRunning() {
-          self.updateAdsWithWalletInfo()
-        } else {
-          self.ads.initialize { success in
-            if success {
-              self.updateAdsWithWalletInfo()
-            }
-          }
-        }
+        self.fetchWalletAndInitializeAds()
       }
-      self.ledgerServiceDidStart?(ledger)
+      self.rewardsServiceDidStart?(rewardsAPI)
       completion?()
     }
   }
 
-  private func updateAdsWithWalletInfo() {
-    guard let ledger = ledger else { return }
-    ledger.currentWalletInfo { wallet in
-      guard let wallet = wallet else { return }
-      let seed = wallet.recoverySeed.map(\.uint8Value)
-      self.ads.updateWalletInfo(
-        wallet.paymentId,
-        base64Seed: Data(seed).base64EncodedString()
-      )
+  private func fetchWalletAndInitializeAds(toggleAds: Bool? = nil) {
+    guard let rewardsAPI = rewardsAPI else { return }
+    rewardsAPI.currentWalletInfo { wallet in
+      var walletInfo: BraveAds.WalletInfo?
+      if let wallet {
+        let seed = wallet.recoverySeed.map(\.uint8Value)
+        walletInfo = .init(
+          paymentId: wallet.paymentId,
+          recoverySeed: Data(seed).base64EncodedString()
+        )
+      }
+      // If ads is already initialized just toggle rewards ads and update the wallet info
+      if self.ads.isAdsServiceRunning() {
+        if let walletInfo {
+          self.ads.updateWalletInfo(walletInfo.paymentId, base64Seed: walletInfo.recoverySeed)
+        }
+        if let toggleAds {
+          self.ads.isEnabled = toggleAds
+        }
+        return
+      }
+      self.ads.initialize(walletInfo: walletInfo) { success in
+        if success, let toggleAds {
+          self.ads.isEnabled = toggleAds
+        }
+      }
     }
   }
 
@@ -118,27 +122,18 @@ public class BraveRewards: NSObject {
       Preferences.Rewards.rewardsToggledOnce.value = true
       createWalletIfNeeded { [weak self] in
         guard let self = self else { return }
-        self.ledger?.isAutoContributeEnabled = newValue
+        self.rewardsAPI?.setAutoContributeEnabled(newValue)
         let wasEnabled = self.ads.isEnabled
-        self.ads.isEnabled = newValue
         if !wasEnabled && newValue {
           Preferences.Rewards.adsEnabledTimestamp.value = Date()
         } else if wasEnabled && !newValue {
           Preferences.Rewards.adsDisabledTimestamp.value = Date()
         }
-        self.reportLastAdsUsageP3A()
         if !newValue {
+          self.ads.isEnabled = newValue
           self.proposeAdsShutdown()
         } else {
-          if self.ads.isAdsServiceRunning() {
-            self.updateAdsWithWalletInfo()
-          } else {
-            self.ads.initialize { success in
-              if success {
-                self.updateAdsWithWalletInfo()
-              }
-            }
-          }
+          self.fetchWalletAndInitializeAds(toggleAds: true)
         }
         self.didChangeValue(for: \.isEnabled)
       }
@@ -152,9 +147,9 @@ public class BraveRewards: NSObject {
       return
     }
     isCreatingWallet = true
-    startLedgerService {
-      guard let ledger = self.ledger else { return }
-      ledger.createWalletAndFetchDetails { [weak self] success in
+    startRewardsService {
+      guard let rewardsAPI = self.rewardsAPI else { return }
+      rewardsAPI.createWalletAndFetchDetails { [weak self] success in
         self?.isCreatingWallet = false
         completion?()
       }
@@ -171,7 +166,7 @@ public class BraveRewards: NSObject {
           at: configuration.storageURL.appendingPathComponent("ads")
         )
         if ads.isEnabled {
-          ads.initialize { _ in }
+          ads.initialize() { _ in }
         }
       }
     }
@@ -188,10 +183,12 @@ public class BraveRewards: NSObject {
   ) {
     let tabId = Int(tab.rewardsId)
     if isSelected {
-      ledger?.selectedTabId = UInt32(tabId)
+      rewardsAPI?.selectedTabId = UInt32(tabId)
       tabRetrieved(tabId, url: url, html: nil)
     }
-    ads.reportTabUpdated(tabId, url: url, redirectedFrom: tab.redirectURLs, isSelected: isSelected, isPrivate: isPrivate)
+    if ads.isAdsServiceRunning() && !isPrivate {
+      ads.reportTabUpdated(tabId, url: url, redirectedFrom: tab.redirectURLs, isSelected: isSelected)
+    }
   }
 
   /// Report that a page has loaded in the current browser tab, and the HTML is available for analysis
@@ -206,7 +203,7 @@ public class BraveRewards: NSObject {
     adsInnerText: String?
   ) {
     tabRetrieved(tabId, url: url, html: html)
-    if let innerText = adsInnerText {
+    if let innerText = adsInnerText, ads.isAdsServiceRunning() {
       ads.reportLoadedPage(
         with: url,
         redirectedFrom: redirectionURLs ?? [],
@@ -215,12 +212,12 @@ public class BraveRewards: NSObject {
         tabId: tabId
       )
     }
-    ledger?.reportLoadedPage(url: url, tabId: UInt32(tabId))
+    rewardsAPI?.reportLoadedPage(url: url, tabId: UInt32(tabId))
   }
 
   /// Report any XHR load happening in the page
   func reportXHRLoad(url: URL, tabId: Int, firstPartyURL: URL, referrerURL: URL?) {
-    ledger?.reportXHRLoad(
+    rewardsAPI?.reportXHRLoad(
       url,
       tabId: UInt32(tabId),
       firstPartyURL: firstPartyURL,
@@ -230,68 +227,31 @@ public class BraveRewards: NSObject {
 
   /// Report that media has started on a tab with a given id
   func reportMediaStarted(tabId: Int) {
+    if !ads.isAdsServiceRunning() { return }
     ads.reportMediaStarted(tabId: tabId)
   }
 
   /// Report that media has stopped on a tab with a given id
   func reportMediaStopped(tabId: Int) {
+    if !ads.isAdsServiceRunning() { return }
     ads.reportMediaStopped(tabId: tabId)
   }
 
   /// Report that a tab with a given id navigated to a new page in the same tab
   func reportTabNavigation(tabId: UInt32) {
-    ledger?.reportTabNavigationOrClosed(tabId: tabId)
+    rewardsAPI?.reportTabNavigationOrClosed(tabId: tabId)
   }
 
   /// Report that a tab with a given id was closed by the user
   func reportTabClosed(tabId: Int) {
-    ads.reportTabClosed(tabId: tabId)
-    ledger?.reportTabNavigationOrClosed(tabId: UInt32(tabId))
+    if ads.isAdsServiceRunning() {
+      ads.reportTabClosed(tabId: tabId)
+    }
+    rewardsAPI?.reportTabNavigationOrClosed(tabId: UInt32(tabId))
   }
 
   private func tabRetrieved(_ tabId: Int, url: URL, html: String?) {
-    ledger?.fetchPublisherActivity(from: url, faviconURL: nil, publisherBlob: html, tabId: UInt64(tabId))
-  }
-  
-  // MARK: - P3A
-  
-  func reportLastAdsUsageP3A() {
-    enum Answer: Int, CaseIterable {
-      case neverOn = 0
-      case stillOn = 1
-      case lessThanThreeHours = 2
-      case lessThanThreeDays = 3
-      case lessThanThreeWeeks = 4
-      case lessThanThreeMonths = 5
-      case moreThanThreeMonths = 6
-    }
-    var answer: Answer = .neverOn
-    if ads.isEnabled {
-      answer = .stillOn
-    } else if let start = Preferences.Rewards.adsEnabledTimestamp.value,
-              let end = Preferences.Rewards.adsDisabledTimestamp.value, end > start {
-      let components = Calendar.current.dateComponents(
-        [.hour, .day, .weekOfYear, .month],
-        from: start,
-        to: end
-      )
-      let (month, week, day, hour) = (components.month ?? 0,
-                                      components.weekOfYear ?? 0,
-                                      components.day ?? 0,
-                                      components.hour ?? 0)
-      if month >= 3 {
-        answer = .moreThanThreeMonths
-      } else if week >= 3 {
-        answer = .lessThanThreeMonths
-      } else if day >= 3 {
-        answer = .lessThanThreeWeeks
-      } else if hour >= 3 {
-        answer = .lessThanThreeDays
-      } else {
-        answer = .lessThanThreeHours
-      }
-    }
-    UmaHistogramEnumeration("Brave.Rewards.AdsEnabledDuration", sample: answer)
+    rewardsAPI?.fetchPublisherActivity(from: url, faviconURL: nil, publisherBlob: html, tabId: UInt64(tabId))
   }
 }
 
@@ -304,9 +264,9 @@ extension BraveRewards {
       case staging
     }
 
-    var storageURL: URL
+    public var storageURL: URL
     public var environment: Environment
-    public var adsBuildChannel: Ads.BuildChannelInfo = .init()
+    public var adsBuildChannel: BraveAds.BuildChannelInfo = .init()
     public var isDebug: Bool?
     public var overridenNumberOfSecondsBetweenReconcile: Int?
     public var retryInterval: Int?

@@ -8,6 +8,7 @@ import Shared
 import WebKit
 import MobileCoreServices
 import os.log
+import UniformTypeIdentifiers
 
 private struct BlobDownloadInfo: Codable {
   let url: URL
@@ -44,14 +45,6 @@ class DownloadContentScriptHandler: TabContentScript {
     return true
   }
   
-  private static func fileExtensionFromMIMEType(_ mimeType: String) -> String? {
-    if let uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType, mimeType as CFString, nil)?.takeRetainedValue(),
-       let fileExtension = UTTypeCopyPreferredTagWithClass(uti, kUTTagClassFilenameExtension)?.takeRetainedValue() {
-      return fileExtension as String
-    }
-    return nil
-  }
-  
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
     defer { replyHandler(nil, nil) }
     
@@ -66,7 +59,7 @@ class DownloadContentScriptHandler: TabContentScript {
       }
       
       let info = try JSONDecoder().decode(BlobDownloadInfo.self, from: JSONSerialization.data(withJSONObject: body))
-      guard let data = Bytes.decodeBase64(info.base64String) else {
+      guard let _ = Bytes.decodeBase64(info.base64String) else {
         return
       }
       
@@ -91,11 +84,10 @@ class DownloadContentScriptHandler: TabContentScript {
       }
 
       if !filename.contains(".") {
-        if let fileExtension = Self.fileExtensionFromMIMEType(info.mimeType) {
+        if let fileExtension = UTType(mimeType: info.mimeType)?.preferredFilenameExtension {
           filename += ".\(fileExtension)"
         }
       }
-      
       
 //      let response = DownloadedResourceResponse(statusCode: 200, data: data)
 //      tab?.temporaryDocument?.onDocumentDownloaded(document: response, error: nil)

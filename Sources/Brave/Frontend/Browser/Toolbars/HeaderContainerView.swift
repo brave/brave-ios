@@ -6,7 +6,7 @@
 import Foundation
 import UIKit
 import SnapKit
-import BraveShared
+import Preferences
 import Combine
 
 class HeaderContainerView: UIView {
@@ -23,17 +23,18 @@ class HeaderContainerView: UIView {
       updateConstraints()
     }
   }
-  let line = UIView().then {
-    $0.backgroundColor = .urlBarSeparator
-  }
+  let line = UIView()
   
   /// Container view for both the expanded & collapsed variants of the bar
   let contentView = UIView()
   
   private var cancellables: Set<AnyCancellable> = []
+  private let privateBrowsingManager: PrivateBrowsingManager
   
-  override init(frame: CGRect) {
-    super.init(frame: frame)
+  init(privateBrowsingManager: PrivateBrowsingManager) {
+    self.privateBrowsingManager = privateBrowsingManager
+    
+    super.init(frame: .zero)
     
     addSubview(contentView)
     contentView.addSubview(expandedBarStackView)
@@ -51,19 +52,15 @@ class HeaderContainerView: UIView {
       $0.edges.equalToSuperview()
     }
     
-    PrivateBrowsingManager.shared
+    updateColors()
+    
+    privateBrowsingManager
       .$isPrivateBrowsing
       .removeDuplicates()
-      .sink(receiveValue: { [weak self] isPrivateBrowsing in
-        self?.updateColors(isPrivateBrowsing)
-      })
-      .store(in: &cancellables)
-    
-    Preferences.General.nightModeEnabled.objectWillChange
       .receive(on: RunLoop.main)
-      .sink { [weak self] _ in
-        self?.updateColors(PrivateBrowsingManager.shared.isPrivateBrowsing)
-      }
+      .sink(receiveValue: { [weak self] _ in
+        self?.updateColors()
+      })
       .store(in: &cancellables)
   }
   
@@ -89,12 +86,10 @@ class HeaderContainerView: UIView {
     }
   }
   
-  private func updateColors(_ isPrivateBrowsing: Bool) {
-    if isPrivateBrowsing {
-      backgroundColor = .privateModeBackground
-    } else {
-      backgroundColor = Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
-    }
+  private func updateColors() {
+    let browserColors = privateBrowsingManager.browserColors
+    line.backgroundColor = browserColors.dividerSubtle
+    backgroundColor = browserColors.chromeBackground
   }
   
   @available(*, unavailable)

@@ -3,7 +3,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import BraveShared
+import Preferences
 import BraveUI
 import Shared
 import Data
@@ -143,16 +143,7 @@ extension BrowserViewController {
 
     let popover = PopoverController(contentController: controller)
     popover.addsConvenientDismissalMargins = false
+    popover.previewForOrigin = .init(view: topToolbar.locationView.shieldsButton)
     popover.present(from: topToolbar.locationView.shieldsButton, on: self)
-
-    let pulseAnimation = RadialPulsingAnimation(ringCount: 3)
-    pulseAnimation.present(
-      icon: topToolbar.locationView.shieldsButton.imageView?.image,
-      from: topToolbar.locationView.shieldsButton,
-      on: popover,
-      controller: self)
-    popover.popoverDidDismiss = { _ in
-      pulseAnimation.removeFromSuperview()
-    }
   }
 }

@@ -33,20 +33,7 @@ struct WalletListHeaderView<Title: View, Subtitle: View>: View {
     }
     .accessibilityElement(children: .contain)
     .foregroundColor(Color(.secondaryBraveLabel))
-    .osAvailabilityModifiers { content in
-      if #available(iOS 15.0, *) {
-        content
-          .padding(.horizontal, -8)
-      } else if #available(iOS 14.5, *) {
-        // In iOS 14.4-14.8 for some reason List does not apply correct padding
-        // or insets to headers and footers
-        content
-          .padding(.horizontal, 8)
-      } else {
-        content
-          .padding(.horizontal, -8)
-      }
-    }
+    .padding(.horizontal, -8)
     .frame(maxWidth: .infinity, alignment: .leading)
   }
 }
@@ -80,7 +67,7 @@ class WalletTableViewHeaderView: UITableViewHeaderFooterView {
 
   let titleLabel = UILabel().then {
     $0.textColor = .secondaryBraveLabel
-    $0.font = .preferredFont(forTextStyle: .footnote, weight: .medium)
+    $0.font = .preferredFont(for: .footnote, weight: .medium)
     $0.adjustsFontForContentSizeCategory = true
     $0.numberOfLines = 0
   }

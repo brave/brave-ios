@@ -8,21 +8,39 @@ import UIKit
 import LocalAuthentication
 import Shared
 import Combine
-import BraveShared
+import Preferences
 import BraveUI
-import SwiftKeychainWrapper
 import os.log
+
+public enum AuthViewType {
+  case external, general, sync, tabTray, passwords
+}
 
 public class WindowProtection {
 
   private class LockedViewController: UIViewController {
     let backgroundView = UIVisualEffectView(effect: UIBlurEffect(style: .systemThickMaterial))
     let lockImageView = UIImageView(image: UIImage(named: "browser-lock-icon", in: .module, compatibleWith: nil)!)
+    let titleLabel = UILabel().then {
+      $0.font = .preferredFont(for: .title3, weight: .semibold)
+      $0.adjustsFontForContentSizeCategory = true
+      $0.textColor = .bravePrimary
+      $0.numberOfLines = 0
+      $0.textAlignment = .center
+    }
     let unlockButton = FilledActionButton(type: .system).then {
-      $0.setTitle("Unlock", for: .normal)
+      $0.setTitle(Strings.unlockButtonTitle, for: .normal)
       $0.titleLabel?.font = .preferredFont(forTextStyle: .headline)
       $0.titleLabel?.adjustsFontForContentSizeCategory = true
       $0.backgroundColor = .braveBlurpleTint
+      $0.isHidden = true
+    }
+    let cancelButton = ActionButton(type: .system).then {
+      $0.setTitle(Strings.cancelButtonTitle, for: .normal)
+      $0.titleLabel?.font = .preferredFont(forTextStyle: .headline)
+      $0.titleLabel?.adjustsFontForContentSizeCategory = true
+      $0.setTitle(Strings.cancelButtonTitle, for: .normal)
+      $0.tintColor = .braveLabel
       $0.isHidden = true
     }
 
@@ -30,21 +48,37 @@ public class WindowProtection {
       super.viewDidLoad()
 
       view.addSubview(backgroundView)
+      view.addSubview(titleLabel)
       view.addSubview(lockImageView)
       view.addSubview(unlockButton)
+      view.addSubview(cancelButton)
       backgroundView.snp.makeConstraints {
         $0.edges.equalTo(view)
+      }
+      titleLabel.snp.makeConstraints {
+        $0.leading.greaterThanOrEqualToSuperview().offset(20)
+        $0.trailing.lessThanOrEqualToSuperview().offset(-20)
+        $0.centerX.equalToSuperview()
+        $0.bottom.equalTo(lockImageView.snp.top).offset(-40)
       }
       lockImageView.snp.makeConstraints {
         $0.center.equalTo(view)
       }
       unlockButton.snp.makeConstraints {
         $0.leading.greaterThanOrEqualToSuperview().offset(20)
-        $0.trailing.lessThanOrEqualToSuperview().offset(20)
+        $0.trailing.lessThanOrEqualToSuperview().offset(-20)
         $0.centerX.equalToSuperview()
         $0.height.greaterThanOrEqualTo(44)
         $0.width.greaterThanOrEqualTo(230)
         $0.top.equalTo(lockImageView.snp.bottom).offset(60)
+      }
+      cancelButton.snp.makeConstraints {
+        $0.leading.greaterThanOrEqualToSuperview().offset(20)
+        $0.trailing.lessThanOrEqualToSuperview().offset(-20)
+        $0.centerX.equalToSuperview()
+        $0.height.greaterThanOrEqualTo(44)
+        $0.width.greaterThanOrEqualTo(230)
+        $0.top.equalTo(unlockButton.snp.bottom).offset(15)
       }
     }
   }
@@ -55,6 +89,7 @@ public class WindowProtection {
   private var protectedWindow: UIWindow
   private var passcodeWindow: UIWindow
   private var context = LAContext()
+  private var viewType: AuthViewType = .general
 
   private var isVisible: Bool = false {
     didSet {
@@ -77,6 +112,32 @@ public class WindowProtection {
     return true
   }
 
+  var isCancellable: Bool = false {
+    didSet {
+      if oldValue != isCancellable {
+        lockedViewController.cancelButton.isHidden = !isCancellable
+      }
+    }
+  }
+  
+  var unlockScreentitle: String = "" {
+    didSet {
+      lockedViewController.titleLabel.isHidden = unlockScreentitle.isEmpty
+      lockedViewController.titleLabel.text = unlockScreentitle
+    }
+  }
+  
+  private let onCancelPressed = PassthroughSubject<Void, Never>()
+  private let didFinalizeAuthentication = PassthroughSubject<(Bool, AuthViewType), Never>()
+
+  var cancelPressed: AnyPublisher<Void, Never> {
+    onCancelPressed.eraseToAnyPublisher()
+  }
+  
+  var finalizedAuthentication: AnyPublisher<(Bool, AuthViewType), Never> {
+    didFinalizeAuthentication.eraseToAnyPublisher()
+  }
+    
   public init?(window: UIWindow) {
     guard let scene = window.windowScene else { return nil }
     protectedWindow = window
@@ -86,10 +147,13 @@ public class WindowProtection {
     passcodeWindow.rootViewController = lockedViewController
 
     lockedViewController.unlockButton.addTarget(self, action: #selector(tappedUnlock), for: .touchUpInside)
-
+    lockedViewController.cancelButton.addTarget(self, action: #selector(tappedCancel), for: .touchUpInside)
+    
     NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification)
       .sink(receiveValue: { [weak self] _ in
         guard let self = self else { return }
+        // Should set as non cancallable for browser lock
+        self.isCancellable = false
         // Update visibility when entering background
         self.isVisible = Preferences.Privacy.lockWithPasscode.value && self.context.canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
       })
@@ -100,7 +164,7 @@ public class WindowProtection {
       .sink(receiveValue: { [weak self] _ in
         guard let self = self else { return }
         self.context = LAContext()  // Reset context for new session
-        self.updateVisibleStatusForForeground()
+        self.updateVisibleStatusForForeground(viewType: .external)
       })
       .store(in: &cancellables)
   }
@@ -111,16 +175,21 @@ public class WindowProtection {
   }
 
   @objc private func tappedUnlock() {
-    presentLocalAuthentication()
+    presentLocalAuthentication(viewType: viewType)
+  }
+  
+  @objc private func tappedCancel() {
+    onCancelPressed.send(())
+    isVisible = false
   }
 
-  private func updateVisibleStatusForForeground(_ determineLockWithPasscode: Bool = true, completion: ((Bool) -> Void)? = nil) {
+  private func updateVisibleStatusForForeground(_ determineLockWithPasscode: Bool = true, viewType: AuthViewType = .general, completion: ((Bool, LAError.Code?) -> Void)? = nil) {
     var error: NSError?
     if !context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error),
       (error as? LAError)?.code == .passcodeNotSet {
       // User no longer has a passcode set so we can't evaluate the auth policy
       isVisible = false
-      completion?(false)
+      completion?(false, .passcodeNotSet)
       return
     }
 
@@ -128,25 +197,31 @@ public class WindowProtection {
       let isLocked = Preferences.Privacy.lockWithPasscode.value
       isVisible = isLocked
       if isLocked {
-        presentLocalAuthentication() { status in
-          completion?(status)
+        presentLocalAuthentication(viewType: viewType) { status, error in
+          completion?(status, error)
         }
       }
     } else {
       isVisible = true
-      presentLocalAuthentication() { status in
-        completion?(status)
+      presentLocalAuthentication(viewType: viewType) { status, error in
+        completion?(status, error)
       }
     }
   }
 
-  private func presentLocalAuthentication(completion: ((Bool) -> Void)? = nil) {
+  private func presentLocalAuthentication(viewType: AuthViewType, completion: ((Bool, LAError.Code?) -> Void)? = nil) {
+    self.viewType = viewType
+
     if !context.canEvaluatePolicy(.deviceOwnerAuthentication, error: nil) {
-      completion?(false)
+      completion?(false, .passcodeNotSet)
       return
     }
     
     lockedViewController.unlockButton.isHidden = true
+    if viewType == .external {
+      isCancellable = false
+    }
+    
     context.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: Strings.authenticationLoginsTouchReason) { success, error in
       DispatchQueue.main.async { [self] in
         if success {
@@ -158,28 +233,34 @@ public class WindowProtection {
             completion: { [self] _ in
               isVisible = false
               lockedViewController.view.alpha = 1.0
-              completion?(true)
+              completion?(true, nil)
             })
         } else {
-          lockedViewController.unlockButton.isHidden = false
-          completion?(false)
+          lockedViewController.unlockButton.isHidden = viewType == .general
+
+          let errorPolicy = error as? LAError
+          completion?(false, errorPolicy?.code)
           
           if let error = error {
             Logger.module.error("Failed to unlock browser using local authentication: \(error.localizedDescription)")
           }
         }
+        
+        self.didFinalizeAuthentication.send((success, viewType))
       }
     }
   }
 
-  func presentAuthenticationForViewController(determineLockWithPasscode: Bool = true, completion: ((Bool) -> Void)? = nil) {
+  func presentAuthenticationForViewController(determineLockWithPasscode: Bool = true, viewType: AuthViewType, completion: ((Bool, LAError.Code?) -> Void)? = nil) {
     if isVisible {
       return
     }
+    
+    self.viewType = viewType
 
     context = LAContext()
-    updateVisibleStatusForForeground(determineLockWithPasscode) { status in
-      completion?(status)
+    updateVisibleStatusForForeground(determineLockWithPasscode, viewType: viewType) { status, error in
+      completion?(status, error)
     }
   }
 }

@@ -16,11 +16,13 @@ public class WalletPanelHostingController: UIHostingController<WalletPanelContai
 
   public weak var delegate: BraveWalletDelegate?
   private var cancellable: AnyCancellable?
+  private var walletStore: WalletStore?
 
   public init(
     walletStore: WalletStore,
     tabDappStore: TabDappStore,
-    origin: URLOrigin
+    origin: URLOrigin,
+    webImageDownloader: WebImageDownloaderType
   ) {
     gesture = WalletInteractionGestureRecognizer(
       keyringStore: walletStore.keyringStore
@@ -36,8 +38,8 @@ public class WalletPanelHostingController: UIHostingController<WalletPanelContai
       self.delegate?.walletPanel(self, presentWalletWithContext: context, walletStore: walletStore)
     }
     rootView.openWalletURLAction = { [unowned self] url in
-      (presentingViewController ?? self).dismiss(animated: true) {
-        self.delegate?.openWalletURL(url)
+      (self.presentingViewController ?? self).dismiss(animated: true) { [self] in
+        self.delegate?.openDestinationURL(url)
       }
     }
     rootView.presentBuySendSwap = { [weak self] in
@@ -49,7 +51,7 @@ public class WalletPanelHostingController: UIHostingController<WalletPanelContai
             self.dismiss(
               animated: true,
               completion: {
-                let walletHostingController = WalletHostingViewController(walletStore: walletStore, presentingContext: .buySendSwap(destination))
+                let walletHostingController = WalletHostingViewController(walletStore: walletStore, webImageDownloader: webImageDownloader, presentingContext: .buySendSwap(destination))
                 walletHostingController.delegate = self.delegate
                 self.present(walletHostingController, animated: true)
               })
@@ -69,6 +71,7 @@ public class WalletPanelHostingController: UIHostingController<WalletPanelContai
           self.dismiss(animated: true)
         }
       }
+    self.walletStore = walletStore
   }
   
   @available(*, unavailable)
@@ -78,6 +81,7 @@ public class WalletPanelHostingController: UIHostingController<WalletPanelContai
   
   deinit {
     gesture.view?.removeGestureRecognizer(gesture)
+    walletStore?.isPresentingWalletPanel = false
   }
   
   private let gesture: WalletInteractionGestureRecognizer
@@ -85,6 +89,11 @@ public class WalletPanelHostingController: UIHostingController<WalletPanelContai
   public override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     view.window?.addGestureRecognizer(gesture)
+  }
+  
+  public override func viewDidLoad() {
+    super.viewDidLoad()
+    walletStore?.isPresentingWalletPanel = true
   }
   
   public override func viewDidLayoutSubviews() {

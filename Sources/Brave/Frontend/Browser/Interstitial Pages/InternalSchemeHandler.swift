@@ -37,6 +37,8 @@ public class InternalSchemeHandler: NSObject, WKURLSchemeHandler {
       "/interstitial-style/InterstitialStyles.css": "text/css",
       "/interstitial-style/NetworkError.css": "text/css",
       "/interstitial-style/CertificateError.css": "text/css",
+      "/interstitial-style/Web3Domain.css": "text/css",
+      "/interstitial-style/IPFSPreference.css": "text/css",
       "/interstitial-icon/Generic.svg": "image/svg+xml",
       "/interstitial-icon/Cloud.svg": "image/svg+xml",
       "/interstitial-icon/Clock.svg": "image/svg+xml",
@@ -45,6 +47,8 @@ public class InternalSchemeHandler: NSObject, WKURLSchemeHandler {
       "/interstitial-icon/Warning.svg": "image/svg+xml",
       "/interstitial-icon/DarkWarning.svg": "image/svg+xml",
       "/interstitial-icon/Carret.png": "image/png",
+      "/interstitial-icon/BraveIPFS.svg": "image/svg+xml",
+      "/interstitial-icon/IPFSBackground.svg": "image/svg+xml",
 
       // readermode
       "/\(InternalURL.Path.readermode.rawValue)/styles/Reader.css": "text/css",
@@ -89,7 +93,9 @@ public class InternalSchemeHandler: NSObject, WKURLSchemeHandler {
       return
     }
 
-    if !urlSchemeTask.request.isPrivileged {
+    // Need a better way to detect when WebKit is making a request from interactionState vs. a regular request by the user
+    // instead of having to check the cache policy
+    if !urlSchemeTask.request.isPrivileged && urlSchemeTask.request.cachePolicy == .useProtocolCachePolicy {
       urlSchemeTask.didFailWithError(InternalPageSchemeHandlerError.notAuthorized)
       return
     }

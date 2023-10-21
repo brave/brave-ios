@@ -16,7 +16,7 @@ struct TransactionDetailsView: View {
   @ObservedObject var networkStore: NetworkStore
   
   @Environment(\.presentationMode) @Binding private var presentationMode
-  @Environment(\.openWalletURLAction) private var openWalletURL
+  @Environment(\.openURL) private var openWalletURL
   
   init(
     transactionDetailsStore: TransactionDetailsStore,
@@ -51,13 +51,6 @@ struct TransactionDetailsView: View {
         Section(
           header: header
             .resetListHeaderStyle()
-            .osAvailabilityModifiers { content in
-              if #available(iOS 15.0, *) {
-                content // Padding already applied
-              } else {
-                content.padding(.top)
-              }
-            }
         ) {
           if let transactionFee = transactionDetailsStore.gasFee {
             detailRow(title: Strings.Wallet.transactionDetailsTxFeeTitle, value: transactionFee)
@@ -68,9 +61,9 @@ struct TransactionDetailsView: View {
           detailRow(title: Strings.Wallet.transactionDetailsDateTitle, value: dateFormatter.string(from: transactionDetailsStore.transaction.createdTime))
           if !transactionDetailsStore.transaction.txHash.isEmpty {
             Button(action: {
-              if let baseURL = self.networkStore.selectedChain.blockExplorerUrls.first.map(URL.init(string:)),
-                 let url = baseURL?.appendingPathComponent("tx/\(transactionDetailsStore.transaction.txHash)") {
-                openWalletURL?(url)
+              if let txNetwork = self.networkStore.allChains.first(where: { $0.chainId == transactionDetailsStore.transaction.chainId }),
+                 let url = txNetwork.txBlockExplorerLink(txHash: transactionDetailsStore.transaction.txHash, for: txNetwork.coin) {
+                openWalletURL(url)
               }
             }) {
               detailRow(title: Strings.Wallet.transactionDetailsTxHashTitle) {

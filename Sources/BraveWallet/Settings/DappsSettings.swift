@@ -4,7 +4,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import SwiftUI
-import BraveShared
+import Preferences
 import BraveCore
 import BraveUI
 
@@ -117,20 +117,13 @@ struct DappsSettings: View {
                 SiteRow(
                   siteConnection: siteConnection
                 )
-                .osAvailabilityModifiers { content in
-                  if #available(iOS 15.0, *) {
-                    content
-                      .swipeActions(edge: .trailing) {
-                        Button(role: .destructive, action: {
-                          withAnimation {
-                            siteConnectionStore.removeAllPermissions(from: [siteConnection])
-                          }
-                        }) {
-                          Label(Strings.Wallet.delete, systemImage: "trash")
-                        }
-                      }
-                  } else {
-                    content
+                .swipeActions(edge: .trailing) {
+                  Button(role: .destructive, action: {
+                    withAnimation {
+                      siteConnectionStore.removeAllPermissions(from: [siteConnection])
+                    }
+                  }) {
+                    Label(Strings.Wallet.delete, systemImage: "trash")
                   }
                 }
               }
@@ -151,7 +144,11 @@ struct DappsSettings: View {
     .listBackgroundColor(Color(UIColor.braveGroupedBackground))
     .navigationTitle(String.localizedStringWithFormat(Strings.Wallet.dappsSettingsNavTitle, coin.localizedTitle))
     .navigationBarTitleDisplayMode(.inline)
-    .filterable(text: $filterText, prompt: Strings.Wallet.manageSiteConnectionsFilterPlaceholder)
+    .searchable(
+      text: $filterText,
+      placement: .navigationBarDrawer(displayMode: .always),
+      prompt: Text(Strings.Wallet.manageSiteConnectionsFilterPlaceholder)
+    )
     .toolbar {
       ToolbarItemGroup(placement: .bottomBar) {
         Spacer()
@@ -188,11 +185,6 @@ private struct SiteRow: View {
   
   let siteConnection: SiteConnection
   
-  private let maxBlockies = 3
-  @ScaledMetric private var blockieSize = 16.0
-  private let maxBlockieSize: CGFloat = 32
-  @ScaledMetric private var blockieDotSize = 2.0
-  
   private var connectedAddresses: String {
     let account = Strings.Wallet.manageSiteConnectionsAccountSingular
     let accounts = Strings.Wallet.manageSiteConnectionsAccountPlural
@@ -223,31 +215,9 @@ private struct SiteRow: View {
     if siteConnection.connectedAddresses.isEmpty {
       EmptyView()
     } else {
-      HStack(spacing: -(min(blockieSize, maxBlockieSize) / 2)) {
-        let numberOfBlockies = min(maxBlockies, siteConnection.connectedAddresses.count)
-        ForEach(0..<numberOfBlockies, id: \.self) { index in
-          Blockie(address: siteConnection.connectedAddresses[index])
-            .frame(width: min(blockieSize, maxBlockieSize), height: min(blockieSize, maxBlockieSize))
-            .overlay(Circle().stroke(Color(.secondaryBraveGroupedBackground), lineWidth: 1))
-            .zIndex(Double(numberOfBlockies - index))
-        }
-        if siteConnection.connectedAddresses.count > maxBlockies {
-          Circle()
-            .foregroundColor(Color(.braveBlurpleTint))
-            .frame(width: min(blockieSize, maxBlockieSize), height: min(blockieSize, maxBlockieSize))
-            .overlay(
-              HStack(spacing: 1) {
-                Circle()
-                  .frame(width: blockieDotSize, height: blockieDotSize)
-                Circle()
-                  .frame(width: blockieDotSize, height: blockieDotSize)
-                Circle()
-                  .frame(width: blockieDotSize, height: blockieDotSize)
-              }
-                .foregroundColor(.white)
-            )
-        }
-      }
+      MultipleAccountBlockiesView(
+        accountAddresses: siteConnection.connectedAddresses
+      )
     }
   }
 }
@@ -266,22 +236,15 @@ private struct SiteConnectionDetailView: View {
       Section(header: Text(String.localizedStringWithFormat(Strings.Wallet.manageSiteConnectionsDetailHeader, siteConnection.coin.localizedTitle))) {
         ForEach(siteConnection.connectedAddresses, id: \.self) { address in
           AccountView(address: address, name: siteConnectionStore.accountInfo(for: address)?.name ?? "")
-            .osAvailabilityModifiers { content in
-              if #available(iOS 15.0, *) {
-                content
-                  .swipeActions(edge: .trailing) {
-                    Button(role: .destructive, action: {
-                      withAnimation(.default) {
-                        if let url = URL(string: siteConnection.url) {
-                          siteConnectionStore.removePermissions(for: siteConnection.coin, from: [address], url: url)
-                        }
-                      }
-                    }) {
-                      Label(Strings.Wallet.delete, systemImage: "trash")
-                    }
+            .swipeActions(edge: .trailing) {
+              Button(role: .destructive, action: {
+                withAnimation(.default) {
+                  if let url = URL(string: siteConnection.url) {
+                    siteConnectionStore.removePermissions(for: siteConnection.coin, from: [address], url: url)
                   }
-              } else {
-                content
+                }
+              }) {
+                Label(Strings.Wallet.delete, systemImage: "trash")
               }
             }
         }
@@ -290,11 +253,6 @@ private struct SiteConnectionDetailView: View {
           withAnimation(.default) {
             if let url = URL(string: siteConnection.url) {
               siteConnectionStore.removePermissions(for: siteConnection.coin, from: addressesToRemove, url: url)
-              if #available(iOS 15, *) {
-                // iOS 15 will dismiss itself (and will use `.swipeActions` instead of `.onDelete`)
-              } else if siteConnection.connectedAddresses.count == addressesToRemove.count {
-                presentationMode.dismiss()
-              }
             }
           }
         }
@@ -324,10 +282,6 @@ private struct SiteConnectionDetailView: View {
           Text(Strings.Wallet.manageSiteConnectionsConfirmAlertRemove),
           action: {
             siteConnectionStore.removeAllPermissions(from: [siteConnection])
-            if #available(iOS 15, *) { // iOS 15 will dismiss itself
-            } else {
-              presentationMode.dismiss()
-            }
           }
         ),
         secondaryButton: Alert.Button.cancel(Text(Strings.CancelString))

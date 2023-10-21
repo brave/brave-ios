@@ -11,6 +11,8 @@ import Shared
 import Data
 import MediaPlayer
 import os.log
+import Preferences
+import Playlist
 
 private extension PlaylistListViewController {
   func shareItem(_ item: PlaylistInfo, anchorView: UIView?) {
@@ -106,6 +108,19 @@ private extension PlaylistListViewController {
       }
     }
   }
+  
+  func openInPrivateTabWithAuthentication(_ item: PlaylistInfo) {
+    if !isPrivateBrowsing, Preferences.Privacy.privateBrowsingLock.value {
+      askForLocalAuthentication { [weak self] success, _ in
+        if success {
+          self?.openInNewTab(item, isPrivate: true)
+        }
+      }
+    } else {
+      self.openInNewTab(item, isPrivate: true)
+    }
+  }
+  
 }
 
 // MARK: UITableViewDelegate
@@ -149,7 +164,7 @@ extension PlaylistListViewController: UITableViewDelegate {
       handler: { [weak self] (action, view, completionHandler) in
         guard let self = self else { return }
 
-        let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
+        let isPrivateBrowsing = self.isPrivateBrowsing
         let style: UIAlertController.Style = UIDevice.current.userInterfaceIdiom == .pad ? .alert : .actionSheet
 
         let alert = UIAlertController(
@@ -173,7 +188,7 @@ extension PlaylistListViewController: UITableViewDelegate {
           UIAlertAction(
             title: Strings.PlayList.sharePlaylistOpenInNewPrivateTabTitle, style: .default,
             handler: { [weak self] _ in
-              self?.openInNewTab(currentItem, isPrivate: true)
+              self?.openInPrivateTabWithAuthentication(currentItem)
             }))
 
         if !isSharedFolder {
@@ -198,10 +213,10 @@ extension PlaylistListViewController: UITableViewDelegate {
         completionHandler(true)
       })
 
-    cacheAction.image = cacheState == .invalid ? UIImage(braveSystemNamed: "brave.cloud.and.arrow.down")! : UIImage(braveSystemNamed: "brave.cloud.slash")!
+    cacheAction.image = cacheState == .invalid ? UIImage(braveSystemNamed: "leo.cloud.download")! : UIImage(braveSystemNamed: "leo.cloud.off")!
     cacheAction.backgroundColor = UIColor.braveDarkerBlurple
 
-    deleteAction.image = UIImage(braveSystemNamed: "brave.trash")!
+    deleteAction.image = UIImage(braveSystemNamed: "leo.trash")!
     deleteAction.backgroundColor = UIColor.braveErrorLabel
 
     shareAction.image = UIImage(systemName: "square.and.arrow.up")
@@ -224,7 +239,7 @@ extension PlaylistListViewController: UITableViewDelegate {
     let actionProvider: UIContextMenuActionProvider = { _ in
       let cacheState = PlaylistManager.shared.state(for: currentItem.tagId)
       let cacheTitle = cacheState == .invalid ? Strings.PlayList.playlistSaveForOfflineButtonTitle : Strings.PlayList.playlistDeleteForOfflineButtonTitle
-      let cacheIcon = cacheState == .invalid ? UIImage(braveSystemNamed: "brave.cloud.and.arrow.down") : UIImage(braveSystemNamed: "brave.cloud.slash")
+      let cacheIcon = cacheState == .invalid ? UIImage(braveSystemNamed: "leo.cloud.download") : UIImage(braveSystemNamed: "leo.cloud.off")
       
       var menuItems: [UIMenuElement] = [
         UIMenu(
@@ -244,7 +259,7 @@ extension PlaylistListViewController: UITableViewDelegate {
 
             // In Private-Browsing, we do not show "Open in New Tab",
             // we only show "Open in Private Tab"
-            let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
+            let isPrivateBrowsing = self.isPrivateBrowsing
             if !isPrivateBrowsing {
               actions.append(
                 UIAction(
@@ -258,7 +273,7 @@ extension PlaylistListViewController: UITableViewDelegate {
               UIAction(
                 title: Strings.PlayList.sharePlaylistOpenInNewPrivateTabTitle, image: UIImage(systemName: "plus.square.fill.on.square.fill"),
                 handler: { [weak self] _ in
-                  self?.openInNewTab(currentItem, isPrivate: true)
+                  self?.openInPrivateTabWithAuthentication(currentItem)
                 }))
 
             return actions
@@ -274,7 +289,7 @@ extension PlaylistListViewController: UITableViewDelegate {
               if PlaylistFolder.getOtherFoldersCount() > 0 {
                 actions.append(
                   UIAction(
-                    title: Strings.PlayList.sharePlaylistMoveActionMenuTitle, image: UIImage(braveSystemNamed: "brave.folder"),
+                    title: Strings.PlayList.sharePlaylistMoveActionMenuTitle, image: UIImage(braveSystemNamed: "leo.folder"),
                     handler: { [weak self] _ in
                       self?.moveItems(indexPaths: [indexPath])
                     }))
@@ -291,7 +306,7 @@ extension PlaylistListViewController: UITableViewDelegate {
             }()),
 
           UIAction(
-            title: Strings.delete, image: UIImage(braveSystemNamed: "brave.trash"), attributes: .destructive,
+            title: Strings.delete, image: UIImage(braveSystemNamed: "leo.trash"), attributes: .destructive,
             handler: { [weak self] _ in
               self?.deleteItem(itemId: currentItem.tagId, indexPath: indexPath)
             })
@@ -350,42 +365,38 @@ extension PlaylistListViewController: UITableViewDelegate {
     delegate?.showStaticImage(image: nil)
 
     prepareToPlayItem(at: indexPath) { [weak self] item in
-      guard let item = item else {
+      guard let self = self, let item = item else {
         self?.activityIndicator.stopAnimating()
         return
       }
 
       PlaylistCarplayManager.shared.currentlyPlayingItemIndex = indexPath.row
       PlaylistCarplayManager.shared.currentPlaylistItem = item
-      self?.delegate?.playItem(item: item) { [weak self] item, error in
-        guard let self = self else {
-          PlaylistCarplayManager.shared.currentPlaylistItem = nil
-          PlaylistCarplayManager.shared.currentlyPlayingItemIndex = -1
-          return
-        }
-        
-        PlaylistCarplayManager.shared.currentPlaylistItem = item
-        self.activityIndicator.stopAnimating()
-
-        switch error {
-        case .other(let err):
-          Logger.module.error("\(err.localizedDescription)")
-          self.commitPlayerItemTransaction(at: indexPath, isExpired: false)
-          self.delegate?.displayLoadingResourceError()
-        case .cannotLoadMedia:
-          self.commitPlayerItemTransaction(at: indexPath, isExpired: false)
-          self.delegate?.displayLoadingResourceError()
-        case .expired:
-          self.commitPlayerItemTransaction(at: indexPath, isExpired: true)
-          self.delegate?.displayExpiredResourceError(item: item)
-        case .none:
+      
+      PlaylistManager.shared.playbackTask = Task { @MainActor in
+        do {
+          guard let item = try await self.delegate?.playItem(item: item) else {
+            self.activityIndicator.stopAnimating()
+            return
+          }
+          
+          PlaylistCarplayManager.shared.currentPlaylistItem = item
+          self.activityIndicator.stopAnimating()
+          
           PlaylistCarplayManager.shared.currentlyPlayingItemIndex = indexPath.row
           PlaylistCarplayManager.shared.currentPlaylistItem = item
           self.commitPlayerItemTransaction(at: indexPath, isExpired: false)
-          self.delegate?.updateLastPlayedItem(item: item)
-        case .cancelled:
+          
+          self.seekLastPlayedItem(
+            at: indexPath,
+            lastPlayedItemId: item.tagId,
+            lastPlayedTime: item.lastPlayedOffset)
+        } catch {
+          PlaylistCarplayManager.shared.currentPlaylistItem = nil
+          PlaylistCarplayManager.shared.currentlyPlayingItemIndex = -1
           self.commitPlayerItemTransaction(at: indexPath, isExpired: false)
-          Logger.module.debug("User cancelled Playlist Playback")
+          self.delegate?.displayLoadingResourceError()
+          Logger.module.error("Playlist Playback Error: \(error)")
         }
       }
     }

@@ -12,6 +12,8 @@ import BraveVPN
 
 /// A menu button that provides a shortcut to toggling Brave VPN
 struct VPNMenuButton: View {
+  /// The status indicating VPN is in retry state
+  var retryStateActive: Bool
   /// The product info
   var vpnProductInfo: VPNProductInfo
   /// The description for product info
@@ -41,7 +43,7 @@ struct VPNMenuButton: View {
   private func toggleVPN(_ enabled: Bool) {
     if BraveSkusManager.keepShowingSessionExpiredState {
       let alert = BraveSkusManager.sessionExpiredStateAlert(loginCallback: { _ in
-        openURL(BraveUX.braveAccountMainURL)
+        openURL(.brave.account)
       })
       
       displayAlert(alert)
@@ -58,6 +60,10 @@ struct VPNMenuButton: View {
     }
     switch BraveVPN.vpnState {
     case .notPurchased, .expired:
+      // Expired Subcriptions can cause glitch because of connect on demand
+      // Disconnect VPN before showing Purchase
+      BraveVPN.disconnect(skipChecks: true)
+
       guard let vc = vpnState.enableVPNDestinationVC else { return }
       displayVPNDestination(vc)
     case .purchased:
@@ -73,23 +79,13 @@ struct VPNMenuButton: View {
   }
 
   private var vpnToggle: some View {
-    Group {
-      let toggle = Toggle("Brave VPN", isOn: isVPNEnabledBinding)
-      if #available(iOS 14.0, *) {
-        toggle
-          .toggleStyle(SwitchToggleStyle(tint: .accentColor))
-      } else {
-        toggle
-      }
-    }
+    Toggle("Brave VPN", isOn: isVPNEnabledBinding)
+      .toggleStyle(SwitchToggleStyle(tint: retryStateActive ? Color(.braveErrorBorder) : .accentColor))
   }
 
   var body: some View {
     HStack {
-      MenuItemHeaderView(
-        icon: UIImage(named: "vpn_menu_icon", in: .module, compatibleWith: nil)!.template,
-        title: description == nil ? "Brave VPN" : Strings.OptionsMenu.braveVPNItemTitle,
-        subtitle: description)
+      headerView
       Spacer()
       if isVPNStatusChanging {
         ActivityIndicatorView(isAnimating: true)
@@ -117,7 +113,38 @@ struct VPNMenuButton: View {
     }
     .onReceive(NotificationCenter.default.publisher(for: .NEVPNStatusDidChange)) { _ in
       isVPNEnabled = BraveVPN.isConnected
-      isVPNStatusChanging = BraveVPN.reconnectPending
+      
+      if BraveVPN.isConnected {
+        isVPNStatusChanging = false
+      } else {
+        isVPNStatusChanging = BraveVPN.reconnectPending
+      }
     }
+  }
+  
+  private var headerView: some View {
+    HStack(spacing: 14) {
+      Image(braveSystemName: retryStateActive ? "leo.warning.triangle-filled" : "leo.product.vpn")
+        .font(.body)
+        .frame(width: 32, height: 32)
+        .foregroundColor(retryStateActive ? Color(.braveErrorLabel) : Color(.braveLabel))
+        .background(
+          RoundedRectangle(cornerRadius: 8, style: .continuous)
+            .fill(Color(.secondaryBraveGroupedBackground))
+            .shadow(color: Color.black.opacity(0.1), radius: 1, x: 0, y: 1)
+        )
+        .padding(.vertical, 2)
+      VStack(alignment: .leading, spacing: 3) {
+        Text(verbatim: description == nil ? "Brave VPN" : Strings.OptionsMenu.braveVPNItemTitle)
+          .foregroundColor(Color(.bravePrimary))
+        if let subTitle = description {
+          Text(retryStateActive ? Strings.VPN.vpnUpdatePaymentMethodDescriptionText : subTitle)
+            .font(.subheadline)
+            .foregroundColor(retryStateActive ? Color(.braveErrorLabel) : Color(.secondaryBraveLabel))
+        }
+      }
+      .padding(.vertical, description != nil ? 5 : 0)
+    }
+    .foregroundColor(Color(.braveLabel))
   }
 }

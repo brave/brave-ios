@@ -7,6 +7,7 @@ import Foundation
 import BraveCore
 import BigNumber
 import os.log
+import Preferences
 
 extension BraveWalletJsonRpcService {
   /// Obtain the decimal balance of an `BlockchainToken` for a given account
@@ -84,6 +85,23 @@ extension BraveWalletJsonRpcService {
         }
       }
     case .fil:
+      balance(account.address, coin: account.coin, chainId: network.chainId) { amount, status, _ in
+        guard status == .success && !amount.isEmpty else {
+          completion(nil)
+          return
+        }
+        let formatter = WeiFormatter(decimalFormatStyle: decimalFormatStyle)
+        if let valueString = formatter.decimalString(
+          for: "\(amount)",
+          radix: .decimal,
+          decimals: Int(token.decimals)
+        ) {
+          completion(Double(valueString))
+        } else {
+          completion(nil)
+        }
+      }
+    case .btc:
       completion(nil)
     @unknown default:
       completion(nil)
@@ -182,6 +200,23 @@ extension BraveWalletJsonRpcService {
         }
       }
     case .fil:
+      balance(accountAddress, coin: token.coin, chainId: network.chainId) { amount, status, _ in
+        guard status == .success && !amount.isEmpty else {
+          completion(nil)
+          return
+        }
+        let formatter = WeiFormatter(decimalFormatStyle: decimalFormatStyle)
+        if let valueString = formatter.decimalString(
+          for: "\(amount)",
+          radix: .decimal,
+          decimals: Int(token.decimals)
+        ) {
+          completion(BDouble(valueString))
+        } else {
+          completion(nil)
+        }
+      }
+    case .btc:
       completion(nil)
     @unknown default:
       completion(nil)
@@ -257,11 +292,18 @@ extension BraveWalletJsonRpcService {
     return balancesForAsset.reduce(0, +)
   }
   
-  /// Returns an array of all networks for the supported coin types.
-  @MainActor func allNetworksForSupportedCoins() async -> [BraveWallet.NetworkInfo] {
+  /// Returns an array of all networks for the supported coin types. Result will exclude test networks if test networks is set to
+  /// not shown in Wallet Settings
+  @MainActor func allNetworksForSupportedCoins(respectTestnetPreference: Bool = true) async -> [BraveWallet.NetworkInfo] {
+    await allNetworks(for: WalletConstants.supportedCoinTypes().elements, respectTestnetPreference: respectTestnetPreference)
+  }
+
+  /// Returns an array of all networks for givin coins. Result will exclude test networks if test networks is set to
+  /// not shown in Wallet Settings
+  @MainActor func allNetworks(for coins: [BraveWallet.CoinType], respectTestnetPreference: Bool = true) async -> [BraveWallet.NetworkInfo] {
     await withTaskGroup(of: [BraveWallet.NetworkInfo].self) { @MainActor [weak self] group -> [BraveWallet.NetworkInfo] in
       guard let self = self else { return [] }
-      for coinType in WalletConstants.supportedCoinTypes {
+      for coinType in coins {
         group.addTask { @MainActor in
           let chains = await self.allNetworks(coinType)
           return chains.filter { // localhost not supported
@@ -269,7 +311,12 @@ extension BraveWalletJsonRpcService {
           }
         }
       }
-      let allChains = await group.reduce([BraveWallet.NetworkInfo](), { $0 + $1 })
+      let allChains = await group.reduce([BraveWallet.NetworkInfo](), { $0 + $1 }).filter { network in
+        if !Preferences.Wallet.showTestNetworks.value && respectTestnetPreference { // filter out test networks
+          return !WalletConstants.supportedTestNetworkChainIds.contains(where: { $0 == network.chainId })
+        }
+        return true
+      }
       return allChains.sorted { lhs, rhs in
         // sort solana chains to the front of the list
         lhs.coin == .sol && rhs.coin != .sol
@@ -278,7 +325,7 @@ extension BraveWalletJsonRpcService {
   }
   
   /// Returns a nullable NFT metadata
-  @MainActor func fetchNFTMetadata(for token: BraveWallet.BlockchainToken) async -> NFTMetadata? {
+  @MainActor func fetchNFTMetadata(for token: BraveWallet.BlockchainToken, ipfsApi: IpfsAPI) async -> NFTMetadata? {
     var metaDataString = ""
     if token.isErc721 {
       let (_, metaData, result, errMsg) = await self.erc721Metadata(token.contractAddress, tokenId: token.tokenId, chainId: token.chainId)
@@ -288,7 +335,7 @@ extension BraveWalletJsonRpcService {
       }
       metaDataString = metaData
     } else {
-      let (metaData, result, errMsg) = await self.solTokenMetadata(token.contractAddress)
+      let (_, metaData, result, errMsg) = await self.solTokenMetadata(token.chainId, tokenMintAddress: token.contractAddress)
       if result != .success {
         Logger.module.debug("Failed to load Solana NFT metadata: \(errMsg)")
       }
@@ -296,13 +343,13 @@ extension BraveWalletJsonRpcService {
     }
     if let data = metaDataString.data(using: .utf8),
        let result = try? JSONDecoder().decode(NFTMetadata.self, from: data) {
-      return result
+      return result.httpfyIpfsUrl(ipfsApi: ipfsApi)
     }
     return nil
   }
   
   /// Returns a map of Token.id with its NFT metadata
-  @MainActor func fetchNFTMetadata(tokens: [BraveWallet.BlockchainToken]) async -> [String: NFTMetadata] {
+  @MainActor func fetchNFTMetadata(tokens: [BraveWallet.BlockchainToken], ipfsApi: IpfsAPI) async -> [String: NFTMetadata] {
     await withTaskGroup(of: [String: NFTMetadata].self) {  @MainActor [weak self] group -> [String: NFTMetadata] in
       guard let self = self else { return [:] }
       for token in tokens {
@@ -316,7 +363,7 @@ extension BraveWalletJsonRpcService {
             }
             metaDataString = metaData
           } else {
-            let (metaData, result, errMsg) = await self.solTokenMetadata(token.contractAddress)
+            let (_, metaData, result, errMsg) = await self.solTokenMetadata(token.chainId, tokenMintAddress: token.contractAddress)
             if result != .success {
               Logger.module.debug("Failed to load Solana NFT metadata: \(errMsg)")
             }
@@ -325,7 +372,8 @@ extension BraveWalletJsonRpcService {
           
           if let data = metaDataString.data(using: .utf8),
              let result = try? JSONDecoder().decode(NFTMetadata.self, from: data) {
-            return [token.id: result]
+
+            return [token.id: result.httpfyIpfsUrl(ipfsApi: ipfsApi)]
           }
           return [:]
         }

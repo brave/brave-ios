@@ -15,18 +15,28 @@ struct CryptoPagesView: View {
   @ObservedObject var cryptoStore: CryptoStore
   @ObservedObject var keyringStore: KeyringStore
 
+  @State private var isShowingMainMenu: Bool = false
   @State private var isShowingSettings: Bool = false
   @State private var isShowingSearch: Bool = false
   @State private var fetchedPendingRequestsThisSession: Bool = false
-
-  @Environment(\.openWalletURLAction) private var openWalletURL
+  @State private var selectedPageIndex: Int = 0
+  
+  private var isConfirmationButtonVisible: Bool {
+    if case .transactions(let txs) = cryptoStore.pendingRequest {
+      return !txs.isEmpty
+    }
+    return cryptoStore.pendingRequest != nil
+  }
 
   var body: some View {
     _CryptoPagesView(
       keyringStore: keyringStore,
       cryptoStore: cryptoStore,
       isShowingPendingRequest: $cryptoStore.isPresentingPendingRequest,
-      isConfirmationsButtonVisible: cryptoStore.pendingRequest != nil
+      isConfirmationsButtonVisible: isConfirmationButtonVisible,
+      selectedIndexChanged: { selectedIndex in
+        selectedPageIndex = selectedIndex
+      }
     )
     .onAppear {
       // If a user chooses not to confirm/reject their requests we shouldn't
@@ -90,38 +100,20 @@ struct CryptoPagesView: View {
             .labelStyle(.iconOnly)
             .foregroundColor(Color(.braveBlurpleTint))
         }
-        Menu {
-          Button(action: {
-            keyringStore.lock()
-          }) {
-            Label(Strings.Wallet.lock, braveSystemImage: "brave.lock")
-              .imageScale(.medium)  // Menu inside nav bar implicitly gets large
-          }
-          Button(action: { isShowingSettings = true }) {
-            Label(Strings.Wallet.settings, braveSystemImage: "brave.gear")
-              .imageScale(.medium)  // Menu inside nav bar implicitly gets large
-          }
-          Divider()
-          Button(action: { openWalletURL?(WalletConstants.braveWalletSupportURL) }) {
-            Label(Strings.Wallet.helpCenter, braveSystemImage: "brave.info.circle")
-          }
-        } label: {
-          Label(Strings.Wallet.otherWalletActionsAccessibilityTitle, systemImage: "ellipsis.circle")
+        Button(action: { self.isShowingMainMenu = true }) {
+          Label(Strings.Wallet.otherWalletActionsAccessibilityTitle, braveSystemImage: "leo.more.horizontal")
             .labelStyle(.iconOnly)
-            .osAvailabilityModifiers { content in
-              if #available(iOS 15.0, *) {
-                content
-              } else {
-                // iOS 14 does not correctly apply a large image scale to a `Menu`s label inside of a
-                // `ToolbarItemGroup` like it does with a `Button` using `DefaultButtonStyle`
-                content
-                  .imageScale(.large)
-              }
-            }
             .foregroundColor(Color(.braveBlurpleTint))
         }
         .accessibilityLabel(Strings.Wallet.otherWalletActionsAccessibilityTitle)
       }
+    }
+    .sheet(isPresented: $isShowingMainMenu) {
+      MainMenuView(
+        isFromPortfolio: selectedPageIndex == 0,
+        isShowingSettings: $isShowingSettings,
+        keyringStore: keyringStore
+      )
     }
   }
 
@@ -130,13 +122,14 @@ struct CryptoPagesView: View {
     var cryptoStore: CryptoStore
     var isShowingPendingRequest: Binding<Bool>
     var isConfirmationsButtonVisible: Bool
+    var selectedIndexChanged: (Int) -> Void
 
     func makeUIViewController(context: Context) -> CryptoPagesViewController {
       CryptoPagesViewController(
         keyringStore: keyringStore,
         cryptoStore: cryptoStore,
-        buySendSwapDestination: context.environment.buySendSwapDestination,
-        isShowingPendingRequest: isShowingPendingRequest
+        isShowingPendingRequest: isShowingPendingRequest,
+        selectedIndexChanged: selectedIndexChanged
       )
     }
     func updateUIViewController(_ uiViewController: CryptoPagesViewController, context: Context) {
@@ -148,23 +141,22 @@ struct CryptoPagesView: View {
 private class CryptoPagesViewController: TabbedPageViewController {
   private let keyringStore: KeyringStore
   private let cryptoStore: CryptoStore
-  private let swapButton = SwapButton()
   let pendingRequestsButton = ConfirmationsButton()
+  let selectedIndexChanged: (Int) -> Void
 
-  @Binding private var buySendSwapDestination: BuySendSwapDestination?
   @Binding private var isShowingPendingRequest: Bool
 
   init(
     keyringStore: KeyringStore,
     cryptoStore: CryptoStore,
-    buySendSwapDestination: Binding<BuySendSwapDestination?>,
-    isShowingPendingRequest: Binding<Bool>
+    isShowingPendingRequest: Binding<Bool>,
+    selectedIndexChanged: @escaping (Int) -> Void
   ) {
     self.keyringStore = keyringStore
     self.cryptoStore = cryptoStore
-    self._buySendSwapDestination = buySendSwapDestination
     self._isShowingPendingRequest = isShowingPendingRequest
-    super.init(nibName: nil, bundle: nil)
+    self.selectedIndexChanged = selectedIndexChanged
+    super.init(selectedIndexChanged: selectedIndexChanged)
   }
 
   @available(*, unavailable)
@@ -191,6 +183,14 @@ private class CryptoPagesViewController: TabbedPageViewController {
         $0.title = Strings.Wallet.portfolioPageTitle
       },
       UIHostingController(
+        rootView: TransactionsActivityView(
+          store: cryptoStore.transactionsActivityStore,
+          networkStore: cryptoStore.networkStore
+        )
+      ).then {
+        $0.title = Strings.Wallet.activityPageTitle
+      },
+      UIHostingController(
         rootView: AccountsView(
           cryptoStore: cryptoStore,
           keyringStore: keyringStore
@@ -198,25 +198,20 @@ private class CryptoPagesViewController: TabbedPageViewController {
       ).then {
         $0.title = Strings.Wallet.accountsPageTitle
       },
+      UIHostingController(
+        rootView: MarketView(
+          cryptoStore: cryptoStore,
+          keyringStore: keyringStore
+        )
+      ).then {
+        $0.title = Strings.Wallet.marketPageTitle
+      },
     ]
-
-    view.addSubview(swapButton)
-    swapButton.snp.makeConstraints {
-      $0.centerX.equalToSuperview()
-      $0.bottom.equalTo(view.safeAreaLayoutGuide).priority(.high)
-      $0.bottom.lessThanOrEqualTo(view).inset(8)
-    }
-
-    pages.forEach {
-      $0.additionalSafeAreaInsets = .init(top: 0, left: 0, bottom: swapButton.intrinsicContentSize.height + 8, right: 0)
-    }
-
-    swapButton.addTarget(self, action: #selector(tappedSwapButton), for: .touchUpInside)
 
     view.addSubview(pendingRequestsButton)
     pendingRequestsButton.snp.makeConstraints {
       $0.trailing.equalToSuperview().inset(16)
-      $0.centerY.equalTo(swapButton)
+      $0.bottom.equalTo(view.safeAreaLayoutGuide).priority(.high)
       $0.bottom.lessThanOrEqualTo(view).inset(8)
     }
     pendingRequestsButton.addTarget(self, action: #selector(tappedPendingRequestsButton), for: .touchUpInside)
@@ -225,30 +220,11 @@ private class CryptoPagesViewController: TabbedPageViewController {
   @objc private func tappedPendingRequestsButton() {
     isShowingPendingRequest = true
   }
-
-  @objc private func tappedSwapButton() {
-    let controller = FixedHeightHostingPanModalController(
-      rootView: BuySendSwapView(
-        networkStore: cryptoStore.networkStore,
-        action: { [weak self] destination in
-          self?.dismiss(
-            animated: true,
-            completion: {
-              self?.buySendSwapDestination = destination
-            })
-        })
-    )
-    presentPanModal(
-      controller,
-      sourceView: swapButton,
-      sourceRect: swapButton.bounds
-    )
-  }
 }
 
 private class ConfirmationsButton: SpringButton {
   private let imageView = UIImageView(
-    image: UIImage(braveSystemNamed: "brave.bell.badge")!
+    image: UIImage(braveSystemNamed: "leo.notification.dot")!
       .applyingSymbolConfiguration(.init(pointSize: 18))
   ).then {
     $0.tintColor = .white

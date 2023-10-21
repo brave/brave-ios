@@ -52,7 +52,7 @@ extension URL {
   }
   
   public func shouldRequestBeOpenedAsPopup() -> Bool {
-    /// List of schemes that are allowed to be opened in new tabs.
+    // List of schemes that are allowed to be opened in new tabs.
     let schemesAllowedToBeOpenedAsPopups = ["http", "https", "javascript", "about", "whatsapp"]
     
     // Treat `window.open("")` the same as `window.open("about:blank")`.
@@ -159,7 +159,7 @@ extension URL {
       return internalUrl.originalURLFromErrorPage?.displayURL
     }
     
-    if let internalUrl = InternalURL(self), internalUrl.isSessionRestore {
+    if let internalUrl = InternalURL(self), internalUrl.isSessionRestore || internalUrl.isWeb3URL {
       return internalUrl.extractedUrlParam?.displayURL
     }
 
@@ -229,6 +229,12 @@ extension URL {
     }
 
     return self
+  }
+  
+  public var withoutFragment: URL {
+    var components = URLComponents(url: self, resolvingAgainstBaseURL: false)
+    components?.fragment = nil
+    return components?.url ?? self
   }
 
   public var withoutWWW: URL {
@@ -338,7 +344,7 @@ extension URL {
   public var decodeReaderModeURL: URL? {
     if self.isReaderModeURL {
       if let components = URLComponents(url: self, resolvingAgainstBaseURL: false), let queryItems = components.queryItems {
-        if let queryItem = queryItems.find({ $0.name == "url" }), let value = queryItem.value {
+        if let queryItem = queryItems.first(where: { $0.name == "url" }), let value = queryItem.value {
           return URL(string: value)
         }
       }
@@ -372,7 +378,7 @@ extension URL {
                          "imdb"]
     
     let searchSiteList = ["search.brave", "google", "qwant",
-                          "startpage", "duckduckgo"]
+                          "startpage", "duckduckgo", "presearch"]
     
     let devSiteList = ["macrumors", "9to5mac", "developer.apple"]
                     
@@ -412,7 +418,8 @@ extension URL {
       "rumble.com", "gorf.tv", "odysee.com", "brighteon.com",
       "lbry.tv", "luminarypodcasts.com", "marthastewart.com",
       "bbcgoodfood.com", "bt.com", "skysports.com", "sky.co.nz",
-      "kayosports.com.au", "listennotes.com", "vid.puffyan.us"
+      "kayosports.com.au", "listennotes.com", "vid.puffyan.us",
+      "twitter.com", "x.com"
     ])
 
     /// Additional sites for Japanese locale
@@ -433,6 +440,11 @@ extension URL {
     }
 
     return siteList.contains(where: urlHost.contains)
+  }
+  
+  public var isPlaylistBlockedSiteURL: Bool {
+    let urlHost = self.host ?? self.hostSLD
+    return urlHost == "talk.brave.com"
   }
 
   public func uniquePathForFilename(_ filename: String) throws -> URL {
@@ -553,7 +565,7 @@ public struct InternalURL {
       components.queryItems = []
     }
 
-    if var item = components.queryItems?.find({ Param.uuidkey.matches($0.name) }) {
+    if var item = components.queryItems?.first(where: { Param.uuidkey.matches($0.name) }) {
       item.value = InternalURL.uuid
     } else {
       components.queryItems?.append(URLQueryItem(name: Param.uuidkey.rawValue, value: InternalURL.uuid))
@@ -612,6 +624,23 @@ public struct InternalURL {
 
     if url.path.hasPrefix(aboutPath) {
       return String(url.path.dropFirst(aboutPath.count))
+    }
+    return nil
+  }
+  
+  public var isWeb3URL: Bool {
+    return web3Component != nil
+  }
+  
+  /// Return the path after "web3/" in the URI.
+  public var web3Component: String? {
+    let web3Path = "/web3/"
+    guard let url = NSURL(idnString: stripAuthorization) as? URL else {
+      return nil
+    }
+    
+    if url.path.hasPrefix(web3Path) {
+      return String(url.path.dropFirst(web3Path.count))
     }
     return nil
   }

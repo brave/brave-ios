@@ -6,7 +6,6 @@
 import WidgetKit
 import SwiftUI
 import Shared
-import BraveShared
 import BraveWidgetsModels
 
 struct StatsWidget: Widget {
@@ -17,6 +16,9 @@ struct StatsWidget: Widget {
     .supportedFamilies([.systemMedium])
     .configurationDisplayName(Strings.Widgets.shieldStatsTitle)
     .description(Strings.Widgets.shieldStatsDescription)
+#if swift(>=5.9)
+    .contentMarginsDisabled()
+#endif
   }
 }
 
@@ -52,11 +54,7 @@ private struct StatsView: View {
   @Environment(\.redactionReasons) var redactionReasons
 
   private var placeholderOrPrivacyRedaction: Bool {
-    if #available(iOS 15, *) {
-      return redactionReasons.contains(.placeholder) || redactionReasons.contains(.privacy)
-    } else {
-      return redactionReasons.contains(.placeholder)
-    }
+    redactionReasons.contains(.placeholder) || redactionReasons.contains(.privacy)
   }
 
   var body: some View {
@@ -100,7 +98,7 @@ private struct StatsView: View {
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .padding(.vertical, 12)
     .padding(.horizontal, 16)
-    .background(Color(UIColor.secondaryBraveBackground))
+    .widgetBackground { Color(UIColor.secondaryBraveBackground) }
     .foregroundColor(Color(UIColor.braveLabel))
   }
 }

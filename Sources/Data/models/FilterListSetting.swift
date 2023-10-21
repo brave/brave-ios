@@ -18,6 +18,8 @@ public final class FilterListSetting: NSManagedObject, CRUD {
   @MainActor @NSManaged public var uuid: String
   @MainActor @NSManaged public var componentId: String?
   @MainActor @NSManaged public var isEnabled: Bool
+  @MainActor @NSManaged public var isAlwaysAggressive: Bool
+  @MainActor @NSManaged public var order: NSNumber?
   @MainActor @NSManaged private var folderPath: String?
 
   @MainActor public var folderURL: URL? {
@@ -36,7 +38,9 @@ public final class FilterListSetting: NSManagedObject, CRUD {
   }
   
   /// Create a filter list setting for the given UUID and enabled status
-  @MainActor public class func create(uuid: String, componentId: String?, isEnabled: Bool, inMemory: Bool) -> FilterListSetting {
+  @MainActor public class func create(
+    uuid: String, componentId: String?, isEnabled: Bool, order: Int, inMemory: Bool, isAlwaysAggressive: Bool
+  ) -> FilterListSetting {
     var newSetting: FilterListSetting!
 
     // Settings are usually accesed on view context, but when the setting doesn't exist,
@@ -48,6 +52,8 @@ public final class FilterListSetting: NSManagedObject, CRUD {
       newSetting.uuid = uuid
       newSetting.componentId = componentId
       newSetting.isEnabled = isEnabled
+      newSetting.isAlwaysAggressive = isAlwaysAggressive
+      newSetting.order = NSNumber(value: order)
     }
 
     let viewContext = inMemory ? DataController.viewContextInMemory : DataController.viewContext
@@ -74,6 +80,14 @@ public final class FilterListSetting: NSManagedObject, CRUD {
           Logger.module.error("FilterListSetting save error: \(error.localizedDescription)")
         }
       }
+    }
+  }
+  
+  @MainActor public func delete(inMemory: Bool) {
+    let viewContext = inMemory ? DataController.viewContextInMemory : DataController.viewContext
+    
+    Self.save(on: viewContext) {
+      self.delete(context: .existing(viewContext))
     }
   }
   

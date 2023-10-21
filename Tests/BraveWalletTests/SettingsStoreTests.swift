@@ -6,25 +6,26 @@
 import XCTest
 import Combine
 import BraveCore
-import BraveShared
+import Preferences
 import BigNumber
 @testable import BraveWallet
 
 class SettingsStoreTests: XCTestCase {
   
+  private var cancellables: Set<AnyCancellable> = .init()
+  
   /// Sets up TestKeyringService, TestBraveWalletService and TestTxService with some default values.
-  private func setupServices() -> (BraveWallet.TestKeyringService, BraveWallet.TestBraveWalletService, BraveWallet.TestTxService) {
-    let mockAccountInfos: [BraveWallet.AccountInfo] = [.previewAccount]
-    let mockUserAssets: [BraveWallet.BlockchainToken] = [.previewToken.then { $0.visible = true }]
+  private func setupServices() -> (BraveWallet.TestKeyringService, BraveWallet.TestBraveWalletService, BraveWallet.TestJsonRpcService, BraveWallet.TestTxService, IpfsAPI) {
+    let mockUserAssets: [BraveWallet.BlockchainToken] = [.previewToken.copy(asVisibleAsset: true)]
     
     let keyringService = BraveWallet.TestKeyringService()
     keyringService._keyringInfo = { _, completion in
       let keyring: BraveWallet.KeyringInfo = .init(
-        id: BraveWallet.DefaultKeyringId,
+        id: BraveWallet.KeyringId.default,
         isKeyringCreated: true,
         isLocked: false,
-        isBackedUp: true,
-        accountInfos: mockAccountInfos)
+        isBackedUp: true
+      )
       completion(keyring)
     }
     keyringService._addObserver = { _ in }
@@ -39,32 +40,117 @@ class SettingsStoreTests: XCTestCase {
     walletService._addObserver = { _ in }
     walletService._setDefaultBaseCurrency = { _ in }
     walletService._defaultBaseCurrency = { $0(CurrencyCode.usd.code) } // default is USD
+    walletService._nftDiscoveryEnabled = { _ in }
+    
+    let rpcService = BraveWallet.TestJsonRpcService()
+    rpcService._ensResolveMethod = { $0(.ask) }
+    rpcService._setEnsResolveMethod = { _ in }
+    rpcService._ensOffchainLookupResolveMethod = { $0(.ask) }
+    rpcService._setEnsOffchainLookupResolveMethod = { _ in }
+    rpcService._snsResolveMethod = { $0(.ask) }
+    rpcService._setSnsResolveMethod = { _ in }
+    rpcService._unstoppableDomainsResolveMethod = { $0(.ask) }
+    rpcService._setUnstoppableDomainsResolveMethod = { _ in }
     
     let txService = BraveWallet.TestTxService()
     
-    return (keyringService, walletService, txService)
+    let ipfsApi = TestIpfsAPI()
+    
+    return (keyringService, walletService, rpcService, txService, ipfsApi)
   }
   
-  /// Test `init` will populate default values from keyring service / wallet service
-  func testInit() {
-    let (keyringService, walletService, txService) = setupServices()
+  /// Test `setup` will populate default values from keyring service / wallet service
+  func testSetup() {
+    let (keyringService, walletService, rpcService, txService, ipfsApi) = setupServices()
     keyringService._autoLockMinutes = { $0(1) }
     walletService._defaultBaseCurrency = { $0(CurrencyCode.cad.code) }
+    walletService._nftDiscoveryEnabled = { $0(false) }
+    rpcService._ensResolveMethod = { $0(.disabled) }
+    rpcService._ensOffchainLookupResolveMethod = { $0(.disabled) }
+    rpcService._snsResolveMethod = { $0(.disabled) }
+    rpcService._unstoppableDomainsResolveMethod = { $0(.disabled) }
 
     let sut = SettingsStore(
       keyringService: keyringService,
       walletService: walletService,
+      rpcService: rpcService,
       txService: txService,
+      ipfsApi: ipfsApi,
       keychain: TestableKeychain()
     )
-
-    XCTAssertEqual(sut.autoLockInterval, .minute)
-    XCTAssertEqual(sut.currencyCode.code, CurrencyCode.cad.code)
+    
+    let autoLockIntervalExpectation = expectation(description: "setup-autoLockInterval")
+    sut.$autoLockInterval
+      .dropFirst()
+      .sink { autoLockInterval in
+        defer { autoLockIntervalExpectation.fulfill() }
+        XCTAssertEqual(autoLockInterval, .minute)
+      }
+      .store(in: &cancellables)
+    
+    let currencyCodeExpectation = expectation(description: "setup-currencyCode")
+    sut.$currencyCode
+      .dropFirst()
+      .sink { currencyCode in
+        defer { currencyCodeExpectation.fulfill() }
+        XCTAssertEqual(currencyCode, CurrencyCode.cad)
+      }
+      .store(in: &cancellables)
+    let nftDiscoveryExpectation = expectation(description: "setup-nftDiscovery")
+    sut.$isNFTDiscoveryEnabled
+      .dropFirst()
+      .sink { isNFTDiscoveryEnabled in
+        defer { nftDiscoveryExpectation.fulfill() }
+        XCTAssertFalse(isNFTDiscoveryEnabled)
+      }
+      .store(in: &cancellables)
+    
+    let ensResolveMethodExpectation = expectation(description: "setup-ensResolveMethod")
+    sut.$ensResolveMethod
+      .dropFirst()
+      .sink { ensResolveMethod in
+        defer { ensResolveMethodExpectation.fulfill() }
+        XCTAssertEqual(ensResolveMethod, .disabled)
+      }
+      .store(in: &cancellables)
+    
+    let ensOffchainResolveMethodExpectation = expectation(description: "setup-ensOffchainResolveMethod")
+    sut.$ensOffchainResolveMethod
+      .dropFirst()
+      .sink { ensOffchainResolveMethod in
+        defer { ensOffchainResolveMethodExpectation.fulfill() }
+        XCTAssertEqual(ensOffchainResolveMethod, .disabled)
+      }
+      .store(in: &cancellables)
+    
+    let snsResolveMethodExpectation = expectation(description: "setup-snsResolveMethod")
+    sut.$snsResolveMethod
+      .dropFirst()
+      .sink { snsResolveMethod in
+        defer { snsResolveMethodExpectation.fulfill() }
+        XCTAssertEqual(snsResolveMethod, .disabled)
+      }
+      .store(in: &cancellables)
+    
+    let udResolveMethodExpectation = expectation(description: "setup-udResolveMethod")
+    sut.$udResolveMethod
+      .dropFirst()
+      .sink { udResolveMethod in
+        defer { udResolveMethodExpectation.fulfill() }
+        XCTAssertEqual(udResolveMethod, .disabled)
+      }
+      .store(in: &cancellables)
+    
+    sut.setup()
+    
+    waitForExpectations(timeout: 1) { error in
+      XCTAssertNil(error)
+    }
   }
 
   /// Test `reset()` will call `reset()` on wallet service, update web3 preferences to default values, and update autolock & currency code values.
   func testReset() {
-    let (keyringService, walletService, txService) = setupServices()
+    let (keyringService, walletService, rpcService, txService, ipfsApi) = setupServices()
     var keyringServiceAutolockMinutes: Int32 = 1
     keyringService._autoLockMinutes = { $0(keyringServiceAutolockMinutes) }
     walletService._defaultBaseCurrency = { $0(CurrencyCode.cad.code) }
@@ -118,12 +204,14 @@ class SettingsStoreTests: XCTestCase {
     let sut = SettingsStore(
       keyringService: keyringService,
       walletService: walletService,
+      rpcService: rpcService,
       txService: txService,
+      ipfsApi: ipfsApi,
       keychain: keychain
     )
     
-    XCTAssertEqual(sut.autoLockInterval, .minute)
-    XCTAssertEqual(sut.currencyCode.code, CurrencyCode.cad.code)
+    sut.autoLockInterval = .minute
+    sut.currencyCode = .cad
 
     // reset internally in services, mock reset here.
     keyringServiceAutolockMinutes = 5
@@ -170,7 +258,7 @@ class SettingsStoreTests: XCTestCase {
 
   /// Test `resetTransaction()` will call `reset()` on TxService
   func testResetTransaction() {
-    let (keyringService, walletService, txService) = setupServices()
+    let (keyringService, walletService, rpcService, txService, ipfsApi) = setupServices()
     var txServiceResetCalled = false
     txService._reset = {
       txServiceResetCalled = true
@@ -179,7 +267,9 @@ class SettingsStoreTests: XCTestCase {
     let sut = SettingsStore(
       keyringService: keyringService,
       walletService: walletService,
+      rpcService: rpcService,
       txService: txService,
+      ipfsApi: ipfsApi,
       keychain: TestableKeychain()
     )
     

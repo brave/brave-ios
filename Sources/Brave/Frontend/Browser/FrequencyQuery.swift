@@ -79,36 +79,22 @@ class FrequencyQuery {
     var tabList = [Site]()
         
     for tab in tabs {
-        
-      if PrivateBrowsingManager.shared.isPrivateBrowsing {
+      if tab.isPrivate {
         if let url = tab.url, url.isWebPage(), !(InternalURL(url)?.isAboutHomeURL ?? false) {
-          
-          if let selectedTabID = tabManager.selectedTab?.id, let tabID = tab.id, selectedTabID == tabID {
+          if let selectedTabID = tabManager.selectedTab?.id, selectedTabID == tab.id {
             continue
           }
           
-          tabList.append(Site(url: url.absoluteString, title: tab.displayTitle, siteType: .tab, tabID: tab.id))
+          tabList.append(Site(url: url.absoluteString, title: tab.displayTitle, siteType: .tab, tabID: tab.id.uuidString))
         }
       } else {
-        var tabURL: URL?
-        
-        if let url = tab.url {
-          tabURL = url
-        } else if let tabID = tab.id {
-          let fetchedTab = TabMO.get(fromId: tabID)
-          
-          if let urlString = fetchedTab?.url, let url = URL(string: urlString) {
-            tabURL = url
-          }
-        }
-        
+        let tabURL = tab.url ?? SessionTab.from(tabId: tab.id)?.url
         if let url = tabURL, url.isWebPage(), !(InternalURL(url)?.isAboutHomeURL ?? false) {
-          
-          if let selectedTabID = tabManager.selectedTab?.id, let tabID = tab.id, selectedTabID == tabID {
+          if let selectedTabID = tabManager.selectedTab?.id, selectedTabID == tab.id {
             continue
           }
           
-          tabList.append(Site(url: url.absoluteString, title: tab.title ?? tab.displayTitle, siteType: .tab, tabID: tab.id))
+          tabList.append(Site(url: url.absoluteString, title: tab.displayTitle, siteType: .tab, tabID: tab.id.uuidString))
         }
       }
     }

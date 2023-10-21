@@ -14,9 +14,12 @@ struct AddCustomAssetView: View {
   var keyringStore: KeyringStore
   @ObservedObject var userAssetStore: UserAssetsStore
   var tokenNeedsTokenId: BraveWallet.BlockchainToken?
+  var supportedTokenTypes: [TokenType] = [.token, .nft]
+  var onNewAssetAdded: (() -> Void)?
+  
   @Environment(\.presentationMode) @Binding private var presentationMode
 
-  enum TokenType: Int, Identifiable, CaseIterable {
+  enum TokenType: Int, Identifiable {
     case token
     case nft
     
@@ -63,16 +66,43 @@ struct AddCustomAssetView: View {
   var body: some View {
     NavigationView {
       Form {
-        if tokenNeedsTokenId == nil {
+        if supportedTokenTypes.count != 1 {
           Section {
           } header: {
             Picker("", selection: $selectedTokenType) {
-              ForEach(TokenType.allCases) { type in
+              ForEach(supportedTokenTypes) { type in
                 Text(type.title)
               }
             }
             .pickerStyle(.segmented)
           }
+        }
+        Section(
+          header: WalletListHeaderView(title: networkSelectionStore.networkSelectionInForm?.coin == .sol ? Text(Strings.Wallet.tokenMintAddress) : Text(Strings.Wallet.tokenAddress))
+        ) {
+          TextField(Strings.Wallet.enterAddress, text: $addressInput)
+            .onChange(of: addressInput) { newValue in
+              guard !newValue.isEmpty else { return }
+              userAssetStore.tokenInfo(address: newValue) { token in
+                guard let token else { return }
+                if nameInput.isEmpty {
+                  nameInput = token.name
+                }
+                if symbolInput.isEmpty {
+                  symbolInput = token.symbol
+                }
+                if !token.isErc721, !token.isNft, decimalsInput.isEmpty {
+                  decimalsInput = "\(token.decimals)"
+                }
+                if let network = networkStore.allChains.first(where: { $0.chainId == token.chainId }) {
+                  networkSelectionStore.networkSelectionInForm = network
+                }
+              }
+            }
+            .autocapitalization(.none)
+            .autocorrectionDisabled()
+            .disabled(userAssetStore.isSearchingToken)
+            .listRowBackground(Color(.secondaryBraveGroupedBackground))
         }
         Section(
           header: WalletListHeaderView(title: Text(Strings.Wallet.customTokenNetworkHeader))
@@ -103,34 +133,6 @@ struct AddCustomAssetView: View {
             }
           }
           .listRowBackground(Color(.secondaryBraveGroupedBackground))
-        }
-        Section(
-          header: WalletListHeaderView(title: networkSelectionStore.networkSelectionInForm?.coin == .sol ? Text(Strings.Wallet.tokenMintAddress) : Text(Strings.Wallet.tokenAddress))
-        ) {
-          TextField(Strings.Wallet.enterAddress, text: $addressInput)
-            .onChange(of: addressInput) { newValue in
-              if !newValue.isEmpty, newValue.isETHAddress {
-                userAssetStore.tokenInfo(by: newValue) { token in
-                  if let token = token {
-                    if nameInput.isEmpty {
-                      nameInput = token.name
-                    }
-                    if symbolInput.isEmpty {
-                      symbolInput = token.symbol
-                    }
-                    if !token.isErc721 {
-                      if decimalsInput.isEmpty {
-                        decimalsInput = "\(token.decimals)"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-            .autocapitalization(.none)
-            .autocorrectionDisabled()
-            .disabled(userAssetStore.isSearchingToken)
-            .listRowBackground(Color(.secondaryBraveGroupedBackground))
         }
         Section(
           header: WalletListHeaderView(title: Text(Strings.Wallet.tokenSymbol))
@@ -284,9 +286,13 @@ struct AddCustomAssetView: View {
           }
       )
       .onAppear {
-        if let token = tokenNeedsTokenId {
+        if supportedTokenTypes.count == 1, let tokenType = supportedTokenTypes.first, selectedTokenType != tokenType {
           Task { @MainActor in
-            selectedTokenType = .nft
+            selectedTokenType = tokenType
+          }
+        }
+        if case .nft = selectedTokenType, let token = tokenNeedsTokenId {
+          Task { @MainActor in
             networkSelectionStore.networkSelectionInForm = await userAssetStore.networkInfo(by: token.chainId, coin: token.coin)
             nameInput = token.name
             symbolInput = token.symbol
@@ -313,7 +319,7 @@ struct AddCustomAssetView: View {
   }
 
   private func addCustomToken() {
-    let network = networkSelectionStore.networkSelectionInForm ?? networkStore.selectedChain
+    let network = networkSelectionStore.networkSelectionInForm ?? networkStore.defaultSelectedChain
     let token: BraveWallet.BlockchainToken
     switch selectedTokenType {
     case .token:
@@ -323,7 +329,9 @@ struct AddCustomAssetView: View {
         logo: logo,
         isErc20: network.coin != .sol,
         isErc721: false,
+        isErc1155: false,
         isNft: false,
+        isSpam: false,
         symbol: symbolInput,
         decimals: Int32(decimalsInput) ?? Int32((networkSelectionStore.networkSelectionInForm?.decimals ?? 18)),
         visible: true,
@@ -356,7 +364,9 @@ struct AddCustomAssetView: View {
           logo: "",
           isErc20: false,
           isErc721: network.coin != .sol && !tokenIdToHex.isEmpty,
+          isErc1155: false,
           isNft: true,
+          isSpam: false,
           symbol: symbolInput,
           decimals: 0,
           visible: true,
@@ -369,6 +379,7 @@ struct AddCustomAssetView: View {
     }
     userAssetStore.addUserAsset(token) { [self] success in
       if success {
+        onNewAssetAdded?()
         presentationMode.dismiss()
       } else {
         showError = true

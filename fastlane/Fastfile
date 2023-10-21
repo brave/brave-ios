@@ -37,9 +37,12 @@ platform :ios do
     run_tests(
       project: "App/Client.xcodeproj",
       scheme: "Debug",
-      device: "iPhone 8",
+      devices: options[:test_all] ? ["iPhone 14 (16.4)", "iPhone 14 (17.0)"] : ["iPhone 14 (16.4)"],
       code_coverage: true,
+      ensure_devices_found: true,
       skip_testing: [
+	"CertificateUtilitiesTests/CertificatePinningTest/testSelfSignedRootAllowed",
+        "CertificateUtilitiesTests/CertificatePinningTest/testSelfSignedRootAllowed2",
         "ClientTests/TabManagerTests/testQueryAddedTabs",
         "ClientTests/TabManagerTests/testQueryAddedPrivateTabs",
         "ClientTests/TabManagerTests/testQueryAddedMixedTabs",
@@ -49,20 +52,28 @@ platform :ios do
         "ClientTests/ContentBlockerTests",
         "ClientTests/HttpCookieExtensionTest/testSaveAndLoadCookie",
         "ClientTests/UserAgentTests",
+        "ClientTests/CachedAdBlockEngineTests/testPerformance",
         "DataTests",
-        "SPMLibrariesTests/WebServerTests/testWebServerIsServingRequests",
-        "BraveSharedTests/CertificatePinningTest/testSelfSignedRootAllowed2",
-      	"BraveWalletTests/ManageSiteConnectionsStoreTests/testRemoveAllPermissions",
-      	"BraveWalletTests/ManageSiteConnectionsStoreTests/testRemovePermissions",
-      	"BraveWalletTests/ManageSiteConnectionsStoreTests/testRemovePermissionsLastPermission"
+        "BraveWalletTests/ManageSiteConnectionsStoreTests/testRemoveAllPermissions",
+        "BraveWalletTests/ManageSiteConnectionsStoreTests/testRemovePermissions",
+        "BraveWalletTests/ManageSiteConnectionsStoreTests/testRemovePermissionsLastPermission",
+        "BraveWalletTests/SendTokenStoreTests/testResolvedAddressUsedInSolTxIfAvailable",
+        "BraveWalletTests/SendTokenStoreTests/testResolvedAddressUsedInEthTxIfAvailable",
+        "BraveWalletTests/SendTokenStoreTests/testUDAddressResolutionEthNetwork",
+        "BraveWalletTests/SendTokenStoreTests/testUDAddressResolutionSolNetwork",
+        "BraveWalletTests/SendTokenStoreTests/testUDAddressResolutionFailure",
+        "BraveWalletTests/SendTokenStoreTests/testUDAddressResolutionTokenChange",
+        "BraveWalletTests/TransactionConfirmationStoreTests/testPrepareERC20Approve",
+        "BraveWalletTests/TransactionConfirmationStoreTests/testPrepareTransactionNotOnSelectedNetwork",
       ]
     )
 
     run_tests(
       project: "App/Client.xcodeproj",
       scheme: "Debug",
-      device: "iPad Pro (9.7-inch)",
+      devices: options[:test_all] ? ["iPad (10th generation) (16.4)", "iPad (10th generation) (17.0)"] : ["iPad (10th generation) (16.4)"],
       code_coverage: true,
+      ensure_devices_found: true,
       skip_testing: [
         "ClientTests/UserAgentTests"
       ],
@@ -79,7 +90,7 @@ platform :ios do
         manageAppVersionAndBuildNumber: false
       }
     }
-    testflight_build({overrideParams: overrideParams})
+    testflight_build({overrideParams: overrideParams, skip_upload: options[:skip_upload]})
   end
 
   desc "Creates a Brave Internal Beta Release build for TestFlight."
@@ -92,7 +103,7 @@ platform :ios do
         manageAppVersionAndBuildNumber: false
       }
     }
-    testflight_build({overrideParams: overrideParams})
+    testflight_build({overrideParams: overrideParams, skip_upload: options[:skip_upload]})
   end
 
   desc "Create an archive to be uploaded to the App Store"
@@ -106,12 +117,13 @@ platform :ios do
           "com.brave.ios.browser" => "Brave iOS",
           "com.brave.ios.browser.ShareExtension" => "Brave iOS Share Extension",
           "com.brave.ios.browser.BrowserIntents" => "Brave iOS Intents Extension",
-          "com.brave.ios.browser.BraveWidgetsExtension" => "Brave iOS Widgets Extension"
+          "com.brave.ios.browser.BraveWidgetsExtension" => "Brave iOS Widgets Extension",
+          "com.brave.ios.browser.BraveWireGuard" => "Brave iOS WireGuard Extension",
         },
         manageAppVersionAndBuildNumber: false
       },
     }
-    testflight_build({overrideParams: overrideParams})
+    testflight_build({overrideParams: overrideParams, skip_upload: options[:skip_upload]})
   end
 
   desc "All Testflight releases use this as the foundation. Pass in `gym` override params."

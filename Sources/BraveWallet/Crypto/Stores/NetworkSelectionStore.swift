@@ -7,18 +7,15 @@ import BraveCore
 import BraveShared
 import SwiftUI
 
-class NetworkSelectionStore: ObservableObject {
+class NetworkSelectionStore: ObservableObject, WalletObserverStore {
   
   enum Mode: Equatable {
-    case select
+    case select(isForOrigin: Bool)
     case formSelection
   }
   
   let mode: Mode
   var networkStore: NetworkStore
-  
-  @Published private(set) var primaryNetworks: [NetworkPresentation] = []
-  @Published private(set) var secondaryNetworks: [NetworkPresentation] = []
   
   /// If we are prompting the user to add an account for the `nextNetwork.coin` type
   @Published var isPresentingNextNetworkAlert = false
@@ -29,41 +26,20 @@ class NetworkSelectionStore: ObservableObject {
   /// The network the user wishes to choose for adding a custom asset
   @Published var networkSelectionInForm: BraveWallet.NetworkInfo?
   
+  var isObserving: Bool = false
+  
   init(
-    mode: Mode = .select,
+    mode: Mode = .select(isForOrigin: false),
     networkStore: NetworkStore
   ) {
     self.mode = mode
     self.networkStore = networkStore
   }
   
-  func update() {
-    self.primaryNetworks = networkStore.primaryNetworks
-      .map { network in
-        let subNetworks = networkStore.subNetworks(for: network)
-        return NetworkPresentation(
-          network: .network(network),
-          subNetworks: subNetworks.count > 1 ? subNetworks : [],
-          isPrimaryNetwork: true
-        )
-      }
-
-    self.secondaryNetworks = networkStore.secondaryNetworks
-      .map { network in
-        NetworkPresentation(
-          network: .network(network),
-          subNetworks: [],
-          isPrimaryNetwork: false
-        )
-      }
-  }
-  
-  @MainActor func selectNetwork(_ network: NetworkPresentation.Network) async -> Bool {
+  @MainActor func selectNetwork(_ network: BraveWallet.NetworkInfo) async -> Bool {
     switch mode {
-    case .select:
-      guard case let .network(network) = network else { return false }
-
-      let error = await networkStore.setSelectedChain(network)
+    case let .select(isForOrigin):
+      let error = await networkStore.setSelectedChain(network, isForOrigin: isForOrigin)
       switch error {
       case .selectedChainHasNoAccounts:
         isPresentingNextNetworkAlert = true
@@ -73,13 +49,8 @@ class NetworkSelectionStore: ObservableObject {
         return true
       }
     case .formSelection:
-      switch network {
-      case let .network(network):
-        networkSelectionInForm = network
-        return true
-      default:
-        return false
-      }
+      networkSelectionInForm = network
+      return true
     }
   }
   
@@ -99,7 +70,7 @@ class NetworkSelectionStore: ObservableObject {
   @MainActor func handleDismissAddAccount() async -> Bool {
     guard let nextNetwork = nextNetwork else { return false }
     // if it errors it's due to no accounts and we don't want to switch to nextNetwork
-    let result = await networkStore.setSelectedChain(nextNetwork)
+    let result = await networkStore.setSelectedChain(nextNetwork, isForOrigin: false)
     self.nextNetwork = nil
     return result != .selectedChainHasNoAccounts
   }

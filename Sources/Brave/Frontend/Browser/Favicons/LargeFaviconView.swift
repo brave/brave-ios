@@ -9,22 +9,48 @@ import Data
 import UIKit
 import Favicon
 
+struct FaviconUX {
+  static let faviconBorderColor = UIColor(white: 0, alpha: 0.2)
+  static let faviconBorderWidth = 1.0 / UIScreen.main.scale
+}
+
 /// Displays a large favicon given some favorite
 class LargeFaviconView: UIView {
-  func loadFavicon(siteURL: URL, monogramFallbackCharacter: Character? = nil) {
+  func loadFavicon(siteURL: URL, isPrivateBrowsing: Bool, monogramFallbackCharacter: Character? = nil) {
     faviconTask?.cancel()
+    if let favicon = FaviconFetcher.getIconFromCache(for: siteURL) {
+      faviconTask = nil
+      
+      self.imageView.image = favicon.image ?? Favicon.defaultImage
+      self.backgroundColor = favicon.backgroundColor
+      self.imageView.contentMode = .scaleAspectFit
+      
+      if let image = favicon.image {
+        self.backgroundView.isHidden = !favicon.isMonogramImage && !image.hasTransparentEdges
+      } else {
+        self.backgroundView.isHidden = !favicon.hasTransparentBackground && !favicon.isMonogramImage
+      }
+      return
+    }
+    
     faviconTask = Task { @MainActor in
+      let isPersistent = !isPrivateBrowsing
       do {
         let favicon = try await FaviconFetcher.loadIcon(url: siteURL,
                                                         kind: .largeIcon,
-                                                        persistent: !PrivateBrowsingManager.shared.isPrivateBrowsing)
+                                                        persistent: isPersistent)
         
         self.imageView.image = favicon.image
         self.backgroundColor = favicon.backgroundColor
         self.imageView.contentMode = .scaleAspectFit
-        self.backgroundView.isHidden = !favicon.hasTransparentBackground && !favicon.isMonogramImage
+        
+        if let image = favicon.image {
+          self.backgroundView.isHidden = !favicon.isMonogramImage && !image.hasTransparentEdges
+        } else {
+          self.backgroundView.isHidden = !favicon.hasTransparentBackground && !favicon.isMonogramImage
+        }
       } catch {
-        self.imageView.image = try? await FaviconFetcher.monogramIcon(url: siteURL).image ?? Favicon.defaultImage
+        self.imageView.image = Favicon.defaultImage
         self.backgroundColor = nil
         self.imageView.contentMode = .scaleAspectFit
         self.backgroundView.isHidden = false
@@ -72,8 +98,8 @@ class LargeFaviconView: UIView {
     layer.cornerCurve = .continuous
 
     clipsToBounds = true
-    layer.borderColor = BraveUX.faviconBorderColor.cgColor
-    layer.borderWidth = BraveUX.faviconBorderWidth
+    layer.borderColor = FaviconUX.faviconBorderColor.cgColor
+    layer.borderWidth = FaviconUX.faviconBorderWidth
 
     layoutMargins = .zero
 

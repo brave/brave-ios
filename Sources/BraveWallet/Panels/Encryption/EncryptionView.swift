@@ -16,9 +16,9 @@ struct EncryptionView: View {
     var address: String {
       switch self {
       case let .getEncryptionPublicKey(request):
-        return request.address
+        return request.accountId.address
       case let .decrypt(request):
-        return request.address
+        return request.accountId.address
       }
     }
     
@@ -35,7 +35,6 @@ struct EncryptionView: View {
   var request: EncryptionType
   @ObservedObject var cryptoStore: CryptoStore
   @ObservedObject var keyringStore: KeyringStore
-  @ObservedObject var networkStore: NetworkStore
   var onDismiss: () -> Void
   
   @State private var isShowingDecryptMessage = false
@@ -68,14 +67,6 @@ struct EncryptionView: View {
   
   var body: some View {
     ScrollView(.vertical) {
-      if let chain = networkStore.selectedChain {
-        HStack(alignment: .top) {
-          Text(chain.chainName)
-          Spacer()
-        }
-        .font(.callout)
-        .padding(.bottom, 6)
-      }
       VStack(spacing: 12) {
         VStack(spacing: 8) {
           Blockie(address: request.address)
@@ -90,7 +81,7 @@ struct EncryptionView: View {
                 .foregroundColor(Color(.secondaryBraveLabel))
             }
           }
-          Text(urlOrigin: request.originInfo.origin)
+          Text(originInfo: request.originInfo)
             .font(.caption)
             .foregroundColor(Color(.braveLabel))
             .multilineTextAlignment(.center)
@@ -105,13 +96,13 @@ struct EncryptionView: View {
       Group {
         if case .getEncryptionPublicKey = request {
           ScrollView {
-            Text(urlOrigin: request.originInfo.origin) + Text(" \(Strings.Wallet.getEncryptionPublicKeyRequestMessage)")
+            Text(originInfo: request.originInfo) + Text(" \(Strings.Wallet.getEncryptionPublicKeyRequestMessage)")
           }
           .padding(20)
         } else if case let .decrypt(decryptRequest) = request {
           ScrollView {
             SensitiveTextView(
-              text: decryptRequest.unsafeMessage ?? "",
+              text: decryptRequest.unsafeMessage,
               isCopyEnabled: false,
               isShowingText: $isShowingDecryptMessage
             )
@@ -222,7 +213,7 @@ struct EncryptionView: View {
     Button(action: { // approve
       handleAction(approved: true)
     }) {
-      Label(approveButtonTitle, braveSystemImage: "brave.checkmark.circle.fill")
+      Label(approveButtonTitle, braveSystemImage: "leo.check.circle-filled")
         .imageScale(.large)
     }
     .buttonStyle(BraveFilledButtonStyle(size: .large))
@@ -231,9 +222,9 @@ struct EncryptionView: View {
   private func handleAction(approved: Bool) {
     switch request {
     case .getEncryptionPublicKey(let request):
-      cryptoStore.handleWebpageRequestResponse(.getEncryptionPublicKey(approved: approved, originInfo: request.originInfo))
+      cryptoStore.handleWebpageRequestResponse(.getEncryptionPublicKey(approved: approved, requestId: request.requestId))
     case .decrypt(let request):
-      cryptoStore.handleWebpageRequestResponse(.decrypt(approved: approved, originInfo: request.originInfo))
+      cryptoStore.handleWebpageRequestResponse(.decrypt(approved: approved, requestId: request.requestId))
     }
     onDismiss()
   }
@@ -242,23 +233,24 @@ struct EncryptionView: View {
 #if DEBUG
 struct EncryptionView_Previews: PreviewProvider {
   static var previews: some View {
-    let address = BraveWallet.AccountInfo.previewAccount.address
+    let account = BraveWallet.AccountInfo.previewAccount
     let originInfo = BraveWallet.OriginInfo(
-      origin: .init(url: URL(string: "https://brave.com")!),
-      originSpec: "",
+      originSpec: WalletConstants.braveWalletOriginSpec,
       eTldPlusOne: ""
     )
     let requests: [EncryptionView.EncryptionType] = [
       .getEncryptionPublicKey(
         .init(
+          requestId: UUID().uuidString,
           originInfo: originInfo,
-          address: address
+          accountId: account.accountId
         )
       ),
       .decrypt(
         .init(
+          requestId: UUID().uuidString,
           originInfo: originInfo,
-          address: address,
+          accountId: account.accountId,
           unsafeMessage: "Secret message"
         )
       )
@@ -269,7 +261,6 @@ struct EncryptionView_Previews: PreviewProvider {
           request: request,
           cryptoStore: .previewStore,
           keyringStore: .previewStoreWithWalletCreated,
-          networkStore: .previewStore,
           onDismiss: { }
         )
       }

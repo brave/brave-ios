@@ -9,7 +9,7 @@ import BraveCore
 import DesignSystem
 import Strings
 import Data
-import BraveShared
+import Preferences
 
 public protocol WalletSiteConnectionDelegate {
   /// A list of accounts connected to this webpage (addresses)
@@ -39,7 +39,7 @@ public struct WalletPanelContainerView: View {
   private var visibleScreen: VisibleScreen {
     let keyring = keyringStore.defaultKeyring
     // check if we are still fetching the `defaultKeyring`
-    if keyringStore.defaultKeyring.id.isEmpty {
+    if !keyringStore.isDefaultKeyringLoaded {
       return .loading
     }
     // keyring fetched, check if user has created a wallet
@@ -67,7 +67,7 @@ public struct WalletPanelContainerView: View {
         presentWalletWithContext?(.panelUnlockOrSetup)
       } label: {
         HStack(spacing: 4) {
-          Image(braveSystemName: "brave.unlock")
+          Image(braveSystemName: "leo.lock.open")
           Text(Strings.Wallet.walletPanelUnlockWallet)
         }
       }
@@ -153,10 +153,11 @@ public struct WalletPanelContainerView: View {
       }
     }
     .environment(
-      \.openWalletURLAction,
-      .init(action: { [openWalletURLAction] url in
-        openWalletURLAction?(url)
-      }))
+      \.openURL,
+       .init(handler: { [openWalletURLAction] url in
+         openWalletURLAction?(url)
+         return .handled
+       }))
   }
 }
 
@@ -172,7 +173,7 @@ struct WalletPanelView: View {
   var presentBuySendSwap: () -> Void
   var buySendSwapBackground: InvisibleUIView
   
-  @Environment(\.openWalletURLAction) private var openWalletURL
+  @Environment(\.openURL) private var openWalletURL
   @Environment(\.pixelLength) private var pixelLength
   @Environment(\.sizeCategory) private var sizeCategory
   @ScaledMetric private var blockieSize = 54
@@ -204,7 +205,6 @@ struct WalletPanelView: View {
   }
   
   @State private var ethPermittedAccounts: [String] = []
-  @State private var solConnectedAddresses: Set<String> = .init()
   @State private var isConnectHidden: Bool = false
   
   enum ConnectionStatus {
@@ -237,9 +237,9 @@ struct WalletPanelView: View {
       if !allowSolProviderAccess.value {
         return .blocked
       } else {
-        return solConnectedAddresses.contains(selectedAccount.address) ? .connected : .disconnected
+        return tabDappStore.solConnectedAddresses.contains(selectedAccount.address) ? .connected : .disconnected
       }
-    case .fil:
+    case .fil, .btc:
       return .blocked
     @unknown default:
       return .blocked
@@ -254,8 +254,6 @@ struct WalletPanelView: View {
         presentWalletWithContext(.editSiteConnection(origin, handler: { accounts in
           if keyringStore.selectedAccount.coin == .eth {
             ethPermittedAccounts = accounts
-          } else if keyringStore.selectedAccount.coin == .sol {
-            solConnectedAddresses = Set(accounts)
           }
           isConnectHidden = isConnectButtonHidden()
         }))
@@ -297,6 +295,7 @@ struct WalletPanelView: View {
   private var networkPickerButton: some View {
     NetworkPicker(
       style: .init(textColor: .white, borderColor: .white),
+      isForOrigin: true,
       keyringStore: keyringStore,
       networkStore: networkStore
     )
@@ -304,7 +303,7 @@ struct WalletPanelView: View {
   
   private var pendingRequestsButton: some View {
     Button(action: { presentWalletWithContext(.pendingRequests) }) {
-      Image(braveSystemName: "brave.bell.badge")
+      Image(braveSystemName: "leo.notification.dot")
         .foregroundColor(.white)
         .frame(minWidth: 30, minHeight: 44)
         .contentShape(Rectangle())
@@ -326,17 +325,17 @@ struct WalletPanelView: View {
   private var menuButton: some View {
     Menu {
       Button(action: { keyringStore.lock() }) {
-        Label(Strings.Wallet.lock, braveSystemImage: "brave.lock")
+        Label(Strings.Wallet.lock, braveSystemImage: "leo.lock")
       }
       Button(action: { presentWalletWithContext(.settings) }) {
-        Label(Strings.Wallet.settings, braveSystemImage: "brave.gear")
+        Label(Strings.Wallet.settings, braveSystemImage: "leo.settings")
       }
       Divider()
-      Button(action: { openWalletURL?(WalletConstants.braveWalletSupportURL) }) {
-        Label(Strings.Wallet.helpCenter, braveSystemImage: "brave.info.circle")
+      Button(action: { openWalletURL(WalletConstants.braveWalletSupportURL) }) {
+        Label(Strings.Wallet.helpCenter, braveSystemImage: "leo.info.outline")
       }
     } label: {
-      Image(systemName: "ellipsis")
+      Image(braveSystemName: "leo.more.horizontal")
         .frame(minWidth: 30, minHeight: 44)
         .contentShape(Rectangle())
     }
@@ -352,6 +351,8 @@ struct WalletPanelView: View {
           return false
         }
       }
+      return true
+    } else if account.coin == .fil {
       return true
     } else {
       return false
@@ -450,13 +451,13 @@ struct WalletPanelView: View {
             }
           }
           VStack(spacing: 4) {
-            let nativeAsset = accountActivityStore.userVisibleAssets.first(where: {
-              $0.token.symbol == networkStore.selectedChain.symbol
-              && $0.token.chainId == networkStore.selectedChainId
+            let nativeAsset = accountActivityStore.userAssets.first(where: {
+              $0.token.symbol == networkStore.selectedChainForOrigin.symbol
+              && $0.token.chainId == networkStore.selectedChainIdForOrigin
             })
-            Text(String(format: "%.04f %@", nativeAsset?.decimalBalance ?? 0.0, networkStore.selectedChain.symbol))
+            Text(String(format: "%.04f %@", nativeAsset?.totalBalance ?? 0.0, networkStore.selectedChainForOrigin.symbol))
               .font(.title2.weight(.bold))
-            Text(currencyFormatter.string(from: NSNumber(value: (Double(nativeAsset?.price ?? "") ?? 0) * (nativeAsset?.decimalBalance ?? 0.0))) ?? "")
+            Text(currencyFormatter.string(from: NSNumber(value: (Double(nativeAsset?.price ?? "") ?? 0) * (nativeAsset?.totalBalance ?? 0.0))) ?? "")
               .font(.callout)
           }
           .padding(.vertical)
@@ -464,7 +465,7 @@ struct WalletPanelView: View {
             Button {
               presentBuySendSwap()
             } label: {
-              Image(braveSystemName: "brave.arrow.left.arrow.right")
+              Image(braveSystemName: "leo.swap.horizontal")
                 .imageScale(.large)
                 .padding(.horizontal, 44)
                 .padding(.vertical, 8)
@@ -475,7 +476,7 @@ struct WalletPanelView: View {
             Button {
               presentWalletWithContext(.transactionHistory)
             } label: {
-              Image(braveSystemName: "brave.history")
+              Image(braveSystemName: "leo.history")
                 .imageScale(.large)
                 .padding(.horizontal, 44)
                 .padding(.vertical, 8)
@@ -488,16 +489,13 @@ struct WalletPanelView: View {
     }
     .foregroundColor(.white)
     .background(
-      BlockieMaterial(address: keyringStore.selectedAccount.id)
+      BlockieMaterial(address: keyringStore.selectedAccount.address)
       .ignoresSafeArea()
     )
     .onChange(of: cryptoStore.pendingRequest) { newValue in
       if newValue != nil {
         presentWalletWithContext(.pendingRequests)
       }
-    }
-    .onChange(of: tabDappStore.solConnectedAddresses) { newValue in
-      solConnectedAddresses = newValue
     }
     .onChange(of: keyringStore.selectedAccount) { _ in
       isConnectHidden = isConnectButtonHidden()
@@ -508,7 +506,6 @@ struct WalletPanelView: View {
           if request.coinType == .eth {
             ethPermittedAccounts = accounts
           } else if request.coinType == .sol {
-            solConnectedAddresses = Set(accounts)
             isConnectHidden = false
           }
           tabDappStore.latestPendingPermissionRequest = nil
@@ -516,14 +513,13 @@ struct WalletPanelView: View {
       }
     }
     .onAppear {
-      if let accountCreationRequest = WalletProviderAccountCreationRequestManager.shared.firstPendingRequest(for: origin, coinTypes: Array(WalletConstants.supportedCoinTypes)) {
+      if let accountCreationRequest = WalletProviderAccountCreationRequestManager.shared.firstPendingRequest(for: origin, coinTypes: WalletConstants.supportedCoinTypes(.dapps).elements) {
         presentWalletWithContext(.createAccount(accountCreationRequest))
       } else if let request = WalletProviderPermissionRequestsManager.shared.firstPendingRequest(for: origin, coinTypes: [.eth, .sol]) {
         presentWalletWithContext(.requestPermissions(request, onPermittedAccountsUpdated: { accounts in
           if request.coinType == .eth {
             ethPermittedAccounts = accounts
           } else if request.coinType == .sol {
-            solConnectedAddresses = Set(accounts)
             isConnectHidden = false
           }
         }))
@@ -536,9 +532,7 @@ struct WalletPanelView: View {
       if let url = origin.url, let accounts = Domain.walletPermissions(forUrl: url, coin: .eth) {
         ethPermittedAccounts = accounts
       }
-      
-      solConnectedAddresses = tabDappStore.solConnectedAddresses
-      
+            
       isConnectHidden = isConnectButtonHidden()
       
       accountActivityStore.update()

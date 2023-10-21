@@ -6,7 +6,7 @@
 // The preload and postload js files are unmodified from Focus.
 
 import Shared
-import BraveShared
+import Preferences
 import Data
 import Foundation
 import BraveCore
@@ -44,10 +44,9 @@ class TPStatsBlocklistChecker {
   enum BlockedType: Hashable {
     case image
     case ad
-    case http
   }
 
-  @MainActor func blockedTypes(requestURL: URL, sourceURL: URL, loadedRuleTypes: Set<ContentBlockerManager.BlocklistRuleType>, resourceType: AdblockEngine.ResourceType) async -> BlockedType? {
+  @MainActor func blockedTypes(requestURL: URL, sourceURL: URL, enabledRuleTypes: Set<ContentBlockerManager.GenericBlocklistType>, resourceType: AdblockEngine.ResourceType, isAggressiveMode: Bool) async -> BlockedType? {
     guard let host = requestURL.host, !host.isEmpty else {
       // TP Stats init isn't complete yet
       return nil
@@ -57,23 +56,15 @@ class TPStatsBlocklistChecker {
       return .image
     }
 
-    if loadedRuleTypes.contains(.general(.blockAds)) || loadedRuleTypes.contains(.general(.blockTrackers)) {
-      if await AdBlockStats.shared.shouldBlock(requestURL: requestURL, sourceURL: sourceURL, resourceType: resourceType) {
+    if enabledRuleTypes.contains(.blockAds) || enabledRuleTypes.contains(.blockTrackers) {
+      if await AdBlockStats.shared.shouldBlock(
+        requestURL: requestURL, sourceURL: sourceURL, resourceType: resourceType,
+        isAggressiveMode: isAggressiveMode
+      ) {
         return .ad
       }
     }
 
-    // TODO: Downgrade to 14.5 once api becomes available.
-    if #unavailable(iOS 15.0) {
-      let shouldUpgrade = await HttpsEverywhereStats.shared.shouldUpgrade(requestURL)
-      
-      if loadedRuleTypes.contains(.general(.upgradeHTTP)) && shouldUpgrade {
-        return .http
-      } else {
-        return nil
-      }
-    } else {
-      return nil
-    }
+    return nil
   }
 }

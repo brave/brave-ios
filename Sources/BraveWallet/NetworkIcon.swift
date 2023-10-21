@@ -11,7 +11,7 @@ struct NetworkIcon: View {
   
   var network: BraveWallet.NetworkInfo
 
-  @ScaledMetric private var length: CGFloat = 30
+  @ScaledMetric var length: CGFloat = 30
   
   var body: some View {
     Group {
@@ -22,7 +22,7 @@ struct NetworkIcon: View {
           .saturation(grayscale ? 0 : 1)
       } else if let urlString = network.iconUrls.first,
                 let url = URL(string: urlString) {
-        WebImageReader(url: url) { image, isFinished in
+        WebImageReader(url: url) { image in
           if let image = image {
             Image(uiImage: image)
               .aspectRatio(contentMode: .fit)
@@ -51,36 +51,10 @@ struct NetworkIcon: View {
   
   private typealias NetworkImageInfo = (iconName: String, grayscale: Bool)
   private var networkImageInfo: NetworkImageInfo? {
-    switch network.chainId {
-    case BraveWallet.MainnetChainId:
-      return ("eth-asset-icon", false)
-    case BraveWallet.GoerliChainId,
-      BraveWallet.SepoliaChainId:
-      return ("eth-asset-icon", true)
-    case BraveWallet.SolanaMainnet:
-      return ("sol-asset-icon", false)
-    case BraveWallet.SolanaTestnet, BraveWallet.SolanaDevnet:
-      return ("sol-asset-icon", true)
-    case BraveWallet.FilecoinMainnet:
-      return ("filecoin-asset-icon", false)
-    case BraveWallet.FilecoinTestnet:
-      return ("filecoin-asset-icon", true)
-    case BraveWallet.PolygonMainnetChainId:
-      return ("matic", false)
-    case BraveWallet.BinanceSmartChainMainnetChainId:
-      return ("bnb-asset-icon", false)
-    case BraveWallet.CeloMainnetChainId:
-      return ("celo", false)
-    case BraveWallet.AvalancheMainnetChainId:
-      return ("avax", false)
-    case BraveWallet.FantomMainnetChainId:
-      return ("fantom", false)
-    case BraveWallet.OptimismMainnetChainId:
-      return ("optimism", false)
-    case BraveWallet.AuroraMainnetChainId:
-      return ("aurora", false)
-    default:
-      return nil
+    let isGrayscale = WalletConstants.supportedTestNetworkChainIds.contains(network.chainId)
+    if let imageName = network.networkLogoName {
+      return (imageName, isGrayscale)
     }
+    return nil
   }
 }

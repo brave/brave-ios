@@ -111,9 +111,9 @@ extension BrowserViewController {
 
   func showReaderModeBar(animated: Bool) {
     if self.readerModeBar == nil {
-      let readerModeBar = ReaderModeBarView(frame: CGRect.zero)
+      let readerModeBar = ReaderModeBarView(privateBrowsingManager: tabManager.privateBrowsingManager)
       readerModeBar.delegate = self
-      view.insertSubview(readerModeBar, belowSubview: header)
+      view.insertSubview(readerModeBar, aboveSubview: webViewContainer)
       self.readerModeBar = readerModeBar
     }
 
@@ -141,6 +141,8 @@ extension BrowserViewController {
 
     guard let currentURL = webView.backForwardList.currentItem?.url, let readerModeURL = currentURL.encodeReaderModeURL("\(InternalURL.baseUrl)/\(InternalURL.Path.readermode.rawValue)") else { return }
 
+    recordTimeBasedNumberReaderModeUsedP3A(activated: true)
+    
     if backList.count > 1 && backList.last?.url == readerModeURL {
       let playlistItem = tab.playlistItem
       webView.go(to: backList.last!)

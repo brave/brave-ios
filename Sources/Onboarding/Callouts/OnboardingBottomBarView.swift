@@ -6,7 +6,7 @@
 import SwiftUI
 import Shared
 import BraveUI
-import BraveShared
+import BraveStrings
 
 public struct OnboardingBottomBarView: View {
   public var dismiss: (() -> Void)?
@@ -19,7 +19,7 @@ public struct OnboardingBottomBarView: View {
       Button {
         dismiss?()
       } label: {
-        Image(braveSystemName: "brave.xmark")
+        Image(braveSystemName: "leo.close")
           .renderingMode(.template)
           .foregroundColor(Color(.bravePrimary))
       }

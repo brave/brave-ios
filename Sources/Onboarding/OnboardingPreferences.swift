@@ -3,9 +3,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import BraveShared
-import struct Shared.Strings
-import BraveCore
+import Preferences
 
 extension Preferences {
   public final class Onboarding {
@@ -31,6 +29,9 @@ extension Preferences {
       key: "onboarding.basic-onboarding-default-browser-selected",
       default: false)
     
+    /// Whether the link vpn receipt alert has been shown.
+    public static let vpnLinkReceiptShown = Option<Bool>(key: "onboarding.link-receipt", default: false)
+    
     /// Whether this is a new user who installed the application after onboarding retention updates
     public static let isNewRetentionUser = Option<Bool?>(key: "general.new-retention", default: nil)
   }
@@ -38,18 +39,14 @@ extension Preferences {
 
 extension Preferences {
   public final class FullScreenCallout {
-    /// Whether the block cookie consent notices callout is shown.
-    public static let blockCookieConsentNoticesCalloutCompleted = Option<Bool>(
-      key: "fullScreenCallout.full-screen-cookie-consent-notices-callout-completed",
-      default: false)
     
     /// Whether the bottom bar callout is shown.
     public static let bottomBarCalloutCompleted = Option<Bool>(
       key: "fullScreenCallout.full-screen-bottom-bar-callout-completed",
       default: false)
     
-    /// Whether the vpn callout is shown.
-    public static let vpnCalloutCompleted = Option<Bool>(
+    /// Whether the vpn promotion callout is shown.
+    public static let vpnPromotionCalloutCompleted = Option<Bool>(
       key: "fullScreenCallout.full-screen-vpn-callout-completed",
       default: false)
     
@@ -67,6 +64,11 @@ extension Preferences {
     public static let omniboxCalloutCompleted = Option<Bool>(
       key: "fullScreenCallout.full-screen-omnibox-callout-completed",
       default: false)
+    
+    /// Whether the vpn promotion callout is shown.
+    public static let vpnUpdateBillingCalloutCompleted = Option<Bool>(
+      key: "fullScreenCallout.full-screen-vpn-billing-callout-completed",
+      default: false)
   }
 }
 
@@ -78,9 +80,14 @@ extension Preferences {
       key: "defaultBrowserIntro.intro-completed",
       default: false)
     
-    /// Whether system notification showed or not
+    /// Whether system notification scheduled or not
     public static let defaultBrowserNotificationScheduled = Option<Bool>(
       key: "general.default-browser-notification-scheduled",
+      default: false)
+    
+    /// Whether a default browser local notification should be shown
+    public static let defaultBrowserNotificationIsCanceled = Option<Bool>(
+      key: "general.default-browser-notification-canceled",
       default: false)
   }
 }

@@ -6,8 +6,9 @@
 import Foundation
 import Shared
 import UIKit
+import SwiftUI
 
-class PageZoomActivity: UIActivity {
+class PageZoomActivity: UIActivity, MenuActivity {
   fileprivate let callback: () -> Void
 
   init(callback: @escaping () -> Void) {
@@ -15,13 +16,17 @@ class PageZoomActivity: UIActivity {
   }
 
   override var activityTitle: String? {
-    return Strings.PageZoom.settingsMenuTitle
+    return Strings.PageZoom.settingsTitle
   }
 
   override var activityImage: UIImage? {
-    return UIImage(named: "settings-page-zoom", in: .module, compatibleWith: nil)
+    return UIImage(braveSystemNamed: "leo.font.size")?.applyingSymbolConfiguration(.init(scale: .large))
   }
-
+  
+  var menuImage: Image {
+    Image(braveSystemName: "leo.font.size")
+  }
+  
   override func perform() {
     callback()
     activityDidFinish(true)

@@ -4,7 +4,7 @@ import Foundation
 import Shared
 import BraveCore
 import os.log
-import BraveShared
+import Preferences
 
 public class DAU {
 
@@ -61,6 +61,11 @@ public class DAU {
   @discardableResult public func sendPingToServer() -> Bool {
     if AppConstants.buildChannel == .debug || AppConstants.buildChannel == .enterprise {
       Logger.module.info("Development build detected, no server ping.")
+      return false
+    }
+    
+    guard Preferences.DAU.sendUsagePing.value else {
+      Logger.module.debug("DAU ping disabled by the user.")
       return false
     }
 
@@ -141,7 +146,21 @@ public class DAU {
   struct ParamsAndPrefs {
     let queryParams: [URLQueryItem]
     let headers: [String: String]
-    let lastLaunchInfoPreference: [Optional<Int>]
+    let lastLaunchInfoPreference: [Int]
+  }
+  
+  func migrateInvalidWeekOfInstallPref() {
+    guard let woi = Preferences.DAU.weekOfInstallation.value else { return }
+    // Check if the value for the day/month do not include 0
+    if woi.components(separatedBy: "-").contains(where: { $0.count == 1 }) {
+      let formatter = DateFormatter()
+      formatter.dateFormat = "yyyy-M-d"
+      formatter.calendar = DAU.calendar
+      formatter.timeZone = TimeZone(abbreviation: "GMT")!
+      if let date = formatter.date(from: woi) {
+        Preferences.DAU.weekOfInstallation.value = DAU.dateFormatter.string(from: date)
+      }
+    }
   }
 
   /// Return params query or nil if no ping should be send to server and also preference values to set
@@ -159,6 +178,8 @@ public class DAU {
     // This could lead to an upgraded device having no `woi`, and that's fine
     if firstLaunch {
       Preferences.DAU.weekOfInstallation.value = date.mondayOfCurrentWeekFormatted
+    } else {
+      migrateInvalidWeekOfInstallPref()
     }
 
     guard let dauStatParams = dauStatParams(for: date, firstPing: firstLaunch) else {

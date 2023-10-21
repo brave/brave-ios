@@ -6,14 +6,14 @@
 import Foundation
 import BraveCore
 
-class AccountActivityStore: ObservableObject {
+class AccountActivityStore: ObservableObject, WalletObserverStore {
   /// If we want to observe selected account changes (ex. in `WalletPanelView`).
   /// In some cases, we do not want to update the account displayed when the
   /// selected account changes (ex. when removing an account).
   let observeAccountUpdates: Bool
   private(set) var account: BraveWallet.AccountInfo
-  @Published private(set) var userVisibleAssets: [AssetViewModel] = []
-  @Published private(set) var userVisibleNFTs: [NFTAssetViewModel] = []
+  @Published private(set) var userAssets: [AssetViewModel] = []
+  @Published private(set) var userNFTs: [NFTAssetViewModel] = []
   @Published var transactionSummaries: [TransactionSummary] = []
   @Published private(set) var currencyCode: String = CurrencyCode.usd.code {
     didSet {
@@ -32,10 +32,21 @@ class AccountActivityStore: ObservableObject {
   private let txService: BraveWalletTxService
   private let blockchainRegistry: BraveWalletBlockchainRegistry
   private let solTxManagerProxy: BraveWalletSolanaTxManagerProxy
+  private let ipfsApi: IpfsAPI
+  private let assetManager: WalletUserAssetManagerType
   /// Cache for storing `BlockchainToken`s that are not in user assets or our token registry.
   /// This could occur with a dapp creating a transaction.
   private var tokenInfoCache: [String: BraveWallet.BlockchainToken] = [:]
-
+  
+  private var keyringServiceObserver: KeyringServiceObserver?
+  private var rpcServiceObserver: JsonRpcServiceObserver?
+  private var txServiceObserver: TxServiceObserver?
+  private var walletServiceObserver: WalletServiceObserver?
+  
+  var isObserving: Bool {
+    keyringServiceObserver != nil && rpcServiceObserver != nil && txServiceObserver != nil && walletServiceObserver != nil
+  }
+  
   init(
     account: BraveWallet.AccountInfo,
     observeAccountUpdates: Bool,
@@ -45,7 +56,9 @@ class AccountActivityStore: ObservableObject {
     assetRatioService: BraveWalletAssetRatioService,
     txService: BraveWalletTxService,
     blockchainRegistry: BraveWalletBlockchainRegistry,
-    solTxManagerProxy: BraveWalletSolanaTxManagerProxy
+    solTxManagerProxy: BraveWalletSolanaTxManagerProxy,
+    ipfsApi: IpfsAPI,
+    userAssetManager: WalletUserAssetManagerType
   ) {
     self.account = account
     self.observeAccountUpdates = observeAccountUpdates
@@ -56,61 +69,111 @@ class AccountActivityStore: ObservableObject {
     self.txService = txService
     self.blockchainRegistry = blockchainRegistry
     self.solTxManagerProxy = solTxManagerProxy
+    self.ipfsApi = ipfsApi
+    self.assetManager = userAssetManager
     
-    self.keyringService.add(self)
-    self.rpcService.add(self)
-    self.txService.add(self)
-    self.walletService.add(self)
+    self.setupObservers()
     
     walletService.defaultBaseCurrency { [self] currencyCode in
       self.currencyCode = currencyCode
     }
   }
+  
+  func tearDown() {
+    keyringServiceObserver = nil
+    rpcServiceObserver = nil
+    txServiceObserver = nil
+    walletServiceObserver = nil
+  }
+  
+  func setupObservers() {
+    guard !isObserving else { return }
+    self.keyringServiceObserver = KeyringServiceObserver(
+      keyringService: keyringService,
+      _selectedWalletAccountChanged: { [weak self] account in
+        guard let self, self.observeAccountUpdates else { return }
+        self.account = account
+        self.update()
+      },
+      _selectedDappAccountChanged: { [weak self] _, account in
+        guard let self, self.observeAccountUpdates, let account else { return }
+        self.account = account
+        self.update()
+      }
+    )
+    self.rpcServiceObserver = JsonRpcServiceObserver(
+      rpcService: rpcService,
+      _chainChangedEvent: { [weak self] _, _, _ in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+          // Handle small gap between chain changing and txController having the correct chain Id
+          self?.update()
+        }
+      }
+    )
+    self.txServiceObserver = TxServiceObserver(
+      txService: txService,
+      _onNewUnapprovedTx: { [weak self] _ in
+        self?.update()
+      },
+      _onTransactionStatusChanged: { [weak self] _ in
+        self?.update()
+      }
+    )
+    self.walletServiceObserver = WalletServiceObserver(
+      walletService: walletService,
+      _onDefaultBaseCurrencyChanged: { [weak self] currency in
+        self?.currencyCode = currency
+      }
+    )
+  }
 
   func update() {
     Task { @MainActor in
       let coin = account.coin
-      let networks = await rpcService.allNetworks(coin)
+      let networksForAccountCoin = await rpcService.allNetworks(coin)
         .filter { $0.chainId != BraveWallet.LocalhostChainId } // localhost not supported
+      let networksForAccount = networksForAccountCoin.filter { // .fil coin type has two different keyring ids
+        $0.supportedKeyrings.contains(account.keyringId.rawValue as NSNumber)
+      }
       
       struct NetworkAssets: Equatable {
         let network: BraveWallet.NetworkInfo
         let tokens: [BraveWallet.BlockchainToken]
         let sortOrder: Int
       }
-      let allVisibleUserAssets = await walletService.allVisibleUserAssets(in: networks)
-      let allTokens = await blockchainRegistry.allTokens(in: networks).flatMap(\.tokens)
-      var updatedUserVisibleAssets: [AssetViewModel] = []
-      var updatedUserVisibleNFTs: [NFTAssetViewModel] = []
-      for networkAssets in allVisibleUserAssets {
+      let allUserAssets = assetManager.getAllUserAssetsInNetworkAssets(networks: networksForAccount, includingUserDeleted: true)
+      let allTokens = await blockchainRegistry.allTokens(in: networksForAccountCoin).flatMap(\.tokens)
+      var updatedUserAssets: [AssetViewModel] = []
+      var updatedUserNFTs: [NFTAssetViewModel] = []
+      for networkAssets in allUserAssets {
         for token in networkAssets.tokens {
           if token.isErc721 || token.isNft {
-            updatedUserVisibleNFTs.append(
+            updatedUserNFTs.append(
               NFTAssetViewModel(
                 token: token,
                 network: networkAssets.network,
-                balance: 0
+                balanceForAccounts: [:]
               )
             )
           } else {
-            updatedUserVisibleAssets.append(
+            updatedUserAssets.append(
               AssetViewModel(
+                groupType: .none,
                 token: token,
                 network: networkAssets.network,
-                decimalBalance: 0,
                 price: "",
-                history: []
+                history: [],
+                balanceForAccounts: [:]
               )
             )
           }
         }
       }
-      self.userVisibleAssets = updatedUserVisibleAssets
-      self.userVisibleNFTs = updatedUserVisibleNFTs
+      self.userAssets = updatedUserAssets
+      self.userNFTs = updatedUserNFTs
       
-      let keyringForAccount = await keyringService.keyringInfo(coin.keyringId)
       typealias TokenNetworkAccounts = (token: BraveWallet.BlockchainToken, network: BraveWallet.NetworkInfo, accounts: [BraveWallet.AccountInfo])
-      let allTokenNetworkAccounts = allVisibleUserAssets.flatMap { networkAssets in
+      let allTokenNetworkAccounts = allUserAssets.flatMap { networkAssets in
         networkAssets.tokens.map { token in
           TokenNetworkAccounts(
             token: token,
@@ -137,60 +200,63 @@ class AccountActivityStore: ObservableObject {
         })
       })
       
-      // fetch price for every visible token
-      let allVisibleTokens = allVisibleUserAssets.flatMap(\.tokens)
-      let allVisibleTokenAssetRatioIds = allVisibleTokens.map(\.assetRatioId)
+      // fetch price for every user asset
+      let allUserAssetsInToken = allUserAssets.flatMap(\.tokens)
+      let allUserAssetsAssetRatioIds = allUserAssetsInToken.map(\.assetRatioId)
       let prices: [String: String] = await assetRatioService.fetchPrices(
-        for: allVisibleTokenAssetRatioIds,
+        for: allUserAssetsAssetRatioIds,
         toAssets: [currencyFormatter.currencyCode],
         timeframe: .oneDay
       )
       
       // fetch NFTs metadata
       let allNFTMetadata = await rpcService.fetchNFTMetadata(
-        tokens: userVisibleNFTs
+        tokens: userNFTs
           .map(\.token)
-          .filter({ $0.isErc721 || $0.isNft })
+          .filter({ $0.isErc721 || $0.isNft }),
+        ipfsApi: ipfsApi
       )
       
       guard !Task.isCancelled else { return }
-      updatedUserVisibleAssets.removeAll()
-      updatedUserVisibleNFTs.removeAll()
-      for networkAssets in allVisibleUserAssets {
+      updatedUserAssets.removeAll()
+      updatedUserNFTs.removeAll()
+      for networkAssets in allUserAssets {
         for token in networkAssets.tokens {
           if token.isErc721 || token.isNft {
-            updatedUserVisibleNFTs.append(
+            updatedUserNFTs.append(
               NFTAssetViewModel(
                 token: token,
                 network: networkAssets.network,
-                balance: Int(totalBalances[token.assetBalanceId] ?? 0),
+                balanceForAccounts: [account.address: Int(totalBalances[token.assetBalanceId] ?? 0)],
                 nftMetadata: allNFTMetadata[token.id]
               )
             )
           } else {
-            updatedUserVisibleAssets.append(
+            updatedUserAssets.append(
               AssetViewModel(
+                groupType: .none,
                 token: token,
                 network: networkAssets.network,
-                decimalBalance: totalBalances[token.assetBalanceId] ?? 0,
                 price: prices[token.assetRatioId.lowercased()] ?? "",
-                history: []
+                history: [],
+                balanceForAccounts: [account.address: totalBalances[token.assetBalanceId] ?? 0]
               )
             )
           }
         }
       }
-      self.userVisibleAssets = updatedUserVisibleAssets
-      self.userVisibleNFTs = updatedUserVisibleNFTs
+      self.userAssets = updatedUserAssets
+      self.userNFTs = updatedUserNFTs
       
-      let selectedNetworkForAccountCoin = await rpcService.network(coin)
-      let assetRatios = self.userVisibleAssets.reduce(into: [String: Double](), {
+      let assetRatios = self.userAssets.reduce(into: [String: Double](), {
         $0[$1.token.assetRatioId.lowercased()] = Double($1.price)
       })
+      
+      let allAccountsForCoin = await keyringService.allAccounts().accounts.filter { $0.coin == account.coin }
       self.transactionSummaries = await fetchTransactionSummarys(
-        network: selectedNetworkForAccountCoin,
-        accountInfos: keyringForAccount.accountInfos,
-        userVisibleTokens: userVisibleAssets.map(\.token).filter { $0.chainId == selectedNetworkForAccountCoin.chainId },
+        networksForAccountCoin: networksForAccountCoin,
+        accountInfos: allAccountsForCoin,
+        userAssets: userAssets.map(\.token),
         allTokens: allTokens,
         assetRatios: assetRatios
       )
@@ -198,21 +264,21 @@ class AccountActivityStore: ObservableObject {
   }
   
   @MainActor private func fetchTransactionSummarys(
-    network: BraveWallet.NetworkInfo,
+    networksForAccountCoin: [BraveWallet.NetworkInfo],
     accountInfos: [BraveWallet.AccountInfo],
-    userVisibleTokens: [BraveWallet.BlockchainToken],
+    userAssets: [BraveWallet.BlockchainToken],
     allTokens: [BraveWallet.BlockchainToken],
     assetRatios: [String: Double]
   ) async -> [TransactionSummary] {
-    let transactions = await txService.allTransactionInfo(account.coin, from: account.address)
+    let transactions = await txService.allTransactions(networks: networksForAccountCoin, for: account)
     var solEstimatedTxFees: [String: UInt64] = [:]
     if account.coin == .sol {
-      solEstimatedTxFees = await solTxManagerProxy.estimatedTxFees(for: transactions.map(\.id))
+      solEstimatedTxFees = await solTxManagerProxy.estimatedTxFees(for: transactions)
     }
     let unknownTokenContractAddresses = transactions
       .flatMap { $0.tokenContractAddresses }
       .filter { contractAddress in
-        !userVisibleTokens.contains(where: { $0.contractAddress.caseInsensitiveCompare(contractAddress) == .orderedSame })
+        !userAssets.contains(where: { $0.contractAddress.caseInsensitiveCompare(contractAddress) == .orderedSame })
         && !allTokens.contains(where: { $0.contractAddress.caseInsensitiveCompare(contractAddress) == .orderedSame })
         && !tokenInfoCache.keys.contains(where: { $0.caseInsensitiveCompare(contractAddress) == .orderedSame })
       }
@@ -225,19 +291,21 @@ class AccountActivityStore: ObservableObject {
       allTokens.append(contentsOf: unknownTokens)
     }
     return transactions
-      .sorted(by: { $0.createdTime > $1.createdTime })
-      .map { transaction in
-        TransactionParser.transactionSummary(
+      .compactMap { transaction in
+        guard let network = networksForAccountCoin.first(where: { $0.chainId == transaction.chainId }) else {
+          return nil
+        }
+        return TransactionParser.transactionSummary(
           from: transaction,
           network: network,
           accountInfos: accountInfos,
-          visibleTokens: userVisibleTokens,
+          userAssets: userAssets,
           allTokens: allTokens,
           assetRatios: assetRatios,
           solEstimatedTxFee: solEstimatedTxFees[transaction.id],
           currencyFormatter: currencyFormatter
         )
-      }
+      }.sorted(by: { $0.createdTime > $1.createdTime })
   }
   
   func transactionDetailsStore(for transaction: BraveWallet.TransactionInfo) -> TransactionDetailsStore {
@@ -248,7 +316,8 @@ class AccountActivityStore: ObservableObject {
       rpcService: rpcService,
       assetRatioService: assetRatioService,
       blockchainRegistry: blockchainRegistry,
-      solanaTxManagerProxy: solTxManagerProxy
+      solanaTxManagerProxy: solTxManagerProxy,
+      userAssetManager: assetManager
     )
   }
   
@@ -260,10 +329,10 @@ class AccountActivityStore: ObservableObject {
 }
 
 extension AccountActivityStore: BraveWalletKeyringServiceObserver {
-  func keyringCreated(_ keyringId: String) {
+  func keyringCreated(_ keyringId: BraveWallet.KeyringId) {
   }
-  
-  func keyringRestored(_ keyringId: String) {
+
+  func walletRestored() {
   }
   
   func keyringReset() {
@@ -284,22 +353,24 @@ extension AccountActivityStore: BraveWalletKeyringServiceObserver {
   func autoLockMinutesChanged() {
   }
   
-  func selectedAccountChanged(_ coin: BraveWallet.CoinType) {
+  func selectedWalletAccountChanged(_ account: BraveWallet.AccountInfo) {
     guard observeAccountUpdates else { return }
-    keyringService.keyringInfo(coin.keyringId) { [self] keyringInfo in
-      keyringService.selectedAccount(coin) { [self] accountAddress in
-        account = keyringInfo.accountInfos.first(where: { $0.address == accountAddress }) ?? keyringInfo.accountInfos.first!
-        update()
-      }
-    }
+    self.account = account
+    update()
   }
   
-  func accountsAdded(_ coin: BraveWallet.CoinType, addresses: [String]) {
+  func selectedDappAccountChanged(_ coin: BraveWallet.CoinType, account: BraveWallet.AccountInfo?) {
+    guard observeAccountUpdates, let account else { return }
+    self.account = account
+    update()
+  }
+  
+  func accountsAdded(_ addedAccounts: [BraveWallet.AccountInfo]) {
   }
 }
 
 extension AccountActivityStore: BraveWalletJsonRpcServiceObserver {
-  func chainChangedEvent(_ chainId: String, coin: BraveWallet.CoinType) {
+  func chainChangedEvent(_ chainId: String, coin: BraveWallet.CoinType, origin: URLOrigin?) {
     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
       // Handle small gap between chain changing and txController having the correct chain Id
       self.update()
@@ -347,6 +418,12 @@ extension AccountActivityStore: BraveWalletBraveWalletServiceObserver {
   func onDefaultSolanaWalletChanged(_ wallet: BraveWallet.DefaultWallet) {
   }
   
+  public func onDiscoverAssetsStarted() {
+  }
+  
   func onDiscoverAssetsCompleted(_ discoveredAssets: [BraveWallet.BlockchainToken]) {
+  }
+  
+  func onResetWallet() {
   }
 }

@@ -88,10 +88,6 @@ class ScriptFactory {
       }
       
       return script
-    
-    case .youtubeAdblock:
-      let source = try makeScriptSource(of: .youtubeAdblock)
-      return WKUserScript(source: source, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: .page)
     }
   }
   
@@ -131,14 +127,37 @@ class ScriptFactory {
     case .domainUserScript(let domainUserScript):
       resultingScript = try self.makeScript(for: domainUserScript)
       
+    case .selectorsPoller(let setup):
+      let encoder = JSONEncoder()
+      let data = try encoder.encode(setup)
+      let args = String(data: data, encoding: .utf8)!
+      let source = try ScriptFactory.shared.makeScriptSource(of: .selectorsPoller)
+        .replacingOccurrences(of: "$<args>", with: args)
+      
+      let secureSource = CosmeticFiltersScriptHandler.secureScript(
+        handlerNamesMap: [
+          "$<message_handler>": CosmeticFiltersScriptHandler.messageHandlerName,
+          "$<partiness_message_handler>": URLPartinessScriptHandler.messageHandlerName
+        ],
+        securityToken: CosmeticFiltersScriptHandler.scriptId,
+        script: source
+      )
+      
+      resultingScript = WKUserScript(
+        source: secureSource, injectionTime: .atDocumentEnd, forMainFrameOnly: false,
+        in: CosmeticFiltersScriptHandler.scriptSandbox
+      )
+      
     case .engineScript(let configuration):
       let source = [
         "(function(){",
-        /// This boolean is used by a script injected by cosmetic filters and enables that script via this boolean
-        /// The script is found here: https://github.com/brave/adblock-resources/blob/master/resources/de-amp.js
-        /// - Note: This script is only a smaller part (1 of 3) of de-amping:
-        /// The second part is handled by an inected script that redirects amp pages to their canonical links
-        /// The third part is handled by debouncing amp links and handled by debouncing rules
+        // This map is used by some of uBlock Origin's resources
+        "const scriptletGlobals = new Map();",
+        // This boolean is used by a script injected by cosmetic filters and enables that script via this boolean
+        // The script is found here: https://github.com/brave/adblock-resources/blob/master/resources/de-amp.js
+        // - Note: This script is only a smaller part (1 of 3) of de-amping:
+        // The second part is handled by an inected script that redirects amp pages to their canonical links
+        // The third part is handled by debouncing amp links and handled by debouncing rules
         configuration.isDeAMPEnabled ? "const deAmpEnabled = true;" : "",
         configuration.source,
         "})();"

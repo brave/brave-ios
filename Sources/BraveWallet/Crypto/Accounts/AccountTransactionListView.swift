@@ -13,7 +13,7 @@ struct AccountTransactionListView: View {
   @ObservedObject var activityStore: AccountActivityStore
   @ObservedObject var networkStore: NetworkStore
   
-  @Environment(\.openWalletURLAction) private var openWalletURL
+  @Environment(\.openURL) private var openWalletURL
   
   @State private var transactionDetails: TransactionDetailsStore?
   
@@ -43,9 +43,9 @@ struct AccountTransactionListView: View {
               .contextMenu {
                 if !txSummary.txHash.isEmpty {
                   Button(action: {
-                    if let baseURL = self.networkStore.selectedChain.blockExplorerUrls.first.map(URL.init(string:)),
-                       let url = baseURL?.appendingPathComponent("tx/\(txSummary.txHash)") {
-                      openWalletURL?(url)
+                    if let txNetwork = self.networkStore.allChains.first(where: { $0.chainId == txSummary.txInfo.chainId }),
+                       let url = txNetwork.txBlockExplorerLink(txHash: txSummary.txHash, for: txNetwork.coin) {
+                      openWalletURL(url)
                     }
                   }) {
                     Label(Strings.Wallet.viewOnBlockExplorer, systemImage: "arrow.up.forward.square")

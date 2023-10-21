@@ -5,7 +5,8 @@
 import WebKit
 import Shared
 import Data
-import BraveShared
+import BraveShields
+import Preferences
 import BraveCore
 import os.log
 
@@ -31,7 +32,7 @@ extension ContentBlockerHelper: TabContentScript {
       return nil
     }
     
-    return WKUserScript.create(
+    return WKUserScript(
       source: secureScript(
         handlerName: messageHandlerName,
         securityToken: UserScriptManager.securityToken,
@@ -64,9 +65,9 @@ extension ContentBlockerHelper: TabContentScript {
       let dto = try JSONDecoder().decode(ContentBlockerDTO.self, from: data)
     
       Task { @MainActor in
-        let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
+        let isPrivateBrowsing = self.tab?.isPrivate == true
         let domain = Domain.getOrCreate(forUrl: currentTabURL, persistent: !isPrivateBrowsing)
-        if let shieldsAllOff = domain.shield_allOff, Bool(truncating: shieldsAllOff) {
+        if domain.areAllShieldsOff {
           // if domain is "all_off", can just skip
           return
         }
@@ -82,23 +83,17 @@ extension ContentBlockerHelper: TabContentScript {
         guard let requestURL = NSURL(idnString: dto.data.resourceURL) as URL? else { return }
         guard let sourceURL = NSURL(idnString: dto.data.sourceURL) as URL? else { return }
         guard let domainURLString = domain.url else { return }
-        let loadedRuleTypes = Set(self.loadedRuleTypeWithSourceTypes.map({ $0.ruleType }))
+        let genericTypes = ContentBlockerManager.shared.validGenericTypes(for: domain)
         
         let blockedType = await TPStatsBlocklistChecker.shared.blockedTypes(
           requestURL: requestURL,
           sourceURL: sourceURL,
-          loadedRuleTypes: loadedRuleTypes,
-          resourceType: dto.data.resourceType
+          enabledRuleTypes: genericTypes,
+          resourceType: dto.data.resourceType,
+          isAggressiveMode: domain.blockAdsAndTrackingLevel.isAggressive
         )
         
         guard let blockedType = blockedType else { return }
-        
-        if blockedType == .http && dto.data.resourceType != .image && currentTabURL.scheme == "https" && requestURL.scheme == "http" {
-          // WKWebView will block loading this URL so we can't count it due to mixed content restrictions
-          // Unfortunately, it does not check to see if a content blocker would promote said URL to https
-          // before blocking the load
-          return
-        }
         
         assertIsMainThread("Result should happen on the main thread")
         
@@ -115,7 +110,7 @@ extension ContentBlockerHelper: TabContentScript {
         if blockedType == .ad, Preferences.PrivacyReports.captureShieldsData.value,
            let domainURL = URL(string: domainURLString),
            let blockedResourceHost = requestURL.baseDomain,
-           !PrivateBrowsingManager.shared.isPrivateBrowsing {
+           tab?.isPrivate != true {
           PrivacyReportsManager.pendingBlockedRequests.append((blockedResourceHost, domainURL, Date()))
         }
         
@@ -130,9 +125,6 @@ extension ContentBlockerHelper: TabContentScript {
         case .ad:
           stats.adblock += 1
           self.stats = self.stats.adding(adCount: 1)
-        case .http:
-          stats.httpse += 1
-          self.stats = self.stats.adding(httpsCount: 1)
         case .image:
           stats.images += 1
         }

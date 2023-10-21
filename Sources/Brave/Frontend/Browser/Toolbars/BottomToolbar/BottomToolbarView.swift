@@ -5,34 +5,37 @@
 import UIKit
 import SnapKit
 import Shared
-import BraveShared
+import Preferences
 import Combine
 
 class BottomToolbarView: UIView, ToolbarProtocol {
   weak var tabToolbarDelegate: ToolbarDelegate?
 
   let tabsButton = TabsButton()
-  let forwardButton = ToolbarButton(top: false)
-  let backButton = ToolbarButton(top: false)
-  let shareButton = ToolbarButton(top: false)
-  let addTabButton = ToolbarButton(top: false)
-  let searchButton = ToolbarButton(top: false).then {
+  let forwardButton = ToolbarButton()
+  let backButton = ToolbarButton()
+  let shareButton = ToolbarButton()
+  let addTabButton = ToolbarButton()
+  let searchButton = ToolbarButton().then {
     $0.isHidden = true
   }
-  let menuButton = MenuButton(top: false)
+  let menuButton = MenuButton()
   let actionButtons: [UIButton]
 
   var helper: ToolbarHelper?
   private let contentView = UIStackView()
   private var cancellables: Set<AnyCancellable> = []
   let line = UIView.separatorLine
+  private let privateBrowsingManager: PrivateBrowsingManager
 
-  fileprivate override init(frame: CGRect) {
-    actionButtons = [backButton, forwardButton, addTabButton, searchButton, tabsButton, menuButton]
-    super.init(frame: frame)
+  init(privateBrowsingManager: PrivateBrowsingManager) {
+    self.privateBrowsingManager = privateBrowsingManager
+    let isBeta = AppConstants.buildChannel == .beta
+    actionButtons = [backButton, isBeta ? shareButton : forwardButton, addTabButton, searchButton, tabsButton, menuButton]
+    super.init(frame: .zero)
     setupAccessibility()
 
-    backgroundColor = Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
+    backgroundColor = privateBrowsingManager.browserColors.chromeBackground
 
     addSubview(contentView)
     addSubview(line)
@@ -48,33 +51,24 @@ class BottomToolbarView: UIView, ToolbarProtocol {
       $0.leading.trailing.equalToSuperview()
     }
 
-    privateModeCancellable = PrivateBrowsingManager.shared
+    privateModeCancellable = privateBrowsingManager
       .$isPrivateBrowsing
       .removeDuplicates()
+      .receive(on: RunLoop.main)
       .sink(receiveValue: { [weak self] isPrivateBrowsing in
-        self?.updateColors(isPrivateBrowsing)
+        guard let self = self else { return }
+        self.updateColors()
+        self.helper?.updateForTraitCollection(self.traitCollection, browserColors: privateBrowsingManager.browserColors)
       })
     
-    Preferences.General.nightModeEnabled.objectWillChange
-      .receive(on: RunLoop.main)
-      .sink { [weak self] _ in
-        self?.updateColors(PrivateBrowsingManager.shared.isPrivateBrowsing)
-      }
-      .store(in: &cancellables)
+    helper?.updateForTraitCollection(traitCollection, browserColors: privateBrowsingManager.browserColors)
     
-    helper?.updateForTraitCollection(traitCollection)
+    updateColors()
   }
 
   private var privateModeCancellable: AnyCancellable?
-  private func updateColors(_ isPrivateBrowsing: Bool) {
-    if isPrivateBrowsing {
-      overrideUserInterfaceStyle = .dark
-      backgroundColor = .privateModeBackground
-    } else {
-      overrideUserInterfaceStyle = DefaultTheme(
-        rawValue: Preferences.General.themeNormalMode.value)?.userInterfaceStyleOverride ?? .unspecified
-      backgroundColor = Preferences.General.nightModeEnabled.value ? .nightModeBackground : .urlBarBackground
-    }
+  private func updateColors() {
+    backgroundColor = privateBrowsingManager.browserColors.chromeBackground
   }
 
   private var isSearchButtonEnabled: Bool = false {
@@ -96,13 +90,14 @@ class BottomToolbarView: UIView, ToolbarProtocol {
     contentView.snp.makeConstraints { make in
       make.leading.trailing.top.equalTo(self)
       make.bottom.equalTo(self.safeArea.bottom)
+      make.height.equalTo(UIConstants.toolbarHeight)
     }
     super.updateConstraints()
   }
   
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
-    helper?.updateForTraitCollection(traitCollection)
+    helper?.updateForTraitCollection(traitCollection, browserColors: privateBrowsingManager.browserColors)
   }
 
   private func setupAccessibility() {

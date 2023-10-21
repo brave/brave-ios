@@ -13,53 +13,33 @@ extension AdblockEngine {
     case couldNotDeserializeDATFile
   }
   
-  static func createEngines(
-    from resources: [AdBlockEngineManager.ResourceWithVersion]
-  ) async -> (engines: [CachedAdBlockEngine], compileResults: [AdBlockEngineManager.ResourceWithVersion: Result<Void, Error>]) {
-    let groupedResources = Dictionary(grouping: resources, by: \.resource.source)
-    
-    let enginesWithCompileResults = await groupedResources.asyncConcurrentMap { source, resources -> (engine: CachedAdBlockEngine, compileResults: [AdBlockEngineManager.ResourceWithVersion: Result<Void, Error>]) in
-      let results = await CachedAdBlockEngine.createEngine(from: resources, source: source)
-      return (results.engine, results.compileResults)
-    }
-    
-    var allCompileResults: [AdBlockEngineManager.ResourceWithVersion: Result<Void, Error>] = [:]
-    let engines = enginesWithCompileResults.map({ $0.engine })
-    
-    for result in enginesWithCompileResults {
-      for compileResult in result.1 {
-        allCompileResults[compileResult.key] = compileResult.value
-      }
-    }
-    
-    return (engines, allCompileResults)
+  convenience init(textFileURL fileURL: URL, resourcesFileURL: URL) throws {
+    try self.init(rules: String(contentsOf: fileURL))
+    try useResources(fromFileURL: resourcesFileURL)
   }
   
-  /// Create an engine from the given resources.
-  ///
-  /// - Warning: You should only have at max dat file in this list. Each dat file can only represent a single engine
-  public static func createEngine(from resources: [AdBlockEngineManager.ResourceWithVersion]) -> (engine: AdblockEngine, compileResults: [AdBlockEngineManager.ResourceWithVersion: Result<Void, Error>]) {
-    let combinedRuleLists = Self.combineAllRuleLists(from: resources)
-    // Create an engine with the combined rule lists
-    let engine = AdblockEngine(rules: combinedRuleLists)
-    // Compile remaining resources
-    let compileResults = engine.compile(resources: resources)
-    // Return the compiled data
-    return (engine, compileResults)
+  convenience init(datFileURL fileURL: URL, resourcesFileURL: URL) throws {
+    self.init()
+    
+    if try !deserialize(data: Data(contentsOf: fileURL)) {
+      throw CompileError.couldNotDeserializeDATFile
+    }
+    
+    try useResources(fromFileURL: resourcesFileURL)
   }
   
   /// Combine all resources of type rule lists to one single string
-  private static func combineAllRuleLists(from resourcesWithVersion: [AdBlockEngineManager.ResourceWithVersion]) -> String {
+  private static func combineAllRuleLists(from infos: [CachedAdBlockEngine.FilterListInfo]) -> String {
     // Combine all rule lists that need to be injected during initialization
-    let allResults = resourcesWithVersion.compactMap { resourceWithVersion -> String? in
-      switch resourceWithVersion.resource.type {
-      case .ruleList:
-        guard let data = FileManager.default.contents(atPath: resourceWithVersion.fileURL.path) else {
+    let allResults = infos.compactMap { info -> String? in
+      switch info.fileType {
+      case .text:
+        guard let data = FileManager.default.contents(atPath: info.localFileURL.path) else {
           return nil
         }
         
         return String(data: data, encoding: .utf8)
-      case .dat, .jsonResources:
+      case .dat:
         return nil
       }
     }
@@ -68,51 +48,15 @@ extension AdblockEngine {
     return combinedRules
   }
   
-  /// Compile all the resources on a detached task
-  func compile(resources: [AdBlockEngineManager.ResourceWithVersion]) -> [AdBlockEngineManager.ResourceWithVersion: Result<Void, Error>] {
-    var compileResults: [AdBlockEngineManager.ResourceWithVersion: Result<Void, Error>] = [:]
-    
-    for resourceWithVersion in resources {
-      do {
-        try self.compile(resource: resourceWithVersion)
-        compileResults[resourceWithVersion] = .success(Void())
-      } catch {
-        compileResults[resourceWithVersion] = .failure(error)
-      }
-    }
-    
-    return compileResults
-  }
-  
-  /// Compile the given resource into the given engine
-  func compile(resource: AdBlockEngineManager.ResourceWithVersion) throws {
-    switch resource.resource.type {
-    case .dat:
-      guard let data = FileManager.default.contents(atPath: resource.fileURL.path) else {
-        throw CompileError.fileNotFound
-      }
-      
-      if !deserialize(data: data) {
-        throw CompileError.couldNotDeserializeDATFile
-      }
-    case .jsonResources:
-      guard let data = FileManager.default.contents(atPath: resource.fileURL.path) else {
-        throw CompileError.fileNotFound
-      }
-      
-      guard let json = try self.validateJSON(data) else {
-        return
-      }
-      
+  private func useResources(fromFileURL fileURL: URL) throws {
+    // Add scriplets if available
+    if let json = try Self.validateJSON(Data(contentsOf: fileURL)) {
       useResources(json)
-    case .ruleList:
-      // This is added during engine initialization
-      break
     }
   }
   
   /// Return a `JSON` string if this data is valid
-  private func validateJSON(_ data: Data) throws -> String? {
+  static func validateJSON(_ data: Data) throws -> String? {
     let value = try JSONSerialization.jsonObject(with: data, options: [])
     
     if let value = value as? NSArray {

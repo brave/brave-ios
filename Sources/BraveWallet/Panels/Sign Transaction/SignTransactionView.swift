@@ -9,6 +9,7 @@ import SwiftUI
 
 class SignTransactionRequestUnion {
   let id: Int32
+  let chainId: String
   let originInfo: BraveWallet.OriginInfo
   let coin: BraveWallet.CoinType
   let fromAddress: String
@@ -17,6 +18,7 @@ class SignTransactionRequestUnion {
   
   init(
     id: Int32,
+    chainId: String,
     originInfo: BraveWallet.OriginInfo,
     coin: BraveWallet.CoinType,
     fromAddress: String,
@@ -24,6 +26,7 @@ class SignTransactionRequestUnion {
     rawMessage: [BraveWallet.ByteArrayStringUnion]
   ) {
     self.id = id
+    self.chainId = chainId
     self.originInfo = originInfo
     self.coin = coin
     self.fromAddress = fromAddress
@@ -47,10 +50,9 @@ struct SignTransactionView: View {
   
   @State private var txIndex: Int = 0
   @State private var showWarning: Bool = true
-  @State private var network: BraveWallet.NetworkInfo?
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.colorScheme) private var colorScheme
-  @Environment(\.openWalletURLAction) private var openWalletURL
+  @Environment(\.openURL) private var openWalletURL
   @ScaledMetric private var blockieSize = 54
   private let maxBlockieSize: CGFloat = 108
   private let normalizedRequests: [SignTransactionRequestUnion]
@@ -72,6 +74,7 @@ struct SignTransactionView: View {
       self.normalizedRequests = requests.map {
         SignTransactionRequestUnion(
           id: $0.id,
+          chainId: $0.chainId,
           originInfo: $0.originInfo,
           coin: $0.coin,
           fromAddress: $0.fromAddress,
@@ -83,6 +86,7 @@ struct SignTransactionView: View {
       self.normalizedRequests = requests.map {
         SignTransactionRequestUnion(
           id: $0.id,
+          chainId: $0.chainId,
           originInfo: $0.originInfo,
           coin: $0.coin,
           fromAddress: $0.fromAddress,
@@ -105,6 +109,10 @@ struct SignTransactionView: View {
   private var currentRequest: SignTransactionRequestUnion {
     normalizedRequests[txIndex]
   }
+  
+  private var network: BraveWallet.NetworkInfo? {
+    networkStore.allChains.first(where: { $0.chainId == currentRequest.chainId })
+  }
 
   private func instructionsDisplayString() -> String {
     currentRequest.txDatas
@@ -112,7 +120,7 @@ struct SignTransactionView: View {
       .map { instructionsForOneTx in
         instructionsForOneTx
           .map { TransactionParser.parseSolanaInstruction($0).toString }
-          .joined(separator: "\n\n") // separator between each instruction
+          .joined(separator: "\n\n====\n\n") // separator between each instruction
       }
       .joined(separator: "\n\n\n\n") // separator between each transaction
   }
@@ -153,7 +161,7 @@ struct SignTransactionView: View {
             }
             .foregroundColor(Color(.bravePrimary))
             .font(.callout)
-            Text(urlOrigin: currentRequest.originInfo.origin)
+            Text(originInfo: currentRequest.originInfo)
               .foregroundColor(Color(.braveLabel))
               .font(.subheadline)
               .multilineTextAlignment(.center)
@@ -233,7 +241,7 @@ struct SignTransactionView: View {
           onDismiss()
         }
       }) {
-        Label(Strings.Wallet.sign, braveSystemImage: "brave.key")
+        Label(Strings.Wallet.sign, braveSystemImage: "leo.key")
           .fixedSize(horizontal: true, vertical: false)
           .imageScale(.large)
       }
@@ -284,7 +292,7 @@ struct SignTransactionView: View {
           .font(.subheadline)
           .foregroundColor(Color(.braveErrorLabel))
         Button(action: {
-          openWalletURL?(WalletConstants.signTransactionRiskLink)
+          openWalletURL(WalletConstants.signTransactionRiskLink)
         }) {
           Text(Strings.Wallet.learnMoreButton)
             .font(.subheadline)
@@ -298,9 +306,6 @@ struct SignTransactionView: View {
       Color(.braveErrorBackground)
         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
     )
-    .onAppear {
-      updateNetwork()
-    }
   }
   
   private func next() {
@@ -308,16 +313,6 @@ struct SignTransactionView: View {
       txIndex += 1
     } else {
       txIndex = 0
-    }
-    updateNetwork()
-  }
-  
-  private func updateNetwork() {
-    Task { @MainActor in
-      if currentRequest.coin != self.network?.coin {
-        self.network = nil // hide network while we fetch network for new coin type
-      }
-      self.network = await networkStore.selectedNetwork(for: currentRequest.coin)
     }
   }
 }
@@ -331,10 +326,12 @@ struct SignTransaction_Previews: PreviewProvider {
       request: .signTransaction([BraveWallet.SignTransactionRequest(
         originInfo: .init(),
         id: 0,
+        from: BraveWallet.AccountInfo.previewAccount.accountId,
         fromAddress: BraveWallet.AccountInfo.previewAccount.address,
         txData: .init(),
         rawMessage: .init(),
-        coin: .sol
+        coin: .sol,
+        chainId: BraveWallet.SolanaMainnet
       )]),
       cryptoStore: .previewStore,
       onDismiss: {}

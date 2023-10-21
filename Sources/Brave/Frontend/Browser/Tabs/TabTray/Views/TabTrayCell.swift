@@ -30,7 +30,9 @@ class TabCell: UICollectionViewCell {
     endPoint: CGPoint(x: 0, y: 1)
   )
   let titleLabel: UILabel
-  let favicon: UIImageView = UIImageView()
+  let favicon: UIImageView = UIImageView().then {
+    $0.contentMode = .scaleAspectFit
+  }
   let closeButton: UIButton
 
   var animator: SwipeAnimator!
@@ -44,11 +46,19 @@ class TabCell: UICollectionViewCell {
   func configure(with tab: Tab) {
     self.tab = tab
     tab.onScreenshotUpdated = { [weak self, weak tab] in
-      self?.screenshotView.image = tab?.screenshot
+      guard let self = self, let tab = tab else { return }
+      
+      if !tab.displayTitle.isEmpty {
+        self.accessibilityLabel = tab.displayTitle
+      }
+      
+      self.titleLabel.text = tab.displayTitle
+      self.favicon.image = tab.displayFavicon?.image ?? Favicon.defaultImage
+      self.screenshotView.image = tab.screenshot
     }
 
     titleLabel.text = tab.displayTitle
-    favicon.image = Favicon.defaultImage
+    favicon.image = tab.displayFavicon?.image ?? Favicon.defaultImage
 
     if !tab.displayTitle.isEmpty {
       accessibilityLabel = tab.displayTitle
@@ -69,7 +79,7 @@ class TabCell: UICollectionViewCell {
     if let displayFavicon = tab.displayFavicon {
       favicon.image = displayFavicon.image ?? Favicon.defaultImage
     } else if let url = tab.url, !url.isLocal, !InternalURL.isValid(url: url) {
-      favicon.loadFavicon(for: url)
+      favicon.loadFavicon(for: url, isPrivateBrowsing: tab.isPrivate)
     } else {
       favicon.image = Favicon.defaultImage
     }

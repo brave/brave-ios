@@ -13,7 +13,8 @@ import JitsiMeetSDK
 @MainActor public class BraveTalkJitsiCoordinator: Sendable {
   /// Whether or not the jitsi SDK integration is enabled
   static var isIntegrationEnabled: Bool {
-    return AppConstants.buildChannel != .release
+    // If needed to disable for certain build channels, check AppConstants.buildChannel here
+    return true
   }
   
   public init() {}
@@ -79,6 +80,18 @@ import JitsiMeetSDK
     jitsiMeetView?.setAudioMuted(isMuted)
   }
   
+  private func dismissJitsiMeetView(_ completion: @escaping () -> Void) {
+    self.pipViewCoordinator?.hide() { _ in
+      self.jitsiMeetView?.removeFromSuperview()
+      self.jitsiMeetView = nil
+      self.pipViewCoordinator = nil
+      self.isCallActive = false
+      // Destroy the bridge after they're done
+      JitsiMeet.sharedInstance().destroyReactNativeBridge()
+      completion()
+    }
+  }
+  
   public func launchNativeBraveTalk(
     for room: String,
     token: String,
@@ -102,17 +115,13 @@ import JitsiMeetSDK
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
           jmv.window?.bringSubviewToFront(jmv)
         }
+      },
+      conferenceJoined: { [weak self] in
         self?.isCallActive = true
       },
       conferenceTerminated: { [weak self] in
         guard let self = self else { return }
-        self.pipViewCoordinator?.hide() { _ in
-          self.jitsiMeetView?.removeFromSuperview()
-          self.jitsiMeetView = nil
-          self.pipViewCoordinator = nil
-          self.isCallActive = false
-          // Destroy the bridge after they're done
-          JitsiMeet.sharedInstance().destroyReactNativeBridge()
+        self.dismissJitsiMeetView {
           onExitCall()
         }
       },
@@ -121,6 +130,15 @@ import JitsiMeetSDK
       },
       audioIsMuted: { [weak self] isMuted in
         self?.isMuted = isMuted
+      },
+      readyToClose: { [weak self] in
+        guard let self = self else { return }
+        if !self.isCallActive {
+          // Trying to leave the join screen
+          self.dismissJitsiMeetView {
+            onExitCall()
+          }
+        }
       }
     )
     
@@ -144,26 +162,33 @@ import JitsiMeetSDK
 
 private class JitsiDelegate: NSObject, JitsiMeetViewDelegate {
   var conferenceWillJoin: () -> Void
+  var conferenceJoined: () -> Void
   var conferenceTerminated: () -> Void
   var enterPiP: () -> Void
   var audioIsMuted: (Bool) -> Void
+  var readyToClose: () -> Void
   
   init(
     conferenceWillJoin: @escaping () -> Void,
+    conferenceJoined: @escaping () -> Void,
     conferenceTerminated: @escaping () -> Void,
     enterPictureInPicture: @escaping () -> Void,
-    audioIsMuted: @escaping (Bool) -> Void
+    audioIsMuted: @escaping (Bool) -> Void,
+    readyToClose: @escaping () -> Void
   ) {
     self.conferenceWillJoin = conferenceWillJoin
+    self.conferenceJoined = conferenceJoined
     self.conferenceTerminated = conferenceTerminated
     self.enterPiP = enterPictureInPicture
     self.audioIsMuted = audioIsMuted
+    self.readyToClose = readyToClose
   }
   
   func conferenceJoined(_ data: [AnyHashable: Any]!) {
     if let isMuted = data?["isAudioMuted"] as? Bool {
       audioIsMuted(isMuted)
     }
+    conferenceJoined()
   }
   
   func conferenceWillJoin(_ data: [AnyHashable: Any]!) {
@@ -181,5 +206,9 @@ private class JitsiDelegate: NSObject, JitsiMeetViewDelegate {
   func audioMutedChanged(_ data: [AnyHashable: Any]!) {
     guard let isMuted = data?["muted"] as? Bool else { return }
     audioIsMuted(isMuted)
+  }
+  
+  func ready(toClose data: [AnyHashable: Any]!) {
+    readyToClose()
   }
 }

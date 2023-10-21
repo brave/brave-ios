@@ -7,8 +7,9 @@ import Foundation
 import BraveCore
 import BigNumber
 import Strings
+import Combine
 
-public class TransactionConfirmationStore: ObservableObject {
+public class TransactionConfirmationStore: ObservableObject, WalletObserverStore {
   /// The value that are being sent/swapped/approved in this transaction
   @Published var value: String = ""
   /// The symbol of token that are being send/swapped/approved in this transaction
@@ -41,15 +42,25 @@ public class TransactionConfirmationStore: ObservableObject {
   @Published var transactionDetails: String = ""
   /// The gas esitimation for this eip1559 transaction
   @Published var eip1559GasEstimation: BraveWallet.GasEstimation1559?
+  /// The gas premium for filcoin transaction
+  @Published var filTxGasPremium: String?
+  /// The gas limit for filcoin transaction
+  @Published var filTxGasLimit: String?
+  /// The gas fee cap for filcoin transaction
+  @Published var filTxGasFeeCap: String?
   /// The origin info of this transaction
   @Published var originInfo: BraveWallet.OriginInfo?
   /// This is an id for the unppproved transaction that is currently displayed on screen
   @Published var activeTransactionId: BraveWallet.TransactionInfo.ID = "" {
     didSet {
-      if let tx = transactions.first(where: { $0.id == activeTransactionId }) {
+      if let tx = allTxs.first(where: { $0.id == activeTransactionId }) {
         updateTransaction(with: tx)
-      } else if let firstTx = transactions.first {
+        activeTxStatus = tx.txStatus
+      } else if let firstTx = unapprovedTxs.first {
         updateTransaction(with: firstTx)
+        activeTxStatus = firstTx.txStatus
+      } else {
+        activeTxStatus = .error
       }
     }
   }
@@ -60,8 +71,27 @@ public class TransactionConfirmationStore: ObservableObject {
       updateTransaction(with: activeTransaction)
     }
   }
-  /// This is a list of all unpproved transactions iterated through all the accounts for the current keyring
-  private(set) var transactions: [BraveWallet.TransactionInfo] = []
+  @Published var activeTxStatus: BraveWallet.TransactionStatus = .unapproved {
+    didSet {
+      if isTxSubmitting == true, oldValue == .approved, activeTxStatus != .approved {
+        isTxSubmitting = false
+      }
+    }
+  }
+  /// Indicates Tx is being submitted. This value will be set to `true` after users click `Confirm` button
+  @Published var isTxSubmitting: Bool = false
+  
+  /// All transactions with any kind of status of all the accounts for all supported keyrings
+  @Published var allTxs: [BraveWallet.TransactionInfo] = []
+  /// This is a list of all unpproved transactions iterated through all the accounts for all supported keyrings
+  var unapprovedTxs: [BraveWallet.TransactionInfo] {
+    return allTxs.filter { $0.txStatus == .unapproved }
+  }
+  var isReadyToBeDismissed: Bool {
+    return unapprovedTxs.isEmpty && activeTransactionId.isEmpty
+  }
+  /// This is a map between transaction id and its error happened during transaction submitting
+  var transactionProviderErrorRegistry: [String: TransactionProviderError] = [:]
 
   let currencyFormatter: NumberFormatter = .usdCurrencyFormatter
     .then {
@@ -70,9 +100,9 @@ public class TransactionConfirmationStore: ObservableObject {
     }
   
   private var activeTransaction: BraveWallet.TransactionInfo {
-    transactions.first(where: { $0.id == activeTransactionId }) ?? (transactions.first ?? .init())
+    unapprovedTxs.first(where: { $0.id == activeTransactionId }) ?? (unapprovedTxs.first ?? .init())
   }
-  
+
   private(set) var activeParsedTransaction: ParsedTransaction = .init()
   private var activeTransactionDetails: String {
     if activeParsedTransaction.transaction.coin == .sol {
@@ -97,6 +127,8 @@ public class TransactionConfirmationStore: ObservableObject {
       }
     }
   }
+  /// A cache of networks for the supported coin types.
+  private var allNetworks: [BraveWallet.NetworkInfo] = []
   
   private let assetRatioService: BraveWalletAssetRatioService
   private let rpcService: BraveWalletJsonRpcService
@@ -106,7 +138,14 @@ public class TransactionConfirmationStore: ObservableObject {
   private let ethTxManagerProxy: BraveWalletEthTxManagerProxy
   private let keyringService: BraveWalletKeyringService
   private let solTxManagerProxy: BraveWalletSolanaTxManagerProxy
+  private let assetManager: WalletUserAssetManagerType
   private var selectedChain: BraveWallet.NetworkInfo = .init()
+  private var txServiceObserver: TxServiceObserver?
+  private var walletServiceObserver: WalletServiceObserver?
+  
+  var isObserving: Bool {
+    txServiceObserver != nil && walletServiceObserver != nil
+  }
 
   init(
     assetRatioService: BraveWalletAssetRatioService,
@@ -116,7 +155,8 @@ public class TransactionConfirmationStore: ObservableObject {
     walletService: BraveWalletBraveWalletService,
     ethTxManagerProxy: BraveWalletEthTxManagerProxy,
     keyringService: BraveWalletKeyringService,
-    solTxManagerProxy: BraveWalletSolanaTxManagerProxy
+    solTxManagerProxy: BraveWalletSolanaTxManagerProxy,
+    userAssetManager: WalletUserAssetManagerType
   ) {
     self.assetRatioService = assetRatioService
     self.rpcService = rpcService
@@ -126,31 +166,95 @@ public class TransactionConfirmationStore: ObservableObject {
     self.ethTxManagerProxy = ethTxManagerProxy
     self.keyringService = keyringService
     self.solTxManagerProxy = solTxManagerProxy
+    self.assetManager = userAssetManager
 
-    self.txService.add(self)
-    self.walletService.add(self)
+    self.setupObservers()
     
     walletService.defaultBaseCurrency { [self] currencyCode in
       self.currencyCode = currencyCode
     }
   }
   
+  func tearDown() {
+    txServiceObserver = nil
+    walletServiceObserver = nil
+  }
+  
+  func setupObservers() {
+    guard !isObserving else { return }
+    self.txServiceObserver = TxServiceObserver(
+      txService: txService,
+      _onNewUnapprovedTx: { _ in
+        // won't have any new unapproved tx being added if you on tx confirmation panel
+      },
+      _onUnapprovedTxUpdated: { [weak self] txInfo in
+        Task { @MainActor [self] in
+          // refresh the unapproved transaction list, as well as tx details UI
+          // first update `allTxs` with the new updated txInfo(txStatus)
+          if let index = self?.allTxs.firstIndex(where: { $0.id == txInfo.id }) {
+            self?.allTxs[index] = txInfo
+          }
+          
+          // update details UI if the current active tx is updated
+          if self?.activeTransactionId == txInfo.id {
+            self?.updateTransaction(with: txInfo)
+            self?.activeTxStatus = txInfo.txStatus
+          }
+          
+          // if somehow the current active transaction no longer exists
+          // set the first `.unapproved` tx as the new `activeTransactionId`
+          if let unapprovedTxs = self?.unapprovedTxs, !unapprovedTxs.contains(where: { $0.id == self?.activeTransactionId }) {
+            self?.activeTransactionId = self?.unapprovedTxs.first?.id ?? ""
+          }
+        }
+      },
+      _onTransactionStatusChanged: { [weak self] txInfo in
+        Task { @MainActor [self] in
+          // once we come here. it means user either rejects or confirms a transaction
+          
+          // first update `allTxs` with the new updated txInfo(txStatus)
+          if let index = self?.allTxs.firstIndex(where: { $0.id == txInfo.id }) {
+            self?.allTxs[index] = txInfo
+          }
+          
+          // only update the `activeTransactionId` if the current active transaction status
+          // becomes `.rejected`/`.dropped`
+          if self?.activeTransactionId == txInfo.id, txInfo.txStatus == .rejected || txInfo.txStatus == .dropped {
+            let indexOfChangedTx = self?.unapprovedTxs.firstIndex(where: { $0.id == txInfo.id }) ?? 0
+            let newIndex = indexOfChangedTx > 0 ? indexOfChangedTx - 1 : 0
+            self?.activeTransactionId = self?.unapprovedTxs[safe: newIndex]?.id ?? self?.unapprovedTxs.first?.id ?? ""
+          } else {
+            if self?.activeTransactionId == txInfo.id {
+              self?.activeTxStatus = txInfo.txStatus
+            }
+          }
+        }
+      }
+    )
+    self.walletServiceObserver = WalletServiceObserver(
+      walletService: walletService,
+      _onDefaultBaseCurrencyChanged: { [weak self] currency in
+        self?.currencyCode = currency
+      }
+    )
+  }
+  
   func nextTransaction() {
-    if let index = transactions.firstIndex(where: { $0.id == activeTransactionId }) {
-      var nextIndex = transactions.index(after: index)
-      if nextIndex == transactions.endIndex {
+    if let index = unapprovedTxs.firstIndex(where: { $0.id == activeTransactionId }) {
+      var nextIndex = unapprovedTxs.index(after: index)
+      if nextIndex == unapprovedTxs.endIndex {
         nextIndex = 0
       }
-      activeTransactionId = transactions[nextIndex].id
+      activeTransactionId = unapprovedTxs[nextIndex].id
     } else {
-      activeTransactionId = transactions.first!.id
+      activeTransactionId = unapprovedTxs.first!.id
     }
   }
 
   func rejectAllTransactions(completion: @escaping (Bool) -> Void) {
     let dispatchGroup = DispatchGroup()
     var allRejectsSucceeded = true
-    for transaction in transactions {
+    for transaction in unapprovedTxs {
       dispatchGroup.enter()
       reject(transaction: transaction, completion: { success in
         defer { dispatchGroup.leave() }
@@ -165,17 +269,19 @@ public class TransactionConfirmationStore: ObservableObject {
   }
   
   @MainActor func prepare() async {
-    transactions = await fetchTransactions()
-    if !transactions.contains(where: { $0.id == activeTransactionId }) {
-      self.activeTransactionId = transactions.first?.id ?? ""
+    allNetworks = await rpcService.allNetworksForSupportedCoins()
+    allTxs = await fetchAllTransactions()
+    if !unapprovedTxs.contains(where: { $0.id == activeTransactionId }) {
+      self.activeTransactionId = unapprovedTxs.first?.id ?? ""
     }
-    let coinsForTransactions: Set<BraveWallet.CoinType> = .init(transactions.map(\.coin))
-    for coin in coinsForTransactions {
-      let network = await rpcService.network(coin)
-      let userVisibleTokens = await walletService.userAssets(network.chainId, coin: coin)
-      await fetchAssetRatios(for: userVisibleTokens)
+    let transactionNetworks: [BraveWallet.NetworkInfo] = Set(allTxs.map(\.chainId))
+      .compactMap { chainId in allNetworks.first(where: { $0.chainId == chainId }) }
+    for network in transactionNetworks {
+      let userAssets = assetManager.getAllUserAssetsInNetworkAssets(networks: [network], includingUserDeleted: true).flatMap { $0.tokens }
+      await fetchAssetRatios(for: userAssets)
     }
-    await fetchUnknownTokens(for: transactions)
+    await fetchUnknownTokens(for: unapprovedTxs)
+    await fetchSolEstimatedTxFees(for: unapprovedTxs)
   }
   
   func updateTransaction(
@@ -187,15 +293,21 @@ public class TransactionConfirmationStore: ObservableObject {
       clearTrasactionInfoBeforeUpdate()
       
       let coin = transaction.coin
-      let keyring = await keyringService.keyringInfo(coin.keyringId)
-      let network = await rpcService.network(coin)
-      let allTokens = await blockchainRegistry.allTokens(network.chainId, coin: coin) + tokenInfoCache.map(\.value)
-      let userVisibleTokens = await walletService.userAssets(network.chainId, coin: coin)
-      
-      var solEstimatedTxFee: UInt64?
-      if transaction.coin == .sol {
-        (solEstimatedTxFee, _, _) = await solTxManagerProxy.estimatedTxFee(transaction.id)
+      let allAccountsForCoin = await keyringService.allAccounts().accounts.filter { $0.coin == coin }
+      if !allNetworks.contains(where: { $0.chainId == transaction.chainId }) {
+        allNetworks = await rpcService.allNetworksForSupportedCoins()
       }
+      guard let network = allNetworks.first(where: { $0.chainId == transaction.chainId }) else {
+        if !transaction.chainId.isEmpty { // default `BraveWallet.TransactionInfo()` has empty chainId
+          // Transactions should be removed if their network is removed
+          // https://github.com/brave/brave-browser/issues/30234
+          assertionFailure("The NetworkInfo for the transaction's chainId (\(transaction.chainId)) is unavailable")
+        }
+        return
+      }
+      let allTokens = await blockchainRegistry.allTokens(network.chainId, coin: coin) + tokenInfoCache.map(\.value)
+      let userAssets = assetManager.getAllUserAssetsInNetworkAssets(networks: [network], includingUserDeleted: true).flatMap { $0.tokens }
+      let solEstimatedTxFee: UInt64? = solEstimatedTxFeeCache[transaction.id]
       
       if transaction.isEIP1559Transaction {
         eip1559GasEstimation = transaction.txDataUnion.ethTxData1559?.gasEstimation
@@ -203,8 +315,8 @@ public class TransactionConfirmationStore: ObservableObject {
       
       guard let parsedTransaction = transaction.parsedTransaction(
         network: network,
-        accountInfos: keyring.accountInfos,
-        visibleTokens: userVisibleTokens,
+        accountInfos: allAccountsForCoin,
+        userAssets: userAssets,
         allTokens: allTokens,
         assetRatios: assetRatios,
         solEstimatedTxFee: solEstimatedTxFee,
@@ -215,13 +327,27 @@ public class TransactionConfirmationStore: ObservableObject {
       activeParsedTransaction = parsedTransaction
       
       await fetchActiveTransactionDetails(
-        keyring: keyring,
+        accounts: allAccountsForCoin,
         network: network,
         allTokens: allTokens,
         shouldFetchCurrentAllowance: shouldFetchCurrentAllowance,
         shouldFetchGasTokenBalance: shouldFetchGasTokenBalance
       )
     }
+  }
+  
+  func activeTxDetailsStore() -> TransactionDetailsStore {
+    let tx = allTxs.first { $0.id == activeTransactionId } ?? activeParsedTransaction.transaction
+    return TransactionDetailsStore(
+      transaction: tx,
+      keyringService: keyringService,
+      walletService: walletService,
+      rpcService: rpcService,
+      assetRatioService: assetRatioService,
+      blockchainRegistry: blockchainRegistry,
+      solanaTxManagerProxy: solTxManagerProxy,
+      userAssetManager: assetManager
+    )
   }
   
   private func clearTrasactionInfoBeforeUpdate() {
@@ -234,6 +360,10 @@ public class TransactionConfirmationStore: ObservableObject {
     isBalanceSufficient = true
     isSolTokenTransferWithAssociatedTokenAccountCreation = false
     isUnlimitedApprovalRequested = false
+    // Filecoin Tx
+    filTxGasPremium = nil
+    filTxGasLimit = nil
+    filTxGasFeeCap = nil
   }
   
   private var assetRatios: [String: Double] = [:]
@@ -242,6 +372,8 @@ public class TransactionConfirmationStore: ObservableObject {
   /// Cache for storing `BlockchainToken`s that are not in user assets or our token registry.
   /// This could occur with a dapp creating a transaction.
   private var tokenInfoCache: [String: BraveWallet.BlockchainToken] = [:]
+  /// Cache for storing the estimated transaction fee for each Solana transaction. The key is the transaction id.
+  private var solEstimatedTxFeeCache: [String: UInt64] = [:]
   
   @MainActor private func fetchAssetRatios(for userVisibleTokens: [BraveWallet.BlockchainToken]) async {
     let priceResult = await assetRatioService.priceWithIndividualRetry(
@@ -265,7 +397,12 @@ public class TransactionConfirmationStore: ObservableObject {
     }
     
     let formatter = WeiFormatter(decimalFormatStyle: .balance)
-    let (allowance, _, _) = await rpcService.erc20TokenAllowance(details.token?.contractAddress(in: selectedChain) ?? "", ownerAddress: parsedTransaction.fromAddress, spenderAddress: details.spenderAddress)
+    let (allowance, _, _) = await rpcService.erc20TokenAllowance(
+      details.token?.contractAddress(in: selectedChain) ?? "",
+      ownerAddress: parsedTransaction.fromAddress,
+      spenderAddress: details.spenderAddress,
+      chainId: parsedTransaction.transaction.chainId
+    )
     let allowanceString = formatter.decimalString(for: allowance.removingHexPrefix, radix: .hex, decimals: Int(details.token?.decimals ?? selectedChain.decimals)) ?? ""
     currentAllowanceCache[parsedTransaction.transaction.id] = allowanceString
     updateTransaction(with: activeTransaction, shouldFetchCurrentAllowance: false, shouldFetchGasTokenBalance: false)
@@ -285,13 +422,19 @@ public class TransactionConfirmationStore: ObservableObject {
   @MainActor private func fetchUnknownTokens(
     for transactions: [BraveWallet.TransactionInfo]
   ) async {
-    let coin = await walletService.selectedCoin()
-    let network = await rpcService.network(coin)
-    let userVisibleTokens = await walletService.userAssets(network.chainId, coin: network.coin)
+    // `AssetRatioService` can only fetch tokens from Ethereum Mainnet
+    let mainnetTransactions = transactions.filter { $0.chainId == BraveWallet.MainnetChainId }
+    guard !mainnetTransactions.isEmpty else { return }
+    let coin: BraveWallet.CoinType = .eth
+    let allNetworks = await rpcService.allNetworks(coin)
+    guard let network = allNetworks.first(where: { $0.chainId == BraveWallet.MainnetChainId }) else {
+      return
+    }
+    let userAssets = assetManager.getAllUserAssetsInNetworkAssets(networks: [network], includingUserDeleted: true).flatMap { $0.tokens }
     let allTokens = await blockchainRegistry.allTokens(network.chainId, coin: network.coin)
-    let unknownTokenContractAddresses = transactions.flatMap(\.tokenContractAddresses)
+    let unknownTokenContractAddresses = mainnetTransactions.flatMap(\.tokenContractAddresses)
       .filter { contractAddress in
-        !userVisibleTokens.contains(where: { $0.contractAddress(in: network).caseInsensitiveCompare(contractAddress) == .orderedSame })
+        !userAssets.contains(where: { $0.contractAddress(in: network).caseInsensitiveCompare(contractAddress) == .orderedSame })
         && !allTokens.contains(where: { $0.contractAddress(in: network).caseInsensitiveCompare(contractAddress) == .orderedSame })
         && !tokenInfoCache.keys.contains(where: { $0.caseInsensitiveCompare(contractAddress) == .orderedSame })
       }
@@ -303,8 +446,18 @@ public class TransactionConfirmationStore: ObservableObject {
     updateTransaction(with: activeTransaction, shouldFetchCurrentAllowance: false, shouldFetchGasTokenBalance: false)
   }
   
+  @MainActor private func fetchSolEstimatedTxFees(
+    for transactions: [BraveWallet.TransactionInfo]
+  ) async {
+    for transaction in transactions where transaction.coin == .sol {
+      let (solEstimatedTxFee, _, _) = await solTxManagerProxy.estimatedTxFee(transaction.chainId, txMetaId: transaction.id)
+      self.solEstimatedTxFeeCache[transaction.id] = solEstimatedTxFee
+    }
+    updateTransaction(with: activeTransaction, shouldFetchCurrentAllowance: false, shouldFetchGasTokenBalance: false)
+  }
+  
   @MainActor func fetchActiveTransactionDetails(
-    keyring: BraveWallet.KeyringInfo,
+    accounts: [BraveWallet.AccountInfo],
     network: BraveWallet.NetworkInfo,
     allTokens: [BraveWallet.BlockchainToken],
     shouldFetchCurrentAllowance: Bool,
@@ -339,7 +492,7 @@ public class TransactionConfirmationStore: ObservableObject {
             isBalanceSufficient = false
           }
         } else if shouldFetchGasTokenBalance {
-          if let account = keyring.accountInfos.first(where: { $0.address == activeParsedTransaction.fromAddress }) {
+          if let account = accounts.first(where: { $0.address == activeParsedTransaction.fromAddress }) {
             await fetchGasTokenBalance(token: network.nativeToken, account: account, network: network)
           }
         }
@@ -368,7 +521,7 @@ public class TransactionConfirmationStore: ObservableObject {
             isBalanceSufficient = false
           }
         } else if shouldFetchGasTokenBalance {
-          if let account = keyring.accountInfos.first(where: { $0.address == activeParsedTransaction.fromAddress }) {
+          if let account = accounts.first(where: { $0.address == activeParsedTransaction.fromAddress }) {
             await fetchGasTokenBalance(token: network.nativeToken, account: account, network: network)
           }
         }
@@ -401,7 +554,7 @@ public class TransactionConfirmationStore: ObservableObject {
             isBalanceSufficient = false
           }
         } else if shouldFetchGasTokenBalance {
-          if let account = keyring.accountInfos.first(where: { $0.address == activeParsedTransaction.fromAddress }) {
+          if let account = accounts.first(where: { $0.address == activeParsedTransaction.fromAddress }) {
             await fetchGasTokenBalance(token: network.nativeToken, account: account, network: network)
           }
         }
@@ -426,19 +579,19 @@ public class TransactionConfirmationStore: ObservableObject {
             isBalanceSufficient = false
           }
         } else if shouldFetchGasTokenBalance {
-          if let account = keyring.accountInfos.first(where: { $0.address == activeParsedTransaction.fromAddress }) {
+          if let account = accounts.first(where: { $0.address == activeParsedTransaction.fromAddress }) {
             await fetchGasTokenBalance(token: network.nativeToken, account: account, network: network)
           }
         }
         
         totalFiat = totalFiat(value: value, tokenAssetRatioId: details.fromToken?.assetRatioId ?? "", gasValue: gasValue, gasSymbol: gasSymbol, assetRatios: assetRatios, currencyFormatter: currencyFormatter)
       }
-    case let .solDappTransaction(details):
+    case let .solDappTransaction(details), let .solSwapTransaction(details):
       symbol = details.symbol ?? ""
       value = details.fromAmount
       transactionDetails = details.instructions
         .map(\.toString)
-        .joined(separator: "\n\n") // separator between each instruction
+        .joined(separator: "\n\n====\n\n") // separator between each instruction
       
       if let gasFee = details.gasFee {
         gasValue = gasFee.fee
@@ -454,10 +607,41 @@ public class TransactionConfirmationStore: ObservableObject {
             isBalanceSufficient = false
           }
         } else if shouldFetchGasTokenBalance {
-          if let account = keyring.accountInfos.first(where: { $0.address == activeParsedTransaction.fromAddress }) {
+          if let account = accounts.first(where: { $0.address == activeParsedTransaction.fromAddress }) {
             await fetchGasTokenBalance(token: network.nativeToken, account: account, network: network)
           }
         }
+      }
+    case let .filSend(details):
+      symbol = details.sendToken?.symbol ?? ""
+      value = details.sendAmount
+      fiat = details.sendFiat ?? ""
+    
+      filTxGasPremium = details.gasPremium
+      filTxGasLimit = details.gasLimit
+      filTxGasFeeCap = details.gasFeeCap
+      
+      if let gasFee = details.gasFee {
+        gasValue = gasFee.fee
+        gasFiat = gasFee.fiat
+        gasSymbol = activeParsedTransaction.networkSymbol
+        gasAssetRatio = assetRatios[activeParsedTransaction.networkSymbol.lowercased(), default: 0]
+        
+        if let gasBalance = gasTokenBalanceCache["\(network.nativeToken.symbol)\(activeParsedTransaction.fromAddress)"] {
+          if let gasValue = BDouble(gasFee.fee),
+             BDouble(gasBalance) > gasValue {
+            isBalanceSufficient = true
+          } else {
+            isBalanceSufficient = false
+          }
+        } else if shouldFetchGasTokenBalance {
+          if let account = accounts.first(where: { $0.address == activeParsedTransaction.fromAddress }) {
+            await fetchGasTokenBalance(token: network.nativeToken, account: account, network: network)
+          }
+        }
+      }
+      if let token = details.sendToken {
+        totalFiat = totalFiat(value: value, tokenAssetRatioId: token.assetRatioId, gasValue: gasValue, gasSymbol: gasSymbol, assetRatios: assetRatios, currencyFormatter: currencyFormatter)
       }
     case .other:
       break
@@ -479,21 +663,41 @@ public class TransactionConfirmationStore: ObservableObject {
     let totalFiat = currencyFormatter.string(from: NSNumber(value: amount + gasAmount)) ?? "$0.00"
     return totalFiat
   }
-
-  @MainActor private func fetchTransactions() async -> [BraveWallet.TransactionInfo] {
-    let allKeyrings = await keyringService.keyrings(for: WalletConstants.supportedCoinTypes)
-    
-    return await txService.pendingTransactions(for: allKeyrings)
+  
+  @MainActor private func fetchAllTransactions() async -> [BraveWallet.TransactionInfo] {
+    let allAccounts = await keyringService.allAccounts().accounts
+    var allNetworksForCoin: [BraveWallet.CoinType: [BraveWallet.NetworkInfo]] = [:]
+    for coin in WalletConstants.supportedCoinTypes() {
+      let allNetworks = await rpcService.allNetworks(coin)
+      allNetworksForCoin[coin] = allNetworks
+    }
+    return await txService.pendingTransactions(networksForCoin: allNetworksForCoin, for: allAccounts)
+      .sorted(by: { $0.createdTime > $1.createdTime })
   }
 
   func confirm(transaction: BraveWallet.TransactionInfo, completion: @escaping (_ error: String?) -> Void) {
-    txService.approveTransaction(transaction.coin, txMetaId: transaction.id) { success, error, message in
+    txService.approveTransaction(
+      transaction.coin,
+      chainId: transaction.chainId,
+      txMetaId: transaction.id
+    ) { [weak self] success, error, message in
+      // As desktop, we only care about eth provider error or solana
+      // provider error (plus we haven't start supporting filecoin)
+      if error.tag == .providerError {
+        self?.transactionProviderErrorRegistry[transaction.id] = TransactionProviderError(code: error.providerError.rawValue, message: message)
+      } else if error.tag == .solanaProviderError {
+        self?.transactionProviderErrorRegistry[transaction.id] = TransactionProviderError(code: error.solanaProviderError.rawValue, message: message)
+      }
       completion(success ? nil : message)
     }
   }
 
   func reject(transaction: BraveWallet.TransactionInfo, completion: @escaping (Bool) -> Void) {
-    txService.rejectTransaction(transaction.coin, txMetaId: transaction.id) { success in
+    txService.rejectTransaction(
+      transaction.coin,
+      chainId: transaction.chainId,
+      txMetaId: transaction.id
+    ) { success in
       completion(success)
     }
   }
@@ -509,7 +713,8 @@ public class TransactionConfirmationStore: ObservableObject {
       transaction.isEIP1559Transaction,
       "Use updateGasFeeAndLimits(for:gasPrice:gasLimit:) for standard transactions")
     ethTxManagerProxy.setGasFeeAndLimitForUnapprovedTransaction(
-      transaction.id,
+      transaction.chainId,
+      txMetaId: transaction.id,
       maxPriorityFeePerGas: maxPriorityFeePerGas,
       maxFeePerGas: maxFeePerGas,
       gasLimit: gasLimit
@@ -528,7 +733,8 @@ public class TransactionConfirmationStore: ObservableObject {
       !transaction.isEIP1559Transaction,
       "Use updateGasFeeAndLimits(for:maxPriorityFeePerGas:maxFeePerGas:gasLimit:) for EIP-1559 transactions")
     ethTxManagerProxy.setGasPriceAndLimitForUnapprovedTransaction(
-      transaction.id,
+    transaction.chainId,
+    txMetaId: transaction.id,
       gasPrice: gasPrice,
       gasLimit: gasLimit
     ) { success in
@@ -541,7 +747,11 @@ public class TransactionConfirmationStore: ObservableObject {
     nonce: String,
     completion: @escaping ((Bool) -> Void)
   ) {
-    ethTxManagerProxy.setNonceForUnapprovedTransaction(transaction.id, nonce: nonce) { success in
+    ethTxManagerProxy.setNonceForUnapprovedTransaction(
+      transaction.chainId,
+      txMetaId: transaction.id,
+      nonce: nonce
+    ) { success in
       // not going to refresh unapproved transactions since the tx observer will be
       // notified `onTransactionStatusChanged` and `onUnapprovedTxUpdated`
       // `transactions` list will be refreshed there.
@@ -550,7 +760,7 @@ public class TransactionConfirmationStore: ObservableObject {
   }
   
   func editAllowance(
-    txMetaId: String,
+    transaction: BraveWallet.TransactionInfo,
     spenderAddress: String,
     amount: String,
     completion: @escaping (Bool) -> Void
@@ -561,7 +771,11 @@ public class TransactionConfirmationStore: ObservableObject {
         completion(false)
         return
       }
-      self.ethTxManagerProxy.setDataForUnapprovedTransaction(txMetaId, data: data) { success in
+      self.ethTxManagerProxy.setDataForUnapprovedTransaction(
+        transaction.chainId,
+        txMetaId: transaction.id,
+        data: data
+      ) { success in
         // not going to refresh unapproved transactions since the tx observer will be
         // notified `onTransactionStatusChanged` and `onUnapprovedTxUpdated`
         // `transactions` list will be refreshed there.
@@ -569,65 +783,15 @@ public class TransactionConfirmationStore: ObservableObject {
       }
     }
   }
-}
-
-extension TransactionConfirmationStore: BraveWalletTxServiceObserver {
-  public func onNewUnapprovedTx(_ txInfo: BraveWallet.TransactionInfo) {
-    // won't have any new unapproved tx being added if you on tx confirmation panel
-  }
-  public func onTransactionStatusChanged(_ txInfo: BraveWallet.TransactionInfo) {
-    Task { @MainActor in
-      // once we come here. it means user either rejects or confirms a transaction
-      // we will need to refresh the transaction list as well as
-      // update the `activeTransactionId` to update the UI
-      let indexOfChangedTx = transactions.firstIndex(where: { $0.id == txInfo.id }) ?? 0
-      let newIndex = indexOfChangedTx > 0 ? indexOfChangedTx - 1 : 0
-      
-      transactions = await fetchTransactions()
-      activeTransactionId = transactions[safe: newIndex]?.id ?? transactions.first?.id ?? ""
-    }
-  }
-  public func onUnapprovedTxUpdated(_ txInfo: BraveWallet.TransactionInfo) {
-    Task { @MainActor in
-      // refresh the unapproved transaction list, as well as tx details UI
-      transactions = await fetchTransactions()
-      
-      if !transactions.contains(where: { $0.id == activeTransactionId }) {
-        activeTransactionId = transactions.first?.id ?? ""
-      }
-      if activeTransactionId == txInfo.id {
-        updateTransaction(with: txInfo)
-      }
-    }
-  }
-
-  public func onTxServiceReset() {
+  
+  func updateActiveTxIdAfterSignedClosed() {
+    let indexOfChangedTx = unapprovedTxs.firstIndex(where: { $0.id == activeTransactionId }) ?? 0
+    let newIndex = indexOfChangedTx > 0 ? indexOfChangedTx - 1 : 0
+    activeTransactionId = unapprovedTxs[safe: newIndex]?.id ?? unapprovedTxs.first?.id ?? ""
   }
 }
 
-extension TransactionConfirmationStore: BraveWalletBraveWalletServiceObserver {
-  public func onActiveOriginChanged(_ originInfo: BraveWallet.OriginInfo) {
-  }
-
-  public func onDefaultWalletChanged(_ wallet: BraveWallet.DefaultWallet) {
-  }
-
-  public func onDefaultBaseCurrencyChanged(_ currency: String) {
-    currencyCode = currency
-  }
-
-  public func onDefaultBaseCryptocurrencyChanged(_ cryptocurrency: String) {
-  }
-
-  public func onNetworkListChanged() {
-  }
-  
-  public func onDefaultEthereumWalletChanged(_ wallet: BraveWallet.DefaultWallet) {
-  }
-  
-  public func onDefaultSolanaWalletChanged(_ wallet: BraveWallet.DefaultWallet) {
-  }
-  
-  public func onDiscoverAssetsCompleted(_ discoveredAssets: [BraveWallet.BlockchainToken]) {
-  }
+struct TransactionProviderError {
+  let code: Int
+  let message: String
 }

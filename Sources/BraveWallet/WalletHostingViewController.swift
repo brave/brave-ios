@@ -15,7 +15,7 @@ public protocol BraveWalletDelegate: AnyObject {
   /// Open a specific URL that comes from the wallet UI. For instance, when purchasing tokens through Ramp.Network
   ///
   /// This will be called after the wallet UI is dismissed
-  func openWalletURL(_ url: URL)
+  func openDestinationURL(_ url: URL)
   /// Requests App Review pop-up after send - swap and add account
   ///
   /// This will be called after the wallet UI is dismissed
@@ -52,9 +52,11 @@ public enum PresentingContext {
 public class WalletHostingViewController: UIHostingController<CryptoView> {
   public weak var delegate: BraveWalletDelegate?
   private var cancellable: AnyCancellable?
+  private var walletStore: WalletStore?
   
   public init(
     walletStore: WalletStore,
+    webImageDownloader: WebImageDownloaderType,
     presentingContext: PresentingContext = .default,
     onUnlock: (() -> Void)? = nil
   ) {
@@ -65,15 +67,13 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
       rootView: CryptoView(
         walletStore: walletStore,
         keyringStore: walletStore.keyringStore,
+        webImageDownloader: webImageDownloader,
         presentingContext: presentingContext
       )
     )
-    rootView.dismissAction = { [unowned self] in
-      self.dismiss(animated: true)
-    }
     rootView.openWalletURLAction = { [unowned self] url in
-      (presentingViewController ?? self).dismiss(animated: true) {
-        self.delegate?.openWalletURL(url)
+      (self.presentingViewController ?? self).dismiss(animated: true) { [self] in
+        self.delegate?.openDestinationURL(url)
       }
     }
     rootView.appRatingRequestAction = { [unowned self] in
@@ -88,17 +88,22 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
         if !isLocked {
           onUnlock?()
         }
-        // SwiftUI has a bug where nested sheets do not dismiss correctly if the root View holding onto
-        // the sheet is removed from the view hierarchy. The root's sheet stays visible even though the
-        // root doesn't exist anymore.
+        // Prior to iOS 16.4, SwiftUI has a bug where nested sheets do not dismiss correctly if the
+        // root View holding onto the sheet is removed from the view hierarchy. The root's sheet
+        // stays visible even though the root doesn't exist anymore.
         //
         // As a workaround to this issue, we can just watch keyring's `isLocked` value from here
         // and dismiss the first sheet ourselves to ensure we dont get stuck with a child view visible
         // while the wallet is locked.
-        if let self = self, isLocked, self.presentedViewController != nil {
+        if #unavailable(iOS 16.4),
+           let self = self,
+           isLocked,
+           let presentedViewController = self.presentedViewController,
+           !presentedViewController.isBeingDismissed {
           self.dismiss(animated: true)
         }
       }
+    self.walletStore = walletStore
   }
   
   @available(*, unavailable)
@@ -108,6 +113,7 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
   
   deinit {
     gesture.view?.removeGestureRecognizer(gesture)
+    walletStore?.isPresentingFullWallet = false
   }
   
   private let gesture: WalletInteractionGestureRecognizer
@@ -116,6 +122,11 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
     super.viewDidAppear(animated)
     view.window?.addGestureRecognizer(gesture)
     UIDevice.current.forcePortraitIfIphone(for: UIApplication.shared)
+  }
+  
+  public override func viewDidLoad() {
+    super.viewDidLoad()
+    walletStore?.isPresentingFullWallet = true
   }
   
   // MARK: -

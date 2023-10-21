@@ -80,11 +80,7 @@ public class SiteTableViewController: LoadingViewController, UITableViewDelegate
       $0.separatorColor = .braveSeparator
       $0.accessibilityIdentifier = "SiteTable"
       $0.cellLayoutMarginsFollowReadableWidth = false
-      #if swift(>=5.5)
-      if #available(iOS 15.0, *) {
-        $0.sectionHeaderTopPadding = 5
-      }
-      #endif
+      $0.sectionHeaderTopPadding = 5
     }
 
     // Set an empty footer to prevent empty cells from appearing in the list.
@@ -132,31 +128,5 @@ public class SiteTableViewController: LoadingViewController, UITableViewDelegate
 
   public func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
     true
-  }
-}
-
-public class LoadingViewController: UIViewController {
-
-  let spinner = UIActivityIndicatorView().then {
-    $0.snp.makeConstraints { make in
-      make.size.equalTo(24)
-    }
-    $0.hidesWhenStopped = true
-    $0.isHidden = true
-  }
-
-  var isLoading: Bool = false {
-    didSet {
-      if isLoading {
-        view.addSubview(spinner)
-        spinner.snp.makeConstraints {
-          $0.center.equalTo(view.snp.center)
-        }
-        spinner.startAnimating()
-      } else {
-        spinner.stopAnimating()
-        spinner.removeFromSuperview()
-      }
-    }
   }
 }

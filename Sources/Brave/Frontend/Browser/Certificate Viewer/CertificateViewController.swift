@@ -9,6 +9,7 @@ import SwiftUI
 import BraveUI
 import Shared
 import BraveShared
+import CertificateUtilities
 
 private struct CertificateTitleView: View {
   let isRootCertificate: Bool
@@ -220,16 +221,6 @@ extension CertificateView {
 
     mapping.append(KeyValue(key: Strings.CertificateViewer.commonNameTitle, value: rdns.commonName))
 
-    mapping.append(
-      contentsOf: rdns.streetAddress.map {
-        KeyValue(key: Strings.CertificateViewer.streetAddressTitle, value: $0)
-      })
-
-    mapping.append(
-      contentsOf: rdns.domainComponent.map {
-        KeyValue(key: Strings.CertificateViewer.domainComponentTitle, value: $0)
-      })
-
     mapping.append(KeyValue(key: Strings.CertificateViewer.userIDTitle, value: rdns.userId))
 
     return mapping.compactMap({
@@ -369,8 +360,6 @@ class CertificateViewController: UIViewController, PopoverContentComponent {
     controller.view.snp.makeConstraints {
       $0.edges.equalToSuperview()
     }
-
-    self.preferredContentSize = CGSize(width: 375.0, height: 667.0)
   }
 
   required init?(coder: NSCoder) {

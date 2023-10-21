@@ -151,7 +151,7 @@ struct MarketPriceView: View {
       Button(action: {
         swapTokenStore.fetchPriceQuote(base: .perSellAsset)
       }) {
-        Label(Strings.Wallet.refreshMarketPriceLabel, braveSystemImage: "brave.arrow.triangle.2.circlepath")
+        Label(Strings.Wallet.refreshMarketPriceLabel, braveSystemImage: "leo.refresh")
           .labelStyle(.iconOnly)
           .foregroundColor(Color(.braveBlurpleTint))
           .font(.title3)
@@ -170,18 +170,56 @@ struct SwapCryptoView: View {
   @State var hideSlippage = true
   @State private var isSwapDisclaimerVisible: Bool = false
 
-  @Environment(\.openWalletURLAction) private var openWalletURL
+  @Environment(\.openURL) private var openWalletURL
   @Environment(\.appRatingRequestAction) private var appRatingRequest
 
   var completion: ((_ success: Bool) -> Void)?
   var onDismiss: () -> Void
+  
+  enum DEXAggregator {
+    case zeroX
+    case jupiter
+    
+    var displayName: String {
+      switch self {
+      case .zeroX: return "0x"
+      case .jupiter: return "Jupiter"
+      }
+    }
+    
+    var url: URL {
+      switch self {
+      case .zeroX: return WalletConstants.zeroXPrivacyPolicy
+      case .jupiter: return WalletConstants.jupiterPrivacyPolicy
+      }
+    }
+    
+    var swapDexAggrigatorNote: String {
+      String.localizedStringWithFormat(Strings.Wallet.swapDexAggrigatorNote, displayName)
+    }
+    
+    var swapDexAggrigatorDisclaimer: String {
+      let network: String
+      switch self {
+      case .zeroX: network = Strings.Wallet.coinTypeEthereum
+      case .jupiter: network = Strings.Wallet.coinTypeSolana
+      }
+      return String.localizedStringWithFormat(
+        Strings.Wallet.swapDexAggrigatorDisclaimer, displayName, network, displayName)
+    }
+  }
+  
+  /// The DEX Aggregator for the current network.
+  var dexAggregator: DEXAggregator {
+    networkStore.defaultSelectedChain.coin == .sol ? .jupiter : .zeroX
+  }
 
   @ViewBuilder var unsupportedSwapChainSection: some View {
     Section {
       VStack(alignment: .leading, spacing: 4.0) {
         Text(Strings.Wallet.swapCryptoUnsupportNetworkTitle)
           .font(.headline)
-        Text(String.localizedStringWithFormat(Strings.Wallet.swapCryptoUnsupportNetworkDescription, networkStore.selectedChain.chainName))
+        Text(String.localizedStringWithFormat(Strings.Wallet.swapCryptoUnsupportNetworkDescription, networkStore.defaultSelectedChain.chainName))
           .font(.subheadline)
           .foregroundColor(Color(.secondaryBraveLabel))
       }
@@ -202,7 +240,7 @@ struct SwapCryptoView: View {
   }
 
   private var isSwapButtonDisabled: Bool {
-    guard !swapTokensStore.isMakingTx else {
+    guard !swapTokensStore.isMakingTx && !swapTokensStore.isUpdatingPriceQuote else {
       return true
     }
     switch swapTokensStore.state {
@@ -227,12 +265,12 @@ struct SwapCryptoView: View {
   @ViewBuilder var swapFormSections: some View {
     Section(
     ) {
-      NavigationLink(destination: SwapTokenSearchView(swapTokenStore: swapTokensStore, searchType: .fromToken, network: networkStore.selectedChain)) {
+      NavigationLink(destination: SwapTokenSearchView(swapTokenStore: swapTokensStore, searchType: .fromToken, network: networkStore.defaultSelectedChain)) {
         HStack {
           if let token = swapTokensStore.selectedFromToken {
             AssetIconView(
               token: token,
-              network: networkStore.selectedChain,
+              network: networkStore.defaultSelectedChain,
               length: 26
             )
           }
@@ -290,13 +328,13 @@ struct SwapCryptoView: View {
       header: WalletListHeaderView(title: Text(Strings.Wallet.swapCryptoToTitle))
     ) {
       NavigationLink(
-        destination: SwapTokenSearchView(swapTokenStore: swapTokensStore, searchType: .toToken, network: networkStore.selectedChain)
+        destination: SwapTokenSearchView(swapTokenStore: swapTokensStore, searchType: .toToken, network: networkStore.defaultSelectedChain)
       ) {
         HStack {
           if let token = swapTokensStore.selectedToToken {
             AssetIconView(
               token: token,
-              network: networkStore.selectedChain,
+              network: networkStore.defaultSelectedChain,
               length: 26
             )
           }
@@ -327,6 +365,7 @@ struct SwapCryptoView: View {
         text: $swapTokensStore.buyAmount
       )
       .keyboardType(.decimalPad)
+      .disabled(networkStore.defaultSelectedChain.coin == .sol)
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
     }
     Section(
@@ -388,24 +427,10 @@ struct SwapCryptoView: View {
     Section(
       header:
         VStack(spacing: 16) {
-          Text(
-            String.localizedStringWithFormat(
-              Strings.Wallet.braveSwapFeeDisclaimer,
-              {
-                let formatter = NumberFormatter()
-                formatter.numberStyle = .percent
-                formatter.minimumFractionDigits = 3
-                formatter.maximumFractionDigits = 3
-                return formatter.string(
-                  from: NSNumber(
-                    value: WalletConstants.braveSwapFee
-                  )) ?? ""
-              }())
-          )
-          .foregroundColor(Color(.braveLabel))
-          .font(.footnote)
+          feesFooter
+          
           WalletLoadingButton(
-            isLoading: swapTokensStore.isMakingTx,
+            isLoading: swapTokensStore.isMakingTx || swapTokensStore.isUpdatingPriceQuote,
             action: {
               Task { @MainActor in
                 let success = await swapTokensStore.createSwapTransaction()
@@ -430,7 +455,7 @@ struct SwapCryptoView: View {
         isSwapDisclaimerVisible = true
       }) {
         HStack {
-          Text(Strings.Wallet.swapDexAggrigatorNote)
+          Text(dexAggregator.swapDexAggrigatorNote)
             .multilineTextAlignment(.center)
             .foregroundColor(Color(.braveLabel))
           Image(systemName: "info.circle")
@@ -442,13 +467,12 @@ struct SwapCryptoView: View {
       .padding(.vertical, 12)
       .alert(isPresented: $isSwapDisclaimerVisible) {
         Alert(
-          title: Text(Strings.Wallet.swapDexAggrigatorNote),
-          message: Text(Strings.Wallet.swapDexAggrigatorDisclaimer),
+          title: Text(dexAggregator.swapDexAggrigatorNote),
+          message: Text(dexAggregator.swapDexAggrigatorDisclaimer),
           primaryButton: Alert.Button.default(
             Text(Strings.learnMore),
             action: {
-              guard let url = URL(string: "https://0x.org/") else { return }
-              openWalletURL?(url)
+              openWalletURL(dexAggregator.url)
             }),
           secondaryButton: Alert.Button.cancel(Text(Strings.OKString))
         )
@@ -456,6 +480,25 @@ struct SwapCryptoView: View {
       .frame(maxWidth: .infinity)
       .font(.footnote)
       .listRowBackground(Color(.braveGroupedBackground))
+    }
+  }
+  
+  @ViewBuilder private var feesFooter: some View {
+    if swapTokensStore.braveFeeForDisplay != nil || swapTokensStore.protocolFeeForDisplay != nil {
+      VStack(spacing: 4) {
+        if let braveFeeForDisplay = swapTokensStore.braveFeeForDisplay {
+          if swapTokensStore.isBraveFeeVoided {
+            Text(String.localizedStringWithFormat(Strings.Wallet.braveFeeLabel, Strings.Wallet.braveSwapFree) + " ") + Text(braveFeeForDisplay).strikethrough()
+          } else {
+            Text(String.localizedStringWithFormat(Strings.Wallet.braveFeeLabel, braveFeeForDisplay))
+          }
+        }
+        if let protocolFee = swapTokensStore.protocolFeeForDisplay {
+          Text(String.localizedStringWithFormat(Strings.Wallet.protocolFeeLabel, protocolFee))
+        }
+      }
+      .font(.footnote)
+      .foregroundColor(Color(.braveLabel))
     }
   }
 

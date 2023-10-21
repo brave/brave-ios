@@ -4,43 +4,30 @@
 
 import Foundation
 import Shared
-import BraveShared
-import SwiftKeychainWrapper
+import Preferences
+import BraveShields
 import Data
 import BraveCore
 import Growth
+import Storage
 import os.log
 
 public class Migration {
 
-  private(set) public var braveCoreSyncObjectsMigrator: BraveCoreMigrator?
   private let braveCore: BraveCoreMain
 
   public init(braveCore: BraveCoreMain) {
     self.braveCore = braveCore
   }
 
-  public static var isChromiumMigrationCompleted: Bool {
-    return Preferences.Chromium.syncV2BookmarksMigrationCompleted.value && Preferences.Chromium.syncV2HistoryMigrationCompleted.value && Preferences.Chromium.syncV2PasswordMigrationCompleted.value
-  }
-
   public func launchMigrations(keyPrefix: String, profile: Profile) {
     Preferences.migratePreferences(keyPrefix: keyPrefix)
-    
     Preferences.migrateWalletPreferences()
+    Preferences.migrateAdAndTrackingProtection()
 
     if !Preferences.Migration.documentsDirectoryCleanupCompleted.value {
       documentsDirectoryCleanup()
       Preferences.Migration.documentsDirectoryCleanupCompleted.value = true
-    }
-
-    // `.migrate` is called in `BrowserViewController.viewDidLoad()`
-    if !Migration.isChromiumMigrationCompleted {
-      braveCoreSyncObjectsMigrator = BraveCoreMigrator(braveCore: braveCore, profile: profile)
-    }
-
-    if !Preferences.Migration.playlistV1FileSettingsLocationCompleted.value {
-      movePlaylistV1Items()
     }
     
     if Preferences.General.isFirstLaunch.value {
@@ -54,35 +41,12 @@ public class Migration {
     }
 
     // Adding Observer to enable sync types
-
     NotificationCenter.default.addObserver(
       self,
       selector: #selector(enableUserSelectedTypesForSync),
       name: BraveServiceStateObserver.coreServiceLoadedNotification,
       object: nil
     )
-  }
-
-  public func moveDatabaseToApplicationDirectory() {
-    if Preferences.Database.DocumentToSupportDirectoryMigration.completed.value {
-      // Migration has been done in some regard, so drop out.
-      return
-    }
-
-    if Preferences.Database.DocumentToSupportDirectoryMigration.previousAttemptedVersion.value == AppInfo.appVersion {
-      // Migration has already been attempted for this version.
-      return
-    }
-
-    // Moves Coredata sqlite file from documents dir to application support dir.
-    do {
-      try DataController.shared.migrateToNewPathIfNeeded()
-    } catch {
-      Logger.module.error("\(error.localizedDescription)")
-    }
-
-    // Regardless of what happened, we attemtped a migration and document it:
-    Preferences.Database.DocumentToSupportDirectoryMigration.previousAttemptedVersion.value = AppInfo.appVersion
   }
 
   @objc private func enableUserSelectedTypesForSync() {
@@ -105,131 +69,148 @@ public class Migration {
       destinationName: "CookiesData.json",
       destinationLocation: .applicationSupportDirectory)
   }
+  
+  // Migrate from TabMO to SessionTab and SessionWindow
+  public static func migrateTabStateToWebkitState(diskImageStore: DiskImageStore?) {
+    let isPrivate = false // Private tabs at the time of writing this code was never persistent, so it wouldn't "restore".
 
-  private func movePlaylistV1Items() {
-    // If moving the file fails, we'll never bother trying again.
-    // It doesn't hurt and the user can easily delete it themselves.
-    defer {
-      Preferences.Migration.playlistV1FileSettingsLocationCompleted.value = true
-    }
-
-    guard let libraryPath = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first,
-      let playlistDirectory = PlaylistDownloadManager.playlistDirectory
-    else {
+    if Preferences.Migration.tabMigrationToInteractionStateCompleted.value {
+      SessionWindow.createIfNeeded(index: 0, isPrivate: isPrivate, isSelected: true)
       return
     }
+    
+    // Get all the old Tabs from TabMO
+    let oldTabIDs = TabMO.getAll().map({ $0.objectID })
 
-    let errorPath = "PlaylistV1FileSettingsLocationCompletion"
-    do {
-      let urls = try FileManager.default.contentsOfDirectory(
-        at: libraryPath,
-        includingPropertiesForKeys: nil,
-        options: [.skipsHiddenFiles])
-      for url in urls where url.absoluteString.contains("com.apple.UserManagedAssets") {
-        do {
-          let assets = try FileManager.default.contentsOfDirectory(
-            at: url,
-            includingPropertiesForKeys: nil,
-            options: [.skipsHiddenFiles])
-          assets.forEach({
-            if let item = PlaylistItem.cachedItem(cacheURL: $0),
-              let itemId = item.uuid {
-              let destination = playlistDirectory.appendingPathComponent($0.lastPathComponent)
-
-              do {
-                try FileManager.default.moveItem(at: $0, to: destination)
-                try PlaylistItem.updateCache(uuid: itemId, cachedData: destination.bookmarkData())
-              } catch {
-                Logger.module.error("Moving Playlist Item for \(errorPath) failed: \(error.localizedDescription)")
-              }
-            }
-          })
-        } catch {
-          Logger.module.error("Moving Playlist Item for \(errorPath) failed: \(error.localizedDescription)")
-        }
-
-        do {
-          try FileManager.default.removeItem(at: url)
-        } catch {
-          Logger.module.error("Deleting Playlist Item for \(errorPath) failed: \(error.localizedDescription)")
-        }
+    // Nothing to migrate
+    if oldTabIDs.isEmpty {
+      // Create a SessionWindow (default window)
+      // Set the window selected by default
+      TabMO.migrate { context in
+        _ = SessionWindow(context: context, index: 0, isPrivate: isPrivate, isSelected: true)
       }
-    } catch {
-      Logger.module.error("Moving Playlist Files for \(errorPath) failed: \(error.localizedDescription)")
-    }
-  }
-
-  private static func movePlaylistV2Items() {
-    // Migrate all items not belonging to a folder
-    func migrateItemsToSavedFolder(folderUUID: String) {
-      let items = PlaylistItem.getItems(parentFolder: nil)
-      if !items.isEmpty {
-        PlaylistItem.moveItems(items: items.map({ $0.objectID }), to: folderUUID)
-      }
-
-      Preferences.Migration.playlistV2FoldersInitialMigrationCompleted.value = true
-    }
-
-    if PlaylistFolder.getFolder(uuid: PlaylistFolder.savedFolderUUID) != nil {
-      migrateItemsToSavedFolder(folderUUID: PlaylistFolder.savedFolderUUID)
-    } else {
-      PlaylistFolder.addFolder(title: Strings.PlaylistFolders.playlistSavedFolderTitle, uuid: PlaylistFolder.savedFolderUUID) { uuid in
-        if PlaylistFolder.getFolder(uuid: uuid) != nil {
-          migrateItemsToSavedFolder(folderUUID: uuid)
-        } else {
-          Logger.module.error("Failed Moving Playlist items to Saved Folder - Unknown Error")
-        }
-      }
-    }
-  }
-  
-  private static func playlistFolderSharingIdentifierV2Migration() {
-    let itemIDs = PlaylistItem.all().map({ $0.objectID })
-    DataController.performOnMainContext(save: true) { context in
-      let items = itemIDs.compactMap({ context.object(with: $0) as? PlaylistItem })
-      items.forEach({
-        if $0.uuid == nil {
-          $0.uuid = UUID().uuidString
-        }
-      })
       
-      Preferences.Migration.playlistV2SharedFoldersInitialMigrationCompleted.value = true
+      Preferences.Migration.tabMigrationToInteractionStateCompleted.value = true
+      return
+    }
+    
+    TabMO.migrate { context in
+      let oldTabs = oldTabIDs.compactMap({ context.object(with: $0) as? TabMO })
+      if oldTabs.isEmpty { return }  // Migration failed
+
+      // Create a SessionWindow (default window)
+      // Set the window selected by default
+      let sessionWindow = SessionWindow(context: context, index: 0, isPrivate: isPrivate, isSelected: true)
+      
+      oldTabs.forEach { oldTab in
+        guard let urlString = oldTab.url,
+              let url = NSURL(idnString: urlString) as? URL ?? URL(string: urlString) else {
+          return
+        }
+        
+        var tabId: UUID
+        if let syncUUID = oldTab.syncUUID {
+          tabId = UUID(uuidString: syncUUID) ?? UUID()
+        } else {
+          tabId = UUID()
+        }
+        
+        var historyURLs = [URL]()
+        let tabTitle = oldTab.title ?? Strings.newTab
+        let historySnapshot = oldTab.urlHistorySnapshot as? [String] ?? []
+        
+        for url in historySnapshot {
+          guard let url = NSURL(idnString: url) as? URL ?? URL(string: url) else {
+            Logger.module.error("Failed to parse URL: \(url) during Migration!")
+            continue
+          }
+          if let internalUrl = InternalURL(url), !internalUrl.isAuthorized, let authorizedURL = InternalURL.authorize(url: url) {
+            historyURLs.append(authorizedURL)
+          } else {
+            historyURLs.append(url)
+          }
+        }
+        
+        if historyURLs.count == 0 {
+          Logger.module.error("User has zero history to migrate!")
+          return
+        }
+
+        // currentPage is -webView.backForwardList.forwardList.count
+        // If for some reason current page can be negative, we clamp it to [0, inf].
+        let currentPage = max((historyURLs.count - 1) + Int(oldTab.urlHistoryCurrentIndex), 0)
+        
+        // Create WebKit interactionState
+        let interactionState = SynthesizedSessionRestore.serialize(withTitle: tabTitle,
+                                                                   historyURLs: historyURLs,
+                                                                   pageIndex: UInt(currentPage),
+                                                                   isPrivateBrowsing: isPrivate)
+        
+        // Create SessionTab and associate it with a SessionWindow
+        // Tabs currently do not have groups, so sessionTabGroup is nil by default
+        _ = SessionTab(context: context,
+                       sessionWindow: sessionWindow,
+                       sessionTabGroup: nil,
+                       index: Int32(oldTab.order),
+                       interactionState: interactionState,
+                       isPrivate: isPrivate,
+                       isSelected: oldTab.isSelected,
+                       lastUpdated: oldTab.lastUpdate ?? .now,
+                       screenshotData: Data(),  // Do not migrate screenshot data
+                       title: tabTitle,
+                       url: url,
+                       tabId: tabId)
+      }
+      
+      Preferences.Migration.tabMigrationToInteractionStateCompleted.value = true
     }
   }
 
   public static func postCoreDataInitMigrations() {
-    if !Preferences.Migration.playlistV2FoldersInitialMigrationCompleted.value {
-      movePlaylistV2Items()
-    }
-    
-    if !Preferences.Migration.playlistV2SharedFoldersInitialMigrationCompleted.value {
-      playlistFolderSharingIdentifierV2Migration()
-    }
-
-    if !Preferences.Migration.xcgloggerFilesRemovalCompleted.value {
-      LegacyLogsMigration.run()
-      
-      Preferences.Migration.xcgloggerFilesRemovalCompleted.value = true
-    }
-
     if Preferences.Migration.coreDataCompleted.value { return }
 
-    // In 1.6.6 we included private tabs in CoreData (temporarely) until the user did one of the following:
-    //  - Cleared private data
-    //  - Exited Private Mode
-    //  - The app was terminated (bug)
-    // However due to a bug, some private tabs remain in the container. Since 1.7 removes `isPrivate` from TabMO,
-    // we must dismiss any records that are private tabs during migration from Model7
     TabMO.deleteAllPrivateTabs()
   
     Domain.migrateShieldOverrides()
-    LegacyBookmarksHelper.migrateBookmarkOrders()
   
     Preferences.Migration.coreDataCompleted.value = true
+  }
+  
+  public static func migrateAdsConfirmations(for configruation: BraveRewards.Configuration) {
+    // To ensure after a user launches 1.21 that their ads confirmations, viewed count and
+    // estimated payout remain correct.
+    //
+    // This hack is unfortunately neccessary due to a missed migration path when moving
+    // confirmations from ledger to ads, we must extract `confirmations.json` out of ledger's
+    // state file and save it as a new file under the ads directory.
+    let base = configruation.storageURL
+    let ledgerStateContainer = base.appendingPathComponent("ledger/random_state.plist")
+    let adsConfirmations = base.appendingPathComponent("ads/confirmations.json")
+    let fm = FileManager.default
+
+    if !fm.fileExists(atPath: ledgerStateContainer.path) || fm.fileExists(atPath: adsConfirmations.path) {
+      // Nothing to migrate or already migrated
+      return
+    }
+
+    do {
+      let contents = NSDictionary(contentsOfFile: ledgerStateContainer.path)
+      guard let confirmations = contents?["confirmations.json"] as? String else {
+        adsRewardsLog.debug("No confirmations found to migrate in ledger's state container")
+        return
+      }
+      try confirmations.write(toFile: adsConfirmations.path, atomically: true, encoding: .utf8)
+    } catch {
+      adsRewardsLog.error("Failed to migrate confirmations.json to ads folder: \(error.localizedDescription)")
+    }
   }
 }
 
 fileprivate extension Preferences {
+  private final class DeprecatedPreferences {
+    static let blockAdsAndTracking = Option<Bool>(key: "shields.block-ads-and-tracking", default: true)
+  }
+  
   /// Migration preferences
   final class Migration {
     static let completed = Option<Bool>(key: "migration.completed", default: false)
@@ -238,12 +219,6 @@ fileprivate extension Preferences {
     /// for user downloaded files.
     static let documentsDirectoryCleanupCompleted =
       Option<Bool>(key: "migration.documents-dir-completed", default: false)
-    static let playlistV1FileSettingsLocationCompleted =
-      Option<Bool>(key: "migration.playlistv1-file-settings-location-completed", default: false)
-    static let playlistV2FoldersInitialMigrationCompleted =
-      Option<Bool>(key: "migration.playlistv2-folders-initial-migration-2-completed", default: false)
-    static let playlistV2SharedFoldersInitialMigrationCompleted =
-      Option<Bool>(key: "migration.playlistv2-sharedfolders-initial-migration-2-completed", default: false)
     // This is new preference introduced in iOS 1.32.3, tracks whether we should perform database migration.
     // It should be called only for users who have not completed the migration beforehand.
     // The reason for second migration flag is to first do file system migrations like moving database files,
@@ -254,11 +229,14 @@ fileprivate extension Preferences {
     /// A new preference key will be introduced in 1.44.x, indicates if Wallet Preferences migration has completed
     static let walletProviderAccountRequestCompleted =
     Option<Bool>(key: "migration.wallet-provider-account-request-completed", default: false)
+
+    static let tabMigrationToInteractionStateCompleted = Option<Bool>(key: "migration.tab-to-interaction-state", default: false)
     
-    // See #5928. We used XCGLogger to handle logs, which used a custom rolling files in the system.
-    // After migrating to Apples OSLog those files have to be removed.
-    static let xcgloggerFilesRemovalCompleted =
-          Option<Bool>(key: "migration.xcglogger-file-removal-completed", default: false)
+    /// A more complicated ad blocking and tracking protection preference  in `1.52.x`
+    /// allows a user to select between `standard`, `aggressive` and `disabled` instead of a simple on/off `Bool`
+    static let adBlockAndTrackingProtectionShieldLevelCompleted = Option<Bool>(
+      key: "migration.ad-block-and-tracking-protection-shield-level-completed", default: false
+    )
   }
 
   /// Migrate a given key from `Prefs` into a specific option
@@ -286,7 +264,7 @@ fileprivate extension Preferences {
       return
     }
 
-    /// Wrapper around BraveShared migrate, to automate prefix injection
+    // Wrapper around BraveShared migrate, to automate prefix injection
     func migrate<T>(key: String, to option: Preferences.Option<T>, transform: ((T) -> T)? = nil) {
       self.migrate(keyPrefix: keyPrefix, key: key, to: option, transform: transform)
     }
@@ -321,27 +299,9 @@ fileprivate extension Preferences {
     // Security
     NSKeyedUnarchiver.setClass(AuthenticationKeychainInfo.self, forClassName: "AuthenticationKeychainInfo")
 
-    // Solely for 1.6.6 -> 1.7 migration
-    if let pinLockInfo = KeychainWrapper.standard.object(forKey: "pinLockInfo") as? AuthenticationKeychainInfo {
-
-      // Checks if browserLock was enabled in old app (1.6.6)
-      let browserLockKey = "\(keyPrefix)browserLock"
-      let isBrowserLockEnabled = Preferences.defaultContainer.bool(forKey: browserLockKey)
-
-      // Preference no longer controls passcode functionality, so delete it
-      Preferences.defaultContainer.removeObject(forKey: browserLockKey)
-      if isBrowserLockEnabled {
-        KeychainWrapper.sharedAppContainerKeychain.setAuthenticationInfo(pinLockInfo)
-      }
-
-      // No longer use this key, so remove, rely on other mechanisms
-      KeychainWrapper.standard.removeObject(forKey: "pinLockInfo")
-    }
-
     // Shields
-    migrate(key: "braveBlockAdsAndTracking", to: Preferences.Shields.blockAdsAndTracking)
+    migrate(key: "braveBlockAdsAndTracking", to: DeprecatedPreferences.blockAdsAndTracking)
     migrate(key: "braveHttpsEverywhere", to: Preferences.Shields.httpsEverywhere)
-    migrate(key: "braveSafeBrowsing", to: Preferences.Shields.blockPhishingAndMalware)
     migrate(key: "noscript_on", to: Preferences.Shields.blockScripts)
     migrate(key: "fingerprintprotection_on", to: Preferences.Shields.fingerprintingProtection)
     migrate(key: "braveAdblockUseRegional", to: Preferences.Shields.useRegionAdBlock)
@@ -360,15 +320,27 @@ fileprivate extension Preferences {
     // Block Stats
     migrate(key: "adblock", to: Preferences.BlockStats.adsCount)
     migrate(key: "tracking_protection", to: Preferences.BlockStats.trackersCount)
-    migrate(key: "httpse", to: Preferences.BlockStats.httpsUpgradeCount)
     migrate(key: "fp_protection", to: Preferences.BlockStats.fingerprintingCount)
     migrate(key: "safebrowsing", to: Preferences.BlockStats.phishingCount)
 
     // On 1.6 lastLaunchInfo is used to check if it's first app launch or not.
     // This needs to be translated to our new preference.
     Preferences.General.isFirstLaunch.value = Preferences.DAU.lastLaunchInfo.value == nil
-
     Preferences.Migration.completed.value = true
+  }
+  
+  class func migrateAdAndTrackingProtection() {
+    guard !Migration.adBlockAndTrackingProtectionShieldLevelCompleted.value else { return }
+    
+    // Migrate old tracking protection setting to new BraveShields setting
+    DeprecatedPreferences.blockAdsAndTracking.migrate() { isEnabled in
+      if !isEnabled {
+        // We only need to migrate `disabled`. `standard` is the default.
+        ShieldPreferences.blockAdsAndTrackingLevel = .disabled
+      }
+    }
+    
+    Migration.adBlockAndTrackingProtectionShieldLevelCompleted.value = true
   }
   
   /// Migrate Wallet Preferences from version <1.43
@@ -379,5 +351,25 @@ fileprivate extension Preferences {
     migrate(keyPrefix: "", key: "wallet.allow-eth-provider-account-requests", to: Preferences.Wallet.allowEthProviderAccess)
     
     Preferences.Migration.walletProviderAccountRequestCompleted.value = true
+  }
+}
+
+private extension Preferences.Option {
+  /// Migrate this preference to another one using the given transform
+  ///
+  /// This method will return any stored value (if it is available). If nothing is stored, the callback is not triggered.
+  /// Any stored value is then removed from the container.
+  func migrate(onStoredValue: ((ValueType) -> Void)) {
+    // Have to do two checks because T may be an Optional, since object(forKey:) returns Any? it will succeed
+    // as casting to T if T is Optional even if the key doesnt exist.
+    if let value = container.object(forKey: key) {
+      if let value = value as? ValueType {
+        onStoredValue(value)
+      }
+      
+      container.removeObject(forKey: key)
+    } else {
+      Logger.module.info("Could not migrate legacy pref with key: \"\(self.key)\".")
+    }
   }
 }

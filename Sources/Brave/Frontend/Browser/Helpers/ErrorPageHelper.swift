@@ -3,6 +3,7 @@ import WebKit
 import Shared
 import BraveShared
 import Storage
+import CertificateUtilities
 
 private let MozDomain = "mozilla"
 private let MozErrorDownloadsNotEnabled = 100
@@ -60,6 +61,7 @@ public class ErrorPageHandler: InternalSchemeResponse {
   private let errorHandlers: [InterstitialPageHandler] = [
     CertificateErrorPageHandler(),
     NetworkErrorPageHandler(),
+    IPFSErrorPageHandler(),
     GenericErrorPageHandler(),
   ]
 
@@ -67,14 +69,7 @@ public class ErrorPageHandler: InternalSchemeResponse {
     guard let model = ErrorPageModel(request: request) else {
       return nil
     }
-
-    for handler in errorHandlers {
-      if handler.canHandle(error: model.error) {
-        return handler.response(for: model)
-      }
-    }
-
-    return nil
+    return errorHandlers.filter({ $0.canHandle(error: model.error )}).first?.response(for: model)
   }
   
   public init() { }

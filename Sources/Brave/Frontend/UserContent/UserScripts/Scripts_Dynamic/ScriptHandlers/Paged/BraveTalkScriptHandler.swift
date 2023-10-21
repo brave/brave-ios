@@ -41,12 +41,12 @@ class BraveTalkScriptHandler: TabContentScript {
     guard var script = loadUserScript(named: scriptName) else {
       return nil
     }
-    return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
-                                                    securityToken: scriptId,
-                                                    script: script),
-                               injectionTime: .atDocumentStart,
-                               forMainFrameOnly: false,
-                               in: scriptSandbox)
+    return WKUserScript(source: secureScript(handlerName: messageHandlerName,
+                                             securityToken: scriptId,
+                                             script: script),
+                        injectionTime: .atDocumentStart,
+                        forMainFrameOnly: false,
+                        in: scriptSandbox)
   }()
 
   private struct Payload: Decodable {
@@ -123,7 +123,7 @@ class BraveTalkScriptHandler: TabContentScript {
   }
 
   private func handleBraveRequestAdsEnabled(_ replyHandler: @escaping (Any?, String?) -> Void) {
-    guard let rewards = rewards, !PrivateBrowsingManager.shared.isPrivateBrowsing else {
+    guard let rewards = rewards, tab?.isPrivate != true else {
       replyHandler(false, nil)
       return
     }

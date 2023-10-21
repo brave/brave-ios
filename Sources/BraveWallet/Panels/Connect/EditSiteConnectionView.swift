@@ -9,7 +9,6 @@ import Strings
 import BraveShared
 import BraveUI
 import Data
-import BraveUI
 
 struct EditSiteConnectionView: View {
   @ObservedObject var keyringStore: KeyringStore
@@ -132,7 +131,7 @@ struct EditSiteConnectionView: View {
   }
   
   private var accountInfos: [BraveWallet.AccountInfo] {
-    keyringStore.allKeyrings.first(where: { $0.coin == coin })?.accountInfos ?? []
+    keyringStore.allAccounts.filter { $0.coin == coin }
   }
   
   var body: some View {
@@ -206,8 +205,8 @@ struct EditSiteConnectionView_Previews: PreviewProvider {
     EditSiteConnectionView(
       keyringStore: {
         let store = KeyringStore.previewStoreWithWalletCreated
-        store.addPrimaryAccount("Account 2", coin: .eth, completion: nil)
-        store.addPrimaryAccount("Account 3", coin: .eth, completion: nil)
+        store.addPrimaryAccount("Account 2", coin: .eth, chainId: BraveWallet.MainnetChainId, completion: nil)
+        store.addPrimaryAccount("Account 3", coin: .eth, chainId: BraveWallet.MainnetChainId, completion: nil)
         return store
       }(),
       origin: .init(url: URL(string: "https://app.uniswap.org")!),

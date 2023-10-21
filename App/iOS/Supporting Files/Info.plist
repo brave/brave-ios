@@ -39,6 +39,8 @@
 			<array>
 				<string>http</string>
 				<string>https</string>
+				<string>ipfs</string>
+				<string>ipns</string>
 				<string>$(BRAVE_URL_SCHEME)</string>
 			</array>
 		</dict>
@@ -73,24 +75,28 @@
 	<string>Websites you visit may request your location.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>This allows use of your microphone when using Brave.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>This permission is used to enable Apple Advanced Speech Recognition. If not allowed `on device` recognition will be used and searches will be totally private. Brave does not store or share your voice searches.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>This lets you save photos.</string>
 	<key>NSUserActivityTypes</key>
 	<array>
 		<string>LockScreenFavoriteConfigurationIntent</string>
+		<string>LockScreenShortcutConfigurationIntent</string>
 		<string>OpenBookmarkWebsiteIntent</string>
 		<string>OpenHistoryWebsiteIntent</string>
 		<string>OpenWebsiteIntent</string>
 		<string>ShortcutsConfigurationIntent</string>
 		<string>StatsConfigurationIntent</string>
 		<string>com.brave.ios.browsing</string>
+		<string>com.brave.ios.browser-scene</string>
 	</array>
 	<key>SERVICES_KEY</key>
 	<string>$(BRAVE_SERVICES_KEY)</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
-		<false/>
+		<true/>
 		<key>UISceneConfigurations</key>
 		<dict>
 			<key>CPTemplateApplicationSceneSessionRoleApplication</key>

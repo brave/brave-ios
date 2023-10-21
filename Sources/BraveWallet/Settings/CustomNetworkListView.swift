@@ -4,7 +4,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import SwiftUI
-import BraveShared
+import Preferences
 import BraveCore
 import Strings
 import BraveUI
@@ -46,14 +46,14 @@ struct CustomNetworkListView: View {
               if sizeCategory.isAccessibilityCategory {
                 VStack(alignment: .leading) {
                   Text(network.id)
-                  if let rpcEndpoint = network.rpcEndpoints.first?.absoluteString {
+                  if let rpcEndpoint = network.rpcEndpoints[safe: Int(network.activeRpcEndpointIndex)]?.absoluteString {
                     Text(rpcEndpoint)
                   }
                 }
               } else {
                 HStack {
                   Text(network.id)
-                  if let rpcEndpoint = network.rpcEndpoints.first?.absoluteString {
+                  if let rpcEndpoint = network.rpcEndpoints[safe: Int(network.activeRpcEndpointIndex)]?.absoluteString {
                     Text(rpcEndpoint)
                   }
                 }
@@ -70,18 +70,11 @@ struct CustomNetworkListView: View {
         .padding(.vertical, 6)
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
-      .osAvailabilityModifiers { content in
-        if #available(iOS 15.0, *) {
-          content
-            .swipeActions(edge: .trailing) {
-              Button(role: .destructive, action: {
-                removeNetwork(network)
-              }) {
-                Label(Strings.Wallet.delete, systemImage: "trash")
-              }
-            }
-        } else {
-          content
+      .swipeActions(edge: .trailing) {
+        Button(role: .destructive, action: {
+          removeNetwork(network)
+        }) {
+          Label(Strings.Wallet.delete, systemImage: "trash")
         }
       }
     }

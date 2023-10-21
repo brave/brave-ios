@@ -45,12 +45,8 @@ enum BlockingStrength: String {
 class ContentBlockerHelper {
   private(set) weak var tab: Tab?
   
-  /// The rule types and source types that are currently loaded in this tab
-  private(set) var loadedRuleTypeWithSourceTypes: Set<ContentBlockerManager.RuleTypeWithSourceType> = []
-  /// The rule types with their source types that should be  loaded in this tab
-  var ruleListTypes: Set<ContentBlockerManager.RuleTypeWithSourceType> = [] {
-    didSet { reloadNeededRuleLists() }
-  }
+  /// The rule lists that are loaded into the current tab
+  private var setRuleLists: Set<WKContentRuleList> = []
 
   var stats: TPPageStats = TPPageStats() {
     didSet {
@@ -69,58 +65,31 @@ class ContentBlockerHelper {
     self.tab = tab
   }
   
-  private func reloadNeededRuleLists() {
-    // Remove old values that were previously added
-    for loadedRuleTypeWithSourceType in loadedRuleTypeWithSourceTypes {
-      // Check if should be removed or if the source type doesn't match, otherwise don't do anything
-      guard !ruleListTypes.contains(loadedRuleTypeWithSourceType) else {
-        continue
-      }
-      
-      guard let ruleList = ContentBlockerManager.shared.cachedRuleList(for: loadedRuleTypeWithSourceType.ruleType) else {
-        // For some reason the rule is not cached. Shouldn't happen.
-        // But if it does we have to remove all the rule lists
-        // We will add back all the necessary ones below
-        tab?.webView?.configuration.userContentController.removeAllContentRuleLists()
-        loadedRuleTypeWithSourceTypes = []
-        assertionFailure("This shouldn't happen!")
-        break
-      }
-      
-      // Since either it shouldn't be included or the source type doesn't match, we remove it
+  @MainActor func set(ruleLists: Set<WKContentRuleList>) {
+    guard ruleLists != setRuleLists else { return }
+    var addedIds: [String] = []
+    var removedIds: [String] = []
+    
+    // Remove unwanted rule lists
+    for ruleList in setRuleLists.subtracting(ruleLists) {
+      // It's added but we don't want it. So we remove it.
       tab?.webView?.configuration.userContentController.remove(ruleList)
-      loadedRuleTypeWithSourceTypes.remove(loadedRuleTypeWithSourceType)
+      setRuleLists.remove(ruleList)
+      removedIds.append(ruleList.identifier)
     }
     
-    // Add new values that are not yet added (or were removed above because the source type didn't match)
-    for ruleTypeWithSourceType in ruleListTypes {
-      // Only add rule lists that are missing
-      guard !loadedRuleTypeWithSourceTypes.contains(ruleTypeWithSourceType) else { continue }
-      guard let ruleList = ContentBlockerManager.shared.cachedRuleList(for: ruleTypeWithSourceType.ruleType) else { continue }
+    // Add missing rule lists
+    for ruleList in ruleLists.subtracting(setRuleLists) {
       tab?.webView?.configuration.userContentController.add(ruleList)
-      loadedRuleTypeWithSourceTypes.insert(ruleTypeWithSourceType)
+      setRuleLists.insert(ruleList)
+      addedIds.append(ruleList.identifier)
     }
     
-    #if DEBUG
-    let rulesString = loadedRuleTypeWithSourceTypes.map { ruleTypeWithSourceType -> String in
-      let ruleTypeString: String
-      
-      switch ruleTypeWithSourceType.ruleType {
-      case .general(let type):
-        ruleTypeString = type.rawValue
-      case .filterList(let uuid):
-        ruleTypeString = "filterList(\(uuid))"
-      }
-      
-      let rulesDebugString = [
-        "ruleType: \(ruleTypeString)",
-        "sourceType: \(ruleTypeWithSourceType.sourceType)"
-      ].joined(separator: ", ")
-      
-      return ["{", rulesDebugString, "}"].joined()
-    }.joined(separator: ", ")
+    let parts = [
+      addedIds.sorted(by: { $0 < $1 }).map({ " + \($0)" }).joined(separator: "\n"),
+      removedIds.sorted(by: { $0 < $1 }).map({ " - \($0)" }).joined(separator: "\n")
+    ]
     
-    log.debug("Loaded \(self.loadedRuleTypeWithSourceTypes.count, privacy: .public) tab rules: \(rulesString, privacy: .public)")
-    #endif
+    ContentBlockerManager.log.debug("Set rule lists:\n\(parts.joined(separator: "\n"))")
   }
 }

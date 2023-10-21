@@ -6,7 +6,7 @@
 import Foundation
 import UIKit
 import BraveCore
-import BraveShared
+import BraveStrings
 import SnapKit
 
 /// A view that displays the tab's secure content state and the URL while scrolling into the page
@@ -16,7 +16,7 @@ class CollapsedURLBarView: UIView {
     $0.isUserInteractionEnabled = false
   }
   
-  private let lockImageView = ToolbarButton(top: true).then {
+  private let lockImageView = ToolbarButton().then {
     $0.setImage(UIImage(braveSystemNamed: "brave.lock.alt", compatibleWith: nil), for: .normal)
     $0.isHidden = true
     $0.tintColor = .bravePrimary
@@ -36,6 +36,12 @@ class CollapsedURLBarView: UIView {
     $0.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
   }
   
+  var browserColors: any BrowserColors = .standard {
+    didSet {
+      updateForTraitCollectionAndBrowserColors()
+    }
+  }
+  
   var isUsingBottomBar: Bool = false {
     didSet {
       setNeedsUpdateConstraints()
@@ -49,7 +55,7 @@ class CollapsedURLBarView: UIView {
     case .localHost:
       lockImageView.isHidden = true
     case .insecure:
-      lockImageView.setImage(UIImage(braveSystemNamed: "brave.exclamationmark.circle.fill")?
+      lockImageView.setImage(UIImage(braveSystemNamed: "leo.info.filled")?
         .withRenderingMode(.alwaysOriginal)
         .withTintColor(.braveErrorLabel), for: .normal)
       lockImageView.accessibilityLabel = Strings.tabToolbarWarningImageAccessibilityLabel
@@ -101,15 +107,15 @@ class CollapsedURLBarView: UIView {
       $0.centerX.equalToSuperview()
     }
     
-    updateForTraitCollection()
+    updateForTraitCollectionAndBrowserColors()
   }
   
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
-    updateForTraitCollection()
+    updateForTraitCollectionAndBrowserColors()
   }
   
-  private func updateForTraitCollection() {
+  private func updateForTraitCollectionAndBrowserColors() {
     let clampedTraitCollection = traitCollection.clampingSizeCategory(maximum: .accessibilityLarge)
     lockImageView.setPreferredSymbolConfiguration(
       .init(
@@ -122,6 +128,8 @@ class CollapsedURLBarView: UIView {
       forImageIn: .normal
     )
     urlLabel.font = .preferredFont(forTextStyle: .caption1, compatibleWith: clampedTraitCollection)
+    lockImageView.tintColor = browserColors.iconDefault
+    urlLabel.textColor = browserColors.textPrimary
   }
   
   override func updateConstraints() {

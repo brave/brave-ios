@@ -6,10 +6,11 @@
 import UIKit
 import Data
 import Shared
-import BraveShared
+import Preferences
 import BraveUI
 import CoreData
 import os.log
+import Combine
 
 private class FavoritesHeaderView: UICollectionReusableView {
   let label = UILabel().then {
@@ -90,15 +91,16 @@ class FavoritesViewController: UIViewController {
   private var tabType: TabType
   private var favoriteGridSize: CGSize = .zero
   private let collectionView: UICollectionView
-  private let backgroundView = UIVisualEffectView(effect: UIBlurEffect(style: .systemChromeMaterial)).then {
-    $0.contentView.backgroundColor = UIColor.braveBackground.withAlphaComponent(0.5)
-  }
+  private let backgroundView = UIVisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterial))
   private var hasPasteboardURL = false
+  private var privateBrowsingManager: PrivateBrowsingManager
+  private var privateModeCancellable: AnyCancellable?
 
-  init(tabType: TabType, action: @escaping (Favorite, BookmarksAction) -> Void, recentSearchAction: @escaping (RecentSearch?, Bool) -> Void) {
+  init(tabType: TabType, privateBrowsingManager: PrivateBrowsingManager, action: @escaping (Favorite, BookmarksAction) -> Void, recentSearchAction: @escaping (RecentSearch?, Bool) -> Void) {
     self.tabType = tabType
     self.action = action
     self.recentSearchAction = recentSearchAction
+    self.privateBrowsingManager = privateBrowsingManager
     collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
 
     super.init(nibName: nil, bundle: nil)
@@ -117,6 +119,15 @@ class FavoritesViewController: UIViewController {
 
     Preferences.Search.shouldShowRecentSearches.observe(from: self)
     Preferences.Search.shouldShowRecentSearchesOptIn.observe(from: self)
+    
+    privateModeCancellable = privateBrowsingManager
+      .$isPrivateBrowsing
+      .removeDuplicates()
+      .receive(on: RunLoop.main)
+      .sink(receiveValue: { [weak self] _ in
+        guard let self = self else { return }
+        self.updateColors()
+      })
   }
 
   @available(*, unavailable)
@@ -154,6 +165,7 @@ class FavoritesViewController: UIViewController {
     }
 
     updateUIWithSnapshot()
+    updateColors()
   }
 
   override func viewDidLayoutSubviews() {
@@ -178,6 +190,12 @@ class FavoritesViewController: UIViewController {
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
     calculateAppropriateGrid()
+  }
+  
+  private func updateColors() {
+    let browserColors = privateBrowsingManager.browserColors
+    // Have to apply a custom alpha here because UIVisualEffectView blurs come with their own tint
+    backgroundView.contentView.backgroundColor = browserColors.containerFrostedGlass.withAlphaComponent(0.8)
   }
 
   private func calculateAppropriateGrid() {
@@ -352,7 +370,7 @@ extension FavoritesViewController: UICollectionViewDelegateFlowLayout {
           })
 
         var urlChildren: [UIAction] = [openInNewTab]
-        if !PrivateBrowsingManager.shared.isPrivateBrowsing {
+        if !self.privateBrowsingManager.isPrivateBrowsing {
           let openInNewPrivateTab = UIAction(
             title: Strings.openNewPrivateTabButtonTitle,
             handler: UIAction.deferredActionHandler { _ in
@@ -577,14 +595,7 @@ extension FavoritesViewController: NSFetchedResultsControllerDelegate {
         toSection: .recentSearches)
     }
 
-    if #available(iOS 14.0, *) {
-      dataSource.apply(snapshot, animatingDifferences: false)
-    } else {
-      // On iOS13 the app leaks memory and crashes, adding small delay helps.
-      DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-        self.dataSource.apply(snapshot, animatingDifferences: false)
-      }
-    }
+    dataSource.apply(snapshot, animatingDifferences: false)
   }
 
   func controller(
@@ -675,16 +686,7 @@ extension FavoritesViewController: NSFetchedResultsControllerDelegate {
 
       cell.textLabel.text = favorite.displayTitle ?? favorite.url
       if let url = favorite.url?.asURL {
-        // All favorites should have domain's, but it was noticed at one
-        // point that this wasn't the case, so for future bug-tracking
-        // assert if its not found.
-        assert(favorite.domain != nil, "Domain should exist for all favorites")
-        // The domain for the favorite is required for pulling cached
-        // favicon info. Since all favorites should have persisted
-        // Domain's, we leave `persistent` as true
-        let domain = favorite.domain ?? Domain.getOrCreate(forUrl: url, persistent: true)
-        cell.imageView.loadFavicon(siteURL: url,
-                                   monogramFallbackCharacter: favorite.title?.first)
+        cell.imageView.loadFavicon(siteURL: url, isPrivateBrowsing: self.privateBrowsingManager.isPrivateBrowsing)
       }
       cell.accessibilityLabel = cell.textLabel.text
 

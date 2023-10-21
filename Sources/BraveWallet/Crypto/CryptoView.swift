@@ -9,27 +9,30 @@ import SwiftUI
 import BraveCore
 import Introspect
 import BraveUI
+import Preferences
 
 public struct CryptoView: View {
   var walletStore: WalletStore
   @ObservedObject var keyringStore: KeyringStore
+  var webImageDownloader: WebImageDownloaderType
   var presentingContext: PresentingContext
-
-  // in iOS 15, PresentationMode will be available in SwiftUI hosted by UIHostingController
-  // but for now we'll have to manage this ourselves
-  var dismissAction: (() -> Void)?
+  @Environment(\.presentationMode) @Binding private var presentationMode
 
   var openWalletURLAction: ((URL) -> Void)?
   
   var appRatingRequestAction: (() -> Void)?
+  
+  @ObservedObject var isOnboardingCompleted = Preferences.Wallet.isOnboardingCompleted
 
   public init(
     walletStore: WalletStore,
     keyringStore: KeyringStore,
+    webImageDownloader: WebImageDownloaderType,
     presentingContext: PresentingContext
   ) {
     self.walletStore = walletStore
     self.keyringStore = keyringStore
+    self.webImageDownloader = webImageDownloader
     self.presentingContext = presentingContext
   }
 
@@ -58,7 +61,7 @@ public struct CryptoView: View {
           request.decisionHandler(.rejected)
           onPermittedAccountsUpdated([])
         }
-        dismissAction?()
+        dismissAction()
       }) {
         Image("wallet-dismiss", bundle: .module)
           .renderingMode(.template)
@@ -86,12 +89,13 @@ public struct CryptoView: View {
                 cryptoStore: store,
                 toolbarDismissContent: dismissButtonToolbarContents,
                 onDismiss: {
-                  dismissAction?()
+                  dismissAction()
                 }
               )
               .onDisappear {
                 // onDisappear allows us to catch all cases (swipe, cancel, confirm/approve/sign)
                 store.isPresentingPendingRequest = false
+                store.prepare()
               }
             case .requestPermissions(let request, let onPermittedAccountsUpdated):
               NewSiteConnectionView(
@@ -102,23 +106,27 @@ public struct CryptoView: View {
                 onConnect: {
                   request.decisionHandler(.granted(accounts: $0))
                   onPermittedAccountsUpdated($0)
-                  dismissAction?()
+                  dismissAction()
                 },
                 onDismiss: {
                   request.decisionHandler(.rejected)
                   onPermittedAccountsUpdated([])
-                  dismissAction?()
+                  dismissAction()
                 }
               )
             case .panelUnlockOrSetup:
               EmptyView()
             case .accountSelection:
-              AccountListView(
-                keyringStore: keyringStore,
-                onDismiss: {
-                  dismissAction?()
-                }
-              )
+              NavigationView {
+                AccountSelectionView(
+                  keyringStore: keyringStore,
+                  networkStore: store.networkStore,
+                  onDismiss: {
+                    dismissAction()
+                  }
+                )
+              }
+              .navigationViewStyle(.stack)
             case .transactionHistory:
               NavigationView {
                 AccountTransactionListView(
@@ -129,6 +137,9 @@ public struct CryptoView: View {
                   ),
                   networkStore: store.networkStore
                 )
+                .onDisappear {
+                  store.closeAccountActivityStore(for: walletStore.keyringStore.selectedAccount)
+                }
                 .toolbar {
                   dismissButtonToolbarContents
                 }
@@ -143,7 +154,7 @@ public struct CryptoView: View {
                   buyTokenStore: store.openBuyTokenStore(destination.initialToken),
                   onDismiss: {
                     store.closeBSSStores()
-                    dismissAction?()
+                    dismissAction()
                   }
                 )
               case .send:
@@ -154,12 +165,12 @@ public struct CryptoView: View {
                   completion: { success in
                     if success {
                       store.closeBSSStores()
-                      dismissAction?()
+                      dismissAction()
                     }
                   },
                   onDismiss: {
                     store.closeBSSStores()
-                    dismissAction?()
+                    dismissAction()
                   }
                 )
               case .swap:
@@ -170,12 +181,12 @@ public struct CryptoView: View {
                   completion: { success in
                     if success {
                       store.closeBSSStores()
-                      dismissAction?()
+                      dismissAction()
                     }
                   },
                   onDismiss: {
                     store.closeBSSStores()
-                    dismissAction?()
+                    dismissAction()
                   }
                 )
               }
@@ -198,23 +209,24 @@ public struct CryptoView: View {
                 coin: keyringStore.selectedAccount.coin,
                 onDismiss: { accounts in
                   handler(accounts)
-                  dismissAction?()
+                  dismissAction()
                 }
               )
             case .createAccount(let request):
               NavigationView {
                 AddAccountView(
                   keyringStore: keyringStore,
+                  networkStore: store.networkStore,
                   preSelectedCoin: request.coinType,
                   onCreate: {
                     // request is fullfilled.
                     request.responseHandler(.created)
-                    dismissAction?()
+                    dismissAction()
                   },
                   onDismiss: {
                     // request get declined by clicking `Cancel`
                     request.responseHandler(.rejected)
-                    dismissAction?()
+                    dismissAction()
                   }
                 )
               }
@@ -233,33 +245,51 @@ public struct CryptoView: View {
         .transition(.move(edge: .bottom))
         .zIndex(1)  // Needed or the dismiss animation messes up
       case .onboarding:
-        UIKitNavigationView {
-          SetupCryptoView(keyringStore: keyringStore)
-            .toolbar {
-              dismissButtonToolbarContents
-            }
+        if isOnboardingCompleted.value {
+          UIKitNavigationView {
+            OnboardingCompletedView(keyringStore: keyringStore)
+          }
+          .transition(.move(edge: .bottom))
+          .zIndex(2)  // Needed or the dismiss animation messes up
+        } else {
+          UIKitNavigationView {
+            SetupCryptoView(keyringStore: keyringStore)
+              .toolbar {
+                ToolbarItemGroup(placement: .destructiveAction) {
+                  Button(action: {
+                    dismissAction()
+                  }) {
+                    Text(Strings.CancelString)
+                  }
+                }
+              }
+          }
+          .transition(.move(edge: .bottom))
+          .zIndex(3)  // Needed or the dismiss animation messes up
         }
-        .transition(.move(edge: .bottom))
-        .zIndex(2)  // Needed or the dismiss animation messes up
       }
     }
     .animation(.default, value: visibleScreen)  // Animate unlock dismiss (required for some reason)
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .environment(
-      \.openWalletURLAction,
-      .init(action: { [openWalletURLAction] url in
-        openWalletURLAction?(url)
-      }))
+    .environment(\.openURL, .init(handler: { [openWalletURLAction] url in
+      openWalletURLAction?(url)
+      return .handled
+    }))
     .environment(
       \.appRatingRequestAction,
       .init(action: { [appRatingRequestAction] in
         appRatingRequestAction?()
       }))
+    .environment(\.webImageDownloader, webImageDownloader)
     .onChange(of: visibleScreen) { newValue in
       if case .panelUnlockOrSetup = presentingContext, newValue == .crypto {
-        dismissAction?()
+        dismissAction()
       }
     }
+  }
+  
+  private func dismissAction() {
+    presentationMode.dismiss()
   }
 }
 
@@ -267,6 +297,19 @@ private struct CryptoContainerView<DismissContent: ToolbarContent>: View {
   var keyringStore: KeyringStore
   @ObservedObject var cryptoStore: CryptoStore
   var toolbarDismissContent: DismissContent
+  @ToolbarContentBuilder
+  // This toolbar content is for `PendingRequestView` which is presented on top of full screen wallet
+  private var pendingRequestToolbarDismissContent: some ToolbarContent {
+    ToolbarItemGroup(placement: .cancellationAction) {
+      Button(action: {
+        cryptoStore.isPresentingPendingRequest = false
+      }) {
+        Image("wallet-dismiss", bundle: .module)
+          .renderingMode(.template)
+          .foregroundColor(Color(.braveBlurpleTint))
+      }
+    }
+  }
 
   var body: some View {
     UIKitNavigationView {
@@ -310,11 +353,14 @@ private struct CryptoContainerView<DismissContent: ToolbarContent>: View {
             RequestContainerView(
               keyringStore: keyringStore,
               cryptoStore: cryptoStore,
-              toolbarDismissContent: toolbarDismissContent,
+              toolbarDismissContent: pendingRequestToolbarDismissContent,
               onDismiss: {
                 cryptoStore.isPresentingPendingRequest = false
               }
             )
+            .onDisappear {
+              cryptoStore.prepare()
+            }
           }
         }
     )

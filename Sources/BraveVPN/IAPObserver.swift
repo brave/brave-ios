@@ -6,7 +6,6 @@
 import Foundation
 import StoreKit
 import Shared
-import BraveShared
 import os.log
 
 public protocol IAPObserverDelegate: AnyObject {
@@ -50,10 +49,13 @@ public class IAPObserver: NSObject, SKPaymentTransactionObserver {
         SKPaymentQueue.default().finishTransaction(transaction)
         
         if callPurchaseDelegateOnce {
-          BraveVPN.validateReceipt() { [weak self] expired in
+          BraveVPN.validateReceiptData() { [weak self] response in
             guard let self = self else { return }
             
-            if expired == false {
+            if response?.status == .expired {
+              // Receipt either expired or receipt validation returned some error.
+              self.delegate?.purchaseFailed(error: .receiptError)
+            } else {
               self.delegate?.purchasedOrRestoredProduct(validateReceipt: false)
               // If we purchased via Apple's IAP we reset the Brave SKUs credential
               // to avoid mixing two purchase types in the app.
@@ -61,9 +63,6 @@ public class IAPObserver: NSObject, SKPaymentTransactionObserver {
               // The user will be able to retrieve the shared credential
               // after log in to account.brave website.
               BraveVPN.clearSkusCredentials(includeExpirationDate: false)
-            } else {
-              // Receipt either expired or receipt validation returned some error.
-              self.delegate?.purchaseFailed(error: .receiptError)
             }
           }
         }
@@ -85,5 +84,15 @@ public class IAPObserver: NSObject, SKPaymentTransactionObserver {
   public func paymentQueue(_ queue: SKPaymentQueue, restoreCompletedTransactionsFailedWithError error: Error) {
     Logger.module.debug("Restoring transaction failed")
     self.delegate?.purchaseFailed(error: .transactionError(error: error as? SKError))
+  }
+  
+  // Used to handle restoring transaction error for users never purchased but trying to restore
+  public func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {
+    if queue.transactions.isEmpty {
+      Logger.module.debug("Restoring transaction failed - Nothing to restore - Account never bought this product")
+
+      let errorRestore = SKError(SKError.unknown, userInfo: ["detail": "not-purchased"])
+      delegate?.purchaseFailed(error: .transactionError(error: errorRestore))
+    }
   }
 }

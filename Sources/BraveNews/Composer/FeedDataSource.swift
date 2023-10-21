@@ -4,15 +4,18 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
-import BraveUI
 import Data
 import Shared
-import BraveShared
+import Preferences
 import FeedKit
-import BraveCore
 import CodableHelpers
-import os.log
+import OSLog
 import SwiftUI
+import Combine
+import Then
+import BraveShared
+import BraveCore
+import Growth
 
 /// Powers the Brave News feed.
 public class FeedDataSource: ObservableObject {
@@ -51,21 +54,21 @@ public class FeedDataSource: ObservableObject {
   }
 
   @Published public private(set) var state: State = .initial
-  @Published private(set) var sources: [FeedItem.Source] = [] {
+  @Published public private(set) var sources: [FeedItem.Source] = [] {
     didSet {
       reloadChannels()
       reloadAvailableLocales()
     }
   }
-  @Published private(set) var sourceSuggestions: [String: [FeedItem.SourceSimilarity]] = [:]
+  @Published public private(set) var sourceSuggestions: [String: [FeedItem.SourceSimilarity]] = [:]
   @Published public var selectedLocale: String {
     didSet {
       reloadChannels()
     }
   }
-  private(set) var availableLocales: Set<String> = []
-  @Published private var allChannels: [String: Set<String>] = [:]
-  var channels: Set<String> {
+  public private(set) var availableLocales: Set<String> = []
+  @Published public private(set) var allChannels: [String: Set<String>] = [:]
+  public var channels: Set<String> {
     allChannels[selectedLocale] ?? []
   }
   private var items: [FeedItem.Content] = []
@@ -88,12 +91,12 @@ public class FeedDataSource: ObservableObject {
     availableLocales = Set(localeMap.keys)
   }
   
-  var followedSources: Set<FeedItem.Source> {
+  public var followedSources: Set<FeedItem.Source> {
     let allOverrides = Set(FeedSourceOverride.all().filter(\.enabled).map(\.publisherID))
     return Set(sources.filter({ allOverrides.contains($0.id) }))
   }
   
-  var followedChannels: Set<FeedChannel> {
+  public var followedChannels: Set<FeedChannel> {
     let channels = Preferences.BraveNews.followedChannels.value
     return channels.reduce(into: Set<FeedChannel>()) { result, element in
       result.formUnion(element.value.map({
@@ -103,10 +106,18 @@ public class FeedDataSource: ObservableObject {
   }
 
   /// An ads object to handle inserting Inline Content Ads within the Brave News sequence
-  public var ads: BraveAds?
+  public var getAdsAPI: (() -> BraveAds)?
+  public var historyAPI: BraveHistoryAPI?
 
   private let todayQueue = DispatchQueue(label: "com.brave.today")
   private let reloadQueue = DispatchQueue(label: "com.brave.today.reload")
+  
+  struct FeedDecodingError: Identifiable {
+    var id: UUID = .init()
+    var resourceName: String
+    var error: String
+  }
+  private(set) var decodingErrors: [FeedDecodingError] = []
 
   // MARK: - Initialization
 
@@ -133,12 +144,14 @@ public class FeedDataSource: ObservableObject {
       DateFormatter().then {
         $0.dateFormat = "yyyy-MM-dd HH:mm:ss"
         $0.timeZone = TimeZone(secondsFromGMT: 0)
+        $0.locale = Locale(identifier: "en_US_POSIX")
+        $0.calendar = Calendar(identifier: .iso8601)
       })
     return decoder
   }()
 
   /// A Brave News environment
-  enum Environment: String, CaseIterable {
+  public enum Environment: String, CaseIterable {
     case dev = "brave.software"
     case staging = "bravesoftware.com"
     case production = "brave.com"
@@ -149,7 +162,7 @@ public class FeedDataSource: ObservableObject {
   /// Updating the environment automatically clears the current cached items if any exist.
   ///
   /// - warning: Should only be changed in non-public releases
-  var environment: Environment = .production {
+  public var environment: Environment = .production {
     didSet {
       if oldValue == environment { return }
       assert(
@@ -164,6 +177,8 @@ public class FeedDataSource: ObservableObject {
   public static let supportedLanguages = [
     "en",
     "ja",
+    "de",
+    "fr",
   ]
   
   /// A list of known supported locales
@@ -171,10 +186,14 @@ public class FeedDataSource: ObservableObject {
     "en_US",
     "en_CA",
     "en_UK",
+    "en_AU",
+    "en_IN",
     "ja_JP",
     "es_ES",
     "es_MX",
     "pt_BR",
+    "de_DE",
+    "fr_FR",
   ]
 
   private struct NewsBucket {
@@ -257,11 +276,24 @@ public class FeedDataSource: ObservableObject {
   }
 
   /// A set of Brave News specific errors that could occur outside of JSON decoding or network errors
-  enum BraveNewsError: Error {
+  enum BraveNewsError: LocalizedError {
+    /// There are no followed locales or items and thus no reason to generate cards
+    case invalidLoad
     /// The resource data that was loaded was empty after parsing
-    case resourceEmpty
+    case resourceEmpty(resource: String)
     /// Something went wrong
     case unknownError
+    
+    var localizedDescription: String {
+      switch self {
+      case .invalidLoad:
+        return "The load failed because there were either no items to show or the list of followed locales is empty"
+      case .resourceEmpty(let resource):
+        return "The resource (\(resource)) downloaded did not have any parsable data"
+      case .unknownError:
+        return "An unknown error occured"
+      }
+    }
   }
   
   private func on<T>(queue: DispatchQueue, work: @escaping () -> T) async -> T {
@@ -364,41 +396,53 @@ public class FeedDataSource: ObservableObject {
     }
   }
   
+  private func unwrappedResource<T>(
+    resource: NewsResource,
+    localeIdentifier: String? = nil,
+    data: [FailableDecodable<T>]
+  ) -> [T] {
+    if AppConstants.buildChannel.isPublic {
+      return data.compactMap(\.wrappedValue)
+    }
+    var values: [T] = []
+    for item in data {
+      if let error = item.decodingError {
+        decodingErrors.append(.init(
+          resourceName: resourceFilename(for: resource, localeIdentifier: localeIdentifier),
+          error: String(describing: error))
+        )
+      } else {
+        if let value = item.wrappedValue {
+          values.append(value)
+        }
+      }
+    }
+    return values
+  }
+  
   private func loadGlobalSources() async throws -> [FeedItem.Source] {
     let sources = try await loadResource(.globalSources, decodedTo: [FailableDecodable<FeedItem.Source>].self)
-    if sources.isEmpty {
-      throw BraveNewsError.resourceEmpty
-    }
-    return sources.compactMap(\.wrappedValue)
+    return unwrappedResource(resource: .globalSources, data: sources)
   }
 
   private func loadLegacySources(for localeIdentifier: String) async throws -> [FeedItem.LegacySource] {
     let sources = try await loadResource(.sources, localeIdentifier: localeIdentifier, decodedTo: [FailableDecodable<FeedItem.LegacySource>].self)
-    if sources.isEmpty {
-      throw BraveNewsError.resourceEmpty
-    }
-    return sources.compactMap(\.wrappedValue)
+    return unwrappedResource(resource: .sources, localeIdentifier: localeIdentifier, data: sources)
   }
 
-  private func loadFeed(for localeIdentifier: String) async throws -> [FeedItem.Content] {
+  private func loadFeed(for localeIdentifier: String) async -> [FeedItem.Content] {
     do {
       let items = try await loadResource(.feed, localeIdentifier: localeIdentifier, decodedTo: [FailableDecodable<FeedItem.Content>].self)
-      if items.isEmpty {
-        throw BraveNewsError.resourceEmpty
-      }
-      return items.compactMap(\.wrappedValue)
+      return unwrappedResource(resource: .feed, localeIdentifier: localeIdentifier, data: items)
     } catch {
       Logger.module.error("Failed to load feed (\(localeIdentifier)): \(error.localizedDescription)")
       return []
     }
   }
   
-  private func loadSourceSuggestions(for localeIdentifier: String) async throws -> [String: [FeedItem.SourceSimilarity]] {
+  private func loadSourceSuggestions(for localeIdentifier: String) async -> [String: [FeedItem.SourceSimilarity]] {
     do {
       let items = try await loadResource(.sourceSuggestions, localeIdentifier: localeIdentifier, decodedTo: [String: [FailableDecodable<FeedItem.SourceSimilarity>]].self)
-      if items.isEmpty {
-        throw BraveNewsError.resourceEmpty
-      }
       return items.mapValues { $0.compactMap(\.wrappedValue) }
     } catch {
       Logger.module.error("Failed to load source suggestions (\(localeIdentifier)): \(error.localizedDescription)")
@@ -512,7 +556,8 @@ public class FeedDataSource: ObservableObject {
 
   /// Whether or not the feed content is currently expired and needs to be reloaded
   public var isFeedContentExpired: Bool {
-    return followedLocales.allSatisfy({ isResourceExpired(.feed, localeIdentifier: $0) })
+    let locales = followedLocales
+    return !locales.isEmpty && locales.allSatisfy({ isResourceExpired(.feed, localeIdentifier: $0) })
   }
 
   /// Whether or not the sources are currently expired and needs to be reloaded
@@ -521,12 +566,17 @@ public class FeedDataSource: ObservableObject {
   }
   
   /// A set of locales that the user is following
-  private var followedLocales: Set<String> {
+  var followedLocales: Set<String> {
+    assert(Thread.isMainThread)
+    
     var locales: Set<String> = []
     // Followed channels
     locales.formUnion(followedChannels.map(\.localeIdentifier))
     // Followed sources
     let localeDetails = followedSources.map(\.localeDetails).compactMap { $0 }
+    let commonLocales = localeDetails
+      .dropFirst()
+      .reduce(into: Set(localeDetails.first?.map(\.locale) ?? []), { $0.formIntersection($1.map(\.locale))})
     for detail in localeDetails where !detail.isEmpty {
       // Sources are tricky, they can exist in multiple locales even though the contents of those will be the
       // same in each feed.
@@ -540,8 +590,12 @@ public class FeedDataSource: ObservableObject {
         // Try and see if it exists in a feed we're already downloading
         if let locale = detail.first(where: { locales.contains($0.locale) })?.locale {
           locales.insert(locale)
-        } else if let locale = locales.first {
-          // Nothing found so we'll just pick one
+        } else if let locale = detail.first(where: { $0.locale == self.selectedLocale })?.locale {
+          // Try and add a feed that is being used for showing channels & ordering source
+          locales.insert(locale)
+        } else if let locale = (detail.first(where: { commonLocales.contains($0.locale) }) ?? detail.first)?.locale {
+          // Nothing found so we'll just try and pick a common locale shared among followed sources to
+          // reduce the number of feeds downloaded. If it doesn't contain one then just picking the first one
           locales.insert(locale)
         }
       }
@@ -559,6 +613,7 @@ public class FeedDataSource: ObservableObject {
   /// `loading` initially.
   public func load(_ completion: (() -> Void)? = nil) {
     state = .loading(state)
+    decodingErrors = []
     Task { @MainActor in
       do {
         self.sources = try await loadGlobalSources()
@@ -580,7 +635,7 @@ public class FeedDataSource: ObservableObject {
         for locale in followedLocales {
           async let suggestions = loadSourceSuggestions(for: locale)
           async let items = loadFeed(for: locale)
-          let (localeSpecificItems, localeSpecificSuggestions) = try await (items, suggestions)
+          let (localeSpecificItems, localeSpecificSuggestions) = await (items, suggestions)
           self.items.append(contentsOf: localeSpecificItems)
           self.sourceSuggestions.merge(with: localeSpecificSuggestions)
         }
@@ -596,7 +651,7 @@ public class FeedDataSource: ObservableObject {
           }
         }
         if !followedLocales.isEmpty && self.items.isEmpty {
-          throw BraveNewsError.resourceEmpty
+          throw BraveNewsError.invalidLoad
         }
         self.reloadCards(from: self.items, sources: self.sources, completion: completion)
       } catch {
@@ -624,6 +679,23 @@ public class FeedDataSource: ObservableObject {
       return false
     }
     return true
+  }
+  
+  public func fetchCachedFiles(resourceKeys: [URLResourceKey] = []) async -> [URL] {
+    let fileManager = FileManager.default
+    guard let braveNewsPath = fileManager.getOrCreateFolder(name: Self.cacheFolderName) else {
+      return []
+    }
+    var files: [URL] = []
+    guard let enumerator = fileManager.enumerator(
+      at: braveNewsPath,
+      includingPropertiesForKeys: resourceKeys,
+      options: [.skipsHiddenFiles, .skipsSubdirectoryDescendants]
+    ) else { return [] }
+    while let fileURL = enumerator.nextObject() as? URL {
+      files.append(fileURL)
+    }
+    return files
   }
 
   // MARK: - Sources
@@ -658,7 +730,7 @@ public class FeedDataSource: ObservableObject {
     needsReloadCards = true
   }
   
-  func isFollowingChannelBinding(channel: FeedChannel) -> Binding<Bool> {
+  public func isFollowingChannelBinding(channel: FeedChannel) -> Binding<Bool> {
     .init {
       Preferences.BraveNews.followedChannels.value[channel.localeIdentifier]?.contains(channel.name) ?? false
     } set: { [self] newValue in
@@ -679,7 +751,7 @@ public class FeedDataSource: ObservableObject {
     }
   }
   
-  func isFollowingSourceBinding(source: FeedItem.Source) -> Binding<Bool> {
+  public func isFollowingSourceBinding(source: FeedItem.Source) -> Binding<Bool> {
     .init {
       FeedSourceOverride.get(fromId: source.id)?.enabled ?? false
     } set: { [self] newValue in
@@ -702,7 +774,7 @@ public class FeedDataSource: ObservableObject {
   }
   
   /// Searches sources, channels and RSS feeds
-  @MainActor func search(query: String) -> SearchResults? {
+  @MainActor public func search(query: String) -> SearchResults? {
     let sourceResults = sources.filter({
       $0.name.localizedCaseInsensitiveContains(query) ||
       $0.siteURL?.absoluteString.localizedCaseInsensitiveContains(query) == true
@@ -766,30 +838,41 @@ public class FeedDataSource: ObservableObject {
   ) {
     // Ensure main thread since we're querying from CoreData
     dispatchPrecondition(condition: .onQueue(.main))
-    let lastVisitedDomains =
-      (try? History.suffix(200)
-        .lazy
-        .compactMap(\.url)
-        .compactMap { URL(string: $0)?.baseDomain }) ?? []
-    let followedSources = FeedSourceOverride.all().filter(\.enabled).map(\.publisherID)
-    todayQueue.async {
-      let items: [FeedItem] = feeds.compactMap { content in
-        var score = content.baseScore
-        if let feedBaseDomain = content.url?.baseDomain,
-          lastVisitedDomains.contains(feedBaseDomain) {
-          score -= 5
+    
+    fetchHistory { historyNodeList in
+      let lastVisitedDomains = historyNodeList.compactMap { $0.url.baseDomain }
+      
+      let followedSources = FeedSourceOverride.all().filter(\.enabled).map(\.publisherID)
+      self.todayQueue.async {
+        let items: [FeedItem] = feeds.compactMap { content in
+          var score = content.baseScore ?? Double.greatestFiniteMagnitude
+          if let feedBaseDomain = content.url?.baseDomain,
+             lastVisitedDomains.contains(feedBaseDomain) {
+            score -= 5
+          }
+          guard let source = sources.first(where: { $0.id == content.publisherID }) else {
+            return nil
+          }
+          if followedSources.contains(where: { $0 == source.id }) {
+            score -= 5
+          }
+          return FeedItem(score: score, content: content, source: source)
         }
-        guard let source = sources.first(where: { $0.id == content.publisherID }) else {
-          return nil
+        
+        DispatchQueue.main.async {
+          completion(items)
         }
-        if followedSources.contains(where: { $0 == source.id }) {
-          score -= 5
-        }
-        return FeedItem(score: score, content: content, source: source)
       }
-      DispatchQueue.main.async {
-        completion(items)
+    }
+  }
+  
+  private func fetchHistory(completion: @escaping ([HistoryNode]) -> Void) {
+    if let historyAPI {
+      historyAPI.search(withQuery: "", maxCount: 200) { historyNodeList in
+        completion(historyNodeList)
       }
+    } else {
+      completion([])
     }
   }
 
@@ -802,18 +885,12 @@ public class FeedDataSource: ObservableObject {
     let hiddenSources = Set(overridenSources.filter { !$0.enabled }.map(\.publisherID))
     let followedChannels = Preferences.BraveNews.followedChannels.value
     
-    let rules: [FeedSequenceElement] = [
-      .sponsor,
-      .fillUsing(
-        FilteredFillStrategy(isIncluded: { $0.source.category == Self.topNewsCategory }),
-        fallback: DefaultFillStrategy(),
-        [
-          .headline(paired: false)
-        ]),
-      .braveAd,
-      .repeating([
+    func createRepeatingFeedElements(withRatingCard: Bool) -> [FeedSequenceElement] {
+      let ratedNewsRow: FeedSequenceElement = withRatingCard ? .headlineRating : .headline(paired: true)
+      
+      return [
         .repeating([.headline(paired: false)], times: 2),
-        .headline(paired: true),
+        ratedNewsRow,
         .partner,
         .categoryGroup,
         .repeating([.headline(paired: false)], times: 2),
@@ -834,7 +911,25 @@ public class FeedDataSource: ObservableObject {
             .headline(paired: true),
             .headline(paired: false),
           ]),
-      ]),
+      ]
+    }
+    
+    let rules: [FeedSequenceElement] = [
+      .sponsor,
+      .fillUsing(
+        FilteredFillStrategy(isIncluded: { $0.source.category == Self.topNewsCategory }),
+        fallback: DefaultFillStrategy(),
+        [
+          .headline(paired: false)
+        ]),
+      .braveAd,
+      .repeating(
+        createRepeatingFeedElements(withRatingCard: AppReviewManager.shared.shouldShowNewsRatingCard()),
+        times: 1
+      ),
+      .repeating(
+        createRepeatingFeedElements(withRatingCard: false)
+      ),
     ]
     
     Task { @MainActor in
@@ -844,7 +939,7 @@ public class FeedDataSource: ObservableObject {
         followedSources: followedSources,
         hiddenSources: hiddenSources,
         followedChannels: followedChannels.mapValues(Set.init),
-        ads: ads
+        ads: getAdsAPI?()
       )
       // Move to OSSignposter when we're 15+
       let log = OSLog(subsystem: Bundle.main.bundleIdentifier ?? "com.brave.ios", category: "Brave News")
@@ -889,6 +984,9 @@ enum FeedSequenceElement {
   /// Displays an `article` type item in a headline card. Can also be displayed as two (smaller) paired
   /// headlines
   case headline(paired: Bool)
+  /// Displays an `article` type item in a headline card and rating card. It will be displayed as two (smaller) paired
+  /// card headline and rate card
+  case headlineRating
   /// Displays a list of `article` typed items with the same category in a vertical list.
   case categoryGroup
   /// Displays a list of `article` typed items with the same source. It can optionally be displayed as a
@@ -905,16 +1003,22 @@ enum FeedSequenceElement {
   indirect case repeating([FeedSequenceElement], times: Int = .max)
 }
 
-struct SearchResults {
-  var sources: [FeedItem.Source]
-  var channels: [FeedChannel]
-  var rssFeeds: [RSSFeedLocation]
+public struct SearchResults {
+  public var sources: [FeedItem.Source]
+  public var channels: [FeedChannel]
+  public var rssFeeds: [RSSFeedLocation]
   
-  static var empty: Self {
+  public static var empty: Self {
     .init(sources: [], channels: [], rssFeeds: [])
   }
   
-  var isEmpty: Bool {
+  public var isEmpty: Bool {
     sources.isEmpty && channels.isEmpty && rssFeeds.isEmpty
+  }
+  
+  public init(sources: [FeedItem.Source], channels: [FeedChannel], rssFeeds: [RSSFeedLocation]) {
+    self.sources = sources
+    self.channels = channels
+    self.rssFeeds = rssFeeds
   }
 }

@@ -19,8 +19,8 @@ import BraveUI
 struct AssetIconView: View {
   var token: BraveWallet.BlockchainToken
   var network: BraveWallet.NetworkInfo
-  /// If we should show the native token logo on non-native assets
-  var shouldShowNativeTokenIcon: Bool = false
+  /// If we should show the network logo on non-native assets
+  var shouldShowNetworkIcon: Bool = false
   @ScaledMetric var length: CGFloat = 40
   var maxLength: CGFloat?
   @ScaledMetric var networkSymbolLength: CGFloat = 15
@@ -37,16 +37,16 @@ struct AssetIconView: View {
   }
 
   private var localImage: Image? {
+    if network.isNativeAsset(token), let uiImage = network.nativeTokenLogoImage {
+      return Image(uiImage: uiImage)
+    }
+    
     for logo in [token.logo, token.symbol.lowercased()] {
       if let baseURL = BraveWallet.TokenRegistryUtils.tokenLogoBaseURL,
         case let imageURL = baseURL.appendingPathComponent(logo),
         let image = UIImage(contentsOfFile: imageURL.path) {
         return Image(uiImage: image)
       }
-    }
-    
-    if network.isNativeAsset(token), let uiImage = networkNativeTokenLogo {
-      return Image(uiImage: uiImage)
     }
     
     return nil
@@ -58,8 +58,8 @@ struct AssetIconView: View {
         image
           .resizable()
           .aspectRatio(contentMode: .fit)
-      } else {
-        WebImageReader(url: URL(string: token.logo)) { image, isFinished in
+      } else if let url = URL(string: token.logo) {
+        WebImageReader(url: url) { image in
           if let image = image {
             Image(uiImage: image)
               .resizable()
@@ -68,6 +68,8 @@ struct AssetIconView: View {
             fallbackMonogram
           }
         }
+      } else {
+        fallbackMonogram
       }
     }
     .frame(width: min(length, maxLength ?? length), height: min(length, maxLength ?? length))
@@ -75,17 +77,17 @@ struct AssetIconView: View {
     .accessibilityHidden(true)
   }
   
-  private var networkNativeTokenLogo: UIImage? {
-    if let logo = network.nativeTokenLogo {
-      return UIImage(named: logo, in: .module, with: nil)
-    }
-    return nil
-  }
-  
   @ViewBuilder private var tokenLogo: some View {
-    if shouldShowNativeTokenIcon, !network.isNativeAsset(token), let image = networkNativeTokenLogo {
+    if shouldShowNetworkIcon,  // explicitly show/not show network logo
+       (!network.isNativeAsset(token) || network.nativeTokenLogoName != network.networkLogoName), // non-native asset OR if the network is not the official Ethereum network, but uses ETH as gas
+       let image = network.networkLogoImage {
       Image(uiImage: image)
         .resizable()
+        .overlay(
+          Circle()
+            .stroke(lineWidth: 2)
+            .foregroundColor(Color(braveSystemName: .containerBackground))
+        )
         .frame(width: min(networkSymbolLength, maxNetworkSymbolLength ?? networkSymbolLength), height: min(networkSymbolLength, maxNetworkSymbolLength ?? networkSymbolLength))
     }
   }
@@ -105,7 +107,9 @@ struct AssetIconView_Previews: PreviewProvider {
         logo: "",
         isErc20: true,
         isErc721: false,
+        isErc1155: false,
         isNft: false,
+        isSpam: false,
         symbol: "XYO",
         decimals: 18,
         visible: false,
@@ -131,32 +135,44 @@ struct NFTIconView: View {
   var network: BraveWallet.NetworkInfo
   /// NFT image url from metadata
   var url: URL?
-  /// If we should show the native token logo on non-native assets
-  var shouldShowNativeTokenIcon: Bool = false
+  /// If we should show the network logo on non-native assets
+  var shouldShowNetworkIcon: Bool = false
   
   @ScaledMetric var length: CGFloat = 40
-  
-  private var networkNativeTokenLogo: UIImage? {
-    if let logo = network.nativeTokenLogo {
-      return UIImage(named: logo, in: .module, with: nil)
-    }
-    return nil
-  }
+  var maxLength: CGFloat?
+  @ScaledMetric var tokenLogoLength: CGFloat = 15
+  var maxTokenLogoLength: CGFloat?
   
   @ViewBuilder private var tokenLogo: some View {
-    if shouldShowNativeTokenIcon, !network.isNativeAsset(token), let image = networkNativeTokenLogo {
+    if shouldShowNetworkIcon, let image = network.nativeTokenLogoImage {
       Image(uiImage: image)
         .resizable()
-        .frame(width: 15, height: 15)
+        .overlay(
+          Circle()
+            .stroke(lineWidth: 2)
+            .foregroundColor(Color(braveSystemName: .containerBackground))
+        )
+        .frame(
+          width: min(tokenLogoLength, maxTokenLogoLength ?? tokenLogoLength),
+          height: min(tokenLogoLength, maxTokenLogoLength ?? tokenLogoLength)
+        )
     }
   }
   
   var body: some View {
     NFTImageView(urlString: url?.absoluteString ?? "") {
-      AssetIconView(token: token, network: network, shouldShowNativeTokenIcon: shouldShowNativeTokenIcon, length: length)
+      AssetIconView(
+        token: token,
+        network: network,
+        shouldShowNetworkIcon: shouldShowNetworkIcon,
+        length: length
+      )
     }
     .cornerRadius(5)
-    .frame(width: length, height: length)
+    .frame(
+      width: min(length, maxLength ?? length),
+      height: min(length, maxLength ?? length)
+    )
     .overlay(tokenLogo, alignment: .bottomTrailing)
     .allowsHitTesting(false)
     .accessibilityHidden(true)

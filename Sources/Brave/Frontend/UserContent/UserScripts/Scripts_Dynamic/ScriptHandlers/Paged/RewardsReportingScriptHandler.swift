@@ -26,12 +26,12 @@ class RewardsReportingScriptHandler: TabContentScript {
       return nil
     }
     
-    return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
-                                                    securityToken: scriptId,
-                                                    script: script),
-                               injectionTime: .atDocumentStart,
-                               forMainFrameOnly: false,
-                               in: scriptSandbox)
+    return WKUserScript(source: secureScript(handlerName: messageHandlerName,
+                                             securityToken: scriptId,
+                                             script: script),
+                        injectionTime: .atDocumentStart,
+                        forMainFrameOnly: false,
+                        in: scriptSandbox)
   }()
 
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
@@ -43,7 +43,7 @@ class RewardsReportingScriptHandler: TabContentScript {
       var referrerUrl: String?
     }
 
-    if PrivateBrowsingManager.shared.isPrivateBrowsing || !rewards.isEnabled {
+    if tab?.isPrivate == true || !rewards.isEnabled {
       return
     }
     

@@ -39,13 +39,13 @@ private struct EditTokenView: View {
             token: assetStore.token,
             network: assetStore.network,
             url: nftMetadata?.imageURL,
-            shouldShowNativeTokenIcon: true
+            shouldShowNetworkIcon: true
           )
         } else {
           AssetIconView(
             token: assetStore.token,
             network: assetStore.network,
-            shouldShowNativeTokenIcon: true
+            shouldShowNetworkIcon: true
           )
         }
         VStack(alignment: .leading) {
@@ -99,12 +99,10 @@ struct EditUserAssetsView: View {
     Button(action: {
       self.isPresentingNetworkFilter = true
     }) {
-      HStack {
-        Image(braveSystemName: "brave.text.alignleft")
-        Text(userAssetsStore.networkFilter.title)
-      }
-      .font(.footnote.weight(.medium))
-      .foregroundColor(Color(.braveBlurpleTint))
+      Image(braveSystemName: "leo.tune")
+        .font(.footnote.weight(.medium))
+        .foregroundColor(Color(.braveBlurpleTint))
+        .clipShape(Rectangle())
     }
   }
   
@@ -126,14 +124,6 @@ struct EditUserAssetsView: View {
             )
             Spacer()
           }
-          .osAvailabilityModifiers { content in
-            if #available(iOS 15.0, *) {
-              content  // Padding already applied
-            } else {
-              content
-                .padding(.top)
-            }
-          }
         ) {
           Group {
             let tokens = tokenStores
@@ -147,25 +137,11 @@ struct EditUserAssetsView: View {
               ForEach(tokens, id: \.token.id) { store in
                 if store.isCustomToken {
                   EditTokenView(assetStore: store, tokenNeedsTokenId: $tokenNeedsTokenId)
-                    .osAvailabilityModifiers { content in
-                      if #available(iOS 15.0, *) {
-                        content
-                          .swipeActions(edge: .trailing) {
-                            Button(role: .destructive, action: {
-                              removeCustomToken(store.token)
-                            }) {
-                              Label(Strings.Wallet.delete, systemImage: "trash")
-                            }
-                          }
-                      } else {
-                        content
-                          .contextMenu {
-                            Button {
-                              removeCustomToken(store.token)
-                            } label: {
-                              Label(Strings.Wallet.delete, systemImage: "trash")
-                            }
-                          }
+                    .swipeActions(edge: .trailing) {
+                      Button(role: .destructive, action: {
+                        removeCustomToken(store.token)
+                      }) {
+                        Label(Strings.Wallet.delete, systemImage: "trash")
                       }
                     }
                 } else {
@@ -182,7 +158,10 @@ struct EditUserAssetsView: View {
       .navigationTitle(Strings.Wallet.editVisibleAssetsButtonTitle)
       .navigationBarTitleDisplayMode(.inline)
       .navigationViewStyle(StackNavigationViewStyle())
-      .filterable(text: $query)
+      .searchable(
+        text: $query,
+        placement: .navigationBarDrawer(displayMode: .always)
+      )
       .onAppear {
         userAssetsStore.update()
       }
@@ -214,7 +193,8 @@ struct EditUserAssetsView: View {
         networkSelectionStore: networkStore.openNetworkSelectionStore(mode: .formSelection),
         keyringStore: keyringStore,
         userAssetStore: userAssetsStore,
-        tokenNeedsTokenId: tokenNeedsTokenId
+        tokenNeedsTokenId: tokenNeedsTokenId,
+        supportedTokenTypes: [.nft]
       )
       .onDisappear {
         networkStore.closeNetworkSelectionStore()
@@ -230,10 +210,14 @@ struct EditUserAssetsView: View {
     .background(Color.clear.sheet(isPresented: $isPresentingNetworkFilter) {
       NavigationView {
         NetworkFilterView(
-          networkFilter: $userAssetsStore.networkFilter,
-          networkStore: networkStore
+          networks: userAssetsStore.networkFilters,
+          networkStore: networkStore,
+          saveAction: { selectedNetworks in
+            userAssetsStore.networkFilters = selectedNetworks
+          }
         )
       }
+      .navigationViewStyle(.stack)
       .onDisappear {
         networkStore.closeNetworkSelectionStore()
       }

@@ -7,6 +7,8 @@ import Data
 import Combine
 
 public final class PrivateBrowsingManager: ObservableObject {
+  
+  public init() {}
 
   @Published public var isPrivateBrowsing = false {
     didSet {
@@ -17,6 +19,8 @@ public final class PrivateBrowsingManager: ObservableObject {
       }
     }
   }
-
-  public static let shared = PrivateBrowsingManager()
+  
+  var browserColors: any BrowserColors {
+    isPrivateBrowsing ? .privateMode : .standard
+  }
 }

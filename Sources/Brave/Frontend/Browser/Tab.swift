@@ -7,12 +7,13 @@ import WebKit
 import Storage
 import Shared
 import BraveCore
-import BraveShared
+import Preferences
 import SwiftyJSON
 import Data
 import os.log
 import BraveWallet
 import Favicon
+import UserAgent
 
 protocol TabContentScriptLoader {
   static func loadUserScript(named: String) -> String?
@@ -47,6 +48,8 @@ protocol TabDelegate {
   func showWalletNotification(_ tab: Tab, origin: URLOrigin)
   func updateURLBarWalletButton()
   func isTabVisible(_ tab: Tab) -> Bool
+  func reloadIPFSSchemeUrl(_ url: URL)
+  func didReloadTab(_ tab: Tab)
 }
 
 @objc
@@ -62,7 +65,7 @@ enum TabSecureContentState {
 }
 
 class Tab: NSObject {
-  var id: String?
+  let id: UUID
   let rewardsId: UInt32
 
   var onScreenshotUpdated: (() -> Void)?
@@ -72,8 +75,6 @@ class Tab: NSObject {
   var blockAllAlerts: Bool = false
   
   private(set) var type: TabType = .regular
-  private let syncTab: BraveSyncTab?
-  let faviconDriver: FaviconDriver?
   
   var redirectURLs = [URL]()
 
@@ -82,23 +83,48 @@ class Tab: NSObject {
   }
 
   var secureContentState: TabSecureContentState = .unknown
-  var sslPinningError: Error? = nil
+  var sslPinningError: Error?
 
-  var walletEthProvider: BraveWalletEthereumProvider?
-  var walletEthProviderScript: WKUserScript?
-  var walletSolProvider: BraveWalletSolanaProvider?
-  var walletSolProviderScripts: [BraveWalletProviderScriptKey: String] = [:]
+  private let _syncTab: BraveSyncTab?
+  private let _faviconDriver: FaviconDriver?
+  private var _walletEthProvider: BraveWalletEthereumProvider?
+  private var _walletSolProvider: BraveWalletSolanaProvider?
+  private var _walletKeyringService: BraveWalletKeyringService? {
+    didSet {
+      _walletKeyringService?.add(self)
+    }
+  }
+  
+  private weak var syncTab: BraveSyncTab? {
+    _syncTab
+  }
+  
+  weak var faviconDriver: FaviconDriver? {
+    _faviconDriver
+  }
+  
+  weak var walletEthProvider: BraveWalletEthereumProvider? {
+    get { _walletEthProvider }
+    set { _walletEthProvider = newValue }
+  }
+  
+  weak var walletSolProvider: BraveWalletSolanaProvider? {
+    get { _walletSolProvider }
+    set { _walletSolProvider = newValue }
+  }
+  
+  weak var walletKeyringService: BraveWalletKeyringService? {
+    get { _walletKeyringService }
+    set { _walletKeyringService = newValue }
+  }
+  
   var tabDappStore: TabDappStore = .init()
   var isWalletIconVisible: Bool = false {
     didSet {
       tabDelegate?.updateURLBarWalletButton()
     }
   }
-  var walletKeyringService: BraveWalletKeyringService? {
-    didSet {
-      walletKeyringService?.add(self)
-    }
-  }
+  
   // PageMetadata is derived from the page content itself, and as such lags behind the
   // rest of the tab.
   var pageMetadata: PageMetadata?
@@ -131,9 +157,9 @@ class Tab: NSObject {
   var tabDelegate: TabDelegate?
   weak var urlDidChangeDelegate: URLChangeDelegate?  // TODO: generalize this.
   var bars = [SnackBar]()
-  var favicons = [Favicon]()
+  var favicon: Favicon
   var lastExecutedTime: Timestamp?
-  var sessionData: SessionData?
+  var sessionData: (title: String, interactionState: Data)?
   fileprivate var lastRequest: URLRequest?
   var restoring: Bool = false
   var pendingScreenshot = false
@@ -151,8 +177,29 @@ class Tab: NSObject {
     willSet {
       url = newValue
       previousComittedURL = committedURL
+      
+      // Clear the current request url and the redirect source url
+      // We don't need these values after the request has been comitted
+      currentRequestURL = nil
+      redirectSourceURL = nil
+      isInternalRedirect = false
     }
   }
+  
+  /// This is the url for the current request
+  var currentRequestURL: URL? {
+    willSet {
+      // Lets push the value as a redirect value
+      redirectSourceURL = currentRequestURL
+    }
+  }
+  
+  /// This tells us if we internally redirected while navigating (i.e. debounce or query stripping)
+  var isInternalRedirect: Bool = false
+  
+  // If the current reqest wasn't comitted and a new one was set
+  // we were redirected and therefore this is set
+  var redirectSourceURL: URL?
   
   /// The previous url that was set before `comittedURL` was set again
   private(set) var previousComittedURL: URL?
@@ -169,14 +216,7 @@ class Tab: NSObject {
       }
     }
   }
-  var lastKnownUrl: URL? {
-    // Tab url can be nil when user cold starts the app
-    // thus we check session data for last known url
-    guard self.url != nil else {
-      return self.sessionData?.urls.last
-    }
-    return self.url
-  }
+
   var mimeType: String?
   var isEditing: Bool = false
   var shouldClassifyLoadsForAds = true
@@ -238,15 +278,12 @@ class Tab: NSObject {
   }
 
   fileprivate(set) var screenshot: UIImage?
-  var screenshotUUID: UUID? {
-    didSet { TabMO.saveScreenshotUUID(screenshotUUID, tabId: id) }
-  }
   
   var webStateDebounceTimer: Timer?
   var onPageReadyStateChanged: ((ReadyState.State) -> Void)?
 
   // If this tab has been opened from another, its parent will point to the tab from which it was opened
-  var parent: Tab?
+  weak var parent: Tab?
 
   fileprivate var contentScriptManager = TabContentScriptManager()
   private var userScripts = Set<UserScriptManager.ScriptType>()
@@ -273,19 +310,34 @@ class Tab: NSObject {
       self.setScript(script: .nightMode, enabled: isNightModeEnabled)
     }
   }
+  
+  /// Boolean tracking custom url-scheme alert presented
+  var isExternalAppAlertPresented = false
+  var externalAppAlertCounter = 0
+  var isExternalAppAlertSuppressed = false
+  var externalAppURLDomain: String?
+  
+  func resetExternalAlertProperties() {
+    externalAppAlertCounter = 0
+    isExternalAppAlertPresented = false
+    isExternalAppAlertSuppressed = false
+    externalAppURLDomain = nil
+  }
 
-  init(configuration: WKWebViewConfiguration, type: TabType = .regular, tabGeneratorAPI: BraveTabGeneratorAPI? = nil) {
+  init(configuration: WKWebViewConfiguration, id: UUID = UUID(), type: TabType = .regular, tabGeneratorAPI: BraveTabGeneratorAPI? = nil) {
     self.configuration = configuration
+    self.favicon = Favicon.default
+    self.id = id
     rewardsId = UInt32.random(in: 1...UInt32.max)
     nightMode = Preferences.General.nightModeEnabled.value
-    syncTab = tabGeneratorAPI?.createBraveSyncTab(isOffTheRecord: type == .private)
+    _syncTab = tabGeneratorAPI?.createBraveSyncTab(isOffTheRecord: type == .private)
     
-    if let syncTab = syncTab {
-      faviconDriver = FaviconDriver(webState: syncTab.webState).then {
-        $0.setMaximumFaviconImageSize(1024)
+    if let syncTab = _syncTab {
+      _faviconDriver = FaviconDriver(webState: syncTab.webState).then {
+        $0.setMaximumFaviconImageSize(CGSize(width: 1024, height: 1024))
       }
     } else {
-      faviconDriver = nil
+      _faviconDriver = nil
     }
 
     super.init()
@@ -317,11 +369,8 @@ class Tab: NSObject {
       configuration!.allowsInlineMediaPlayback = true
       // Enables Zoom in website by ignoring their javascript based viewport Scale limits.
       configuration!.ignoresViewportScaleLimits = true
-
-      // TODO: Downgrade to 14.5 once api becomes available.
-      if #available(iOS 15.0, *) {
-        configuration!.upgradeKnownHostsToHTTPS = Preferences.Shields.httpsEverywhere.value
-      }
+      configuration!.upgradeKnownHostsToHTTPS = Preferences.Shields.httpsEverywhere.value
+      configuration!.enablePageTopColorSampling()
 
       if configuration!.urlSchemeHandler(forURLScheme: InternalURL.scheme) == nil {
         configuration!.setURLSchemeHandler(InternalSchemeHandler(), forURLScheme: InternalURL.scheme)
@@ -338,10 +387,11 @@ class Tab: NSObject {
       webView.scrollView.layer.masksToBounds = false
       webView.navigationDelegate = navigationDelegate
 
-      restore(webView, restorationData: self.sessionData?.savedTabData)
+      restore(webView, restorationData: self.sessionData)
 
       self.webView = webView
-      self.webView?.addObserver(self, forKeyPath: KVOConstants.URL.rawValue, options: .new, context: nil)
+      self.webView?.addObserver(self, forKeyPath: KVOConstants.URL.keyPath, options: .new, context: nil)
+      
       tabDelegate?.tab(self, didCreateWebView: webView)
       
       let scriptPreferences: [UserScriptManager.ScriptType: Bool] = [
@@ -364,12 +414,9 @@ class Tab: NSObject {
   }
 
   func clearHistory(config: WKWebViewConfiguration) {
-    guard let webView = webView, let tabID = id else {
+    guard let webView = webView else {
       return
     }
-
-    // Remove the tab history from saved tabs
-    TabMO.removeHistory(with: tabID)
 
     /*
      * Clear selector is used on WKWebView backForwardList because backForwardList list is only exposed with a getter
@@ -386,52 +433,49 @@ class Tab: NSObject {
     if webView.backForwardList.responds(to: selector) {
       webView.backForwardList.performSelector(onMainThread: selector, with: nil, waitUntilDone: true)
     }
+    
+    // Remove the tab history from saved tabs
+    // To remove history from WebKit, we simply update the session data AFTER calling "clear" above
+    SessionTab.update(tabId: id, interactionState: webView.sessionData ?? Data(), title: title, url: webView.url ?? TabManager.ntpInteralURL)
   }
 
-  func restore(_ webView: WKWebView, restorationData: SavedTab?) {
+  func restore(_ webView: WKWebView, restorationData: (title: String, interactionState: Data)?) {
     // Pulls restored session data from a previous SavedTab to load into the Tab. If it's nil, a session restore
     // has already been triggered via custom URL, so we use the last request to trigger it again; otherwise,
     // we extract the information needed to restore the tabs and create a NSURLRequest with the custom session restore URL
     // to trigger the session restore via custom handlers
-    if let sessionData = restorationData {
+    if let sessionInfo = restorationData {
       restoring = true
-
-      lastTitle = sessionData.title
-
-      var urls = [String]()
-      for url in sessionData.history {
-        guard let url = URL(string: url) else { continue }
-        urls.append(url.absoluteString)
-      }
-
-      let currentPage = sessionData.historyIndex
+      lastTitle = sessionInfo.title
+      webView.interactionState = sessionInfo.interactionState
+      restoring = false
       self.sessionData = nil
-      var jsonDict = [String: AnyObject]()
-      jsonDict["history"] = urls as AnyObject?
-      jsonDict["currentPage"] = currentPage as AnyObject?
-      guard let json = JSON(jsonDict).rawString()?.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) else {
-        return
-      }
-
-      if let restoreURL = URL(string: "\(InternalURL.baseUrl)/\(SessionRestoreHandler.path)?history=\(json)") {
-        let request = PrivilegedRequest(url: restoreURL) as URLRequest
-        webView.load(request)
-        lastRequest = request
-        restoring = false
-      }
     } else if let request = lastRequest {
       webView.load(request)
     } else {
       Logger.module.warning("creating webview with no lastRequest and no session data: \(self.url?.absoluteString ?? "nil")")
     }
-
+  }
+  
+  func restore(_ webView: WKWebView, requestRestorationData: (title: String, request: URLRequest)?) {
+    if let sessionInfo = requestRestorationData {
+      restoring = true
+      lastTitle = sessionInfo.title
+      webView.load(sessionInfo.request)
+      restoring = false
+      self.sessionData = nil
+    } else if let request = lastRequest {
+      webView.load(request)
+    } else {
+      Logger.module.warning("creating webview with no lastRequest and no session data: \(self.url?.absoluteString ?? "nil")")
+    }
   }
 
   func deleteWebView() {
     contentScriptManager.uninstall(from: self)
 
     if let webView = webView {
-      webView.removeObserver(self, forKeyPath: KVOConstants.URL.rawValue)
+      webView.removeObserver(self, forKeyPath: KVOConstants.URL.keyPath)
       tabDelegate?.tab(self, willDeleteWebView: webView)
     }
     webView = nil
@@ -441,6 +485,22 @@ class Tab: NSObject {
     deleteWebView()
     deleteNewTabPageController()
     contentScriptManager.helpers.removeAll()
+    
+    // A number of mojo-powered core objects have to be deconstructed on the same
+    // thread they were constructed
+    var mojoObjects: [Any?] = [
+      _faviconDriver,
+      _syncTab,
+      _walletEthProvider,
+      _walletSolProvider,
+      _walletKeyringService
+    ]
+    
+    DispatchQueue.main.async {
+      // Reference inside to retain it, supress warnings by reading/writing
+      _ = mojoObjects
+      mojoObjects = []
+    }
   }
 
   var loading: Bool {
@@ -466,8 +526,8 @@ class Tab: NSObject {
     return tabs
   }
 
-  var title: String? {
-    return webView?.title
+  var title: String {
+    return webView?.title ?? ""
   }
 
   var displayTitle: String {
@@ -483,13 +543,7 @@ class Tab: NSObject {
       return Strings.Hotkey.newTabTitle
     }
 
-    // lets double check the sessionData in case this is a non-restored new tab
-    if let firstURL = sessionData?.urls.first, sessionData?.urls.count == 1, InternalURL(firstURL)?.isAboutHomeURL ?? false {
-      syncTab?.setTitle(Strings.Hotkey.newTabTitle)
-      return Strings.Hotkey.newTabTitle
-    }
-
-    if let url = self.url, !InternalURL.isValid(url: url), let shownUrl = url.displayURL?.absoluteString {
+    if let url = self.url, !InternalURL.isValid(url: url), let shownUrl = url.displayURL?.absoluteString, webView != nil {
       syncTab?.setTitle(shownUrl)
       return shownUrl
     }
@@ -500,10 +554,12 @@ class Tab: NSObject {
       if let title = url?.absoluteString {
         syncTab?.setTitle(title)
         return title
-      } else if let tab = TabMO.get(fromId: id) {
-        let title = tab.title ?? tab.url ?? ""
-        syncTab?.setTitle(title)
-        return title
+      } else if let tab = SessionTab.from(tabId: id) {
+        if tab.title.isEmpty {
+          return Strings.Hotkey.newTabTitle
+        }
+        syncTab?.setTitle(tab.title)
+        return tab.title
       }
       
       syncTab?.setTitle("")
@@ -519,10 +575,12 @@ class Tab: NSObject {
   }
 
   var displayFavicon: Favicon? {
-    if let url = url, InternalURL(url)?.isAboutHomeURL == true { return nil }
-    return favicons.max {
-      $0.image?.size.width ?? 0 < $1.image?.size.width ?? 0
+    if let url = url, InternalURL(url)?.isAboutHomeURL == true {
+      return Favicon(image: UIImage(sharedNamed: "brave.logo"),
+                     isMonogramImage: false,
+                     backgroundColor: .clear)
     }
+    return favicon
   }
 
   var canGoBack: Bool {
@@ -537,19 +595,15 @@ class Tab: NSObject {
   /// In private browsing the URL is in memory but this is not the case for normal mode
   /// For Normal  Mode Tab information is fetched using Tab ID from
   var fetchedURL: URL? {
-    if PrivateBrowsingManager.shared.isPrivateBrowsing {
+    if isPrivate {
       if let url = url, url.isWebPage() {
         return url
       }
     } else {
       if let tabUrl = url, tabUrl.isWebPage() {
         return tabUrl
-      } else if let tabID = id {
-        let fetchedTab = TabMO.get(fromId: tabID)
-        
-        if let urlString = fetchedTab?.url, let url = URL(string: urlString), url.isWebPage() {
-          return url
-        }
+      } else if let fetchedTab = SessionTab.from(tabId: id), fetchedTab.url.isWebPage() {
+        return url
       }
     }
     
@@ -595,7 +649,7 @@ class Tab: NSObject {
           return webView.loadFileURL(url, allowingReadAccessTo: url)
         }
 
-        /// Donate Custom Intent Open Website
+        // Donate Custom Intent Open Website
         if url.isSecureWebPage(), !isPrivate {
           ActivityShortcutManager.shared.donateCustomIntent(for: .openWebsite, with: url.absoluteString)
         }
@@ -623,10 +677,16 @@ class Tab: NSObject {
         refreshControl.endRefreshing()
       }
     }
+    
+    tabDelegate?.didReloadTab(self)
 
     // If the current page is an error page, and the reload button is tapped, load the original URL
     if let url = webView?.url, let internalUrl = InternalURL(url), let page = internalUrl.originalURLFromErrorPage {
-      webView?.replaceLocation(with: page)
+      if page.isIPFSScheme {
+        tabDelegate?.reloadIPFSSchemeUrl(page)
+      } else {
+        webView?.replaceLocation(with: page)
+      }
       return
     }
 
@@ -638,7 +698,7 @@ class Tab: NSObject {
 
     if let webView = self.webView {
       Logger.module.debug("restoring webView from scratch")
-      restore(webView, restorationData: sessionData?.savedTabData)
+      restore(webView, restorationData: sessionData)
     }
   }
 
@@ -713,19 +773,15 @@ class Tab: NSObject {
     bars.reversed().filter({ !$0.shouldPersist(self) }).forEach({ removeSnackbar($0) })
   }
 
-  func setScreenshot(_ screenshot: UIImage?, revUUID: Bool = true) {
+  func setScreenshot(_ screenshot: UIImage?) {
     self.screenshot = screenshot
-    if revUUID {
-      self.screenshotUUID = UUID()
-    }
-
     onScreenshotUpdated?()
   }
 
   /// Switches user agent Desktop -> Mobile or Mobile -> Desktop.
   func switchUserAgent() {
     if let urlString = webView?.url?.baseDomain {
-      // The website was changed once already, need to flip the override.
+      // The website was changed once already, need to flip the override.onScreenshotUpdated
       if let siteOverride = userAgentOverrides[urlString] {
         userAgentOverrides[urlString] = !siteOverride
       } else {
@@ -756,7 +812,7 @@ class Tab: NSObject {
 
   override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
     guard let webView = object as? BraveWebView, webView == self.webView,
-      let path = keyPath, path == KVOConstants.URL.rawValue
+      let path = keyPath, path == KVOConstants.URL.keyPath
     else {
       return assertionFailure("Unhandled KVO key: \(keyPath ?? "nil")")
     }
@@ -784,7 +840,7 @@ class Tab: NSObject {
     }
     if let path = Bundle.module.path(forResource: fileName, ofType: type),
       let source = try? String(contentsOfFile: path) {
-      let userScript = WKUserScript.create(source: source, injectionTime: injectionTime, forMainFrameOnly: mainFrameOnly, in: contentWorld)
+      let userScript = WKUserScript(source: source, injectionTime: injectionTime, forMainFrameOnly: mainFrameOnly, in: contentWorld)
       webView.configuration.userContentController.addUserScript(userScript)
     }
   }
@@ -851,11 +907,7 @@ private class TabContentScriptManager: NSObject, WKScriptMessageHandlerWithReply
     // If this helper handles script messages, then get the handler name and register it. The Tab
     // receives all messages and then dispatches them to the right TabHelper.
     let scriptMessageHandlerName = type(of: helper).messageHandlerName
-    if #available(iOS 14.3, *) {
-      tab.webView?.configuration.userContentController.addScriptMessageHandler(self, contentWorld: contentWorld, name: scriptMessageHandlerName)
-    } else {
-      tab.webView?.configuration.userContentController.addScriptMessageHandler(self, contentWorld: .page, name: scriptMessageHandlerName)
-    }
+    tab.webView?.configuration.userContentController.addScriptMessageHandler(self, contentWorld: contentWorld, name: scriptMessageHandlerName)
   }
   
   func removeContentScript(name: String, forTab tab: Tab, contentWorld: WKContentWorld) {
@@ -935,13 +987,6 @@ class TabWebView: BraveWebView, MenuHelperInterface {
     }
   }
 
-  override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-    // The find-in-page selection menu only appears if the webview is the first responder.
-    becomeFirstResponder()
-
-    return super.hitTest(point, with: event)
-  }
-
   // rdar://33283179 Apple bug where `serverTrust` is not defined as KVO when it should be
   override func value(forUndefinedKey key: String) -> Any? {
     if key == #keyPath(WKWebView.serverTrust) {
@@ -959,7 +1004,7 @@ class TabWebView: BraveWebView, MenuHelperInterface {
   }
 }
 
-///
+//
 // Temporary fix for Bug 1390871 - NSInvalidArgumentException: -[WKContentView menuHelperFindInPage]: unrecognized selector
 //
 // This class only exists to contain the swizzledMenuHelperFindInPage. This class is actually never
@@ -1032,8 +1077,8 @@ extension Tab {
 
 // MARK: - Brave SKU
 extension Tab {
-  func injectSessionStorageItem(key: String, value: String) {
-    self.webView?.evaluateSafeJavaScript(functionName: "sessionStorage.setItem",
+  func injectLocalStorageItem(key: String, value: String) {
+    self.webView?.evaluateSafeJavaScript(functionName: "localStorage.setItem",
                                          args: [key, value],
                                          contentWorld: BraveSkusScriptHandler.scriptSandbox)
   }
@@ -1085,8 +1130,6 @@ extension Tab {
   private func updateInjectedScripts() {
     UserScriptManager.shared.loadCustomScripts(into: self,
                                                userScripts: userScripts,
-                                               customScripts: customUserScripts,
-                                               walletEthProviderScript: walletEthProviderScript,
-                                               walletSolProviderScripts: walletSolProviderScripts)
+                                               customScripts: customUserScripts)
   }
 }

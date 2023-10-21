@@ -6,20 +6,14 @@
 import Foundation
 
 /// An endless sequence iterator for the given resource
-struct ResourceDownloaderStream: Sendable, AsyncSequence, AsyncIteratorProtocol {
-  /// An object representing the download
-  struct DownloadResult: Equatable {
-    let date: Date
-    let fileURL: URL
-  }
-  
-  typealias Element = Result<DownloadResult, Error>
-  private let resource: ResourceDownloader.Resource
-  private let resourceDownloader: ResourceDownloader
+struct ResourceDownloaderStream<Resource: DownloadResourceInterface>: Sendable, AsyncSequence, AsyncIteratorProtocol {
+  typealias Element = Result<ResourceDownloader<Resource>.DownloadResult, Error>
+  private let resource: Resource
+  private let resourceDownloader: ResourceDownloader<Resource>
   private let fetchInterval: TimeInterval
   private var firstLoad = true
   
-  init(resource: ResourceDownloader.Resource, resourceDownloader: ResourceDownloader, fetchInterval: TimeInterval) {
+  init(resource: Resource, resourceDownloader: ResourceDownloader<Resource>, fetchInterval: TimeInterval) {
     self.resource = resource
     self.resourceDownloader = resourceDownloader
     self.fetchInterval = fetchInterval
@@ -35,13 +29,12 @@ struct ResourceDownloaderStream: Sendable, AsyncSequence, AsyncIteratorProtocol 
       do {
         self.firstLoad = false
         let result = try await resourceDownloader.download(resource: resource)
-        
-        switch result {
-        case .downloaded(let url, let date), .notModified(let url, let date):
-          return .success(DownloadResult(date: date, fileURL: url))
-        }
-      } catch {
+        return .success(result)
+      } catch let error as URLError {
+        // Soft fail these errors
         return .failure(error)
+      } catch {
+        throw error
       }
     }
     
@@ -51,15 +44,13 @@ struct ResourceDownloaderStream: Sendable, AsyncSequence, AsyncIteratorProtocol 
       
       do {
         let result = try await resourceDownloader.download(resource: resource)
-        
-        switch result {
-        case .downloaded(let url, let date):
-          return .success(DownloadResult(date: date, fileURL: url))
-        case .notModified:
-          continue
-        }
-      } catch {
+        guard result.isModified else { continue }
+        return .success(result)
+      } catch let error as URLError {
+        // Soft fail these errors
         return .failure(error)
+      } catch {
+        throw error
       }
     }
   }

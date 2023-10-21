@@ -13,6 +13,7 @@ import BraveCore
 import BraveUI
 import BraveWallet
 import os.log
+import Preferences
 
 extension BrowserViewController: TabManagerDelegate {
   func tabManager(_ tabManager: TabManager, didSelectedTabChange selected: Tab?, previous: Tab?) {
@@ -41,6 +42,7 @@ extension BrowserViewController: TabManagerDelegate {
         })
       
       updateURLBar()
+      recordScreenTimeUsage(for: tab)
 
       if let url = tab.url, !InternalURL.isValid(url: url) {
         let previousEstimatedProgress = previous?.webView?.estimatedProgress ?? 1.0
@@ -99,6 +101,7 @@ extension BrowserViewController: TabManagerDelegate {
     }
 
     updateToolbarUsingTabManager(tabManager)
+    updateStatusBarOverlayColor()
 
     removeAllBars()
     if let bars = selected?.bars {
@@ -107,7 +110,9 @@ extension BrowserViewController: TabManagerDelegate {
       }
     }
 
-    updateFindInPageVisibility(visible: false, tab: previous)
+    if #unavailable(iOS 16.0) {
+      updateFindInPageVisibility(visible: false, tab: previous)
+    }
     displayPageZoom(visible: false)
     updateTabsBarVisibility()
     selected?.updatePullToRefreshVisibility()
@@ -164,7 +169,7 @@ extension BrowserViewController: TabManagerDelegate {
     topToolbar.leaveOverlayMode(didCancel: true)
     updateTabsBarVisibility()
 
-    if !PrivateBrowsingManager.shared.isPrivateBrowsing {
+    if !privateBrowsingManager.isPrivateBrowsing {
       rewards.reportTabClosed(tabId: Int(tab.rewardsId))
     }
   }
@@ -197,7 +202,7 @@ extension BrowserViewController: TabManagerDelegate {
   }
 
   func tabManagerDidRemoveAllTabs(_ tabManager: TabManager, toast: ButtonToast?) {
-    guard let toast = toast, !PrivateBrowsingManager.shared.isPrivateBrowsing else {
+    guard let toast = toast, !privateBrowsingManager.isPrivateBrowsing else {
       return
     }
     show(toast: toast, afterWaiting: ButtonToastUX.toastDelay)
@@ -213,12 +218,20 @@ extension BrowserViewController: TabManagerDelegate {
     var newTabMenuChildren: [UIAction] = []
     var addTabMenuChildren: [UIAction] = []
 
-    if !PrivateBrowsingManager.shared.isPrivateBrowsing {
+    if !privateBrowsingManager.isPrivateBrowsing {
       let openNewPrivateTab = UIAction(
         title: Strings.Hotkey.newPrivateTabTitle,
         image: UIImage(systemName: "plus.square.fill.on.square.fill"),
         handler: UIAction.deferredActionHandler { [unowned self] _ in
-          self.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: true)
+          if Preferences.Privacy.privateBrowsingLock.value {
+            self.askForLocalAuthentication { [weak self] success, error in
+              if success {
+                self?.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: true)
+              }
+            }
+          } else {
+            self.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: true)
+          }
         })
 
       if (UIDevice.current.userInterfaceIdiom == .pad && tabsBar.view.isHidden == true) || (UIDevice.current.userInterfaceIdiom == .phone && toolbar == nil) {
@@ -229,10 +242,10 @@ extension BrowserViewController: TabManagerDelegate {
     }
 
     let openNewTab = UIAction(
-      title: PrivateBrowsingManager.shared.isPrivateBrowsing ? Strings.Hotkey.newPrivateTabTitle : Strings.Hotkey.newTabTitle,
-      image: PrivateBrowsingManager.shared.isPrivateBrowsing ? UIImage(systemName: "plus.square.fill.on.square.fill") : UIImage(systemName: "plus.square.on.square"),
+      title: privateBrowsingManager.isPrivateBrowsing ? Strings.Hotkey.newPrivateTabTitle : Strings.Hotkey.newTabTitle,
+      image: privateBrowsingManager.isPrivateBrowsing ? UIImage(systemName: "plus.square.fill.on.square.fill") : UIImage(systemName: "plus.square.on.square"),
       handler: UIAction.deferredActionHandler { [unowned self] _ in
-        self.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing)
+        self.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: privateBrowsingManager.isPrivateBrowsing)
       })
 
     if (UIDevice.current.userInterfaceIdiom == .pad && tabsBar.view.isHidden) || (UIDevice.current.userInterfaceIdiom == .phone && toolbar == nil) {
@@ -261,7 +274,7 @@ extension BrowserViewController: TabManagerDelegate {
         image: UIImage(systemName: "book"),
         handler: UIAction.deferredActionHandler { [unowned self] _ in
           let mode = BookmarkEditMode.addFolderUsingTabs(title: Strings.savedTabsFolderTitle, tabList: tabManager.tabsForCurrentMode)
-          let addBookMarkController = AddEditBookmarkTableViewController(bookmarkManager: bookmarkManager, mode: mode)
+          let addBookMarkController = AddEditBookmarkTableViewController(bookmarkManager: bookmarkManager, mode: mode, isPrivateBrowsing: privateBrowsingManager.isPrivateBrowsing)
 
           presentSettingsNavigation(with: addBookMarkController, cancelEnabled: true)
         })
@@ -290,14 +303,15 @@ extension BrowserViewController: TabManagerDelegate {
     
     var recentlyClosedMenuChildren: [UIAction] = []
 
-    if !PrivateBrowsingManager.shared.isPrivateBrowsing {
-      let recentlyClosedTab = UIAction(
+    // Recently Closed Actions are only in normal mode
+    if !privateBrowsingManager.isPrivateBrowsing {
+      let viewRecentlyClosedTabs = UIAction(
         title: Strings.RecentlyClosed.viewRecentlyClosedTab,
-        image: UIImage(braveSystemNamed: "brave.arrow.counterclockwise.rectangle.portrait"),
+        image: UIImage(braveSystemNamed: "leo.browser.mobile-recent-tabs"),
         handler: UIAction.deferredActionHandler { [weak self] _ in
           guard let self = self else { return }
           
-          if PrivateBrowsingManager.shared.isPrivateBrowsing {
+          if privateBrowsingManager.isPrivateBrowsing {
             return
           }
                   
@@ -308,17 +322,37 @@ extension BrowserViewController: TabManagerDelegate {
             // After opening the Recently Closed in a new tab delete it from list
             RecentlyClosed.remove(with: recentlyClosed.url)
           }
-          recentlyClosedTabsView.onDismiss = { [weak self] cleared in
-            // Dismiss on presentation mode does not work on iOS 14
-            if #unavailable(iOS 15) {
-              self?.dismiss(animated: true)
+
+          recentlyClosedTabsView.onClearAllRecentlyClosed = { [weak self] in
+            // After clearing tabs need to remove button actions from the tab bar controls
+            guard let self = self else { return }
+
+            DispatchQueue.main.async {
+              self.updateToolbarUsingTabManager(tabManager)
             }
           }
           
           self.present(UIHostingController(rootView: recentlyClosedTabsView), animated: true)
         })
-      
-      recentlyClosedMenuChildren.append(recentlyClosedTab)
+      // Fetch last item in Recently Closed
+      if let recentlyClosedTab = RecentlyClosed.all().first {
+        recentlyClosedMenuChildren.append(viewRecentlyClosedTabs)
+        let reopenLastClosedTab = UIAction(
+          title: Strings.RecentlyClosed.recentlyClosedReOpenLastActionTitle,
+          image: UIImage(braveSystemNamed: "leo.browser.mobile-tab-ntp"),
+          handler: UIAction.deferredActionHandler { [weak self] _ in
+            guard let self = self else { return }
+            
+            if privateBrowsingManager.isPrivateBrowsing {
+              return
+            }
+            
+            self.tabManager.addAndSelectRecentlyClosed(recentlyClosedTab)
+            RecentlyClosed.remove(with: recentlyClosedTab.url)
+          })
+        
+        recentlyClosedMenuChildren.append(reopenLastClosedTab)
+      }
     }
     
     var closeTabMenuChildren: [UIAction] = []
@@ -351,8 +385,8 @@ extension BrowserViewController: TabManagerDelegate {
           let alert = UIAlertController(title: nil, message: Strings.closeAllTabsPrompt, preferredStyle: .actionSheet)
           let cancelAction = UIAlertAction(title: Strings.CancelString, style: .cancel)
           let closedTabsTitle = String(format: Strings.closeAllTabsTitle, tabManager.tabsForCurrentMode.count)
-          let closeAllAction = UIAlertAction(title: closedTabsTitle, style: .destructive) { _ in
-            if !PrivateBrowsingManager.shared.isPrivateBrowsing {
+          let closeAllAction = UIAlertAction(title: closedTabsTitle, style: .destructive) { [unowned self] _ in
+            if !privateBrowsingManager.isPrivateBrowsing {
               // Add the tab information to recently closed before removing
               tabManager.addAllTabsToRecentlyClosed()
             }

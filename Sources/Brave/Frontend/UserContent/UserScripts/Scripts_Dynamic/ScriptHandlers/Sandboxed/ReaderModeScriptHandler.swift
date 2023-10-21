@@ -119,7 +119,7 @@ struct ReaderModeStyle {
 
   /// Encode the style to a JSON dictionary that can be passed to ReaderMode.js
   func encode() -> String {
-    return JSON(["theme": theme.rawValue, "fontType": fontType.rawValue, "fontSize": fontSize.rawValue]).stringValue() ?? ""
+    return JSON(["theme": theme.rawValue, "fontType": fontType.rawValue, "fontSize": fontSize.rawValue] as [String: Any]).stringValue() ?? ""
   }
 
   /// Encode the style to a dictionary that can be stored in the profile
@@ -164,6 +164,7 @@ struct ReadabilityResult {
   var content = ""
   var title = ""
   var credits = ""
+  var direction = "auto"
 
   init?(object: AnyObject?) {
     if let dict = object as? NSDictionary {
@@ -188,6 +189,9 @@ struct ReadabilityResult {
       if let credits = dict["byline"] as? String {
         self.credits = credits
       }
+      if let direction = dict["dir"] as? String {
+        self.direction = direction
+      }
     } else {
       return nil
     }
@@ -201,6 +205,7 @@ struct ReadabilityResult {
     let content = object["content"].string
     let title = object["title"].string
     let credits = object["credits"].string
+    let direction = object["dir"].string
 
     if domain == nil || url == nil || content == nil || title == nil || credits == nil {
       return nil
@@ -211,11 +216,12 @@ struct ReadabilityResult {
     self.content = content!
     self.title = title!
     self.credits = credits!
+    self.direction = direction ?? "auto"
   }
 
   /// Encode to a dictionary, which can then for example be json encoded
   func encode() -> [String: Any] {
-    return ["domain": domain, "url": url, "content": content, "title": title, "credits": credits]
+    return ["domain": domain, "url": url, "content": content, "title": title, "credits": credits, "dir": direction]
   }
 
   /// Encode to a JSON encoded string

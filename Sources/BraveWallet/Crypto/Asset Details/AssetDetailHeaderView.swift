@@ -8,7 +8,7 @@ import SwiftUI
 import BraveCore
 import DesignSystem
 import Strings
-import BraveShared
+import Preferences
 
 extension BraveWallet.AssetTimePrice: DataPoint {
   var value: CGFloat {
@@ -22,10 +22,11 @@ struct AssetDetailHeaderView: View {
   @ObservedObject var networkStore: NetworkStore
   @Binding var buySendSwapDestination: BuySendSwapDestination?
   @Binding var isShowingBridgeAlert: Bool
+  var onAccountCreationNeeded: (_ savedDestination: BuySendSwapDestination) -> Void
 
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-  @Environment(\.openWalletURLAction) private var openWalletURL
+  @Environment(\.openURL) private var openWalletURL
   @State private var selectedCandle: BraveWallet.AssetTimePrice?
 
   private var deltaText: some View {
@@ -63,7 +64,7 @@ struct AssetDetailHeaderView: View {
   
   @ViewBuilder private var actionButtons: some View {
     buySendSwapButtonsContainer
-    if assetDetailStore.token.isAuroraSupportedToken {
+    if case let .blockchainToken(token) = assetDetailStore.assetDetailType, token.isAuroraSupportedToken {
       auroraBridgeButton
     }
   }
@@ -73,32 +74,49 @@ struct AssetDetailHeaderView: View {
       if assetDetailStore.isBuySupported {
         Button(
           action: {
-            buySendSwapDestination = BuySendSwapDestination(
+            let destination = BuySendSwapDestination(
               kind: .buy,
-              initialToken: assetDetailStore.token
+              initialToken: assetDetailStore.assetDetailToken
             )
+            if assetDetailStore.accounts.isEmpty {
+              onAccountCreationNeeded(destination)
+            } else {
+              buySendSwapDestination = destination
+            }
           }
         ) {
           Text(Strings.Wallet.buy)
         }
       }
-      Button(
-        action: {
-          buySendSwapDestination = BuySendSwapDestination(
-            kind: .send,
-            initialToken: assetDetailStore.token
-          )
-        }
-      ) {
-        Text(Strings.Wallet.send)
-      }
-      if assetDetailStore.isSwapSupported && assetDetailStore.token.isFungibleToken {
+      if assetDetailStore.isSendSupported {
         Button(
           action: {
-            buySendSwapDestination = BuySendSwapDestination(
-              kind: .swap,
-              initialToken: assetDetailStore.token
+            let destination = BuySendSwapDestination(
+              kind: .send,
+              initialToken: assetDetailStore.assetDetailToken
             )
+            if assetDetailStore.accounts.isEmpty {
+              onAccountCreationNeeded(destination)
+            } else {
+              buySendSwapDestination = destination
+            }
+          }
+        ) {
+          Text(Strings.Wallet.send)
+        }
+      }
+      if assetDetailStore.isSwapSupported && assetDetailStore.assetDetailToken.isFungibleToken {
+        Button(
+          action: {
+            let destination = BuySendSwapDestination(
+              kind: .swap,
+              initialToken: assetDetailStore.assetDetailToken
+            )
+            if assetDetailStore.accounts.isEmpty {
+              onAccountCreationNeeded(destination)
+            } else {
+              buySendSwapDestination = destination
+            }
           }
         ) {
           Text(Strings.Wallet.swap)
@@ -115,7 +133,7 @@ struct AssetDetailHeaderView: View {
           isShowingBridgeAlert = true
         } else {
           if let link = WalletConstants.auroraBridgeLink {
-            openWalletURL?(link)
+            openWalletURL(link)
           }
         }
       }
@@ -126,9 +144,9 @@ struct AssetDetailHeaderView: View {
   }
   
   @ViewBuilder private var tokenImageNameAndNetwork: some View {
-    AssetIconView(token: assetDetailStore.token, network: assetDetailStore.network ?? networkStore.selectedChain)
+    AssetIconView(token: assetDetailStore.assetDetailToken, network: assetDetailStore.network ?? networkStore.defaultSelectedChain)
     VStack(alignment: .leading) {
-      Text(assetDetailStore.token.name)
+      Text(assetDetailStore.assetDetailToken.name)
         .fixedSize(horizontal: false, vertical: true)
         .font(.title3.weight(.semibold))
       if let chainName = assetDetailStore.network?.chainName {
@@ -140,8 +158,8 @@ struct AssetDetailHeaderView: View {
   }
 
   var body: some View {
-    VStack(alignment: assetDetailStore.token.isFungibleToken ? .center : .leading, spacing: 0) {
-      if assetDetailStore.token.isFungibleToken {
+    VStack(alignment: assetDetailStore.assetDetailToken.isFungibleToken ? .center : .leading, spacing: 0) {
+      if assetDetailStore.assetDetailToken.isFungibleToken {
         VStack(alignment: .leading) {
           if sizeCategory.isAccessibilityCategory {
             VStack(alignment: .leading) {
@@ -175,8 +193,8 @@ struct AssetDetailHeaderView: View {
           Text(
             String.localizedStringWithFormat(
               Strings.Wallet.assetDetailSubtitle,
-              assetDetailStore.token.name,
-              assetDetailStore.token.symbol)
+              assetDetailStore.assetDetailToken.name,
+              assetDetailStore.assetDetailToken.symbol)
           )
           .font(.footnote)
           .foregroundColor(Color(.secondaryBraveLabel))
@@ -208,8 +226,8 @@ struct AssetDetailHeaderView: View {
           .chartAccessibility(
             title: String.localizedStringWithFormat(
               Strings.Wallet.assetDetailSubtitle,
-              assetDetailStore.token.name,
-              assetDetailStore.token.symbol),
+              assetDetailStore.assetDetailToken.name,
+              assetDetailStore.assetDetailToken.symbol),
             dataPoints: data
           )
           .disabled(data.isEmpty)
@@ -223,20 +241,20 @@ struct AssetDetailHeaderView: View {
         .padding(16)
       } else {
         HStack {
-          AssetIconView(token: assetDetailStore.token, network: networkStore.selectedChain)
-          Text(assetDetailStore.token.nftTokenTitle)
+          AssetIconView(token: assetDetailStore.assetDetailToken, network: networkStore.defaultSelectedChain)
+          Text(assetDetailStore.assetDetailToken.nftTokenTitle)
             .fixedSize(horizontal: false, vertical: true)
             .font(.title3.weight(.semibold))
           Spacer()
         }
         .padding(16)
       }
-      if assetDetailStore.token.isFungibleToken {
+      if assetDetailStore.assetDetailToken.isFungibleToken {
         Divider()
           .padding(.bottom)
       }
       actionButtonsContainer
-        .padding(.horizontal, assetDetailStore.token.isFungibleToken ? 0 : 16)
+        .padding(.horizontal, assetDetailStore.assetDetailToken.isFungibleToken ? 0 : 16)
     }
   }
 }
@@ -249,7 +267,8 @@ struct CurrencyDetailHeaderView_Previews: PreviewProvider {
       keyringStore: .previewStore,
       networkStore: .previewStore,
       buySendSwapDestination: .constant(nil),
-      isShowingBridgeAlert: .constant(false)
+      isShowingBridgeAlert: .constant(false),
+      onAccountCreationNeeded: { _ in }
     )
     .padding(.vertical)
     .previewLayout(.sizeThatFits)

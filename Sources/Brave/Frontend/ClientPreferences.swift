@@ -4,8 +4,8 @@
 
 import Foundation
 import Shared
-import BraveShared
 import UIKit
+import Preferences
 
 enum TabBarVisibility: Int, CaseIterable {
   case never
@@ -14,18 +14,9 @@ enum TabBarVisibility: Int, CaseIterable {
 }
 
 extension Preferences {
-  public enum AutoCloseTabsOption: Int, CaseIterable, RepresentableOptionType {
+  public enum AutoCloseTabsOption: Int, CaseIterable {
     case manually
     case oneDay, oneWeek, oneMonth
-
-    public var displayString: String {
-      switch self {
-      case .manually: return Strings.Settings.autocloseTabsManualOption
-      case .oneDay: return Strings.Settings.autocloseTabsOneDayOption
-      case .oneWeek: return Strings.Settings.autocloseTabsOneWeekOption
-      case .oneMonth: return Strings.Settings.autocloseTabsOneMonthOption
-      }
-    }
 
     /// Return time interval when to remove old tabs, or nil if no tabs should be removed.
     public var timeInterval: TimeInterval? {
@@ -62,11 +53,10 @@ extension Preferences {
     public static let nightModeEnabled = Option<Bool>(key: "general.night-mode-enabled", default: false)
     /// Specifies whether the bookmark button is present on toolbar
     static let showBookmarkToolbarShortcut = Option<Bool>(key: "general.show-bookmark-toolbar-shortcut", default: UIDevice.isIpad)
-    /// Sets Desktop UA for iPad by default (iOS 13+ & iPad only).
-    /// Do not read it directly, prefer to use `UserAgent.shouldUseDesktopMode` instead.
-    static let alwaysRequestDesktopSite = Option<Bool>(key: "general.always-request-desktop-site", default: UIDevice.isIpad)
     /// Controls whether or not media should continue playing in the background
     static let mediaAutoBackgrounding = Option<Bool>(key: "general.media-auto-backgrounding", default: false)
+    /// Controls whether or not youtube videos should play with the highest quality by default
+    static let youtubeHighQuality = Option<String>(key: "general.youtube-high-quality", default: "wifi")
     /// Controls whether or not to show the last visited bookmarks folder
     static let showLastVisitedBookmarksFolder = Option<Bool>(key: "general.bookmarks-show-last-visited-bookmarks-folder", default: true)
 
@@ -83,6 +73,9 @@ extension Preferences {
 
     /// Whether or not the app (in regular browsing mode) will follow universal links
     static let followUniversalLinks = Option<Bool>(key: "general.follow-universal-links", default: true)
+    
+    /// Whether or not the app will always load YouTube in Brave
+    public static let keepYouTubeInBrave = Option<Bool>(key: "general.follow-universal-links.youtube", default: false)
 
     /// Whether or not the pull-to-refresh control is added to web views
     static let enablePullToRefresh = Option<Bool>(key: "general.enable-pull-to-refresh", default: true)
@@ -130,12 +123,18 @@ extension Preferences {
   
   final public class Privacy {
     static let lockWithPasscode = Option<Bool>(key: "privacy.lock-with-passcode", default: false)
+    static let privateBrowsingLock = Option<Bool>(key: "privacy.private-browsing-lock", default: false)
     /// Forces all private tabs
     public static let privateBrowsingOnly = Option<Bool>(key: "privacy.private-only", default: false)
+    /// Whether or not private browsing tabs can be session restored (persistent private browsing)
+    public static let persistentPrivateBrowsing = Option<Bool>(key: "privacy.private-browsing-persistence", default: false)
     /// Blocks all cookies and access to local storage
     static let blockAllCookies = Option<Bool>(key: "privacy.block-all-cookies", default: false)
     /// The toggles states for clear private data screen
     static let clearPrivateDataToggles = Option<[Bool]>(key: "privacy.clear-data-toggles", default: [])
+    /// Enables the Apple's Screen Time feature.
+    public static let screenTimeEnabled = Option<Bool>(key: "privacy.screentime", default: true)
+    
   }
   final public class NewTabPage {
     /// Whether bookmark image are enabled / shown
@@ -187,6 +186,9 @@ extension Preferences {
     /// Tells the app whether we should show Favourites in new tab page view controller
     public static let showNewTabFavourites =
       Option<Bool>(key: "newtabpage.show-newtab-favourites", default: true)
+    
+    /// A Codable json representation of NewTabPageP3AHelperStorage
+    public static let sponsoredImageEventCountJSON = Option<String?>(key: "newtabpage.si-p3a.event-count", default: nil)
   }
 
   final public class Debug {
@@ -198,43 +200,6 @@ extension Preferences {
     static let lastCosmeticFiltersCSSUpdate = Option<Date?>(key: "last-cosmetic-filters-css-update", default: nil)
     /// When cosmetic filters Scriptlets were last time updated on the device.
     static let lastCosmeticFiltersScripletsUpdate = Option<Date?>(key: "last-cosmetic-filters-scriptlets-update", default: nil)
-  }
-
-  final public class Playlist {
-    /// The Option to show video list left or right side
-    static let listViewSide = Option<String>(key: "playlist.listViewSide", default: PlayListSide.left.rawValue)
-    /// The count of how many times  Add to Playlist URL-Bar onboarding has been shown
-    static let addToPlaylistURLBarOnboardingCount = Option<Int>(key: "playlist.addToPlaylistURLBarOnboardingCount", default: 0)
-    /// The last played item url
-    static let lastPlayedItemUrl = Option<String?>(key: "playlist.last.played.item.url", default: nil)
-    /// The last played item time
-    static let lastPlayedItemTime = Option<Double>(key: "playlist.last.played.item.time", default: 0.0)
-    /// Whether to play the video when controller loaded
-    static let firstLoadAutoPlay = Option<Bool>(key: "playlist.firstLoadAutoPlay", default: false)
-    /// The Option to download video yes / no / only wi-fi
-    static let autoDownloadVideo = Option<String>(key: "playlist.autoDownload", default: PlayListDownloadType.on.rawValue)
-    /// The Option to disable playlist MediaSource web-compatibility
-    static let webMediaSourceCompatibility = Option<Bool>(key: "playlist.webMediaSourceCompatibility", default: UIDevice.isIpad)
-    /// The option to start the playback where user left-off
-    static let playbackLeftOff = Option<Bool>(key: "playlist.playbackLeftOff", default: true)
-    /// The option to disable long-press-to-add-to-playlist gesture.
-    static let enableLongPressAddToPlaylist =
-      Option<Bool>(key: "playlist.longPressAddToPlaylist", default: true)
-    /// The option to enable or disable the 3-dot menu badge for playlist
-    static let enablePlaylistMenuBadge =
-      Option<Bool>(key: "playlist.enablePlaylistMenuBadge", default: true)
-    /// The option to enable or disable the URL-Bar button for playlist
-    static let enablePlaylistURLBarButton =
-      Option<Bool>(key: "playlist.enablePlaylistURLBarButton", default: true)
-    /// The option to enable or disable the continue where left-off playback in CarPlay
-    static let enableCarPlayRestartPlayback =
-      Option<Bool>(key: "playlist.enableCarPlayRestartPlayback", default: false)
-    /// The last time all playlist folders were synced
-    static let lastPlaylistFoldersSyncTime =
-      Option<Date?>(key: "playlist.lastPlaylistFoldersSyncTime", default: nil)
-    /// Sync shared folders automatically preference
-    static let syncSharedFoldersAutomatically =
-      Option<Bool>(key: "playlist.syncSharedFoldersAutomatically", default: false)
   }
     
   final public class PrivacyReports {

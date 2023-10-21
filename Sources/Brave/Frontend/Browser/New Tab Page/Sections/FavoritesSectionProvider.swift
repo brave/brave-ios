@@ -5,7 +5,7 @@
 
 import Foundation
 import BraveUI
-import BraveShared
+import Preferences
 import Data
 import CoreData
 import Shared
@@ -21,6 +21,8 @@ class FavoritesSectionProvider: NSObject, NTPObservableSectionProvider {
   var sectionDidChange: (() -> Void)?
   var action: (Favorite, BookmarksAction) -> Void
   var legacyLongPressAction: (UIAlertController) -> Void
+  
+  private let isPrivateBrowsing: Bool
 
   var hasMoreThanOneFavouriteItems: Bool {
     frc.fetchedObjects?.count ?? 0 > 0
@@ -30,10 +32,12 @@ class FavoritesSectionProvider: NSObject, NTPObservableSectionProvider {
 
   init(
     action: @escaping (Favorite, BookmarksAction) -> Void,
-    legacyLongPressAction: @escaping (UIAlertController) -> Void
+    legacyLongPressAction: @escaping (UIAlertController) -> Void,
+    isPrivateBrowsing: Bool
   ) {
     self.action = action
     self.legacyLongPressAction = legacyLongPressAction
+    self.isPrivateBrowsing = isPrivateBrowsing
 
     frc = Favorite.frc()
     super.init()
@@ -52,10 +56,10 @@ class FavoritesSectionProvider: NSObject, NTPObservableSectionProvider {
 
   /// The number of times that each row contains
   static func numberOfItems(in collectionView: UICollectionView, availableWidth: CGFloat) -> Int {
-    /// Two considerations:
-    /// 1. icon size minimum
-    /// 2. trait collection
-    /// 3. orientation ("is landscape")
+    // Two considerations:
+    // 1. icon size minimum
+    // 2. trait collection
+    // 3. orientation ("is landscape")
     let icons = (min: 4, max: 6)
     let defaultWidth: CGFloat = defaultIconSize.width
     let fittingNumber: Int
@@ -110,15 +114,7 @@ class FavoritesSectionProvider: NSObject, NTPObservableSectionProvider {
     cell.imageView.cancelLoading()
 
     if let url = fav.url?.asURL {
-      // All favorites should have domain's, but it was noticed at one
-      // point that this wasn't the case, so for future bug-tracking
-      // assert if its not found.
-      assert(fav.domain != nil, "Domain should exist for all favorites")
-      // The domain for the favorite is required for pulling cached
-      // favicon info. Since all favorites should have persisted
-      // Domain's, we leave `persistent` as true
-      let domain = fav.domain ?? Domain.getOrCreate(forUrl: url, persistent: true)
-      cell.imageView.loadFavicon(siteURL: url, monogramFallbackCharacter: fav.title?.first)
+      cell.imageView.loadFavicon(siteURL: url, isPrivateBrowsing: isPrivateBrowsing)
     }
     cell.accessibilityLabel = cell.textLabel.text
   }
@@ -182,7 +178,7 @@ class FavoritesSectionProvider: NSObject, NTPObservableSectionProvider {
         })
 
       var urlChildren: [UIAction] = [openInNewTab]
-      if !PrivateBrowsingManager.shared.isPrivateBrowsing {
+      if !self.isPrivateBrowsing {
         let openInNewPrivateTab = UIAction(
           title: Strings.openNewPrivateTabButtonTitle,
           handler: UIAction.deferredActionHandler { _ in
@@ -219,6 +215,8 @@ class FavoritesSectionProvider: NSObject, NTPObservableSectionProvider {
 extension FavoritesSectionProvider: NSFetchedResultsControllerDelegate {
   func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
     try? frc.performFetch()
-    sectionDidChange?()
+    DispatchQueue.main.async {
+      self.sectionDidChange?()
+    }
   }
 }

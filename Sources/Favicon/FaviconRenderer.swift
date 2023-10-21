@@ -8,12 +8,12 @@ import UIKit
 import BraveCore
 
 /// A class for rendering a FavIcon onto a `UIImage`
-class FaviconRenderer {
+public class FaviconRenderer {
   @MainActor
-  static func loadIcon(for url: URL, persistent: Bool) async throws -> Favicon {
+  public static func loadIcon(for url: URL, persistent: Bool) async throws -> Favicon {
     // Load the Favicon from Brave-Core
     let attributes: FaviconAttributes = await withCheckedContinuation { continuation in
-      FaviconLoader.getForPrivateMode(!persistent).favicon(forPageURLOrHost: url, sizeInPoints: .desiredSmall, minSizeInPoints: .desiredSmallest) { _, attributes in
+      FaviconLoader.getForPrivateMode(!persistent).favicon(forPageURLOrHost: url, sizeInPoints: .desiredLargest, minSizeInPoints: .desiredMedium /*32x32*/) { _, attributes in
 
         // If the completion block was called with the `default` image, do nothing
         if attributes.usesDefaultImage {

@@ -6,7 +6,7 @@
 import Foundation
 import UIKit
 import BraveUI
-import BraveShared
+import BraveStrings
 
 class PlaylistMenuHeader: UITableViewHeaderFooterView {
   enum State {
@@ -15,7 +15,7 @@ class PlaylistMenuHeader: UITableViewHeaderFooterView {
   }
   
   let titleLabel = UILabel().then {
-    $0.font = .preferredFont(forTextStyle: .title3, weight: .medium)
+    $0.font = .preferredFont(for: .title3, weight: .medium)
     $0.textColor = .bravePrimary
     $0.numberOfLines = 0
     $0.lineBreakMode = .byWordWrapping
@@ -122,14 +122,13 @@ class PlaylistMenuHeader: UITableViewHeaderFooterView {
     switch state {
     case .add:
       menuButton.setTitle(Strings.PlaylistFolderSharing.addButtonTitle, for: .normal)
-      menuButton.setImage(UIImage(systemName: "plus"), for: .normal)
       menuButton.backgroundColor = .braveBlurpleTint
       menuButton.accessibilityLabel = Strings.PlaylistFolderSharing.addButtonAccessibilityTitle
       menuButton.contentEdgeInsets = UIEdgeInsets(top: 6.0, left: 20.0, bottom: 6.0, right: 20.0)
       menuButton.sizeToFit()
     case .menu:
       menuButton.setTitle(nil, for: .normal)
-      menuButton.setImage(UIImage(systemName: "ellipsis"), for: .normal)
+      menuButton.setImage(UIImage(braveSystemNamed: "leo.more.horizontal"), for: .normal)
       menuButton.backgroundColor = .clear
       menuButton.accessibilityLabel = Strings.PlaylistFolderSharing.menuButtonAccessibilityTitle
       menuButton.contentEdgeInsets = UIEdgeInsets(top: 6.0, left: 20.0, bottom: 6.0, right: 0.0)

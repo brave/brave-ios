@@ -5,7 +5,7 @@
 import SwiftUI
 import BraveUI
 import Shared
-import BraveShared
+import Preferences
 import Data
 
 struct PrivacyReportsView: View {
@@ -13,6 +13,7 @@ struct PrivacyReportsView: View {
   
   let lastVPNAlerts: [BraveVPNAlert]?
   
+  private(set) var isPrivateBrowsing: Bool
   var onDismiss: (() -> Void)?
   var openPrivacyReportsUrl: (() -> Void)?
   
@@ -33,21 +34,15 @@ struct PrivacyReportsView: View {
   }
   
   private func dismissView() {
-    // Dismiss on presentation mode does not work on iOS 14
-    // when using the UIHostingController is parent view.
-    // As a workaround a completion handler is used instead.
-    if #available(iOS 15, *) {
-      presentationMode.dismiss()
-    } else {
-      onDismiss?()
-    }
+    presentationMode.dismiss()
+    onDismiss?()
   }
   
   private var clearAllDataButton: some View {
     Button(action: {
       showClearDataPrompt = true
     }, label: {
-      Image(uiImage: .init(braveSystemNamed: "brave.trash")!.template)
+      Image(uiImage: .init(braveSystemNamed: "leo.trash")!.template)
     })
       .accessibility(label: Text(Strings.PrivacyHub.clearAllDataAccessibility))
       .foregroundColor(Color(.braveBlurpleTint))
@@ -72,18 +67,6 @@ struct PrivacyReportsView: View {
       .foregroundColor(Color(.braveBlurpleTint))
   }
   
-  private var noDataCalloutView: some View {
-    HStack {
-      Image(systemName: "info.circle.fill")
-      Text(Strings.PrivacyHub.noDataCalloutBody)
-    }
-    .foregroundColor(Color.white)
-    .frame(maxWidth: .infinity)
-    .padding()
-    .background(Color(.braveInfoLabel))
-    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-  }
-  
   var body: some View {
     NavigationView {
       ScrollView(.vertical) {
@@ -103,7 +86,7 @@ struct PrivacyReportsView: View {
             Divider()
           }
           
-          PrivacyHubAllTimeSection(onDismiss: dismissView)
+          PrivacyHubAllTimeSection(isPrivateBrowsing: isPrivateBrowsing, onDismiss: dismissView)
           
           VStack {
             Text(Strings.PrivacyHub.privacyReportsDisclaimer)
@@ -125,24 +108,13 @@ struct PrivacyReportsView: View {
         .padding()
         .navigationTitle(Strings.PrivacyHub.privacyReportsTitle)
         .navigationBarTitleDisplayMode(.inline)
-        .osAvailabilityModifiers { content in
-          if #available(iOS 15.0, *) {
-            content
-              .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                  doneButton
-                }
-
-                ToolbarItem(placement: .cancellationAction) {
-                  clearAllDataButton
-                }
-              }
-          } else {
-            // Bug: On iOS 14 Action Sheets do not work when placed in `.toolbar/ToolbarItem`.
-            // .navigationBarItems is used as a workaround.
-            // This view modifier is deprecated in iOS 15.4+
-            content
-              .navigationBarItems(leading: clearAllDataButton, trailing: doneButton)
+        .toolbar {
+          ToolbarItem(placement: .confirmationAction) {
+            doneButton
+          }
+          
+          ToolbarItem(placement: .cancellationAction) {
+            clearAllDataButton
           }
         }
       }
@@ -159,9 +131,9 @@ struct PrivacyReports_Previews: PreviewProvider {
   static var previews: some View {
     
     Group {
-      PrivacyReportsView(lastVPNAlerts: nil)
+      PrivacyReportsView(lastVPNAlerts: nil, isPrivateBrowsing: false)
       
-      PrivacyReportsView(lastVPNAlerts: nil)
+      PrivacyReportsView(lastVPNAlerts: nil, isPrivateBrowsing: false)
         .preferredColorScheme(.dark)
     }
   }

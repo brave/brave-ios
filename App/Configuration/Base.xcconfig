@@ -9,6 +9,7 @@
 
 #include "Local/BuildId.xcconfig"
 #include "Local/Version.xcconfig"
+#include "Local/Keys.xcconfig"
 
 OTHER_SWIFT_FLAGS_BASE=-DMOZ_TARGET_$(TARGET_NAME:upper)
 

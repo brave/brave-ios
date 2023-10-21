@@ -9,7 +9,6 @@
 // increased startup times which may lead to termination by the OS.
 import Shared
 import Storage
-import SwiftKeychainWrapper
 import Foundation
 import os.log
 
@@ -60,7 +59,6 @@ public protocol Profile: AnyObject {
   var prefs: Prefs { get }
   var searchEngines: SearchEngines { get }
   var files: FileAccessor { get }
-  var logins: BrowserLogins { get }
   var certStore: CertStore { get }
 
   var isShutdown: Bool { get }
@@ -90,26 +88,9 @@ extension Profile {
 open class BrowserProfile: Profile {
 
   fileprivate let name: String
-  fileprivate let keychain: KeychainWrapper
   public var isShutdown = false
 
   public  let files: FileAccessor
-
-  let loginsDB: BrowserDB
-
-  private static var loginsKey: String? {
-    let key = "sqlcipher.key.logins.db"
-    let keychain = KeychainWrapper.sharedAppContainerKeychain
-    keychain.ensureStringItemAccessibility(.afterFirstUnlock, forKey: key)
-    if keychain.hasValue(forKey: key) {
-      return keychain.string(forKey: key)
-    }
-
-    let Length: UInt = 256
-    let secret = Bytes.generateRandomBytes(Length).base64EncodedString
-    keychain.set(secret, forKey: key, withAccessibility: .afterFirstUnlock)
-    return secret
-  }
 
   /**
      * N.B., BrowserProfile is used from our extensions, often via a pattern like
@@ -128,7 +109,6 @@ open class BrowserProfile: Profile {
     Logger.module.debug("Initing profile \(localName) on thread \(Thread.current).")
     self.name = localName
     self.files = ProfileFileAccessor(localName: localName)
-    self.keychain = KeychainWrapper.sharedAppContainerKeychain
 
     if clear {
       do {
@@ -145,9 +125,6 @@ open class BrowserProfile: Profile {
     // since the DB handles will create new DBs under the new profile folder.
     let isNewProfile = !files.exists("")
 
-    // Set up our database handles.
-    self.loginsDB = BrowserDB(filename: "logins.db", secretKey: BrowserProfile.loginsKey, schema: LoginsSchema(), files: files)
-
     if isNewProfile {
       Logger.module.info("New profile. Removing old account metadata.")
       prefs.clearAll()
@@ -157,15 +134,11 @@ open class BrowserProfile: Profile {
   public func reopen() {
     Logger.module.debug("Reopening profile.")
     isShutdown = false
-
-    loginsDB.reopenIfClosed()
   }
 
   public func shutdown() {
     Logger.module.debug("Shutting down profile.")
     isShutdown = true
-
-    loginsDB.forceClose()
   }
 
   deinit {
@@ -190,9 +163,5 @@ open class BrowserProfile: Profile {
 
   public lazy var certStore: CertStore = {
     return CertStore()
-  }()
-
-  public lazy var logins: BrowserLogins = {
-    return SQLiteLogins(db: self.loginsDB)
   }()
 }

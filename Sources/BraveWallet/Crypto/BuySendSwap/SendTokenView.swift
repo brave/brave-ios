@@ -7,6 +7,8 @@ import SwiftUI
 import Strings
 import DesignSystem
 import BigNumber
+import BraveUI
+import BraveCore
 
 struct SendTokenView: View {
   @ObservedObject var keyringStore: KeyringStore
@@ -15,10 +17,14 @@ struct SendTokenView: View {
 
   @State private var isShowingScanner = false
   @State private var isShowingError = false
+  @State private var didAutoShowSelectAccountToken = false
+  @State private var isShowingSelectAccountTokenView: Bool = false
 
   @ScaledMetric private var length: CGFloat = 16.0
   
   @Environment(\.appRatingRequestAction) private var appRatingRequest
+  @Environment(\.openURL) private var openURL
+  @Environment(\.presentationMode) @Binding private var presentationMode
   
   var completion: ((_ success: Bool) -> Void)?
   var onDismiss: () -> Void
@@ -29,9 +35,14 @@ struct SendTokenView: View {
           !sendTokenStore.isMakingTx,
           !sendTokenStore.sendAddress.isEmpty,
           !sendTokenStore.isResolvingAddress,
-          sendTokenStore.addressError == nil,
+          sendTokenStore.addressError?.shouldBlockSend != true,
           sendTokenStore.sendError == nil else {
       return true
+    }
+    if sendTokenStore.isOffchainResolveRequired {
+      // if offchain resolve is required, the send button will show 'Use ENS Domain'
+      // and will enable ens offchain, instead of attempting to create send tx.
+      return false
     }
     if token.isErc721 || token.isNft {
       return balance < 1
@@ -49,6 +60,8 @@ struct SendTokenView: View {
   private var sendButtonTitle: String {
     if let error = sendTokenStore.sendError {
       return error.localizedDescription
+    } else if sendTokenStore.isOffchainResolveRequired {
+      return Strings.Wallet.ensOffchainGatewayButton
     } else {
       return Strings.Wallet.sendCryptoSendButtonTitle
     }
@@ -57,46 +70,57 @@ struct SendTokenView: View {
   var body: some View {
     NavigationView {
       Form {
-        Section {
-          AccountPicker(
-            keyringStore: keyringStore,
-            networkStore: networkStore
-          )
-          .listRowBackground(Color(UIColor.braveGroupedBackground))
-          .resetListHeaderStyle()
-        }
         Section(
-          header: WalletListHeaderView(title: Text(Strings.Wallet.sendCryptoFromTitle))
-        ) {
-          NavigationLink(
-            destination:
-              SendTokenSearchView(
-                sendTokenStore: sendTokenStore,
-                network: networkStore.selectedChain
+          header: WalletListHeaderView {
+            HStack {
+              Text("\(Strings.Wallet.sendCryptoFromTitle): \(keyringStore.selectedAccount.name) (\(keyringStore.selectedAccount.address.truncatedAddress))")
+              Spacer()
+              Menu(
+                content: {
+                  Text(keyringStore.selectedAccount.address.zwspOutput)
+                  Button(action: {
+                    UIPasteboard.general.string = keyringStore.selectedAccount.address
+                  }) {
+                    Label(Strings.Wallet.copyAddressButtonTitle, braveSystemImage: "leo.copy.plain-text")
+                  }
+                },
+                label: {
+                  Image(braveSystemName: "leo.more.horizontal")
+                    .padding(6)
+                    .clipShape(Rectangle())
+                }
               )
-          ) {
+            }
+          }
+        ) {
+          Button(action: { self.isShowingSelectAccountTokenView = true }) {
             HStack {
               if let token = sendTokenStore.selectedSendToken {
                 if token.isErc721 || token.isNft {
                   NFTIconView(
                     token: token,
-                    network: networkStore.selectedChain,
+                    network: networkStore.defaultSelectedChain,
                     url: sendTokenStore.selectedSendNFTMetadata?.imageURL,
                     length: 26
                   )
                 } else {
                   AssetIconView(
                     token: token,
-                    network: networkStore.selectedChain,
+                    network: networkStore.defaultSelectedChain,
                     length: 26
                   )
                 }
               }
-              Text(sendTokenStore.selectedSendToken?.symbol ?? "")
-                .font(.title3.weight(.semibold))
-                .foregroundColor(Color(.braveLabel))
+              VStack(alignment: .leading) {
+                Text(sendTokenStore.selectedSendToken?.symbol ?? "")
+                  .font(.title3.weight(.semibold))
+                  .foregroundColor(Color(.braveLabel))
+                Text(networkStore.defaultSelectedChain.chainName)
+                  .font(.caption)
+                  .foregroundColor(Color(.secondaryBraveLabel))
+              }
               Spacer()
-              Text(sendTokenStore.selectedSendTokenBalance?.decimalDescription ?? "0.0000")
+              Text("\(sendTokenStore.selectedSendTokenBalance?.decimalDescription.trimmingTrailingZeros ?? "0") \(sendTokenStore.selectedSendToken?.symbol ?? "")")
                 .font(.title3.weight(.semibold))
                 .foregroundColor(Color(.braveLabel))
             }
@@ -132,51 +156,22 @@ struct SendTokenView: View {
         }
         Section(
           header: WalletListHeaderView(title: Text(Strings.Wallet.sendCryptoToTitle)),
-          footer: Group {
-            if let error = sendTokenStore.addressError {
-              HStack(alignment: .firstTextBaseline, spacing: 4) {
-                Image(systemName: "exclamationmark.circle.fill")
-                Text(error.localizedDescription)
-                  .fixedSize(horizontal: false, vertical: true)
-                  .animation(nil, value: error.localizedDescription)
-              }
-              .transition(
-                .asymmetric(
-                  insertion: .opacity.animation(.default),
-                  removal: .identity
-                )
-              )
-              .font(.footnote)
-              .foregroundColor(Color(.braveErrorLabel))
-              .padding(.bottom)
-            } else {
-              // SwiftUI will add/remove this Section footer when addressError
-              // optionality is changed. This can cause keyboard to dismiss.
-              // By using clear square, the footer remains and section is not
-              // redrawn, so the keyboard does not dismiss as user types.
-              Color.clear.frame(width: 1, height: 1)
-                .accessibility(hidden: true)
-                .transition(.identity)
-            }
-          }
+          footer:
+            SectionFooterErrorView(
+              errorMessage: sendTokenStore.addressError?.localizedDescription
+            )
         ) {
           VStack {
             HStack(spacing: 14.0) {
               TextField(Strings.Wallet.sendToCryptoAddressPlaceholder, text: $sendTokenStore.sendAddress)
                 .autocorrectionDisabled()
-                .osAvailabilityModifiers {
-                  if #available(iOS 15, *) {
-                    $0.textInputAutocapitalization(.never)
-                  } else {
-                    $0.autocapitalization(.none)
-                  }
-                }
+                .textInputAutocapitalization(.never)
               Button(action: {
                 if let string = UIPasteboard.general.string {
                   sendTokenStore.sendAddress = string
                 }
               }) {
-                Label(Strings.Wallet.pasteFromPasteboard, braveSystemImage: "brave.clipboard")
+                Label(Strings.Wallet.pasteFromPasteboard, braveSystemImage: "leo.copy.plain-text")
                   .labelStyle(.iconOnly)
                   .foregroundColor(Color(.primaryButtonTint))
                   .font(.body)
@@ -185,7 +180,7 @@ struct SendTokenView: View {
               Button(action: {
                 isShowingScanner = true
               }) {
-                Label(Strings.Wallet.scanQRCodeAccessibilityLabel, braveSystemImage: "brave.qr-code")
+                Label(Strings.Wallet.scanQRCodeAccessibilityLabel, braveSystemImage: "leo.qr.code")
                   .labelStyle(.iconOnly)
                   .foregroundColor(Color(.primaryButtonTint))
                   .font(.body)
@@ -195,6 +190,29 @@ struct SendTokenView: View {
             Group {
               if sendTokenStore.isResolvingAddress {
                 ProgressView()
+              }
+              if sendTokenStore.isOffchainResolveRequired {
+                VStack(alignment: .leading, spacing: 8) {
+                  Divider()
+                  Text(Strings.Wallet.ensOffchainGatewayTitle)
+                    .font(.body)
+                    .fontWeight(.bold)
+                    .foregroundColor(Color(.braveLabel))
+                    .fixedSize(horizontal: false, vertical: true)
+                  Text(Strings.Wallet.ensOffchainGatewayDesc)
+                    .font(.body)
+                    .foregroundColor(Color(.secondaryBraveLabel))
+                    .fixedSize(horizontal: false, vertical: true)
+                  Button(action: {
+                    openURL(WalletConstants.braveWalletENSOffchainURL)
+                  }) {
+                    Text(Strings.Wallet.learnMoreButton)
+                      .foregroundColor(Color(.braveBlurpleTint))
+                  }
+                }
+                .font(.subheadline)
+                .padding(.top, 8) // padding between sendAddress & divider
+                .frame(maxWidth: .infinity)
               }
               if let resolvedAddress = sendTokenStore.resolvedAddress {
                 AddressView(address: resolvedAddress) {
@@ -213,14 +231,18 @@ struct SendTokenView: View {
             WalletLoadingButton(
               isLoading: sendTokenStore.isLoading || sendTokenStore.isMakingTx,
               action: {
-                sendTokenStore.sendToken(
-                  amount: sendTokenStore.sendAmount
-                ) { success, _ in
-                  isShowingError = !success
-                  if success {
-                    appRatingRequest?()
+                if sendTokenStore.isOffchainResolveRequired {
+                  sendTokenStore.enableENSOffchainLookup()
+                } else {
+                  sendTokenStore.sendToken(
+                    amount: sendTokenStore.sendAmount
+                  ) { success, _ in
+                    isShowingError = !success
+                    if success {
+                      appRatingRequest?()
+                    }
+                    completion?(success)
                   }
-                  completion?(success)
                 }
               },
               label: {
@@ -251,6 +273,16 @@ struct SendTokenView: View {
           address: $sendTokenStore.sendAddress
         )
       }
+      .sheet(isPresented: $isShowingSelectAccountTokenView) {
+        NavigationView {
+          SelectAccountTokenView(
+            store: sendTokenStore.selectTokenStore,
+            networkStore: networkStore
+          )
+          .navigationTitle(Strings.Wallet.selectTokenToSendTitle)
+          .navigationBarTitleDisplayMode(.inline)
+        }
+      }
       .navigationTitle(Strings.Wallet.send)
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
@@ -262,8 +294,13 @@ struct SendTokenView: View {
         }
       }
     }
-    .onAppear {
+    .task {
+      if !didAutoShowSelectAccountToken {
+        isShowingSelectAccountTokenView = true
+        didAutoShowSelectAccountToken = true
+      }
       sendTokenStore.update()
+      await sendTokenStore.selectTokenStore.update()
     }
     .navigationViewStyle(.stack)
   }

@@ -25,12 +25,15 @@ struct NetworkSelectionView: View {
     self.store = networkSelectionStore
   }
   
-  private var selectedNetwork: NetworkPresentation.Network {
+  private var selectedNetwork: BraveWallet.NetworkInfo {
     switch store.mode {
-    case .select:
-      return .network(networkStore.selectedChain)
+    case let .select(isForOrigin):
+      if isForOrigin {
+        return networkStore.selectedChainForOrigin
+      }
+      return networkStore.defaultSelectedChain
     case .formSelection:
-      return .network(store.networkSelectionInForm ?? .init())
+      return store.networkSelectionInForm ?? .init()
     }
   }
   
@@ -44,56 +47,37 @@ struct NetworkSelectionView: View {
   var body: some View {
     NetworkSelectionRootView(
       navigationTitle: navigationTitle,
-      selectedNetwork: selectedNetwork,
-      primaryNetworks: store.primaryNetworks,
-      secondaryNetworks: store.secondaryNetworks,
+      selectedNetworks: [selectedNetwork],
+      allNetworks: networkStore.allChains,
       selectNetwork: { network in
         selectNetwork(network)
       }
     )
-    .onAppear {
-      store.update()
-    }
-    .background(
-      Color.clear
-        .alert(
-          isPresented: $store.isPresentingNextNetworkAlert
-        ) {
-          Alert(
-            title: Text(String.localizedStringWithFormat(Strings.Wallet.createAccountAlertTitle, store.nextNetwork?.shortChainName ?? "")),
-            message: Text(Strings.Wallet.createAccountAlertMessage),
-            primaryButton: .default(Text(Strings.yes), action: {
-              store.handleCreateAccountAlertResponse(shouldCreateAccount: true)
-            }),
-            secondaryButton: .cancel(Text(Strings.no), action: {
-              store.handleCreateAccountAlertResponse(shouldCreateAccount: false)
-            })
-          )
-        }
-    )
-    .background(
-      Color.clear
-        .sheet(
-          isPresented: $store.isPresentingAddAccount
-        ) {
-          NavigationView {
-            AddAccountView(keyringStore: keyringStore, preSelectedCoin: store.nextNetwork?.coin)
-          }
-          .navigationViewStyle(.stack)
-          .onDisappear {
-            Task { @MainActor in
-              if await store.handleDismissAddAccount() {
-                presentationMode.dismiss()
-              }
-            }
+    .addAccount(
+      keyringStore: keyringStore,
+      networkStore: networkStore,
+      accountNetwork: store.nextNetwork,
+      isShowingConfirmation: $store.isPresentingNextNetworkAlert,
+      isShowingAddAccount: $store.isPresentingAddAccount,
+      onConfirmAddAccount: {
+        store.handleCreateAccountAlertResponse(shouldCreateAccount: true)
+      },
+      onCancelAddAccount: {
+        store.handleCreateAccountAlertResponse(shouldCreateAccount: false)
+      },
+      onAddAccountDismissed: {
+        Task { @MainActor in
+          if await store.handleDismissAddAccount() {
+            presentationMode.dismiss()
           }
         }
+      }
     )
   }
   
-  private func selectNetwork(_ presentation: NetworkPresentation.Network) {
+  private func selectNetwork(_ network: BraveWallet.NetworkInfo) {
     Task { @MainActor in
-      if await store.selectNetwork(presentation) {
+      if await store.selectNetwork(network) {
         presentationMode.dismiss()
       }
     }

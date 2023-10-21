@@ -47,6 +47,10 @@ class RecentSearchQRCodeScannerController: UIViewController {
 
     scannerView.cameraView.scanCallback = { [weak self] string in
       guard let self = self, !string.isEmpty, !self.didScan else { return }
+      // Feedback indicating code scan is finalized
+      AudioServicesPlayAlertSound(SystemSoundID(kSystemSoundID_Vibrate))
+      UIImpactFeedbackGenerator(style: .medium).bzzt()
+      
       self.didScan = true
       self.onDidScan(string)
       self.dismiss(animated: true, completion: nil)
@@ -63,6 +67,19 @@ class RecentSearchQRCodeScannerController: UIViewController {
     super.viewWillAppear(animated)
 
     scannerView.cameraView.startRunning()
+  }
+  
+  override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+    scannerView.cameraView.stopRunning()
+    
+    coordinator.animate(alongsideTransition: nil) { [weak self] _ in
+      guard let self else { return }
+      
+      if let orientation = self.view.window?.windowScene?.interfaceOrientation {
+          self.scannerView.cameraView.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation(ui: orientation)
+      }
+      self.scannerView.cameraView.startRunning()
+    }
   }
 
   // MARK: - Actions

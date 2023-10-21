@@ -10,6 +10,7 @@ import Strings
 
 struct AssetSearchView: View {
   var keyringStore: KeyringStore
+  @ObservedObject var networkStore: NetworkStore
   var cryptoStore: CryptoStore
   var userAssetsStore: UserAssetsStore
   
@@ -18,23 +19,38 @@ struct AssetSearchView: View {
   @State private var allAssets: [AssetViewModel] = []
   @State private var allNFTMetadata: [String: NFTMetadata] = [:]
   @State private var query = ""
-  @State private var networkFilter: NetworkFilter = .allNetworks
+  @State private var networkFilters: [Selectable<BraveWallet.NetworkInfo>] = []
   @State private var isPresentingNetworkFilter = false
+  @State private var selectedToken: BraveWallet.BlockchainToken?
+  
+  public init(
+    keyringStore: KeyringStore,
+    cryptoStore: CryptoStore,
+    userAssetsStore: UserAssetsStore
+  ) {
+    self.keyringStore = keyringStore
+    self.networkStore = cryptoStore.networkStore
+    self.cryptoStore = cryptoStore
+    self.userAssetsStore = userAssetsStore
+  }
 
   private var filteredTokens: [AssetViewModel] {
-    let allAssets: [AssetViewModel]
-    switch networkFilter {
-    case .allNetworks:
-      allAssets = self.allAssets
-    case .network(let network):
-      allAssets = self.allAssets.filter { $0.network.chainId == network.chainId }
-    }
-    let normalizedQuery = query.lowercased()
-    if normalizedQuery.isEmpty {
+    let filterByNetwork = !networkFilters.allSatisfy(\.isSelected)
+    let filterByQuery = !query.isEmpty
+    if !filterByNetwork && !filterByQuery {
       return allAssets
     }
-    return allAssets.filter {
-      $0.token.symbol.lowercased().contains(normalizedQuery) || $0.token.name.lowercased().contains(normalizedQuery)
+    let selectedNetworks = networkFilters.filter(\.isSelected)
+    let normalizedQuery = query.lowercased()
+    return allAssets.filter { asset in
+      if filterByNetwork,
+         !selectedNetworks.contains(where: { asset.network.chainId == $0.model.chainId }) {
+        return false
+      }
+      if filterByQuery {
+        return asset.token.symbol.lowercased().contains(normalizedQuery) || asset.token.name.lowercased().contains(normalizedQuery)
+      }
+      return true
     }
   }
   
@@ -42,20 +58,22 @@ struct AssetSearchView: View {
     Button(action: {
       self.isPresentingNetworkFilter = true
     }) {
-      HStack {
-        Image(braveSystemName: "brave.text.alignleft")
-        Text(networkFilter.title)
-      }
-      .font(.footnote.weight(.medium))
-      .foregroundColor(Color(.braveBlurpleTint))
+      Image(braveSystemName: "leo.tune")
+        .font(.footnote.weight(.medium))
+        .foregroundColor(Color(.braveBlurpleTint))
+        .clipShape(Rectangle())
     }
     .sheet(isPresented: $isPresentingNetworkFilter) {
       NavigationView {
         NetworkFilterView(
-          networkFilter: $networkFilter,
-          networkStore: cryptoStore.networkStore
+          networks: networkFilters,
+          networkStore: cryptoStore.networkStore,
+          saveAction: { networkFilters in
+            self.networkFilters = networkFilters
+          }
         )
       }
+      .navigationViewStyle(.stack)
       .onDisappear {
         cryptoStore.networkStore.closeNetworkSelectionStore()
       }
@@ -69,14 +87,6 @@ struct AssetSearchView: View {
           header: WalletListHeaderView(
             title: Text(Strings.Wallet.assetsTitle)
           )
-          .osAvailabilityModifiers { content in
-            if #available(iOS 15.0, *) {
-              content  // Padding already applied
-            } else {
-              content
-                .padding(.top)
-            }
-          }
         ) {
           Group {
             if filteredTokens.isEmpty {
@@ -87,31 +97,7 @@ struct AssetSearchView: View {
                 .frame(maxWidth: .infinity)
             } else {
               ForEach(filteredTokens) { assetViewModel in
-                
-                NavigationLink(
-                  destination: {
-                    if assetViewModel.token.isErc721 {
-                      NFTDetailView(
-                        nftDetailStore: cryptoStore.nftDetailStore(for: assetViewModel.token, nftMetadata: allNFTMetadata[assetViewModel.token.id]),
-                        buySendSwapDestination: .constant(nil)
-                      ) { metadata in
-                        allNFTMetadata[assetViewModel.token.id] = metadata
-                      }
-                      .onDisappear {
-                        cryptoStore.closeNFTDetailStore(for: assetViewModel.token)
-                      }
-                    } else {
-                      AssetDetailView(
-                        assetDetailStore: cryptoStore.assetDetailStore(for: assetViewModel.token),
-                        keyringStore: keyringStore,
-                        networkStore: cryptoStore.networkStore
-                      )
-                      .onDisappear {
-                        cryptoStore.closeAssetDetailStore(for: assetViewModel.token)
-                      }
-                    }
-                  }
-                ) {
+                Button(action: { selectedToken = assetViewModel.token }) {
                   SearchAssetView(
                     title: title(for: assetViewModel.token),
                     symbol: assetViewModel.token.symbol,
@@ -122,13 +108,13 @@ struct AssetSearchView: View {
                         token: assetViewModel.token,
                         network: assetViewModel.network,
                         url: allNFTMetadata[assetViewModel.token.id]?.imageURL,
-                        shouldShowNativeTokenIcon: true
+                        shouldShowNetworkIcon: true
                       )
                     } else {
                       AssetIconView(
                         token: assetViewModel.token,
                         network: assetViewModel.network,
-                        shouldShowNativeTokenIcon: true
+                        shouldShowNetworkIcon: true
                       )
                     }
                   }
@@ -141,6 +127,40 @@ struct AssetSearchView: View {
       }
       .listStyle(.insetGrouped)
       .listBackgroundColor(Color(UIColor.braveGroupedBackground))
+      .background(
+        NavigationLink(
+          isActive: Binding(
+            get: { selectedToken != nil },
+            set: { if !$0 { selectedToken = nil } }
+          ),
+          destination: {
+            if let selectedToken {
+              if selectedToken.isErc721 {
+                NFTDetailView(
+                  nftDetailStore: cryptoStore.nftDetailStore(for: selectedToken, nftMetadata: allNFTMetadata[selectedToken.id]),
+                  buySendSwapDestination: .constant(nil)
+                ) { metadata in
+                  allNFTMetadata[selectedToken.id] = metadata
+                }
+                .onDisappear {
+                  cryptoStore.closeNFTDetailStore(for: selectedToken)
+                }
+              } else {
+                AssetDetailView(
+                  assetDetailStore: cryptoStore.assetDetailStore(for: .blockchainToken(selectedToken)),
+                  keyringStore: keyringStore,
+                  networkStore: cryptoStore.networkStore
+                )
+                .onDisappear {
+                  cryptoStore.closeAssetDetailStore(for: .blockchainToken(selectedToken))
+                }
+              }
+            }
+          },
+          label: {
+            EmptyView()
+          })
+      )
       .navigationTitle(Strings.Wallet.searchTitle.capitalized)
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
@@ -158,13 +178,25 @@ struct AssetSearchView: View {
         }
       }
       .animation(nil, value: query)
-      .filterable(text: $query)
+      .searchable(
+        text: $query,
+        placement: .navigationBarDrawer(displayMode: .always)
+      )
     }
     .navigationViewStyle(StackNavigationViewStyle())
     .onAppear {
       Task { @MainActor in
         self.allAssets = await userAssetsStore.allAssets()
         self.allNFTMetadata = await userAssetsStore.allNFTMetadata()
+        self.networkFilters = networkStore.allChains.map {
+          .init(isSelected: true, model: $0)
+        }
+      }
+    }
+    .onChange(of: networkStore.allChains) { allChains in
+      self.networkFilters = allChains.map { network in
+        let existingSelectionValue = self.networkFilters.first(where: { $0.model.chainId == network.chainId})?.isSelected
+        return .init(isSelected: existingSelectionValue ?? true, model: network)
       }
     }
   }
@@ -209,6 +241,9 @@ struct SearchAssetView<ImageView: View>: View {
           .foregroundColor(Color(.braveLabel))
       }
       Spacer()
+      Image(systemName: "chevron.right")
+        .font(.body.weight(.semibold))
+        .foregroundColor(Color(.separator))
     }
     .frame(maxWidth: .infinity)
     .padding(.vertical, 6)

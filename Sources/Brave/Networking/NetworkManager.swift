@@ -64,6 +64,7 @@ final class NetworkManager: Sendable {
         if case .failure(let error) = res {
           completion(.failure(error))
         }
+        _ = cancellable // To silence warning
         cancellable = nil
       }, receiveValue: { res in
         completion(.success(res))
@@ -161,9 +162,6 @@ extension NetworkManager {
                                       response: URLResponse) throws -> CachedNetworkResource {
     let fileNotModifiedStatusCode = 304
 
-    // Identifier for a specific version of a resource for a HTTP request
-    let etagHeader = "Etag"
-    
     guard let response = response as? HTTPURLResponse else {
       throw URLError(.badServerResponse)
     }
@@ -181,12 +179,12 @@ extension NetworkManager {
       throw NetworkManagerError.fileNotModified
 
     default:
-      let responseEtag = resourceType.isCached() ? response.allHeaderFields[etagHeader] as? String : nil
+      let responseEtag = resourceType.isCached() ? response.value(forHTTPHeaderField: "ETag") : nil
 
       var lastModified: TimeInterval?
 
       if checkLastServerSideModification,
-        let lastModifiedHeaderValue = response.allHeaderFields["Last-Modified"] as? String {
+         let lastModifiedHeaderValue = response.value(forHTTPHeaderField: "Last-Modified") {
         let formatter = DateFormatter().then {
           $0.timeZone = TimeZone(abbreviation: "GMT")
           $0.dateFormat = "EEE, dd MMM yyyy HH:mm:ss zzz"

@@ -7,11 +7,12 @@ import Foundation
 import Shared
 import WebKit
 import BraveCore
-import BraveShared
+import BraveShields
+import Preferences
 import Data
 
 class RequestBlockingContentScriptHandler: TabContentScript {
-  private struct RequestBlockingDTO: Decodable {
+  struct RequestBlockingDTO: Decodable {
     struct RequestBlockingDTOData: Decodable, Hashable {
       let resourceType: AdblockEngine.ResourceType
       let resourceURL: String
@@ -31,12 +32,12 @@ class RequestBlockingContentScriptHandler: TabContentScript {
       return nil
     }
     
-    return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
-                                                    securityToken: scriptId,
-                                                    script: script),
-                               injectionTime: .atDocumentStart,
-                               forMainFrameOnly: false,
-                               in: scriptSandbox)
+    return WKUserScript(source: secureScript(handlerName: messageHandlerName,
+                                             securityToken: scriptId,
+                                             script: script),
+                        injectionTime: .atDocumentStart,
+                        forMainFrameOnly: false,
+                        in: scriptSandbox)
   }()
   
   private weak var tab: Tab?
@@ -65,12 +66,15 @@ class RequestBlockingContentScriptHandler: TabContentScript {
       // we use `NSURL(idnString: String)` to parse them
       guard let requestURL = NSURL(idnString: dto.data.resourceURL) as URL? else { return }
       guard let sourceURL = NSURL(idnString: dto.data.sourceURL) as URL? else { return }
-      let isPrivateBrowsing = PrivateBrowsingManager.shared.isPrivateBrowsing
+      let isPrivateBrowsing = tab.isPrivate
       
       Task { @MainActor in
         let domain = Domain.getOrCreate(forUrl: currentTabURL, persistent: !isPrivateBrowsing)
         guard let domainURLString = domain.url else { return }
-        let shouldBlock = await AdBlockStats.shared.shouldBlock(requestURL: requestURL, sourceURL: sourceURL, resourceType: dto.data.resourceType)
+        let shouldBlock = await AdBlockStats.shared.shouldBlock(
+          requestURL: requestURL, sourceURL: sourceURL, resourceType: dto.data.resourceType,
+          isAggressiveMode: domain.blockAdsAndTrackingLevel.isAggressive
+        )
         
         // Ensure we check that the stats we're tracking is still for the same page
         // Some web pages (like youtube) like to rewrite their main frame urls
@@ -86,7 +90,7 @@ class RequestBlockingContentScriptHandler: TabContentScript {
         if shouldBlock, Preferences.PrivacyReports.captureShieldsData.value,
            let domainURL = URL(string: domainURLString),
            let blockedResourceHost = requestURL.baseDomain,
-           !PrivateBrowsingManager.shared.isPrivateBrowsing {
+           !isPrivateBrowsing {
           PrivacyReportsManager.pendingBlockedRequests.append((blockedResourceHost, domainURL, Date()))
         }
 

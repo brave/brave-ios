@@ -6,7 +6,7 @@
 import Foundation
 import WebKit
 import Shared
-import BraveShared
+import Preferences
 import BraveCore
 import os.log
 
@@ -37,12 +37,12 @@ class BraveSearchScriptHandler: TabContentScript {
     guard var script = loadUserScript(named: scriptName) else {
       return nil
     }
-    return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
-                                                    securityToken: scriptId,
-                                                    script: script),
-                               injectionTime: .atDocumentStart,
-                               forMainFrameOnly: false,
-                               in: scriptSandbox)
+    return WKUserScript(source: secureScript(handlerName: messageHandlerName,
+                                             securityToken: scriptId,
+                                             script: script),
+                        injectionTime: .atDocumentStart,
+                        forMainFrameOnly: false,
+                        in: scriptSandbox)
   }()
 
   private enum Method: Int {
@@ -98,7 +98,7 @@ class BraveSearchScriptHandler: TabContentScript {
   }
 
   private func handleCanSetBraveSearchAsDefault(replyHandler: (Any?, String?) -> Void) {
-    if PrivateBrowsingManager.shared.isPrivateBrowsing {
+    if tab?.isPrivate == true {
       Logger.module.debug("Private mode detected, skipping setting Brave Search as a default")
       replyHandler(false, nil)
       return

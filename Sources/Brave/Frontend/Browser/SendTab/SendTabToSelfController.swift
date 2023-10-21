@@ -6,7 +6,7 @@
 import Foundation
 import BraveUI
 import BraveCore
-import BraveShared
+import BraveStrings
 
 class SendTabToSelfController: SendTabTransitioningController {
   
@@ -185,11 +185,11 @@ extension SendTabToSelfContentController {
       
       switch device.deviceType {
       case .mobile:
-        deviceTypeImage = UIImage(braveSystemNamed: "brave.tablet.and.phone")
+        deviceTypeImage = UIImage(braveSystemNamed: "leo.smartphone.tablet-portrait")
       case .PC:
-        deviceTypeImage = UIImage(braveSystemNamed: "brave.laptop")
+        deviceTypeImage = UIImage(braveSystemNamed: "leo.laptop")
       default:
-        deviceTypeImage = UIImage(braveSystemNamed: "brave.laptop.and.phone")
+        deviceTypeImage = UIImage(braveSystemNamed: "leo.smartphone.laptop")
       }
       
       cell.do {

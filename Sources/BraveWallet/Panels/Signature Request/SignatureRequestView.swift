@@ -4,15 +4,15 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import SwiftUI
-import Strings
+import BraveStrings
 import BraveCore
-import BraveShared
 import DesignSystem
 
 struct SignatureRequestView: View {
   var requests: [BraveWallet.SignMessageRequest]
   @ObservedObject var keyringStore: KeyringStore
   var cryptoStore: CryptoStore
+  @ObservedObject var networkStore: NetworkStore
   
   var onDismiss: () -> Void
 
@@ -34,12 +34,16 @@ struct SignatureRequestView: View {
   }
   
   private var account: BraveWallet.AccountInfo {
-    keyringStore.allAccounts.first(where: { $0.address == currentRequest.address }) ?? keyringStore.selectedAccount
+    keyringStore.allAccounts.first(where: { $0.address == currentRequest.accountId.address }) ?? keyringStore.selectedAccount
+  }
+  
+  private var network: BraveWallet.NetworkInfo? {
+    networkStore.allChains.first(where: { $0.chainId == currentRequest.chainId })
   }
   
   /// Request display text, used as fallback.
   private var requestDisplayText: String {
-    if currentRequest.domain.isEmpty {
+    if requestDomain.isEmpty {
       return requestMessage
     }
     return """
@@ -58,7 +62,7 @@ struct SignatureRequestView: View {
     let regularFont = metrics.scaledFont(for: UIFont.systemFont(ofSize: desc.pointSize, weight: .regular))
     let regularAttributes: [NSAttributedString.Key: Any] = [
       .font: regularFont, .foregroundColor: UIColor.braveLabel]
-    if currentRequest.domain.isEmpty {
+    if requestDomain.isEmpty {
       // if we don't show domain, we don't need the titles so we
       // can fallback to `requestDisplayText` string for perf reasons
       return nil
@@ -79,14 +83,19 @@ struct SignatureRequestView: View {
     return attrString
   }
   
+  private var currentRequestDomain: String? {
+    currentRequest.signData.ethSignTypedData?.domain
+  }
+  
   private var requestDomain: String {
+    guard let domain = currentRequestDomain else { return "" }
     if showOrignalMessage[requestIndex] == true {
-      return currentRequest.domain
+      return domain
     } else {
       let uuid = UUID()
-      var result = currentRequest.domain
+      var result = domain
       if needPilcrowFormatted[requestIndex] == true {
-        var copy = currentRequest.domain
+        var copy = domain
         while copy.range(of: "\\n{2,}", options: .regularExpression) != nil {
           if let range = copy.range(of: "\\n{2,}", options: .regularExpression) {
             let newlines = String(copy[range])
@@ -95,34 +104,65 @@ struct SignatureRequestView: View {
           }
         }
       }
-      if currentRequest.domain.hasUnknownUnicode {
+      if domain.hasUnknownUnicode {
         result = result.printableWithUnknownUnicode
       }
-      
+
       return result.replacingOccurrences(of: uuid.uuidString, with: "\u{00B6}")
     }
   }
   
+  private var currentRequestMessage: String? {
+    if let ethSignTypedData = currentRequest.signData.ethSignTypedData {
+      return ethSignTypedData.message
+    } else if let ethStandardSignData = currentRequest.signData.ethStandardSignData {
+      return ethStandardSignData.message
+    } else if let solanaSignData = currentRequest.signData.solanaSignData {
+      return solanaSignData.message
+    } else if let ethSiweData = currentRequest.signData.ethSiweData {
+      // TODO: Replace with custom UI: https://github.com/brave/brave-ios/issues/7827
+      var message = "Origin: \(ethSiweData.origin.host)"
+      message += "\nAddress: \(ethSiweData.address)"
+      if let statement = ethSiweData.statement {
+        message += "\nStatement: \(statement)"
+      }
+      message += "\nURI: \(ethSiweData.uri.absoluteString)"
+      message += "\nVersion: \(ethSiweData.version)"
+      message += "\nChain Id: \(ethSiweData.chainId)"
+      message += "\nNonce: \(ethSiweData.nonce)"
+      message += "\nIssued At: \(ethSiweData.issuedAt)"
+      if let expirationTime = ethSiweData.expirationTime {
+        message += "\nExpiration Time: \(expirationTime)"
+      }
+      return message
+    } else { // ethSiweData will have separate UI
+      return nil
+    }
+  }
+  
   private var requestMessage: String {
+    guard let message = currentRequestMessage else {
+      return ""
+    }
     if showOrignalMessage[requestIndex] == true {
-      return currentRequest.message
+      return message
     } else {
       let uuid = UUID()
-      var result = currentRequest.message
+      var result = message
       if needPilcrowFormatted[requestIndex] == true {
-        var copy = currentRequest.message
-        while copy.range(of: "\\n{2,}", options: .regularExpression) != nil {
-          if let range = copy.range(of: "\\n{2,}", options: .regularExpression) {
+        var copy = message
+        while copy.range(of: "\\n{3,}", options: .regularExpression) != nil {
+          if let range = copy.range(of: "\\n{3,}", options: .regularExpression) {
             let newlines = String(copy[range])
             result.replaceSubrange(range, with: "\n\(uuid.uuidString) <\(newlines.count)>\n")
             copy.replaceSubrange(range, with: "\n\(uuid.uuidString) <\(newlines.count)>\n")
           }
         }
       }
-      if currentRequest.message.hasUnknownUnicode {
+      if message.hasUnknownUnicode {
         result = result.printableWithUnknownUnicode
       }
-      
+
       return result.replacingOccurrences(of: uuid.uuidString, with: "\u{00B6}")
     }
   }
@@ -131,21 +171,28 @@ struct SignatureRequestView: View {
     requests: [BraveWallet.SignMessageRequest],
     keyringStore: KeyringStore,
     cryptoStore: CryptoStore,
+    networkStore: NetworkStore,
     onDismiss: @escaping () -> Void
   ) {
     assert(!requests.isEmpty)
     self.requests = requests
     self.keyringStore = keyringStore
     self.cryptoStore = cryptoStore
+    self.networkStore = networkStore
     self.onDismiss = onDismiss
   }
   
   var body: some View {
     ScrollView(.vertical) {
       VStack {
-        if requests.count > 1 {
-          HStack {
-            Spacer()
+        HStack {
+          if let network {
+            Text(network.chainName)
+              .font(.callout)
+              .foregroundColor(Color(.braveLabel))
+          }
+          Spacer()
+          if requests.count > 1 {
             Text(String.localizedStringWithFormat(Strings.Wallet.transactionCount, requestIndex + 1, requests.count))
               .fontWeight(.semibold)
             Button(action: next) {
@@ -169,7 +216,7 @@ struct SignatureRequestView: View {
                   .foregroundColor(Color(.secondaryBraveLabel))
               }
             }
-            Text(urlOrigin: currentRequest.originInfo.origin)
+            Text(originInfo: currentRequest.originInfo)
               .font(.caption)
               .foregroundColor(Color(.braveLabel))
               .multilineTextAlignment(.center)
@@ -178,7 +225,7 @@ struct SignatureRequestView: View {
           Text(Strings.Wallet.signatureRequestSubtitle)
             .font(.headline)
             .foregroundColor(Color(.bravePrimary))
-          if needPilcrowFormatted[requestIndex] == true || currentRequest.message.hasUnknownUnicode == true {
+          if needPilcrowFormatted[requestIndex] == true || currentRequestMessage?.hasUnknownUnicode == true {
             VStack(spacing: 8) {
               if needPilcrowFormatted[requestIndex] == true {
                 Text("\(Image(systemName: "exclamationmark.triangle.fill")) \(Strings.Wallet.signMessageConsecutiveNewlineWarning)")
@@ -186,7 +233,7 @@ struct SignatureRequestView: View {
                   .foregroundColor(Color(.braveLabel))
                   .multilineTextAlignment(.center)
               }
-              if currentRequest.message.hasUnknownUnicode == true {
+              if currentRequestMessage?.hasUnknownUnicode == true {
                 Text("\(Image(systemName: "exclamationmark.triangle.fill"))  \(Strings.Wallet.signMessageRequestUnknownUnicodeWarning)")
                   .font(.subheadline.weight(.medium))
                   .foregroundColor(Color(.braveLabel))
@@ -255,14 +302,14 @@ struct SignatureRequestView: View {
       alignment: .bottom
     )
     .frame(maxWidth: .infinity)
-    .navigationTitle(Strings.Wallet.signatureRequestTitle)
+    .navigationTitle(navigationTitle)
     .navigationBarTitleDisplayMode(.inline)
     .foregroundColor(Color(.braveLabel))
     .background(Color(.braveGroupedBackground).edgesIgnoringSafeArea(.all))
     .introspectTextView { textView in
       // A flash to show users message is overflowing the text view (related to issue https://github.com/brave/brave-ios/issues/6277)
       if showOrignalMessage[requestIndex] == true {
-        let currentRequestHasConsecutiveNewLines = currentRequest.domain.hasConsecutiveNewLines || currentRequest.message.hasConsecutiveNewLines
+        let currentRequestHasConsecutiveNewLines = currentRequestDomain?.hasConsecutiveNewLines == true || currentRequestMessage?.hasConsecutiveNewLines == true
         if textView.contentSize.height > staticTextViewHeight && currentRequestHasConsecutiveNewLines {
           needPilcrowFormatted[requestIndex] = true
           textView.flashScrollIndicators()
@@ -271,6 +318,13 @@ struct SignatureRequestView: View {
         }
       }
     }
+  }
+  
+  private var navigationTitle: String {
+    guard let _ = currentRequest.signData.ethSiweData else {
+      return Strings.Wallet.signatureRequestTitle
+    }
+    return Strings.Wallet.signInWithBraveWallet
   }
   
   private var isButtonsDisabled: Bool {
@@ -309,7 +363,7 @@ struct SignatureRequestView: View {
         onDismiss()
       }
     }) {
-      Label(Strings.Wallet.sign, braveSystemImage: "brave.key")
+      Label(Strings.Wallet.sign, braveSystemImage: "leo.key")
         .imageScale(.large)
     }
     .buttonStyle(BraveFilledButtonStyle(size: .large))
@@ -361,7 +415,7 @@ extension String {
   
   var hasConsecutiveNewLines: Bool {
     // return true if string has two or more consecutive newline chars
-    return range(of: "\\n{2,}", options: .regularExpression) != nil
+    return range(of: "\\n{3,}", options: .regularExpression) != nil
   }
   
   var printableWithUnknownUnicode: String {
@@ -389,6 +443,7 @@ struct SignatureRequestView_Previews: PreviewProvider {
       requests: [.previewRequest],
       keyringStore: .previewStoreWithWalletCreated,
       cryptoStore: .previewStore,
+      networkStore: .previewStore,
       onDismiss: { }
     )
   }

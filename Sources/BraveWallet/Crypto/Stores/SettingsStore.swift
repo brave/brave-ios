@@ -7,9 +7,10 @@ import Foundation
 import LocalAuthentication
 import BraveCore
 import Data
-import BraveShared
+import Preferences
+import Combine
 
-public class SettingsStore: ObservableObject {
+public class SettingsStore: ObservableObject, WalletObserverStore {
   /// The number of minutes to wait until the Brave Wallet is automatically locked
   @Published var autoLockInterval: AutoLockInterval = .minute {
     didSet {
@@ -33,42 +34,140 @@ public class SettingsStore: ObservableObject {
       walletService.setDefaultBaseCurrency(currencyCode.code)
     }
   }
+  
+  /// The current ENS Resolve Method preference (Ask / Enabled / Disabled)
+  @Published var ensResolveMethod: BraveWallet.ResolveMethod = .ask {
+    didSet {
+      guard oldValue != ensResolveMethod else { return }
+      rpcService.setEnsResolveMethod(ensResolveMethod)
+    }
+  }
+  
+  /// The current ENS Offchain Resolve Method preference (Ask / Enabled / Disabled)
+  @Published var ensOffchainResolveMethod: BraveWallet.ResolveMethod = .ask {
+    didSet {
+      rpcService.setEnsOffchainLookupResolveMethod(ensOffchainResolveMethod)
+    }
+  }
+
+  /// The current SNS Resolve Method preference (Ask / Enabled / Disabled)
+  @Published var snsResolveMethod: BraveWallet.ResolveMethod = .ask {
+    didSet {
+      guard oldValue != snsResolveMethod else { return }
+      rpcService.setSnsResolveMethod(snsResolveMethod)
+    }
+  }
+  
+  /// The current Unstoppable Domains Resolve Method preference (Ask / Enabled / Disabled)
+  @Published var udResolveMethod: BraveWallet.ResolveMethod = .ask {
+    didSet {
+      guard oldValue != udResolveMethod else { return }
+      rpcService.setUnstoppableDomainsResolveMethod(udResolveMethod)
+    }
+  }
+  
+  /// The current preference for enabling NFT discovery (Enabled / Disabled)
+  @Published var isNFTDiscoveryEnabled: Bool = false {
+    didSet {
+      guard oldValue != isNFTDiscoveryEnabled else { return }
+      walletService.setNftDiscoveryEnabled(isNFTDiscoveryEnabled)
+    }
+  }
 
   private let keyringService: BraveWalletKeyringService
   private let walletService: BraveWalletBraveWalletService
+  private let rpcService: BraveWalletJsonRpcService
   private let txService: BraveWalletTxService
+  let ipfsApi: IpfsAPI
   private let keychain: KeychainType
+  private var keyringServiceObserver: KeyringServiceObserver?
+  private var walletServiceObserver: WalletServiceObserver?
+  
+  var isObserving: Bool {
+    keyringServiceObserver != nil && walletServiceObserver != nil
+  }
 
   public init(
     keyringService: BraveWalletKeyringService,
     walletService: BraveWalletBraveWalletService,
+    rpcService: BraveWalletJsonRpcService,
     txService: BraveWalletTxService,
+    ipfsApi: IpfsAPI,
     keychain: KeychainType = Keychain()
   ) {
     self.keyringService = keyringService
     self.walletService = walletService
+    self.rpcService = rpcService
     self.txService = txService
+    self.ipfsApi = ipfsApi
     self.keychain = keychain
 
-    keyringService.add(self)
-    keyringService.autoLockMinutes { [self] minutes in
-      self.autoLockInterval = .init(value: minutes)
-    }
-    
-    walletService.add(self)
-    walletService.defaultBaseCurrency { [self] currencyCode in
+    self.setupObservers()
+  }
+  
+  func tearDown() {
+    keyringServiceObserver = nil
+    walletServiceObserver = nil
+  }
+  
+  func setupObservers() {
+    guard !isObserving else { return }
+    self.keyringServiceObserver = KeyringServiceObserver(
+      keyringService: keyringService,
+      _autoLockMinutesChanged: { [weak self] in
+        self?.keyringService.autoLockMinutes { minutes in
+          self?.autoLockInterval = .init(value: minutes)
+        }
+      }
+    )
+    self.walletServiceObserver = WalletServiceObserver(
+      walletService: walletService,
+      _onDefaultBaseCurrencyChanged: { [weak self] currency in
+        self?.currencyCode = CurrencyCode(code: currency)
+      }
+    )
+  }
+  
+  func setup() {
+    Task { @MainActor in
+      let currencyCode = await walletService.defaultBaseCurrency()
       self.currencyCode = CurrencyCode(code: currencyCode)
+
+      let autoLockMinutes = await keyringService.autoLockMinutes()
+      self.autoLockInterval = .init(value: autoLockMinutes)
+
+      self.snsResolveMethod = await rpcService.snsResolveMethod()
+      self.ensResolveMethod = await rpcService.ensResolveMethod()
+      self.ensOffchainResolveMethod = await rpcService.ensOffchainLookupResolveMethod()
+      self.udResolveMethod = await rpcService.unstoppableDomainsResolveMethod()
+      
+      self.isNFTDiscoveryEnabled = await walletService.nftDiscoveryEnabled()
     }
   }
 
   func reset() {
     walletService.reset()
+    
     keychain.resetPasswordInKeychain(key: KeyringStore.passwordKeychainKey)
-    for coin in WalletConstants.supportedCoinTypes {
+    for coin in WalletConstants.supportedCoinTypes() {
       Domain.clearAllWalletPermissions(for: coin)
       Preferences.Wallet.reset(for: coin)
     }
+    
     Preferences.Wallet.displayWeb3Notifications.reset()
+    Preferences.Wallet.migrateCoreToWalletUserAssetCompleted.reset()
+    // Portfolio/NFT Filters
+    Preferences.Wallet.groupByFilter.reset()
+    Preferences.Wallet.sortOrderFilter.reset()
+    Preferences.Wallet.isHidingSmallBalancesFilter.reset()
+    Preferences.Wallet.isHidingUnownedNFTsFilter.reset()
+    Preferences.Wallet.isShowingNFTNetworkLogoFilter.reset()
+    Preferences.Wallet.nonSelectedAccountsFilter.reset()
+    Preferences.Wallet.nonSelectedNetworksFilter.reset()
+    // onboarding
+    Preferences.Wallet.isOnboardingCompleted.reset()
+    
+    WalletUserAssetGroup.removeAllGroup()
   }
 
   func resetTransaction() {
@@ -95,67 +194,18 @@ public class SettingsStore: ObservableObject {
   }
 }
 
-extension SettingsStore: BraveWalletKeyringServiceObserver {
-  public func keyringCreated(_ keyringId: String) {
+#if DEBUG
+// for testing
+extension SettingsStore {
+  func autoLockMinutesChanged() {
+    keyringServiceObserver?.autoLockMinutesChanged()
   }
   
-  public func keyringRestored(_ keyringId: String) {
-  }
-  
-  public func keyringReset() {
-  }
-  
-  public func locked() {
-  }
-  
-  public func unlocked() {
-  }
-  
-  public func backedUp() {
-  }
-  
-  public func accountsChanged() {
-  }
-  
-  public func autoLockMinutesChanged() {
-    keyringService.autoLockMinutes { [weak self] minutes in
-      self?.autoLockInterval = .init(value: minutes)
-    }
-  }
-  
-  public func selectedAccountChanged(_ coin: BraveWallet.CoinType) {
-  }
-  
-  public func accountsAdded(_ coin: BraveWallet.CoinType, addresses: [String]) {
+  func onDefaultBaseCurrencyChanged(_ currency: String) {
+    walletServiceObserver?.onDefaultBaseCurrencyChanged(currency)
   }
 }
-
-extension SettingsStore: BraveWalletBraveWalletServiceObserver {
-  public func onActiveOriginChanged(_ originInfo: BraveWallet.OriginInfo) {
-  }
-  
-  public func onDefaultWalletChanged(_ wallet: BraveWallet.DefaultWallet) {
-  }
-  
-  public func onDefaultBaseCurrencyChanged(_ currency: String) {
-    currencyCode = CurrencyCode(code: currency)
-  }
-  
-  public func onDefaultBaseCryptocurrencyChanged(_ cryptocurrency: String) {
-  }
-  
-  public func onNetworkListChanged() {
-  }
-  
-  public func onDefaultEthereumWalletChanged(_ wallet: BraveWallet.DefaultWallet) {
-  }
-  
-  public func onDefaultSolanaWalletChanged(_ wallet: BraveWallet.DefaultWallet) {
-  }
-  
-  public func onDiscoverAssetsCompleted(_ discoveredAssets: [BraveWallet.BlockchainToken]) {
-  }
-}
+#endif
 
 struct CurrencyCode: Hashable, Identifiable {
   let code: String

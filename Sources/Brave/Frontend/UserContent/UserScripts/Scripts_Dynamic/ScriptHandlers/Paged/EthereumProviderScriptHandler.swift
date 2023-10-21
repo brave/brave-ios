@@ -33,12 +33,12 @@ class EthereumProviderScriptHandler: TabContentScript {
     guard var script = loadUserScript(named: scriptName) else {
       return nil
     }
-    return WKUserScript.create(source: secureScript(handlerName: messageHandlerName,
-                                                    securityToken: scriptId,
-                                                    script: script),
-                               injectionTime: .atDocumentStart,
-                               forMainFrameOnly: true,
-                               in: scriptSandbox)
+    return WKUserScript(source: secureScript(handlerName: messageHandlerName,
+                                             securityToken: scriptId,
+                                             script: script),
+                        injectionTime: .atDocumentStart,
+                        forMainFrameOnly: true,
+                        in: scriptSandbox)
   }()
   
   private struct MessageBody: Decodable {
@@ -60,7 +60,7 @@ class EthereumProviderScriptHandler: TabContentScript {
     }
   }
   
-  func userContentController(
+  @MainActor func userContentController(
     _ userContentController: WKUserContentController,
     didReceiveScriptMessage message: WKScriptMessage,
     replyHandler: @escaping (Any?, String?) -> Void
@@ -99,13 +99,16 @@ class EthereumProviderScriptHandler: TabContentScript {
       firstAllowedAccount: String,
       updateJSProperties: Bool
     ) {
-      if reject {
-        replyHandler(nil, formedResponse.jsonString)
-      } else {
-        replyHandler(formedResponse.jsonObject, nil)
-      }
-      if updateJSProperties {
-        tab.updateEthereumProperties()
+      Task { @MainActor in
+        if updateJSProperties {
+          await tab.updateEthereumProperties()
+        }
+        
+        if reject {
+          replyHandler(nil, formedResponse.jsonString)
+        } else {
+          replyHandler(formedResponse.jsonObject, nil)
+        }
       }
     }
     
@@ -125,7 +128,7 @@ class EthereumProviderScriptHandler: TabContentScript {
         replyHandler(nil, "Invalid args")
         return
       }
-      provider.request(requestPayload, completion: handleResponse)
+      provider.sendAsync(requestPayload, completion: handleResponse)
     case .send:
       struct SendPayload {
         var method: String
@@ -145,8 +148,7 @@ class EthereumProviderScriptHandler: TabContentScript {
       
       if sendPayload.method.isEmpty {
         if let params = sendPayload.params, params.tag != .null {
-          // Same as sendAsync
-          provider.request(params, completion: handleResponse)
+          provider.sendAsync(params, completion: handleResponse)
         } else {
           // Empty method with no params is not valid
           replyHandler(nil, "Invalid args")

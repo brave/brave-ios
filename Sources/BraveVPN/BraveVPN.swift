@@ -5,7 +5,7 @@
 
 import UIKit
 import Shared
-import BraveShared
+import Preferences
 import NetworkExtension
 import Data
 import GuardianConnect
@@ -16,12 +16,17 @@ public class BraveVPN {
   private static let housekeepingApi = GRDHousekeepingAPI()
   private static let helper = GRDVPNHelper.sharedInstance()
   private static let serverManager = GRDServerManager()
+  private static let tunnelManager = GRDTunnelManager()
   
   public static let iapObserver = IAPObserver()
 
   /// List of regions the VPN can connect to.
   /// This list is not static and should be refetched every now and then.
   static var regions: [GRDRegion] = []
+  
+  /// Record last used region
+  /// It is used to hold details of the region when automatic selection is used
+  static var lastKnownRegion: GRDRegion?
   
   // Non translatable
   private static let connectionName = "Brave Firewall + VPN"
@@ -45,7 +50,7 @@ public class BraveVPN {
         }
       }
     }
-    
+
     if let customCredential = customCredential {
       if hasExpired == true {
         clearConfiguration()
@@ -65,6 +70,9 @@ public class BraveVPN {
 
     helper.dummyDataForDebugging = !AppConstants.buildChannel.isPublic
     helper.tunnelLocalizedDescription = connectionName
+    helper.grdTunnelProviderManagerLocalizedDescription = connectionName
+    helper.tunnelProviderBundleIdentifier = AppInfo.baseBundleIdentifier + ".BraveWireGuard"
+    helper.appGroupIdentifier = AppInfo.sharedContainerIdentifier
 
     if case .notPurchased = vpnState {
       // Unlikely if user has never bought the vpn, we clear vpn config here for safety.
@@ -72,9 +80,9 @@ public class BraveVPN {
       return
     }
     
-    // We validate the current receipt at the start to know if the subscription has expirerd.
-    BraveVPN.validateReceipt() { expired in
-      if expired == true {
+    BraveVPN.validateReceiptData() { receiptResponse in
+      // Clear configuration if only if the receipt response is expired (not retryPeriod)
+      if receiptResponse?.status == .expired {
         clearConfiguration()
         logAndStoreError("Receipt expired")
         return
@@ -109,11 +117,11 @@ public class BraveVPN {
   }
   
   /// Connects to Guardian's server to validate locally stored receipt.
-  /// Returns true if the receipt expired, false if not or nil if expiration status can't be determined.
-  public static func validateReceipt(receiptHasExpired: ((Bool?) -> Void)? = nil) {
+  /// Returns ReceiptResponse whoich hold information about status of receipt expiration etc
+  public static func validateReceiptData(receiptResponse: ((ReceiptResponse?) -> Void)? = nil) {
     guard let receipt = receipt,
-    let bundleId = Bundle.main.bundleIdentifier else {
-      receiptHasExpired?(nil)
+          let bundleId = Bundle.main.bundleIdentifier else {
+      receiptResponse?(nil)
       return
     }
     
@@ -122,32 +130,100 @@ public class BraveVPN {
       // if we detect Brave's SKU token we should not look at Apple's receipt.
       return
     }
-
-    housekeepingApi.verifyReceipt(receipt, bundleId: bundleId) { validSubscriptions, success, error in
-      if !success {
-        // Api call for receipt verification failed,
-        // we do not know if the receipt has expired or not.
-        receiptHasExpired?(nil)
-        logAndStoreError("Api call for receipt verification failed: \(error ?? "unknown error")")
+    
+    housekeepingApi.verifyReceiptData(receipt, bundleId: bundleId) { response, error in
+      if let error = error {
+        // Error while fetching receipt response, the variations of error can be listed
+        // No App Store receipt data present
+        // Failed to retrieve receipt data from server
+        // Failed to decode JSON response data
+        receiptResponse?(nil)
+        logAndStoreError("Call for receipt verification failed: \(error.localizedDescription)")
         return
       }
-
-      guard let validSubscriptions = validSubscriptions,
-            let newestReceipt = validSubscriptions.sorted(by: { $0.expiresDate > $1.expiresDate }).first else {
-        // Setting super old date to force expiration logic in the UI.
-        Preferences.VPN.expirationDate.value = Date(timeIntervalSince1970: 1)
-        receiptHasExpired?(true)
-        logAndStoreError("vpn expired", printToConsole: false)
-        return
-      }
-
-      Preferences.VPN.expirationDate.value = newestReceipt.expiresDate
-      Preferences.VPN.freeTrialUsed.value = !newestReceipt.isTrialPeriod
-      populateRegionDataIfNecessary()
       
-      GRDSubscriptionManager.setIsPayingUser(true)
-      receiptHasExpired?(false)
+      guard let response = response else {
+        receiptResponse?(nil)
+        logAndStoreError("Receipt verification response is empty")
+        return
+      }
+      
+      let receiptResponseItem = GRDIAPReceiptResponse(withReceiptResponse: response)
+      let processedReceiptDetail = BraveVPN.processReceiptResponse(receiptResponseItem: receiptResponseItem)
+
+      switch processedReceiptDetail.status {
+      case .expired:
+        Preferences.VPN.expirationDate.value = Date(timeIntervalSince1970: 1)
+        Preferences.VPN.originalTransactionId.value = nil
+        logAndStoreError("VPN Subscription LineItems are empty subscription expired", printToConsole: false)
+      case .active, .retryPeriod:
+        if let expirationDate = processedReceiptDetail.expiryDate {
+          Preferences.VPN.expirationDate.value = expirationDate
+        }
+        
+        if let gracePeriodExpirationDate = processedReceiptDetail.graceExpiryDate {
+          Preferences.VPN.gracePeriodExpirationDate.value = gracePeriodExpirationDate
+        }
+        
+        Preferences.VPN.freeTrialUsed.value = !processedReceiptDetail.isInTrialPeriod
+
+        populateRegionDataIfNecessary()
+        GRDSubscriptionManager.setIsPayingUser(true)
+      }
+      
+      Preferences.VPN.vpnReceiptStatus.value = processedReceiptDetail.status.rawValue
+      
+      receiptResponse?(processedReceiptDetail)
     }
+  }
+  
+  public static func processReceiptResponse(receiptResponseItem: GRDIAPReceiptResponse) -> ReceiptResponse {
+    guard let newestReceiptLineItem = receiptResponseItem.lineItems.sorted(by: { $0.expiresDate > $1.expiresDate }).first else {
+      if let originalTransactionId = Preferences.VPN.originalTransactionId.value {
+        let lineItemMetaDataForOriginalId =  receiptResponseItem.lineItemsMetadata.first(
+          where: { Int($0.originalTransactionId) ?? 00 == originalTransactionId })
+        
+        if let metaData = lineItemMetaDataForOriginalId, metaData.gracePeriodExpiresDate > Date() {
+          let response = ReceiptResponse(
+            status: .retryPeriod,
+            expiryReason: ReceiptResponse.ExpirationIntent(rawValue: Int(metaData.expirationIntent)) ?? .none,
+            graceExpiryDate: metaData.gracePeriodExpiresDate,
+            isInTrialPeriod: false,
+            autoRenewEnabled: false)
+          
+          return response
+        }
+      }
+
+      return ReceiptResponse(status: .expired)
+    }
+
+    let lineItemMetaData =  receiptResponseItem.lineItemsMetadata.first(
+      where: { Int($0.originalTransactionId) ?? 00 == newestReceiptLineItem.originalTransactionId })
+
+    // Original transaction id of last active subscription in order to detect grace period
+    Preferences.VPN.originalTransactionId.value = newestReceiptLineItem.originalTransactionId
+    
+    guard let metadata = lineItemMetaData else {
+      logAndStoreError("No line item meta data - can not happen")
+      return ReceiptResponse(status: .active)
+    }
+
+    let receiptStatus: ReceiptResponse.Status = lineItemMetaData?.isInBillingRetryPeriod == true ? .retryPeriod : .active
+    // Expiration Intent is unsigned
+    let expirationIntent = ReceiptResponse.ExpirationIntent(rawValue: Int(metadata.expirationIntent)) ?? .none
+    // 0 is for turned off renewal, 1 is subscription renewal
+    let autoRenewEnabled = metadata.autoRenewStatus == 1
+
+    let response = ReceiptResponse(
+      status: receiptStatus,
+      expiryReason: expirationIntent,
+      expiryDate: newestReceiptLineItem.expiresDate,
+      graceExpiryDate: metadata.gracePeriodExpiresDate,
+      isInTrialPeriod: newestReceiptLineItem.isTrialPeriod,
+      autoRenewEnabled: autoRenewEnabled)
+    
+    return response
   }
 
   // MARK: - STATE
@@ -156,7 +232,7 @@ public class BraveVPN {
   public static var reconnectPending = false
 
   /// A state in which the vpn can be.
-  public enum State {
+  public enum State: Equatable {
     case notPurchased
     case purchased(enabled: Bool)
 
@@ -200,10 +276,18 @@ public class BraveVPN {
 
   /// Whether the vpn subscription has expired.
   /// Returns nil if there has been no subscription yet (user never bought the vpn).
-  public static var hasExpired: Bool? {
+  private static var hasExpired: Bool? {
     guard let expirationDate = Preferences.VPN.expirationDate.value else { return nil }
 
-    return expirationDate < Date()
+    if expirationDate < Date() {
+      if let gracePeriodExpirationDate = Preferences.VPN.gracePeriodExpirationDate.value {
+        return gracePeriodExpirationDate < Date()
+      }
+      
+      return true
+    }
+    
+    return false
   }
 
   /// Location of last used server for the vpn configuration.
@@ -232,6 +316,26 @@ public class BraveVPN {
     }
   }
   
+  // MARK: - ReceiptResponse
+  
+  public struct ReceiptResponse {
+    public enum Status: Int {
+      case active, expired, retryPeriod
+    }
+    
+    enum ExpirationIntent: Int {
+      case none, cancelled, billingError, priceIncreaseConsent, notAvailable, unknown
+    }
+    
+    var status: Status
+    var expiryReason: ExpirationIntent = .none
+    var expiryDate: Date?
+    var graceExpiryDate: Date?
+
+    var isInTrialPeriod: Bool = false
+    var autoRenewEnabled: Bool = false
+  }
+  
   // MARK: - Actions
 
   /// Reconnects to the vpn.
@@ -249,7 +353,12 @@ public class BraveVPN {
 
   /// Disconnects the vpn.
   /// The vpn must be configured prior to that otherwise it does nothing.
-  public static func disconnect() {
+  public static func disconnect(skipChecks: Bool = false) {
+    if skipChecks {
+      helper.disconnectVPN()
+      return
+    }
+    
     if reconnectPending {
       logAndStoreError("Can't disconnect the vpn while reconnect is still pending.")
       return
@@ -272,17 +381,38 @@ public class BraveVPN {
         }
         
         reconnectPending = false
-        completion?(status == .success)
+        
+        // Re-connected user should update last used region - detail is pulled
+        fetchLastUsedRegionDetail() { _, _ in
+          DispatchQueue.main.async {
+            completion?(status == .success)
+          }
+        }
       }
     } else {
+      // Setting User preferred Transport Protocol to WireGuard
+      // In order to easily fetch and change in settings later
+      GRDTransportProtocol.setUserPreferred(.wireGuard)
+      
       // New user or no credentials and have to remake them.
-      helper.configureFirstTimeUserPostCredential(nil) { success, error in
+      helper.configureFirstTimeUser(
+        for: GRDTransportProtocol.getUserPreferredTransportProtocol(),
+        postCredential: nil) { success, error in
         if let error = error {
           logAndStoreError("configureFirstTimeUserPostCredential \(error)")
+        } else {
+          helper.ikev2VPNManager.removeFromPreferences()
         }
-        
+         
         reconnectPending = false
-        completion?(success)
+          
+        // First time user will connect automatic region - detail is pulled
+        fetchLastUsedRegionDetail() { _, _ in
+          DispatchQueue.main.async {  
+            completion?(success)
+          }
+        }
+      
       }
     }
   }
@@ -300,6 +430,36 @@ public class BraveVPN {
       completion?(status)
     }
   }
+  
+  public static func changePreferredTransportProtocol(with transportProtocol: TransportProtocol, completion: ((Bool) -> Void)? = nil) {
+    helper.forceDisconnectVPNIfNecessary()
+    GRDVPNHelper.clearVpnConfiguration()
+    
+    GRDTransportProtocol.setUserPreferred(transportProtocol)
+
+    // New user or no credentials and have to remake them.
+    helper.configureFirstTimeUser(for: transportProtocol, postCredential: nil) { success, error in
+      if let error = error {
+        logAndStoreError("Change Preferred transport FirstTimeUserPostCredential \(error)")
+      } else {
+        removeConfigurationFromPreferences(for: transportProtocol)
+      }
+      
+      reconnectPending = false
+      completion?(success)
+    }
+    
+    func removeConfigurationFromPreferences(for transportProtocol: TransportProtocol) {
+      switch transportProtocol {
+      case .wireGuard:
+        helper.ikev2VPNManager.removeFromPreferences()
+      case .ikEv2:
+        tunnelManager.removeTunnel()
+      default:
+        return
+      }
+    }
+  }
 
   public static func clearCredentials() {
     GRDKeychain.removeGuardianKeychainItems()
@@ -314,6 +474,7 @@ public class BraveVPN {
     
     if includeExpirationDate {
       Preferences.VPN.expirationDate.reset()
+      Preferences.VPN.gracePeriodExpirationDate.reset()
     }
   }
 
@@ -322,6 +483,12 @@ public class BraveVPN {
   /// Returns currently chosen region. Returns nil if automatic region is selected.
   public static var selectedRegion: GRDRegion? {
     helper.selectedRegion
+  }
+  
+  /// Return the region last activated with the details
+  /// It will give region details for automatic
+  public static var activatedRegion: GRDRegion? {
+    helper.selectedRegion ?? lastKnownRegion
   }
   
   /// Switched to use an automatic region, region closest to user location.
@@ -335,21 +502,33 @@ public class BraveVPN {
   }
   
   public static func changeVPNRegion(to region: GRDRegion?, completion: @escaping ((Bool) -> Void)) {
+    if isConnected {
+      helper.disconnectVPN()
+    }
+    
     helper.select(region)
-    helper.configureFirstTimeUser(with: region) { success, error in
+    
+    // The preferred tunnel has to be used for configuration
+    // Otherwise faulty configuration will be added while connecting
+    let activeTunnelProtocol = GRDTransportProtocol.getUserPreferredTransportProtocol()
+    
+    helper.configureFirstTimeUser(for: activeTunnelProtocol, with: region) { success, error in
+      let subcredentials = "Credentials \(GRDKeychain.getPasswordString(forAccount: kKeychainStr_SubscriberCredential) ?? "Empty")"
+      
       if success {
         Logger.module.debug("Changed VPN region to \(region?.regionName ?? "default selection")")
         completion(true)
       } else {
-        Logger.module.debug("connection failed: \(error ?? "nil")")
+        Logger.module.debug("Connection failed: \(error ?? "nil")")
+        Logger.module.debug("Region change connection failed for subcredentials \(subcredentials)")
         completion(false)
       }
     }
   }
   
   public static func populateRegionDataIfNecessary () {
-    serverManager.getRegionsWithCompletion { regions in
-      self.regions = regions
+    serverManager.regions { regions, _ in
+      self.regions = regions ?? []
     }
   }
   
@@ -441,6 +620,32 @@ public class BraveVPN {
             Preferences.VPN.vpnWorksInBackgroundNotificationShowed.value = true
           }
         }
+      }
+    }
+  }
+  
+  /// The function that fetched the last used region details from timezones
+  /// It used to get details of Region when Automatic Region is used
+  /// Otherwise the region detail items will be empty
+  /// - Parameter completion: completion block that returns region with details or error
+  public static func fetchLastUsedRegionDetail(_ completion: ((GRDRegion?, Bool) -> Void)? = nil) {
+    switch vpnState {
+    case .expired, .notPurchased:
+      break
+    case .purchased(_):
+      housekeepingApi.requestTimeZonesForRegions { timeZones, success, responseStatusCode in
+        guard success, let timeZones = timeZones else {
+          logAndStoreError(
+            "Failed to get timezones while fetching region: \(responseStatusCode)",
+            printToConsole: true)
+          completion?(nil, false)
+          
+          return
+        }
+        
+        let region = GRDServerManager.localRegion(fromTimezones: timeZones)
+        completion?(region, true)
+        lastKnownRegion = region
       }
     }
   }

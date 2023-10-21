@@ -17,8 +17,6 @@ public struct NewSiteConnectionView: View {
   var accounts: [String]
   var coin: BraveWallet.CoinType
   var onConnect: (_ addresses: [String]) -> Void
-  
-  @available(iOS, introduced: 14.0, deprecated: 15.0, message: "Use PresentationMode on iOS 15")
   var onDismiss: () -> Void
   
   public init(
@@ -43,7 +41,7 @@ public struct NewSiteConnectionView: View {
   @State private var isConfirmationViewVisible: Bool = false
   
   private var accountInfos: [BraveWallet.AccountInfo] {
-    let allAccounts = keyringStore.allKeyrings.first(where: { $0.coin == coin })?.accountInfos ?? []
+    let allAccounts = keyringStore.allAccounts.filter { $0.coin == coin }
     return allAccounts.filter { self.accounts.contains($0.address) }
   }
   
@@ -98,10 +96,18 @@ public struct NewSiteConnectionView: View {
         Section {
           ForEach(accountInfos) { account in
             Button {
-              if selectedAccounts.contains(account.id) {
-                selectedAccounts.remove(account.id)
-              } else {
-                selectedAccounts.insert(account.id)
+              switch coin {
+              case .eth:
+                if selectedAccounts.contains(account.id) {
+                  selectedAccounts.remove(account.id)
+                } else {
+                  selectedAccounts.insert(account.id)
+                }
+              case .sol:
+                // only allow selecting one Solana account at a time
+                selectedAccounts = .init(arrayLiteral: account.id)
+              default:
+                break // not supported
               }
             } label: {
               HStack {
@@ -111,7 +117,7 @@ public struct NewSiteConnectionView: View {
                 Spacer()
                 Group {
                   if selectedAccounts.contains(account.id) {
-                    Image(braveSystemName: "brave.checkmark.circle.fill")
+                    Image(braveSystemName: "leo.check.circle-filled")
                       .foregroundColor(Color(.braveSuccessLabel))
                   } else {
                     Image(systemName: "circle")
@@ -173,9 +179,9 @@ public struct NewSiteConnectionView: View {
         selectedAccounts.insert(keyringStore.selectedAccount.id)
       } else { // Need to fetch selected account for coin
         Task { @MainActor in
-          if let selectedAccount = await keyringStore.selectedAccount(for: coin) {
+          if let selectedAccount = await keyringStore.selectedDappAccount(for: coin) {
             if accounts.contains(selectedAccount.address) {
-              // currently gselected account exists in permissions request, select it
+              // currently selected account exists in permissions request, select it
               selectedAccounts.insert(selectedAccount.id)
             } else if let firstAccount = accounts.first {
               // else select the first account by default
@@ -188,7 +194,7 @@ public struct NewSiteConnectionView: View {
   }
   
   private var accountsAddressesToConfirm: String {
-    keyringStore.defaultKeyring.accountInfos
+    accountInfos
       .filter { selectedAccounts.contains($0.id) }
       .map(\.address.truncatedAddress)
       .joined(separator: ", ")
@@ -208,7 +214,7 @@ public struct NewSiteConnectionView: View {
       }
       Section {
         HStack(spacing: 12) {
-          Image(braveSystemName: "brave.checkmark.circle.fill")
+          Image(braveSystemName: "leo.check.circle-filled")
             .imageScale(.large)
           Text(Strings.Wallet.newSiteConnectConfirmationMessage)
             .multilineTextAlignment(.leading)
@@ -222,7 +228,7 @@ public struct NewSiteConnectionView: View {
       }
       Section {
         Button {
-          let accounts = keyringStore.allKeyrings.flatMap(\.accountInfos)
+          let accounts = accountInfos
             .filter { selectedAccounts.contains($0.id) }
             .map(\.address)
           onConnect(accounts)
@@ -250,8 +256,8 @@ struct NewSiteConnectionView_Previews: PreviewProvider {
       coin: .eth,
       keyringStore: {
         let store = KeyringStore.previewStoreWithWalletCreated
-        store.addPrimaryAccount("Account 2", coin: .eth, completion: nil)
-        store.addPrimaryAccount("Account 3", coin: .eth, completion: nil)
+        store.addPrimaryAccount("Account 2", coin: .eth, chainId: BraveWallet.MainnetChainId, completion: nil)
+        store.addPrimaryAccount("Account 3", coin: .eth, chainId: BraveWallet.MainnetChainId, completion: nil)
         return store
       }(),
       onConnect: { _ in },

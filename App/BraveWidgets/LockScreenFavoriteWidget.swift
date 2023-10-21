@@ -6,9 +6,9 @@
 import Foundation
 import WidgetKit
 import SwiftUI
-import BraveShared
 import BraveWidgetsModels
-import Favicon
+import FaviconModels
+import Strings
 
 struct LockScreenFavoriteWidget: Widget {
   var body: some WidgetConfiguration {
@@ -37,15 +37,32 @@ private struct LockScreenFavoriteProvider: IntentTimelineProvider {
   func placeholder(in context: Context) -> Entry {
     Entry(date: Date(), favorite: nil)
   }
-  func getSnapshot(for configuration: LockScreenFavoriteConfigurationIntent, in context: Context, completion: @escaping (LockScreenFavoriteEntry) -> Void) {
+  
+  func widgetFavorite(for url: URL?, completion: @escaping (WidgetFavorite?) -> Void) {
     let favorites = FavoritesWidgetData.loadWidgetData() ?? []
-    let selectedFavorite = favorites.first(where: { $0.url == configuration.favorite?.url }) ?? favorites.first
-    completion(Entry(date: Date(), favorite: selectedFavorite))
+    var selectedFavorite = favorites.first(where: { $0.url == url }) ?? favorites.first
+    if let favicon = selectedFavorite?.favicon, let image = favicon.image {
+      image.prepareThumbnail(of: .init(width: 64, height: 64)) { image in
+        selectedFavorite?.favicon = .init(
+          image: image,
+          isMonogramImage: favicon.isMonogramImage,
+          backgroundColor: favicon.backgroundColor
+        )
+        completion(selectedFavorite)
+      }
+    } else {
+      completion(selectedFavorite)
+    }
+  }
+  func getSnapshot(for configuration: LockScreenFavoriteConfigurationIntent, in context: Context, completion: @escaping (LockScreenFavoriteEntry) -> Void) {
+    widgetFavorite(for: configuration.favorite?.url) { selectedFavorite in
+      completion(Entry(date: Date(), favorite: selectedFavorite))
+    }
   }
   func getTimeline(for configuration: LockScreenFavoriteConfigurationIntent, in context: Context, completion: @escaping (Timeline<LockScreenFavoriteEntry>) -> Void) {
-    let favorites = FavoritesWidgetData.loadWidgetData() ?? []
-    let selectedFavorite = favorites.first(where: { $0.url == configuration.favorite?.url }) ?? favorites.first
-    completion(Timeline(entries: [Entry(date: Date(), favorite: selectedFavorite)], policy: .never))
+    widgetFavorite(for: configuration.favorite?.url) { selectedFavorite in
+      completion(Timeline(entries: [Entry(date: Date(), favorite: selectedFavorite)], policy: .never))
+    }
   }
 }
 
@@ -54,45 +71,45 @@ private struct LockScreenFavoriteView: View {
   var entry: LockScreenFavoriteEntry
   
   var body: some View {
-    if let fav = entry.favorite {
-      Group {
-        if let attributes = fav.favicon, let image = attributes.image {
-          FaviconImage(image: image, contentMode: .scaleAspectFit, includePadding: false) // includePadding forced to false here since we are providing our own padding below
-            .padding(6)
-            .background(Color(attributes.backgroundColor))
-            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-            .padding(12)
-            .background(Color.black)
-        } else {
-          Text(verbatim: fav.url.baseDomain?.first?.uppercased() ?? "")
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .font(.system(size: 28))
-            .clipped()
-            .padding(4)
-            .background(
-              Color.white.aspectRatio(1, contentMode: .fit)
-                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-            )
-            .padding(12)
-            .foregroundColor(Color.black)
-            .background(Color.black)
+    ZStack {
+      AccessoryWidgetBackground()
+        .widgetBackground { EmptyView() }
+      if let fav = entry.favorite {
+        Group {
+          if let attributes = fav.favicon, let image = attributes.image {
+            FaviconImage(image: image, contentMode: .scaleAspectFit, includePadding: false) // includePadding forced to false here since we are providing our own padding below
+              .background(attributes.backgroundColor.cgColor.alpha == 0 ? .white :  Color(attributes.backgroundColor))
+              .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+              .padding(12)
+          } else {
+            Text(verbatim: fav.url.baseDomain?.first?.uppercased() ?? "")
+              .frame(maxWidth: .infinity, maxHeight: .infinity)
+              .font(.system(size: 28))
+              .clipped()
+              .padding(4)
+              .background(
+                Color.white.aspectRatio(1, contentMode: .fit)
+                  .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+              )
+              .padding(12)
+              .foregroundColor(Color.black)
+          }
         }
+        .accessibilityLabel(fav.title ?? fav.url.absoluteString)
+        .widgetLabel(fav.title ?? "")
+        .widgetURL(fav.url)
+      } else {
+        Image(braveSystemName: "leo.brave.icon-monochrome")
+          .imageScale(.large)
+          .font(.system(size: 24))
+          .foregroundColor(Color.black)
+          .frame(maxWidth: .infinity, maxHeight: .infinity)
+          .background(
+            Color(white: 0.9)
+              .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+              .padding(12)
+          )
       }
-      .accessibilityLabel(fav.title ?? fav.url.absoluteString)
-      .widgetLabel(fav.title ?? "")
-      .widgetURL(fav.url)
-    } else {
-      Image(braveSystemName: "brave.logo")
-        .imageScale(.large)
-        .font(.system(size: 24))
-        .foregroundColor(Color.black)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(
-          Color(white: 0.9)
-            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-            .padding(12)
-        )
-        .background(Color.black)
     }
   }
 }
@@ -129,7 +146,7 @@ struct LockScreenFavoriteViewWidget_Previews: PreviewProvider {
             favicon: .init(
               image: mockImage,
               isMonogramImage: false,
-              backgroundColor: .clear
+              backgroundColor: .white
             )
           )
         )

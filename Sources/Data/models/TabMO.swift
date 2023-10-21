@@ -60,16 +60,28 @@ public final class TabMO: NSManagedObject, CRUD {
   }
 
   // MARK: - Public interface
+  
+  public static func migrate(_ block: @escaping (NSManagedObjectContext) -> Void) {
+    DataController.performOnMainContext(save: true) { context in
+      block(context)
+      
+      do {
+        try context.save()
+      } catch {
+        Logger.module.error("Error saving context: \(error)")
+      }
+    }
+  }
 
   // MARK: Create
 
   /// Creates new tab and returns its syncUUID. If you want to add urls to existing tabs use `update()` method.
-  public class func create(uuidString: String = UUID().uuidString) -> String {
-    createInternal(uuidString: uuidString, lastUpdateDate: Date())
+  public class func create(title: String, uuidString: String = UUID().uuidString) -> String {
+    createInternal(uuidString: uuidString, title: title, lastUpdateDate: Date())
     return uuidString
   }
 
-  class func createInternal(uuidString: String, lastUpdateDate: Date) {
+  class func createInternal(uuidString: String, title: String, lastUpdateDate: Date) {
     DataController.perform(task: { context in
       guard let entity = entity(context) else {
         Logger.module.error("Error fetching the entity 'Tab' from Managed Object-Model")
@@ -79,7 +91,7 @@ public final class TabMO: NSManagedObject, CRUD {
       let tab = TabMO(entity: entity, insertInto: context)
       // TODO: replace with logic to create sync uuid then buble up new uuid to browser.
       tab.syncUUID = uuidString
-      tab.title = Strings.newTab
+      tab.title = title
       tab.lastUpdate = lastUpdateDate
     })
   }
@@ -102,22 +114,6 @@ public final class TabMO: NSManagedObject, CRUD {
 
   public class func get(fromId id: String?) -> TabMO? {
     return getInternal(fromId: id)
-  }
-
-  public class func insertRecentlyClosed(uuidString: String, _ saved: SavedRecentlyClosed) {
-    DataController.perform { context in
-      guard let entity = entity(context) else {
-        Logger.module.error("Error fetching the entity 'Tab' from Managed Object-Model")
-        return
-      }
-  
-      let tab = TabMO(entity: entity, insertInto: context)
-      tab.syncUUID = uuidString
-      tab.url = saved.url
-      tab.title = saved.title
-      tab.urlHistorySnapshot = saved.historyList as NSArray
-      tab.urlHistoryCurrentIndex = saved.historyIndex
-    }
   }
   
   // MARK: Update

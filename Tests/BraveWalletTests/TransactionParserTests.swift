@@ -15,12 +15,17 @@ private extension BraveWallet.AccountInfo {
     coin: BraveWallet.CoinType = .eth
   ) {
     self.init(
+      accountId: .init(
+        coin: coin,
+        keyringId: coin.keyringIds.first ?? .default,
+        kind: .derived,
+        address: address,
+        bitcoinAccountIndex: 0,
+        uniqueKey: address
+      ),
       address: address,
       name: name,
-      isImported: false,
-      hardware: nil,
-      coin: .eth,
-      keyringId: BraveWallet.DefaultKeyringId
+      hardware: nil
     )
   }
 }
@@ -29,19 +34,44 @@ class TransactionParserTests: XCTestCase {
   
   private let currencyFormatter: NumberFormatter = .usdCurrencyFormatter
   private let accountInfos: [BraveWallet.AccountInfo] = [
-    .init(address: "0x1234567890123456789012345678901234567890", name: "Ethereum Account 1"),
-    .init(address: "0x0987654321098765432109876543210987654321", name: "Ethereum Account 2"),
-    .init(address: "0xaaaaaaaaaabbbbbbbbbbccccccccccdddddddddd", name: "Solana Account 1", coin: .sol),
-    .init(address: "0xeeeeeeeeeeffffffffff11111111112222222222", name: "Solana Account 2", coin: .sol)
+    BraveWallet.AccountInfo.previewAccount,
+    (BraveWallet.AccountInfo.previewAccount.copy() as! BraveWallet.AccountInfo).then {
+      $0.name = "Ethereum Account 2"
+      $0.address = "0x0987654321098765432109876543210987654321"
+      $0.accountId.address = "0x0987654321098765432109876543210987654321"
+    },
+    (BraveWallet.AccountInfo.mockSolAccount.copy() as! BraveWallet.AccountInfo).then {
+      $0.name = "Solana Account 1"
+      $0.address = "0xaaaaaaaaaabbbbbbbbbbccccccccccdddddddddd"
+      $0.accountId.address = "0xaaaaaaaaaabbbbbbbbbbccccccccccdddddddddd"
+    },
+    (BraveWallet.AccountInfo.mockSolAccount.copy() as! BraveWallet.AccountInfo).then {
+      $0.name = "Solana Account 2"
+      $0.address = "0xeeeeeeeeeeffffffffff11111111112222222222"
+      $0.accountId.address = "0xeeeeeeeeeeffffffffff11111111112222222222"
+    },
+    (BraveWallet.AccountInfo.mockFilTestnetAccount.copy() as! BraveWallet.AccountInfo).then {
+      $0.name = "Filecoin Testnet 1"
+      $0.address = "fil_testnet_address_1"
+      $0.accountId.address = "fil_testnet_address_1"
+    },
+    (BraveWallet.AccountInfo.mockFilTestnetAccount.copy() as! BraveWallet.AccountInfo).then {
+      $0.name = "Filecoin Testnet 2"
+      $0.address = "fil_testnet_address_2"
+      $0.accountId.address = "fil_testnet_address_2"
+    }
   ]
   private let tokens: [BraveWallet.BlockchainToken] = [
-    .previewToken, .previewDaiToken, .mockUSDCToken, .mockSolToken, .mockSpdToken, .mockSolanaNFTToken
+    .previewToken, .previewDaiToken, .mockUSDCToken, .mockSolToken, .mockSpdToken, .mockSolanaNFTToken, .mockFilToken
   ]
-  let assetRatios: [String: Double] = ["eth": 1,
-                                       "dai": 2,
-                                       "usdc": 3,
-                                       "sol": 20,
-                                       "spd": 15]
+  let assetRatios: [String: Double] = [
+    "eth": 1,
+    BraveWallet.BlockchainToken.previewDaiToken.assetRatioId.lowercased(): 2,
+    BraveWallet.BlockchainToken.mockUSDCToken.assetRatioId.lowercased(): 3,
+    "sol": 20,
+    BraveWallet.BlockchainToken.mockSpdToken.assetRatioId.lowercased(): 15,
+    "fil": 2
+  ]
   
   func testEthSendTransaction() {
     let network: BraveWallet.NetworkInfo = .mockMainnet
@@ -72,7 +102,8 @@ class TransactionParserTests: XCTestCase {
     )
     let transaction = BraveWallet.TransactionInfo(
       id: "1",
-      fromAddress: "0x1234567890123456789012345678901234567890",
+      fromAddress: accountInfos[0].accountId.address,
+      from: accountInfos[0].accountId,
       txHash: "0xaaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeeeffffffffff1234",
       txDataUnion: .init(ethTxData1559: transactionData),
       txStatus: .confirmed,
@@ -83,13 +114,14 @@ class TransactionParserTests: XCTestCase {
       submittedTime: Date(),
       confirmedTime: Date(),
       originInfo: nil,
-      groupId: nil
+      chainId: BraveWallet.MainnetChainId,
+      effectiveRecipient: transactionData.baseData.to
     )
     
     let expectedParsedTransaction = ParsedTransaction(
       transaction: transaction,
-      namedFromAddress: "Ethereum Account 1",
-      fromAddress: "0x1234567890123456789012345678901234567890",
+      namedFromAddress: accountInfos[0].name,
+      fromAddress: accountInfos[0].address,
       namedToAddress: "Ethereum Account 2",
       toAddress: "0x0987654321098765432109876543210987654321",
       networkSymbol: "ETH",
@@ -111,7 +143,7 @@ class TransactionParserTests: XCTestCase {
       transaction: transaction,
       network: network,
       accountInfos: accountInfos,
-      visibleTokens: tokens,
+      userAssets: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
       solEstimatedTxFee: nil,
@@ -165,7 +197,8 @@ class TransactionParserTests: XCTestCase {
     )
     let transaction = BraveWallet.TransactionInfo(
       id: "2",
-      fromAddress: "0x1234567890123456789012345678901234567890",
+      fromAddress: accountInfos[0].address,
+      from: accountInfos[0].accountId,
       txHash: "0xaaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeeeffffffffff1234",
       txDataUnion: .init(ethTxData1559: transactionData),
       txStatus: .confirmed,
@@ -176,13 +209,14 @@ class TransactionParserTests: XCTestCase {
       submittedTime: Date(),
       confirmedTime: Date(),
       originInfo: nil,
-      groupId: nil
+      chainId: BraveWallet.MainnetChainId,
+      effectiveRecipient: transactionData.baseData.to
     )
     
     let expectedParsedTransaction = ParsedTransaction(
       transaction: transaction,
-      namedFromAddress: "Ethereum Account 1",
-      fromAddress: "0x1234567890123456789012345678901234567890",
+      namedFromAddress: accountInfos[0].name,
+      fromAddress: accountInfos[0].address,
       namedToAddress: "Ethereum Account 2",
       toAddress: "0x0987654321098765432109876543210987654321",
       networkSymbol: "ETH",
@@ -204,7 +238,7 @@ class TransactionParserTests: XCTestCase {
       transaction: transaction,
       network: network,
       accountInfos: accountInfos,
-      visibleTokens: tokens,
+      userAssets: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
       solEstimatedTxFee: nil,
@@ -245,7 +279,8 @@ class TransactionParserTests: XCTestCase {
     )
     let transaction = BraveWallet.TransactionInfo(
       id: "3",
-      fromAddress: "0x1234567890123456789012345678901234567890",
+      fromAddress: accountInfos[0].address,
+      from: accountInfos[0].accountId,
       txHash: "0xaaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeeeffffffffff1234",
       txDataUnion: .init(ethTxData1559: transactionData),
       txStatus: .confirmed,
@@ -260,13 +295,14 @@ class TransactionParserTests: XCTestCase {
       submittedTime: Date(),
       confirmedTime: Date(),
       originInfo: nil,
-      groupId: nil
+      chainId: BraveWallet.MainnetChainId,
+      effectiveRecipient: transactionData.baseData.to
     )
     
     let expectedParsedTransaction = ParsedTransaction(
       transaction: transaction,
-      namedFromAddress: "Ethereum Account 1",
-      fromAddress: "0x1234567890123456789012345678901234567890",
+      namedFromAddress: accountInfos[0].name,
+      fromAddress: accountInfos[0].address,
       namedToAddress: "0x Exchange Proxy",
       toAddress: "0xDef1C0ded9bec7F1a1670819833240f027b25EfF",
       networkSymbol: "ETH",
@@ -292,7 +328,7 @@ class TransactionParserTests: XCTestCase {
       transaction: transaction,
       network: network,
       accountInfos: accountInfos,
-      visibleTokens: tokens,
+      userAssets: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
       solEstimatedTxFee: nil,
@@ -333,7 +369,8 @@ class TransactionParserTests: XCTestCase {
     )
     let transaction = BraveWallet.TransactionInfo(
       id: "3",
-      fromAddress: "0x1234567890123456789012345678901234567890",
+      fromAddress: accountInfos[0].address,
+      from: accountInfos[0].accountId,
       txHash: "0xaaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeeeffffffffff1234",
       txDataUnion: .init(ethTxData1559: transactionData),
       txStatus: .confirmed,
@@ -348,13 +385,14 @@ class TransactionParserTests: XCTestCase {
       submittedTime: Date(),
       confirmedTime: Date(),
       originInfo: nil,
-      groupId: nil
+      chainId: BraveWallet.MainnetChainId,
+      effectiveRecipient: transactionData.baseData.to
     )
     
     let expectedParsedTransaction = ParsedTransaction(
       transaction: transaction,
-      namedFromAddress: "Ethereum Account 1",
-      fromAddress: "0x1234567890123456789012345678901234567890",
+      namedFromAddress: accountInfos[0].name,
+      fromAddress: accountInfos[0].address,
       namedToAddress: "0x Exchange Proxy",
       toAddress: "0xDef1C0ded9bec7F1a1670819833240f027b25EfF",
       networkSymbol: "ETH",
@@ -380,7 +418,7 @@ class TransactionParserTests: XCTestCase {
       transaction: transaction,
       network: network,
       accountInfos: accountInfos,
-      visibleTokens: tokens,
+      userAssets: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
       solEstimatedTxFee: nil,
@@ -421,7 +459,8 @@ class TransactionParserTests: XCTestCase {
     )
     let transaction = BraveWallet.TransactionInfo(
       id: "4",
-      fromAddress: "0x1234567890123456789012345678901234567890",
+      fromAddress: accountInfos[0].address,
+      from: accountInfos[0].accountId,
       txHash: "0xaaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeeeffffffffff1234",
       txDataUnion: .init(ethTxData1559: transactionData),
       txStatus: .confirmed,
@@ -432,13 +471,14 @@ class TransactionParserTests: XCTestCase {
       submittedTime: Date(),
       confirmedTime: Date(),
       originInfo: nil,
-      groupId: nil
+      chainId: BraveWallet.MainnetChainId,
+      effectiveRecipient: transactionData.baseData.to
     )
     
     let expectedParsedTransaction = ParsedTransaction(
       transaction: transaction,
-      namedFromAddress: "Ethereum Account 1",
-      fromAddress: "0x1234567890123456789012345678901234567890",
+      namedFromAddress: accountInfos[0].name,
+      fromAddress: accountInfos[0].address,
       namedToAddress: BraveWallet.BlockchainToken.previewDaiToken.contractAddress.truncatedAddress,
       toAddress: BraveWallet.BlockchainToken.previewDaiToken.contractAddress,
       networkSymbol: "ETH",
@@ -462,7 +502,7 @@ class TransactionParserTests: XCTestCase {
       transaction: transaction,
       network: network,
       accountInfos: accountInfos,
-      visibleTokens: tokens,
+      userAssets: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
       solEstimatedTxFee: nil,
@@ -503,7 +543,8 @@ class TransactionParserTests: XCTestCase {
     )
     let transaction = BraveWallet.TransactionInfo(
       id: "5",
-      fromAddress: "0x1234567890123456789012345678901234567890",
+      fromAddress: accountInfos[0].address,
+      from: accountInfos[0].accountId,
       txHash: "0xaaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeeeffffffffff1234",
       txDataUnion: .init(ethTxData1559: transactionData),
       txStatus: .confirmed,
@@ -514,13 +555,14 @@ class TransactionParserTests: XCTestCase {
       submittedTime: Date(),
       confirmedTime: Date(),
       originInfo: nil,
-      groupId: nil
+      chainId: BraveWallet.MainnetChainId,
+      effectiveRecipient: transactionData.baseData.to
     )
     
     let expectedParsedTransaction = ParsedTransaction(
       transaction: transaction,
-      namedFromAddress: "Ethereum Account 1",
-      fromAddress: "0x1234567890123456789012345678901234567890",
+      namedFromAddress: accountInfos[0].name,
+      fromAddress: accountInfos[0].address,
       namedToAddress: BraveWallet.BlockchainToken.previewDaiToken.contractAddress.truncatedAddress,
       toAddress: BraveWallet.BlockchainToken.previewDaiToken.contractAddress,
       networkSymbol: "ETH",
@@ -544,7 +586,7 @@ class TransactionParserTests: XCTestCase {
       transaction: transaction,
       network: network,
       accountInfos: accountInfos,
-      visibleTokens: tokens,
+      userAssets: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
       solEstimatedTxFee: nil,
@@ -585,7 +627,8 @@ class TransactionParserTests: XCTestCase {
     )
     let transaction = BraveWallet.TransactionInfo(
       id: "6",
-      fromAddress: "0x1234567890123456789012345678901234567890",
+      fromAddress: accountInfos[0].address,
+      from: accountInfos[0].accountId,
       txHash: "0xaaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeeeffffffffff1234",
       txDataUnion: .init(ethTxData1559: transactionData),
       txStatus: .confirmed,
@@ -600,13 +643,14 @@ class TransactionParserTests: XCTestCase {
       submittedTime: Date(),
       confirmedTime: Date(),
       originInfo: nil,
-      groupId: nil
+      chainId: BraveWallet.MainnetChainId,
+      effectiveRecipient: transactionData.baseData.to
     )
     
     let expectedParsedTransaction = ParsedTransaction(
       transaction: transaction,
-      namedFromAddress: "Ethereum Account 1",
-      fromAddress: "0x1234567890123456789012345678901234567890",
+      namedFromAddress: accountInfos[0].name,
+      fromAddress: accountInfos[0].address,
       namedToAddress: "Ethereum Account 2",
       toAddress: "0x0987654321098765432109876543210987654321",
       networkSymbol: "ETH",
@@ -629,7 +673,7 @@ class TransactionParserTests: XCTestCase {
       transaction: transaction,
       network: network,
       accountInfos: accountInfos,
-      visibleTokens: tokens,
+      userAssets: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
       solEstimatedTxFee: nil,
@@ -647,8 +691,8 @@ class TransactionParserTests: XCTestCase {
     let transactionData: BraveWallet.SolanaTxData = .init(
       recentBlockhash: "",
       lastValidBlockHeight: 0,
-      feePayer: "0xaaaaaaaaaabbbbbbbbbbccccccccccdddddddddd",
-      toWalletAddress: "0xeeeeeeeeeeffffffffff11111111112222222222",
+      feePayer: accountInfos[2].accountId.address,
+      toWalletAddress: accountInfos[3].accountId.address,
       splTokenMintAddress: "",
       lamports: 100000000,
       amount: 0,
@@ -656,16 +700,23 @@ class TransactionParserTests: XCTestCase {
       instructions: [
         .init(
           programId: "",
-          accountMetas: [.init(pubkey: "", isSigner: false, isWritable: false)],
+          accountMetas: [
+            .init(pubkey: "", addrTableLookupIndex: nil, isSigner: false, isWritable: false)
+          ],
           data: [],
           decodedData: nil)
       ],
+      version: .legacy,
+      messageHeader: .init(),
+      staticAccountKeys: [],
+      addressTableLookups: [],
       send: .init(maxRetries: .init(maxRetries: 1), preflightCommitment: nil, skipPreflight: nil),
       signTransactionParam: nil
     )
     let transaction = BraveWallet.TransactionInfo(
       id: "7",
-      fromAddress: "0xaaaaaaaaaabbbbbbbbbbccccccccccdddddddddd",
+      fromAddress: accountInfos[2].accountId.address,
+      from: accountInfos[2].accountId,
       txHash: "0xaaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeeeffffffffff1234",
       txDataUnion: .init(solanaTxData: transactionData),
       txStatus: .confirmed,
@@ -677,14 +728,15 @@ class TransactionParserTests: XCTestCase {
       submittedTime: Date(),
       confirmedTime: Date(),
       originInfo: nil,
-      groupId: nil
+      chainId: BraveWallet.SolanaMainnet,
+      effectiveRecipient: nil
     )
     let expectedParsedTransaction = ParsedTransaction(
       transaction: transaction,
-      namedFromAddress: "Solana Account 1",
-      fromAddress: "0xaaaaaaaaaabbbbbbbbbbccccccccccdddddddddd",
-      namedToAddress: "Solana Account 2",
-      toAddress: "0xeeeeeeeeeeffffffffff11111111112222222222",
+      namedFromAddress: accountInfos[2].name,
+      fromAddress: accountInfos[2].accountId.address,
+      namedToAddress: accountInfos[3].name,
+      toAddress: accountInfos[3].accountId.address,
       networkSymbol: "SOL",
       details: .solSystemTransfer(
         .init(
@@ -704,7 +756,7 @@ class TransactionParserTests: XCTestCase {
       transaction: transaction,
       network: network,
       accountInfos: accountInfos,
-      visibleTokens: tokens,
+      userAssets: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
       solEstimatedTxFee: 1230000,
@@ -736,8 +788,8 @@ class TransactionParserTests: XCTestCase {
     let transactionData: BraveWallet.SolanaTxData = .init(
       recentBlockhash: "",
       lastValidBlockHeight: 0,
-      feePayer: "0xaaaaaaaaaabbbbbbbbbbccccccccccdddddddddd",
-      toWalletAddress: "0xeeeeeeeeeeffffffffff11111111112222222222",
+      feePayer: accountInfos[2].accountId.address,
+      toWalletAddress: accountInfos[3].accountId.address,
       splTokenMintAddress: BraveWallet.BlockchainToken.mockSpdToken.contractAddress,
       lamports: 0,
       amount: 43210000,
@@ -745,16 +797,23 @@ class TransactionParserTests: XCTestCase {
       instructions: [
         .init(
           programId: "",
-          accountMetas: [.init(pubkey: "", isSigner: false, isWritable: false)],
+          accountMetas: [
+            .init(pubkey: "", addrTableLookupIndex: nil, isSigner: false, isWritable: false)
+          ],
           data: [],
           decodedData: nil)
       ],
+      version: .legacy,
+      messageHeader: .init(),
+      staticAccountKeys: [],
+      addressTableLookups: [],
       send: .init(maxRetries: .init(maxRetries: 1), preflightCommitment: nil, skipPreflight: nil),
       signTransactionParam: nil
     )
     let transaction = BraveWallet.TransactionInfo(
       id: "7",
-      fromAddress: "0xaaaaaaaaaabbbbbbbbbbccccccccccdddddddddd",
+      fromAddress: accountInfos[2].accountId.address,
+      from: accountInfos[2].accountId,
       txHash: "0xaaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeeeffffffffff1234",
       txDataUnion: .init(solanaTxData: transactionData),
       txStatus: .confirmed,
@@ -766,14 +825,15 @@ class TransactionParserTests: XCTestCase {
       submittedTime: Date(),
       confirmedTime: Date(),
       originInfo: nil,
-      groupId: nil
+      chainId: BraveWallet.SolanaMainnet,
+      effectiveRecipient: nil
     )
     let expectedParsedTransaction = ParsedTransaction(
       transaction: transaction,
-      namedFromAddress: "Solana Account 1",
-      fromAddress: "0xaaaaaaaaaabbbbbbbbbbccccccccccdddddddddd",
-      namedToAddress: "Solana Account 2",
-      toAddress: "0xeeeeeeeeeeffffffffff11111111112222222222",
+      namedFromAddress: accountInfos[2].name,
+      fromAddress: accountInfos[2].accountId.address,
+      namedToAddress: accountInfos[3].name,
+      toAddress: accountInfos[3].accountId.address,
       networkSymbol: "SOL",
       details: .solSplTokenTransfer(
         .init(
@@ -793,7 +853,7 @@ class TransactionParserTests: XCTestCase {
       transaction: transaction,
       network: network,
       accountInfos: accountInfos,
-      visibleTokens: tokens,
+      userAssets: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
       solEstimatedTxFee: 12300000,
@@ -812,8 +872,8 @@ class TransactionParserTests: XCTestCase {
     let transactionData: BraveWallet.SolanaTxData = .init(
       recentBlockhash: "",
       lastValidBlockHeight: 0,
-      feePayer: "0xaaaaaaaaaabbbbbbbbbbccccccccccdddddddddd",
-      toWalletAddress: "0xeeeeeeeeeeffffffffff11111111112222222222",
+      feePayer: accountInfos[2].accountId.address,
+      toWalletAddress: accountInfos[3].accountId.address,
       splTokenMintAddress: BraveWallet.BlockchainToken.mockSolanaNFTToken.contractAddress,
       lamports: 0,
       amount: 1,
@@ -821,16 +881,23 @@ class TransactionParserTests: XCTestCase {
       instructions: [
         .init(
           programId: "",
-          accountMetas: [.init(pubkey: "", isSigner: false, isWritable: false)],
+          accountMetas: [
+            .init(pubkey: "", addrTableLookupIndex: nil, isSigner: false, isWritable: false)
+          ],
           data: [],
           decodedData: nil)
       ],
+      version: .legacy,
+      messageHeader: .init(),
+      staticAccountKeys: [],
+      addressTableLookups: [],
       send: .init(maxRetries: .init(maxRetries: 1), preflightCommitment: nil, skipPreflight: nil),
       signTransactionParam: nil
     )
     let transaction = BraveWallet.TransactionInfo(
       id: "7",
-      fromAddress: "0xaaaaaaaaaabbbbbbbbbbccccccccccdddddddddd",
+      fromAddress: accountInfos[2].accountId.address,
+      from: accountInfos[2].accountId,
       txHash: "0xaaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeeeffffffffff1234",
       txDataUnion: .init(solanaTxData: transactionData),
       txStatus: .confirmed,
@@ -842,14 +909,15 @@ class TransactionParserTests: XCTestCase {
       submittedTime: Date(),
       confirmedTime: Date(),
       originInfo: nil,
-      groupId: nil
+      chainId: BraveWallet.SolanaMainnet,
+      effectiveRecipient: nil
     )
     let expectedParsedTransaction = ParsedTransaction(
       transaction: transaction,
-      namedFromAddress: "Solana Account 1",
-      fromAddress: "0xaaaaaaaaaabbbbbbbbbbccccccccccdddddddddd",
-      namedToAddress: "Solana Account 2",
-      toAddress: "0xeeeeeeeeeeffffffffff11111111112222222222",
+      namedFromAddress: accountInfos[2].name,
+      fromAddress: accountInfos[2].accountId.address,
+      namedToAddress: accountInfos[3].name,
+      toAddress: accountInfos[3].accountId.address,
       networkSymbol: "SOL",
       details: .solSplTokenTransfer(
         .init(
@@ -869,7 +937,7 @@ class TransactionParserTests: XCTestCase {
       transaction: transaction,
       network: network,
       accountInfos: accountInfos,
-      visibleTokens: tokens,
+      userAssets: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
       solEstimatedTxFee: 12300000,
@@ -888,19 +956,19 @@ class TransactionParserTests: XCTestCase {
     let transferInstruction = BraveWallet.SolanaInstruction(
       programId: BraveWallet.SolanaSystemProgramId,
       accountMetas: [
-        .init(pubkey: fromPubkey, isSigner: false, isWritable: false),
-        .init(pubkey: toPubkey, isSigner: false, isWritable: false)
+        .init(pubkey: fromPubkey, addrTableLookupIndex: nil, isSigner: false, isWritable: false),
+        .init(pubkey: toPubkey, addrTableLookupIndex: nil, isSigner: false, isWritable: false)
       ],
       data: [],
       decodedData: .init(
         instructionType: UInt32(BraveWallet.SolanaSystemInstruction.transfer.rawValue),
         accountParams: [
-          .init(name: "from_account", localizedName: "From Account"),
-          .init(name: "to_account", localizedName: "To Account"),],
-        params: [.init(name: "lamports", localizedName: "Lamports", value: "10000")]
+          .init(name: BraveWallet.FromAccount, localizedName: "From Account"),
+          .init(name: BraveWallet.ToAccount, localizedName: "To Account"),],
+        params: [.init(name: BraveWallet.Lamports, localizedName: "Lamports", value: "10000", type: .uint64)]
       )
     )
-    let expectedParsedTransfer = SolanaDappTxDetails.ParsedSolanaInstruction(
+    let expectedParsedTransfer = SolanaTxDetails.ParsedSolanaInstruction(
       name: "System Program - Transfer",
       details: [
         .init(key: "From Account", value: fromPubkey),
@@ -915,28 +983,28 @@ class TransactionParserTests: XCTestCase {
     let withdrawNonceAccountInstruction = BraveWallet.SolanaInstruction(
       programId: BraveWallet.SolanaSystemProgramId,
       accountMetas: [
-        .init(pubkey: fromPubkey, isSigner: false, isWritable: false),
-        .init(pubkey: toPubkey, isSigner: false, isWritable: false),
-        .init(pubkey: "SysvarRecentB1ockHashes11111111111111111111", isSigner: false, isWritable: false),
-        .init(pubkey: "SysvarRent111111111111111111111111111111111", isSigner: false, isWritable: false),
-        .init(pubkey: toPubkey, isSigner: false, isWritable: false),
+        .init(pubkey: fromPubkey, addrTableLookupIndex: nil, isSigner: false, isWritable: false),
+        .init(pubkey: toPubkey, addrTableLookupIndex: nil, isSigner: false, isWritable: false),
+        .init(pubkey: "SysvarRecentB1ockHashes11111111111111111111", addrTableLookupIndex: nil, isSigner: false, isWritable: false),
+        .init(pubkey: "SysvarRent111111111111111111111111111111111", addrTableLookupIndex: nil, isSigner: false, isWritable: false),
+        .init(pubkey: toPubkey, addrTableLookupIndex: nil, isSigner: false, isWritable: false),
       ],
       data: [],
       decodedData: .init(
         instructionType: UInt32(BraveWallet.SolanaSystemInstruction.withdrawNonceAccount.rawValue),
         accountParams: [
-          .init(name: "nonce_account", localizedName: "Nonce Account"),
-          .init(name: "to_account", localizedName: "To Account"),
+          .init(name: BraveWallet.NonceAccount, localizedName: "Nonce Account"),
+          .init(name: BraveWallet.ToAccount, localizedName: "To Account"),
           .init(name: "recentblockhashes_sysvar", localizedName: "RecentBlockhashes sysvar"),
           .init(name: "rent_sysvar", localizedName: "Rent sysvar"),
           .init(name: "nonce_authority", localizedName: "Nonce Authority")
         ],
         params: [
-          .init(name: "lamports", localizedName: "Lamports", value: "40")
+          .init(name: BraveWallet.Lamports, localizedName: "Lamports", value: "40", type: .uint64)
         ]
       )
     )
-    let expectedParsedWithdrawNonceAccount = SolanaDappTxDetails.ParsedSolanaInstruction(
+    let expectedParsedWithdrawNonceAccount = SolanaTxDetails.ParsedSolanaInstruction(
       name: "System Program - Withdraw Nonce Account",
       details: [
         .init(key: "Nonce Account", value: fromPubkey),
@@ -954,24 +1022,24 @@ class TransactionParserTests: XCTestCase {
     let createAccountInstruction = BraveWallet.SolanaInstruction(
       programId: BraveWallet.SolanaSystemProgramId,
       accountMetas: [
-        .init(pubkey: fromPubkey, isSigner: false, isWritable: false),
-        .init(pubkey: toPubkey, isSigner: false, isWritable: false),
+        .init(pubkey: fromPubkey, addrTableLookupIndex: nil, isSigner: false, isWritable: false),
+        .init(pubkey: toPubkey, addrTableLookupIndex: nil, isSigner: false, isWritable: false),
       ],
       data: [],
       decodedData: .init(
         instructionType: UInt32(BraveWallet.SolanaSystemInstruction.createAccount.rawValue),
         accountParams: [
-          .init(name: "from_account", localizedName: "From Account"),
-          .init(name: "new_account", localizedName: "New Account"),
+          .init(name: BraveWallet.FromAccount, localizedName: "From Account"),
+          .init(name: BraveWallet.NewAccount, localizedName: "New Account"),
         ],
         params: [
-          .init(name: "lamports", localizedName: "Lamports", value: "2000"),
-          .init(name: "space", localizedName: "Space", value: "1"),
-          .init(name: "owner_program", localizedName: "Owner Program", value: toPubkey)
+          .init(name: BraveWallet.Lamports, localizedName: "Lamports", value: "2000", type: .uint64),
+          .init(name: "space", localizedName: "Space", value: "1", type: .unknown),
+          .init(name: "owner_program", localizedName: "Owner Program", value: toPubkey, type: .unknown)
         ]
       )
     )
-    let expectedParsedCreateAccount = SolanaDappTxDetails.ParsedSolanaInstruction(
+    let expectedParsedCreateAccount = SolanaTxDetails.ParsedSolanaInstruction(
       name: "System Program - Create Account",
       details: [
         .init(key: "From Account", value: fromPubkey),
@@ -988,26 +1056,26 @@ class TransactionParserTests: XCTestCase {
     let createAccountWithSeedInstruction = BraveWallet.SolanaInstruction(
       programId: BraveWallet.SolanaSystemProgramId,
       accountMetas: [
-        .init(pubkey: fromPubkey, isSigner: false, isWritable: false),
-        .init(pubkey: toPubkey, isSigner: false, isWritable: false),
+        .init(pubkey: fromPubkey, addrTableLookupIndex: nil, isSigner: false, isWritable: false),
+        .init(pubkey: toPubkey, addrTableLookupIndex: nil, isSigner: false, isWritable: false),
       ],
       data: [],
       decodedData: .init(
         instructionType: UInt32(BraveWallet.SolanaSystemInstruction.createAccountWithSeed.rawValue),
         accountParams: [
-          .init(name: "from_account", localizedName: "From Account"),
+          .init(name: BraveWallet.FromAccount, localizedName: "From Account"),
           .init(name: "created_account", localizedName: "Created Account"),
         ],
         params: [
-          .init(name: "lamports", localizedName: "Lamports", value: "300"),
-          .init(name: "base", localizedName: "Base", value: toPubkey),
-          .init(name: "seed", localizedName: "Seed", value: ""),
-          .init(name: "space", localizedName: "Space", value: "1"),
-          .init(name: "owner_program", localizedName: "Owner Program", value: toPubkey)
+          .init(name: BraveWallet.Lamports, localizedName: "Lamports", value: "300", type: .uint64),
+          .init(name: "base", localizedName: "Base", value: toPubkey, type: .unknown),
+          .init(name: "seed", localizedName: "Seed", value: "", type: .unknown),
+          .init(name: "space", localizedName: "Space", value: "1", type: .unknown),
+          .init(name: "owner_program", localizedName: "Owner Program", value: toPubkey, type: .unknown)
         ]
       )
     )
-    let expectedParsedCreateAccountWithSeed = SolanaDappTxDetails.ParsedSolanaInstruction(
+    let expectedParsedCreateAccountWithSeed = SolanaTxDetails.ParsedSolanaInstruction(
       name: "System Program - Create Account With Seed",
       details: [
         .init(key: "From Account", value: fromPubkey),
@@ -1022,5 +1090,93 @@ class TransactionParserTests: XCTestCase {
       instruction: createAccountWithSeedInstruction
     )
     XCTAssertNoDifference(expectedParsedCreateAccountWithSeed, TransactionParser.parseSolanaInstruction(createAccountWithSeedInstruction))
+  }
+  
+  func testFilecoinSendTransfer() {
+    let network: BraveWallet.NetworkInfo = .mockFilecoinTestnet
+    
+    let transactionData: BraveWallet.FilTxData = .init(
+      nonce: "",
+      gasPremium: "100911",
+      gasFeeCap: "101965",
+      gasLimit: "1527953",
+      maxFee: "0",
+      to: accountInfos[5].address,
+      value: "1000000000000000000"
+    )
+    let transaction = BraveWallet.TransactionInfo(
+      id: "8",
+      fromAddress: accountInfos[4].address,
+      from: accountInfos[4].accountId,
+      txHash: "0xaaaaaaaaaabbbbbbbbbbccccccccccddddddddddeeeeeeeeeeffffffffffggggg1234",
+      txDataUnion: .init(filTxData: transactionData),
+      txStatus: .unapproved,
+      txType: .other,
+      txParams: [],
+      txArgs: [
+      ],
+      createdTime: Date(),
+      submittedTime: Date(),
+      confirmedTime: Date(),
+      originInfo: nil,
+      chainId: BraveWallet.FilecoinTestnet,
+      effectiveRecipient: nil
+    )
+  
+    let expectedParsedTransaction = ParsedTransaction(
+      transaction: transaction,
+      namedFromAddress: accountInfos[4].name,
+      fromAddress: accountInfos[4].address,
+      namedToAddress: accountInfos[5].name,
+      toAddress: accountInfos[5].address,
+      networkSymbol: "FIL",
+      details: .filSend(
+        .init(
+          sendToken: .mockFilToken,
+          sendValue: "1000000000000000000",
+          sendAmount: "1",
+          sendFiat: "$2.00",
+          gasPremium: "0.000000000000100911",
+          gasLimit: "0.000000000001527953",
+          gasFeeCap: "0.000000000000101965",
+          gasFee: GasFee(
+            fee: "0.000000155797727645",
+            fiat: "$0.0000003116"
+          )
+        )
+      )
+    )
+    
+    guard let parsedTransaction = TransactionParser.parseTransaction(
+      transaction: transaction,
+      network: network,
+      accountInfos: accountInfos,
+      userAssets: tokens,
+      allTokens: tokens,
+      assetRatios: assetRatios,
+      solEstimatedTxFee: nil,
+      currencyFormatter: currencyFormatter
+    ) else {
+      XCTFail("Failed to parse filecoinSendTransfer transaction")
+      return
+    }
+    
+    XCTAssertEqual(expectedParsedTransaction.fromAddress, parsedTransaction.fromAddress)
+    XCTAssertEqual(expectedParsedTransaction.namedFromAddress, parsedTransaction.namedFromAddress)
+    XCTAssertEqual(expectedParsedTransaction.toAddress, parsedTransaction.toAddress)
+    XCTAssertEqual(expectedParsedTransaction.networkSymbol, parsedTransaction.networkSymbol)
+    guard case let .filSend(expectedDetails) = expectedParsedTransaction.details,
+          case let .filSend(parsedDetails) = parsedTransaction.details else {
+      XCTFail("Incorrectly parsed filecoinSendTransfer transaction")
+      return
+    }
+  
+    XCTAssertEqual(expectedDetails.sendValue, parsedDetails.sendValue)
+    XCTAssertEqual(expectedDetails.sendAmount, parsedDetails.sendAmount)
+    XCTAssertEqual(expectedDetails.sendFiat, parsedDetails.sendFiat)
+    XCTAssertEqual(expectedDetails.gasPremium, parsedDetails.gasPremium)
+    XCTAssertEqual(expectedDetails.gasLimit, parsedDetails.gasLimit)
+    XCTAssertEqual(expectedDetails.gasFeeCap, parsedDetails.gasFeeCap)
+    XCTAssertEqual(expectedDetails.gasFee, parsedDetails.gasFee)
   }
 }

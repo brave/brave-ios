@@ -4,19 +4,64 @@
 
 import UIKit
 import Shared
-import BraveShared
+import Preferences
 import BraveCore
 import os.log
 
-public class NTPDataSource {
+enum NTPWallpaper {
+  case image(NTPBackgroundImage)
+  case sponsoredImage(NTPSponsoredImageBackground)
+  case superReferral(NTPSponsoredImageBackground, code: String)
+  
+  var backgroundImage: UIImage? {
+    let imagePath: URL
+    switch self {
+    case .image(let background):
+      imagePath = background.imagePath
+    case .sponsoredImage(let background):
+      imagePath = background.imagePath
+    case .superReferral(let background, _):
+      imagePath = background.imagePath
+    }
+    return UIImage(contentsOfFile: imagePath.path)
+  }
+  
+  var logoImage: UIImage? {
+    let imagePath: URL?
+    switch self {
+    case .image:
+      imagePath = nil
+    case .sponsoredImage(let background):
+      imagePath = background.logo.imagePath
+    case .superReferral(let background, _):
+      imagePath = background.logo.imagePath
+    }
+    return imagePath.flatMap { UIImage(contentsOfFile: $0.path) }
+  }
+  
+  var focalPoint: CGPoint? {
+    switch self {
+    case .image:
+      return nil // Will eventually return a real value
+    case .sponsoredImage(let background):
+      return background.focalPoint
+    case .superReferral(let background, _):
+      return background.focalPoint
+    }
+  }
+}
 
-  var initializeFavorites: ((_ sites: [CustomTheme.TopSite]?) -> Void)?
+public class NTPDataSource {
+  
+  private(set) var privateBrowsingManager: PrivateBrowsingManager
+
+  var initializeFavorites: ((_ sites: [NTPSponsoredImageTopSite]?) -> Void)?
 
   /// Custom homepage spec requirement:
   /// If we fail to fetch super referrer, and it succeeds at later time,
   /// default favorites are going to be replaced with the ones from the super referrer.
   /// This happens only if the user has not changed default favorites.
-  var replaceFavoritesIfNeeded: ((_ sites: [CustomTheme.TopSite]?) -> Void)?
+  var replaceFavoritesIfNeeded: ((_ sites: [NTPSponsoredImageTopSite]?) -> Void)?
 
   // Data is static to avoid duplicate loads
 
@@ -37,51 +82,24 @@ public class NTPDataSource {
   ///     sponsored image should be shown. (`1` means, first image in cycle N, should be shown).
   /// One example, if rotation is every 4 images, but sponsored image should be shown as 2nd image, then this will
   ///     be reset back to `1` after reaching `4`, and when the value is `2`, a sponsored image will be shown.
-  // This can be easily converted to a preference to persist
+  /// This can be easily converted to a preference to persist
   private var backgroundRotationCounter = 1
 
-  private lazy var downloader = NTPDownloader()
-  private var customTheme: CustomTheme?
-  private var sponsor: NTPSponsor?
+  let service: NTPBackgroundImagesService
 
-  private lazy var standardBackgrounds: [NTPWallpaper] = {
-    let backgroundFilePath = "ntp-data"
-    guard let backgroundData = self.loadData(file: backgroundFilePath) else { return [] }
-
-    do {
-      return try JSONDecoder().decode([NTPWallpaper].self, from: backgroundData)
-    } catch {
-      return []
-    }
-  }()
-
-  public init() {
-    downloader.delegate = self
-
-    Preferences.NewTabPage.backgroundSponsoredImages.observe(from: self)
+  public init(service: NTPBackgroundImagesService, privateBrowsingManager: PrivateBrowsingManager) {
+    self.service = service
+    self.privateBrowsingManager = privateBrowsingManager
+    
     Preferences.NewTabPage.selectedCustomTheme.observe(from: self)
-  }
-
-  public func startFetching() {
-    let downloadType = downloader.currentResourceType
-    // For super referrer we want to load assets from cache first, then check if new resources
-    // are on the server.
-    // This is because as super referrer install we never want to show other images than the ones
-    // provided by the super referrer.
-    // In the future we might want to extend this preload from cache logic to other resource types.
-    if case .superReferral = downloadType {
-      downloader.preloadCustomTheme()
-    }
-
-    if downloader.delegate != nil {
-      downloader.notifyObservers(for: downloader.currentResourceType)
+    
+    self.service.sponsoredImageDataUpdated = { [weak self] _ in
+      self?.sponsorComponentUpdated()
     }
   }
-
-  public func fetchSpecificResource(_ type: NTPDownloader.ResourceType) {
-    if downloader.delegate != nil {
-      downloader.notifyObservers(for: type)
-    }
+  
+  deinit {
+    self.service.sponsoredImageDataUpdated = nil
   }
 
   // This is used to prevent the same handful of backgrounds from being shown.
@@ -91,12 +109,6 @@ public class NTPDataSource {
   // This can 'easily' be adjusted to support both sets by switching to String, and using filePath to identify uniqueness.
   private var lastBackgroundChoices = [Int]()
 
-  enum BackgroundType {
-    case regular
-    case withBrandLogo(_ logo: NTPLogo?)
-    case withQRCode(_ code: String)
-  }
-
   private enum ImageRotationStrategy {
     /// Special strategy for sponsored images, uses in-memory property to keep track of which image to show.
     case sponsoredRotation
@@ -104,36 +116,40 @@ public class NTPDataSource {
     case randomOrderAvoidDuplicates
   }
 
-  func newBackground() -> (NTPWallpaper, BackgroundType)? {
+  func newBackground() -> NTPWallpaper? {
     if !Preferences.NewTabPage.backgroundImages.value { return nil }
 
     // Identifying the background array to use
-    let (backgroundSet, backgroundType, strategy) = {
-      () -> ([NTPWallpaper], BackgroundType, ImageRotationStrategy) in
+    let (backgroundSet, strategy) = {
+      () -> ([NTPWallpaper], ImageRotationStrategy) in
 
-      if let theme = customTheme,
-        let refCode = theme.refCode,
+      if let theme = service.superReferralImageData,
+         case let refCode = service.superReferralCode,
+         !refCode.isEmpty,
         Preferences.NewTabPage.selectedCustomTheme.value != nil {
-        return (theme.wallpapers, .withQRCode(refCode), .randomOrderAvoidDuplicates)
+        return (theme.campaigns.flatMap(\.backgrounds).map { NTPWallpaper.superReferral($0, code: refCode) }, .randomOrderAvoidDuplicates)
       }
 
-      if let sponsor = sponsor {
+      if let sponsor = service.sponsoredImageData {
         let attemptSponsored =
           Preferences.NewTabPage.backgroundSponsoredImages.value
           && backgroundRotationCounter == NTPDataSource.sponsorshipShowValue
-          && !PrivateBrowsingManager.shared.isPrivateBrowsing
+          && !privateBrowsingManager.isPrivateBrowsing
 
         if attemptSponsored {
           // Pick the campaign randomly
           let campaignIndex: Int = Int.random(in: 0..<sponsor.campaigns.count)
 
           if let campaign = sponsor.campaigns[safe: campaignIndex] {
-            return (campaign.wallpapers, .withBrandLogo(campaign.logo), .sponsoredRotation)
+            return (campaign.backgrounds.map(NTPWallpaper.sponsoredImage), .sponsoredRotation)
           }
         }
       }
 
-      return (standardBackgrounds, .regular, .randomOrderAvoidDuplicates)
+      if service.backgroundImages.isEmpty {
+        return ([NTPWallpaper.image(.fallback)], .randomOrderAvoidDuplicates)
+      }
+      return (service.backgroundImages.map(NTPWallpaper.image), .randomOrderAvoidDuplicates)
     }()
 
     if backgroundSet.isEmpty { return nil }
@@ -175,75 +191,30 @@ public class NTPDataSource {
     backgroundRotationCounter += 1
 
     guard let bgWithIndex = backgroundSet[safe: backgroundIndex] else { return nil }
-    return (bgWithIndex, backgroundType)
+    return bgWithIndex
   }
-
-  private func loadData(file: String) -> Data? {
-    guard let filePath = Bundle.module.path(forResource: file, ofType: "json") else {
-      return nil
-    }
-
-    do {
-      let backgroundData = try Data(contentsOf: URL(fileURLWithPath: filePath))
-      return backgroundData
-    } catch {
-      Logger.module.error("Failed to get bundle path for \(file)")
-    }
-
-    return nil
-  }
-}
-
-extension NTPDataSource: NTPDownloaderDelegate {
-  func onSponsorUpdated(sponsor: NTPSponsor?) {
-    self.sponsor = sponsor
-
-    // Force to set up basic favorites if it hasn't been done already.
-    initializeFavorites?(nil)
-  }
-
-  func onThemeUpdated(theme: CustomTheme?) {
-    self.customTheme = theme
-
-    if Preferences.NewTabPage.preloadedFavoritiesInitialized.value {
-      replaceFavoritesIfNeeded?(theme?.topSites)
+  
+  func sponsorComponentUpdated() {
+    if let superReferralImageData = service.superReferralImageData, superReferralImageData.isSuperReferral {
+      if Preferences.NewTabPage.preloadedFavoritiesInitialized.value {
+        replaceFavoritesIfNeeded?(superReferralImageData.topSites)
+      } else {
+        initializeFavorites?(superReferralImageData.topSites)
+      }
     } else {
-      initializeFavorites?(theme?.topSites)
+      // Force to set up basic favorites if it hasn't been done already.
+      initializeFavorites?(nil)
     }
-  }
-
-  func preloadCustomTheme(theme: CustomTheme?) {
-    self.customTheme = theme
   }
 }
 
 extension NTPDataSource: PreferencesObserver {
   public func preferencesDidChange(for key: String) {
-    let sponsoredPref = Preferences.NewTabPage.backgroundSponsoredImages
     let customThemePref = Preferences.NewTabPage.selectedCustomTheme
     let installedThemesPref = Preferences.NewTabPage.installedCustomThemes
 
     switch key {
-    case sponsoredPref.key:
-      if sponsoredPref.value {
-        // Issue download only when no custom theme is currently set.
-        if customThemePref.value == nil {
-          Preferences.NTP.ntpCheckDate.value = nil
-          downloader.delegate = self
-          fetchSpecificResource(.sponsor)
-        }
-
-      } else {
-        downloader.delegate = nil
-        do {
-          try downloader.removeCampaign(type: .sponsor)
-        } catch {
-          Logger.module.error("\(error.localizedDescription)")
-        }
-      }
     case customThemePref.key:
-      downloader.delegate = self
-
       let installedThemes = installedThemesPref.value
       if let theme = customThemePref.value, !installedThemes.contains(theme) {
         installedThemesPref.value = installedThemesPref.value + [theme]
@@ -252,4 +223,21 @@ extension NTPDataSource: PreferencesObserver {
       break
     }
   }
+}
+
+extension NTPSponsoredImageTopSite {
+  var asFavoriteSite: FavoriteSite? {
+    guard let url = destinationURL else {
+      return nil
+    }
+    return FavoriteSite(url, name)
+  }
+}
+
+extension NTPBackgroundImage {
+  static let fallback: NTPBackgroundImage = .init(
+    imagePath: Bundle.module.url(forResource: "corwin-prescott-3", withExtension: "jpg")!,
+    author: "Corwin Prescott",
+    link: URL(string: "https://www.brave.com")!
+  )
 }

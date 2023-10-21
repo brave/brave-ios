@@ -74,9 +74,10 @@ private class WebViewNavigationAdapter: NSObject, WKNavigationDelegate {
   }
 }
 
-class TabSessionTests: XCTestCase {
+@MainActor class TabSessionTests: XCTestCase {
   private var tabManager: TabManager!
   private let maxTimeout = 60.0
+  private let privateBrowsingManager = PrivateBrowsingManager()
 
   override class func setUp() {
     super.setUp()
@@ -89,7 +90,7 @@ class TabSessionTests: XCTestCase {
     DataController.shared.initializeOnce()
     tabManager = { () -> TabManager in
       let profile = BrowserProfile(localName: "profile")
-      return TabManager(prefs: profile.prefs, imageStore: nil, rewards: nil, tabGeneratorAPI: nil)
+      return TabManager(windowId: UUID(), prefs: profile.prefs, rewards: nil, tabGeneratorAPI: nil, privateBrowsingManager: privateBrowsingManager)
     }()
   }
 
@@ -104,26 +105,12 @@ class TabSessionTests: XCTestCase {
     tabManager.removeAll()
     tabManager.reset()
 
-    let group = DispatchGroup()
-
-    group.enter()
-    History.deleteAll({
-      group.leave()
-    })
-
     HTTPCookieStorage.shared.removeCookies(since: .distantPast)
 
-    group.enter()
     WKWebsiteDataStore.default().removeData(
       ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(),
       modifiedSince: .distantPast,
       completionHandler: {
-        group.leave()
-      })
-
-    group.notify(
-      queue: .main,
-      execute: {
         completion()
       })
   }
@@ -632,7 +619,7 @@ class TabSessionTests: XCTestCase {
     let group = DispatchGroup()
     for tab in self.tabManager.allTabs {
       // include all scripts
-      UserScriptManager.shared.loadCustomScripts(into: tab, userScripts: scripts, customScripts: customScripts, walletEthProviderScript: nil, walletSolProviderScripts: [:])
+      UserScriptManager.shared.loadCustomScripts(into: tab, userScripts: scripts, customScripts: customScripts)
 
       group.enter()
     }

@@ -9,7 +9,7 @@ import BraveShared
 import Shared
 import AVKit
 import AVFoundation
-
+import Playlist
 import MediaPlayer
 
 protocol VideoViewDelegate: AnyObject {
@@ -187,10 +187,6 @@ class VideoView: UIView, VideoTrackerBarDelegate {
 
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
-  }
-
-  deinit {
-    detachLayer()
   }
 
   override func layoutSubviews() {
@@ -578,7 +574,7 @@ class VideoView: UIView, VideoTrackerBarDelegate {
     staticImageView.contentMode = .scaleAspectFit
   }
 
-  func setVideoInfo(videoDomain: String, videoTitle: String?) {
+  func setVideoInfo(videoDomain: String, videoTitle: String?, isPrivateBrowsing: Bool) {
     var displayTitle = videoTitle ?? ""
 
     if displayTitle.isEmpty {
@@ -600,7 +596,7 @@ class VideoView: UIView, VideoTrackerBarDelegate {
     }
 
     infoView.titleLabel.text = displayTitle
-    infoView.updateFavIcon(domain: videoDomain)
+    infoView.updateFavIcon(domain: videoDomain, isPrivateBrowsing: isPrivateBrowsing)
   }
 
   func resetVideoInfo() {
@@ -653,25 +649,19 @@ class VideoView: UIView, VideoTrackerBarDelegate {
           changeHandler: { [weak self] _, change in
             guard let self = self else { return }
             
-            if let tracks = change.newValue,
-               !(tracks?.isEmpty ?? true),
-               !(self.delegate?.isVideoTracksAvailable ?? true) {
-              self.particleView.alpha = 1.0
-            } else {
-              self.particleView.alpha = 0.0
+            DispatchQueue.main.async {
+              if let tracks = change.newValue,
+                 !(tracks?.isEmpty ?? true),
+                 !(self.delegate?.isVideoTracksAvailable ?? true) {
+                self.particleView.alpha = 1.0
+              } else {
+                self.particleView.alpha = 0.0
+              }
             }
           }
         )
       }
     }
-  }
-
-  func detachLayer() {
-    playerStatusObserver = nil
-
-    staticImageView.layer.removeFromSuperlayer()
-    playerLayer?.removeFromSuperlayer()
-    playerLayer?.player = nil
   }
 
   func play() {
@@ -711,11 +701,6 @@ extension VideoView: UIGestureRecognizerDelegate {
   func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
     let location = touch.location(in: self)
     let restrictedViews = [infoView, controlsView]
-    for view in restrictedViews {
-      if view.point(inside: self.convert(location, to: view), with: nil) {
-        return false
-      }
-    }
-    return true
+    return !restrictedViews.contains(where: { $0.point(inside: self.convert(location, to: $0), with: nil) })
   }
 }

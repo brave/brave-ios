@@ -3,7 +3,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import BraveShared
+import BraveStrings
 import Data
 import UIKit
 import Favicon
@@ -45,17 +45,12 @@ extension TabTrayController: UITableViewDataSource, UITableViewDelegate {
     
     cell.imageIconView.do {
       $0.contentMode = .scaleAspectFit
-      $0.image = Favicon.defaultImage
-      $0.layer.borderColor = BraveUX.faviconBorderColor.cgColor
-      $0.layer.borderWidth = BraveUX.faviconBorderWidth
+      $0.layer.borderColor = FaviconUX.faviconBorderColor.cgColor
+      $0.layer.borderWidth = FaviconUX.faviconBorderWidth
       $0.layer.cornerRadius = 6
       $0.layer.cornerCurve = .continuous
       $0.layer.masksToBounds = true
-      
-      // TODO: Remove Domain creation and load FavIcon method swap the method with brave-core fetch #5312
-      $0.loadFavicon(
-        for: distantTab.url,
-        monogramFallbackCharacter: distantTab.title?.first)
+      $0.loadFavicon(for: distantTab.url, isPrivateBrowsing: tabManager.privateBrowsingManager.isPrivateBrowsing)
     }
   }
   
@@ -76,15 +71,16 @@ extension TabTrayController: UITableViewDataSource, UITableViewDelegate {
     
     switch sectionDetails.deviceFormFactor {
     case .phone, .tablet:
-      deviceTypeImage = UIImage(braveSystemNamed: "brave.tablet.and.phone")
+      deviceTypeImage = UIImage(braveSystemNamed: "leo.smartphone.tablet-portrait")
     case .desktop:
-      deviceTypeImage = UIImage(braveSystemNamed: "brave.laptop")
+      deviceTypeImage = UIImage(braveSystemNamed: "leo.laptop")
     default:
-      deviceTypeImage = UIImage(braveSystemNamed: "brave.laptop.and.phone")
+      deviceTypeImage = UIImage(braveSystemNamed: "leo.smartphone.laptop")
     }
         
     let headerView = tableView.dequeueReusableHeaderFooter() as TabSyncHeaderView
-
+    let browserColors: some BrowserColors = .standard // Sync devices dont appear in private mode
+    
     headerView.do {
       $0.imageIconView.image = deviceTypeImage?.template
       $0.titleLabel.text = sectionDetails.name
@@ -94,8 +90,8 @@ extension TabTrayController: UITableViewDataSource, UITableViewDelegate {
       $0.isCollapsed = hiddenSections.contains(section)
       $0.section = section
       $0.delegate = self
-      $0.backgroundColor = .secondaryBraveBackground
-      $0.tintColor = .secondaryBraveBackground
+      $0.backgroundColor = browserColors.chromeBackground
+      $0.tintColor = browserColors.chromeBackground
     }
          
     return headerView
@@ -215,17 +211,17 @@ extension Date {
   var formattedSyncSessionPeriodDate: String {
     let hourFormatter = DateFormatter().then {
       $0.locale = .current
-      $0.dateFormat = "HH:mm a"
+      $0.dateFormat = "h:mm a"
     }
     
     let hourDayFormatter = DateFormatter().then {
       $0.locale = .current
-      $0.dateFormat = "EEEE HH:mm a"
+      $0.dateFormat = "EEEE h:mm a"
     }
     
     let fullDateFormatter = DateFormatter().then {
       $0.locale = .current
-      $0.dateFormat = "HH:mm a MM-dd-yyyy"
+      $0.dateFormat = "h:mm a MM-dd-yyyy"
     }
         
     if compare(getCurrentDateWith(dayOffset: TimePeriodOffset.today.period)) ==

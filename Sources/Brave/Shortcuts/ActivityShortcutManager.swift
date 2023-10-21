@@ -5,7 +5,7 @@
 
 import Shared
 import Data
-import BraveShared
+import Preferences
 import Intents
 import CoreSpotlight
 import MobileCoreServices
@@ -16,6 +16,7 @@ import BraveNews
 import Growth
 import os.log
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// Shortcut Activity Types and detailed information to create and perform actions
 public enum ActivityType: String {
@@ -100,7 +101,7 @@ public class ActivityShortcutManager: NSObject {
   // MARK: Activity Creation Methods
 
   public func createShortcutActivity(type: ActivityType) -> NSUserActivity {
-    let attributes = CSSearchableItemAttributeSet(itemContentType: kUTTypeItem as String)
+    let attributes = CSSearchableItemAttributeSet(itemContentType: UTType.item.identifier)
     attributes.contentDescription = type.description
 
     let activity = NSUserActivity(activityType: type.identifier)
@@ -128,7 +129,7 @@ public class ActivityShortcutManager: NSObject {
   private func handleActivityDetails(type: ActivityType, using bvc: BrowserViewController) {
     switch type {
     case .newTab:
-      bvc.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing, isExternal: true)
+      bvc.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: bvc.privateBrowsingManager.isPrivateBrowsing, isExternal: true)
       bvc.popToBVC()
     case .newPrivateTab:
       bvc.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: true, isExternal: true)
@@ -136,7 +137,7 @@ public class ActivityShortcutManager: NSObject {
     case .clearBrowsingHistory:
       bvc.clearHistoryAndOpenNewTab()
     case .enableBraveVPN:
-      bvc.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: PrivateBrowsingManager.shared.isPrivateBrowsing, isExternal: true)
+      bvc.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: bvc.privateBrowsingManager.isPrivateBrowsing, isExternal: true)
       bvc.popToBVC()
 
       switch BraveVPN.vpnState {
@@ -168,7 +169,7 @@ public class ActivityShortcutManager: NSObject {
         })
         controller.viewDidDisappear = {
           if Preferences.Review.braveNewsCriteriaPassed.value {
-            AppReviewManager.shared.isReviewRequired = true
+            AppReviewManager.shared.isRevisedReviewRequired = true
             Preferences.Review.braveNewsCriteriaPassed.value = false
           }
         }
@@ -176,9 +177,12 @@ public class ActivityShortcutManager: NSObject {
         bvc.present(container, animated: true)
       }
     case .openPlayList:
+      bvc.popToBVC()
+      
       let tab = bvc.tabManager.selectedTab
       PlaylistCarplayManager.shared.getPlaylistController(tab: tab) { playlistController in
         playlistController.modalPresentationStyle = .fullScreen
+        PlaylistP3A.recordUsage()
         bvc.present(playlistController, animated: true)
       }
     }
@@ -212,8 +216,7 @@ public class ActivityShortcutManager: NSObject {
   // MARK: Intent Donation Methods
 
   public func donateCustomIntent(for type: IntentType, with urlString: String) {
-    guard !PrivateBrowsingManager.shared.isPrivateBrowsing,
-          !urlString.isEmpty,
+    guard !urlString.isEmpty,
           URL(string: urlString) != nil else {
       return
     }

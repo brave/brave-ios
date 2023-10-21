@@ -53,10 +53,12 @@ struct TransactionHeader: View {
                 AddressView(address: fromAccountAddress) {
                   Text(fromAccountName)
                 }
+                .frame(minWidth: 0, maxWidth: .infinity)
                 Image(systemName: "arrow.right")
                 AddressView(address: toAccountAddress) {
                   Text(toAccountName)
                 }
+                .frame(minWidth: 0, maxWidth: .infinity)
               }
             }
           }
@@ -72,7 +74,7 @@ struct TransactionHeader: View {
         ))
       )
       if let originInfo = originInfo {
-        Text(urlOrigin: originInfo.origin)
+        Text(originInfo: originInfo)
           .foregroundColor(Color(.braveLabel))
           .font(.subheadline)
           .multilineTextAlignment(.center)

@@ -6,11 +6,11 @@ import UIKit
 import Shared
 import BraveShared
 import BraveUI
+import BraveShields
 
 class AdvancedShieldsView: UIStackView {
   let siteTitle = HeaderTitleView()
-  let adsTrackersControl = ToggleView(title: Strings.blockAdsAndTracking)
-  let blockMalwareControl = ToggleView(title: Strings.blockPhishing)
+  let adsTrackersControl = ToggleView(title: Strings.Shields.trackersAndAdsBlocking)
   let blockScriptsControl = ToggleView(title: Strings.blockScripts)
   let fingerprintingControl = ToggleView(title: Strings.fingerprintingProtection)
   let globalControlsTitleView = HeaderTitleView().then {
@@ -26,7 +26,6 @@ class AdvancedShieldsView: UIStackView {
     let rows: [UIView] = [
       siteTitle,
       adsTrackersControl,
-      blockMalwareControl,
       blockScriptsControl,
       fingerprintingControl,
       globalControlsTitleView,
@@ -110,6 +109,7 @@ extension AdvancedShieldsView {
       toggleSwitch.addTarget(self, action: #selector(switchValueChanged), for: .valueChanged)
 
       toggleSwitch.setContentHuggingPriority(.required, for: .horizontal)
+      toggleSwitch.setContentCompressionResistancePriority(.required, for: .horizontal)
 
       snp.makeConstraints {
         $0.height.greaterThanOrEqualTo(toggleSwitch)

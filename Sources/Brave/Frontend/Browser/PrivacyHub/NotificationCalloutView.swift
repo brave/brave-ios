@@ -6,7 +6,7 @@
 import SwiftUI
 import BraveUI
 import Shared
-import BraveShared
+import Preferences
 import DesignSystem
 import os.log
 
@@ -51,7 +51,7 @@ extension PrivacyReportsView {
             if sizeCategory.isAccessibilityCategory {
               Text(Strings.PrivacyHub.notificationCalloutButtonText)
             } else {
-              Label(Strings.PrivacyHub.notificationCalloutButtonText, braveSystemImage: "brave.bell")
+              Label(Strings.PrivacyHub.notificationCalloutButtonText, braveSystemImage: "leo.notification")
             }
           }
           .font(.callout)
