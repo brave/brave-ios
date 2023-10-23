@@ -126,12 +126,12 @@ struct NFTView: View {
         HStack(spacing: 12) {
           Text(nftStore.displayType.dropdownTitle)
             .font(.subheadline.weight(.semibold))
-          Text("\(nftStore.totalDisplayNFTCounter)")
+          Text("\(nftStore.totalDisplayedNFTCount)")
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
             .font(.caption2.weight(.semibold))
             .background(
-              Color(uiColor: WalletV2Design.displayNFTCounterColor)
+              Color(braveSystemName: .primary20)
                 .cornerRadius(4)
             )
           Image(braveSystemName: "leo.carat.down")

@@ -156,7 +156,7 @@ struct FiltersDisplaySettingsView: View {
     self._isHidingSmallBalances = State(initialValue: filters.isHidingSmallBalances)
     self._isHidingUnownedNFTs = State(initialValue: filters.groupBy == .accounts ? true : filters.isHidingUnownedNFTs)
     self._isShowingNFTNetworkLogo = State(initialValue: filters.isShowingNFTNetworkLogo)
-    self._isHidingUnownedNFTsDisabled = State(initialValue: filters.groupBy == .accounts ? true : false)
+    self._isHidingUnownedNFTsDisabled = State(initialValue: filters.groupBy == .accounts)
     self._accounts = State(initialValue: filters.accounts)
     self._networks = State(initialValue: filters.networks)
     self.isNFTFilters = isNFTFilters

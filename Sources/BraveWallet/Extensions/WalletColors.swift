@@ -257,11 +257,4 @@ enum WalletV2Design {
     blue: 207 / 255,
     alpha: 1
   )
-  
-  static let displayNFTCounterColor = UIColor(
-    red: 213 / 255,
-    green: 220 / 255,
-    blue: 1,
-    alpha: 1
-  )
 }
