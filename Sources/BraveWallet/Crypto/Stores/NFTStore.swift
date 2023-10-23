@@ -263,8 +263,8 @@ public class NFTStore: ObservableObject, WalletObserverStore {
         .map { networkAssets in
           NetworkAssets(
             network: networkAssets.network,
-            tokens: networkAssets.tokens.filter { $0.isNft || $0.isErc721 }
-            , sortOrder: networkAssets.sortOrder
+            tokens: networkAssets.tokens.filter { $0.isNft || $0.isErc721 },
+            sortOrder: networkAssets.sortOrder
           )
         }
       // user hidden NFTs
@@ -272,8 +272,8 @@ public class NFTStore: ObservableObject, WalletObserverStore {
         .map { networkAssets in
           NetworkAssets(
             network: networkAssets.network,
-            tokens: networkAssets.tokens.filter { $0.isNft || $0.isErc721 }
-            , sortOrder: networkAssets.sortOrder
+            tokens: networkAssets.tokens.filter { $0.isNft || $0.isErc721 },
+            sortOrder: networkAssets.sortOrder
           )
         }
       // all spam NFTs marked by SimpleHash
