@@ -22,3 +22,13 @@ public class ShieldPreferences {
     set { blockAdsAndTrackingLevelRaw.value = newValue.rawValue }
   }
 }
+
+// MARK: - Youtube warning
+
+extension ShieldPreferences {
+  /// The bool detemining if adblock warning was shown
+  public static let hasSeenAntiAdBlockWarning = Preferences.Option<Bool>(
+    key: "shields.has-seen-anti-ad-block-warning",
+    default: false
+  )
+}
