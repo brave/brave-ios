@@ -8,6 +8,7 @@ import WebKit
 import Shared
 import Data
 import os.log
+import BraveShields
 
 /// This handler receives a list of ids and selectors for a given frame for which it is then able to inject scripts and css rules in order to hide certain elements
 ///
@@ -31,9 +32,12 @@ class CosmeticFiltersScriptHandler: TabContentScript {
   static let userScript: WKUserScript? = nil
   
   private weak var tab: Tab?
+  private let youtubeWarningCallback: (URL) -> Void
+  private var shownYoutubeWarning = false
   
-  init(tab: Tab) {
+  init(tab: Tab, youtubeWarningCallback: @escaping (URL) -> Void) {
     self.tab = tab
+    self.youtubeWarningCallback = youtubeWarningCallback
   }
   
   func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
@@ -80,6 +84,19 @@ class CosmeticFiltersScriptHandler: TabContentScript {
             aggressiveSelectors = aggressiveSelectors.union(tuple.selectors)
           } else {
             standardSelectors = standardSelectors.union(tuple.selectors)
+          }
+        }
+        
+        // Based on what we block we want to show the youtube warning
+        // TODO: @JS Figure out which selectors should trigger this warning
+        if !ShieldPreferences.hasSeenAntiAdBlockWarning.value {
+          if let url = self.tab?.url, let etldP1 = url.baseDomain, etldP1 == "youtube.com" {
+            if !shownYoutubeWarning {
+              shownYoutubeWarning = true
+              youtubeWarningCallback(url)
+            }
+          } else {
+            shownYoutubeWarning = false
           }
         }
         

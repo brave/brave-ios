@@ -90,6 +90,25 @@ public struct BraveOutlineButtonStyle: ButtonStyle {
   }
 }
 
+public struct BravePlainButtonStyle: ButtonStyle {
+  @Environment(\.isEnabled) private var isEnabled
+
+  public var size: BraveButtonSize
+
+  public init(size: BraveButtonSize) {
+    self.size = size
+  }
+
+  public func makeBody(configuration: Configuration) -> some View {
+    configuration.label
+      .opacity(configuration.isPressed ? 0.7 : 1.0)
+      .font(size.font)
+      .foregroundColor(isEnabled ? Color(.braveLabel) : Color(.braveDisabled))
+      .padding(size.padding)
+      .animation(.linear(duration: 0.15), value: isEnabled)
+  }
+}
+
 #if DEBUG
 struct BraveButtonStyle_Previews: PreviewProvider {
   static let defaultSizes: [BraveButtonSize] = [

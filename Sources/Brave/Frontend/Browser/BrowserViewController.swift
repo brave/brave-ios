@@ -2693,15 +2693,34 @@ extension BrowserViewController: TabDelegate {
       ReadyStateScriptHandler(tab: tab),
       DeAmpScriptHandler(tab: tab),
       SiteStateListenerScriptHandler(tab: tab),
-      CosmeticFiltersScriptHandler(tab: tab),
       URLPartinessScriptHandler(tab: tab),
       FaviconScriptHandler(tab: tab),
       Web3NameServiceScriptHandler(tab: tab),
       Web3IPFSScriptHandler(tab: tab),
       YoutubeQualityScriptHandler(tab: tab),
-      
       tab.contentBlocker,
       tab.requestBlockingContentHelper,
+      
+      CosmeticFiltersScriptHandler(tab: tab, youtubeWarningCallback: { [weak self] url in
+        guard let self = self else { return }
+        let viewController = AntiAdBlockWarningViewController(url: url)
+        
+        let popover = PopoverController(
+          contentController: viewController,
+          contentSizeBehavior: .preferredContentSize
+        )
+        
+        viewController.dismissCallback = { [weak self, weak popover] needsReload in
+          if needsReload {
+            self?.tabManager.reloadSelectedTab()
+          }
+          
+          popover?.dismissPopover()
+        }
+        
+        popover.arrowDirectionBehavior = .automatic
+        popover.present(from: self.topToolbar.locationView.shieldsButton, on: self)
+      }),
     ]
     
     if #unavailable(iOS 16.0) {
