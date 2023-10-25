@@ -7,7 +7,6 @@ import Shared
 import Preferences
 import WebKit
 import os.log
-import iAd
 import AdServices
 
 public class UserReferralProgram {

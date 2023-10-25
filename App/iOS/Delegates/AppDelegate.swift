@@ -220,7 +220,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     if Preferences.URP.installAttributionLookupOutstanding.value == nil {
-      // Similarly to referral lookup set thgis prefrence if it is never set
+      // Similarly to referral lookup, this prefrence should be set if it is a new user
       // Trigger install attribution fetch only first launch
       Preferences.URP.installAttributionLookupOutstanding.value = isFirstLaunch
 
