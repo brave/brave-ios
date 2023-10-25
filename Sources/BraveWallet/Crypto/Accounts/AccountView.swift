@@ -11,13 +11,15 @@ struct AccountView: View {
   var address: String
   /// The account name describing what the account is for
   var name: String
+  /// The shape of the blockie used
+  var blockieShape: Blockie.Shape = .circle
 
   @ScaledMetric private var avatarSize = 40.0
   private let maxAvatarSize: CGFloat = 80.0
 
   var body: some View {
     HStack {
-      Blockie(address: address)
+      Blockie(address: address, shape: blockieShape)
         .frame(width: min(avatarSize, maxAvatarSize), height: min(avatarSize, maxAvatarSize))
       VStack(alignment: .leading, spacing: 2) {
         Text(name)
