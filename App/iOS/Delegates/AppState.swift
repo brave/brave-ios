@@ -191,7 +191,8 @@ public class AppState {
       (ErrorPageHandler.path, ErrorPageHandler()),
       (ReaderModeHandler.path, ReaderModeHandler(profile: profile)),
       (IPFSSchemeHandler.path, IPFSSchemeHandler()),
-      (Web3DomainHandler.path, Web3DomainHandler())
+      (Web3DomainHandler.path, Web3DomainHandler()),
+      (PlayerHandler.path, PlayerHandler())
     ]
 
     responders.forEach { (path, responder) in

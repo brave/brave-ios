@@ -149,6 +149,10 @@ extension URL {
     if let internalUrl = InternalURL(self), internalUrl.isSessionRestore || internalUrl.isWeb3URL {
       return internalUrl.extractedUrlParam?.displayURL
     }
+    
+    if let internalUrl = InternalURL(self), internalUrl.isBravePlayerPage {
+      return internalUrl.extractedUrlParam?.displayURL
+    }
 
     if !InternalURL.isValid(url: self) {
       let url = self.havingRemovedAuthorisationComponents()
@@ -507,6 +511,7 @@ public struct InternalURL {
     case errorpage = "errorpage"
     case sessionrestore = "sessionrestore"
     case readermode = "reader-mode"
+    case player = "player"
     func matches(_ string: String) -> Bool {
       return string.range(of: "/?\(self.rawValue)", options: .regularExpression, range: nil, locale: nil) != nil
     }
@@ -572,6 +577,10 @@ public struct InternalURL {
   
   public var isReaderModePage: Bool {
     return InternalURL.Path.readermode.matches(url.path)
+  }
+  
+  public var isBravePlayerPage: Bool {
+    return InternalURL.Path.player.matches(url.path)
   }
 
   public var originalURLFromErrorPage: URL? {

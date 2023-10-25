@@ -457,6 +457,11 @@ extension BrowserViewController: WKNavigationDelegate {
     if let url = responseURL {
       request = pendingRequests.removeValue(forKey: url.absoluteString)
     }
+    
+    if let videoID = PlayerUtils.youTubeVideoID(from: responseURL!) {
+      tabManager.addTabAndSelect(PrivilegedRequest(url: URL(string: "\(InternalURL.baseUrl)/\(InternalURL.Path.player.rawValue)?url=\(responseURL!.absoluteString.escape()!)")!) as URLRequest, isPrivate: false)
+      return .cancel
+    }
 
     // We can only show this content in the web view if this web view is not pending
     // download via the context menu.
