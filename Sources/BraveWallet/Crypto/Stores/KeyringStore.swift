@@ -287,6 +287,7 @@ public class KeyringStore: ObservableObject, WalletObserverStore {
       }
       self.isWalletCreated = await keyringService.isWalletCreated()
       // fallback case where user completed front-end onboarding, but has no keyring created/accounts.
+      // this can occur if we crash prior to saving, ex. brave-ios #8291
       if !isWalletCreated && Preferences.Wallet.isOnboardingCompleted.value {
         Preferences.Wallet.isOnboardingCompleted.reset()
       }
