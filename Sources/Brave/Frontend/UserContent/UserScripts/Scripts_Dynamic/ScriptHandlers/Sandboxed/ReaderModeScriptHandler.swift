@@ -256,6 +256,23 @@ class ReaderModeScriptHandler: TabContentScript {
   static let messageHandlerName = "readerModeMessageHandler"
   static let scriptSandbox: WKContentWorld = .defaultClient
   static let userScript: WKUserScript? = nil
+  
+  /// Checking if active tab url is one of the reader domain restirected urls
+  /// Reader Mode  is getting restricted for SERP pages like 'search.brave.com'
+  var isReaderModeRestrictedDomain: Bool {
+    get {
+      guard let url = tab?.webView?.url else {
+        return false
+      }
+      let urlHost = url.host ?? url.hostSLD
+      
+      let siteList = Set<String>([
+        "search.brave.com"
+      ])
+      
+      return siteList.contains(where: urlHost.contains)
+    }
+  }
 
   fileprivate func handleReaderPageEvent(_ readerPageEvent: ReaderPageEvent) {
     switch readerPageEvent {
@@ -302,7 +319,9 @@ class ReaderModeScriptHandler: TabContentScript {
           }
         case .stateChange:
           if let readerModeState = ReaderModeState(rawValue: msg["Value"] as? String ?? "Invalid") {
-            handleReaderModeStateChange(readerModeState)
+            let restrictedDomainChange = readerModeState == .available && isReaderModeRestrictedDomain
+
+            handleReaderModeStateChange(restrictedDomainChange ? .unavailable : readerModeState)
           }
         case .contentParsed:
           if let readabilityResult = ReadabilityResult(object: msg["Value"] as AnyObject?) {
