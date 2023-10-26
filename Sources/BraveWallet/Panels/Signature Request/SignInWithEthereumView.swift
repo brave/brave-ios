@@ -87,7 +87,12 @@ struct SignInWithEthereumView: View {
         originInfo.eTldPlusOne, originInfo.eTldPlusOne
       ))
       
-      NavigationLink(destination: SignInWithEthereumDetailsView(message: message)) {
+      NavigationLink(
+        destination: SignInWithEthereumDetailsView(
+          originInfo: originInfo,
+          message: message
+        )
+      ) {
         Text(Strings.Wallet.seeDetailsButtonTitle)
           .fontWeight(.semibold)
           .foregroundColor(Color(braveSystemName: .textInteractive))
@@ -156,6 +161,7 @@ struct SignInWithEthereumView: View {
 /// The view pushed when user taps to view request details.
 private struct SignInWithEthereumDetailsView: View {
   
+  let originInfo: BraveWallet.OriginInfo
   let message: BraveWallet.SIWEMessage
   
   var body: some View {
@@ -163,7 +169,7 @@ private struct SignInWithEthereumDetailsView: View {
       LazyVStack {
         LazyVStack {
           LazyVStack { // Max view count on `LazyVStack`
-            detailRow(title: Strings.Wallet.siweOriginLabel, value: Text(urlOrigin: message.origin))
+            detailRow(title: Strings.Wallet.siweOriginLabel, value: Text(originInfo: originInfo))
             Divider()
             detailRow(title: Strings.Wallet.siweAddressLabel, value: Text(verbatim: message.address))
             if let statement = message.statement {
