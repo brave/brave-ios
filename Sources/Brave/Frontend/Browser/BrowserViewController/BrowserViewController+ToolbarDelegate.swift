@@ -18,6 +18,8 @@ import Preferences
 import CertificateUtilities
 import AVFoundation
 import Playlist
+import Onboarding
+import BraveShields
 
 // MARK: - TopToolbarDelegate
 
@@ -642,6 +644,33 @@ extension BrowserViewController: TopToolbarDelegate {
       selectedTab.webView?.findInteraction?.dismissFindNavigator()
     }
     presentWalletPanel(from: selectedTab.getOrigin(), with: selectedTab.tabDappStore)
+  }
+  
+  func topToolbarDidTapBravePlayerButton(_ urlBar: TopToolbarView) {
+    guard ShieldPreferences.useBravePlayer.value else {
+      let viewController = BravePlayerInfoViewController()
+      
+      let popover = PopoverController(
+        contentController: viewController,
+        contentSizeBehavior: .preferredContentSize
+      )
+      
+      viewController.dismissCallback = { [weak self, weak popover] confirmed in
+        ShieldPreferences.useBravePlayer.value = true
+        popover?.dismissPopover()
+        self?.launchBravePlayer()
+      }
+      
+      popover.arrowDirectionBehavior = .automatic
+      popover.present(from: self.topToolbar.locationView.bravePlayerButton, on: self)
+      return
+    }
+    
+    launchBravePlayer()
+  }
+  
+  private func launchBravePlayer() {
+    // TODO: Launch brave player
   }
     
   private func hideSearchController() {

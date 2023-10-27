@@ -9,6 +9,7 @@ import Preferences
 import Combine
 import BraveCore
 import DesignSystem
+import BraveShields
 
 protocol TabLocationViewDelegate {
   func tabLocationViewDidTapLocation(_ tabLocationView: TabLocationView)
@@ -21,6 +22,7 @@ protocol TabLocationViewDelegate {
   func tabLocationViewDidTapStop(_ tabLocationView: TabLocationView)
   func tabLocationViewDidTapVoiceSearch(_ tabLocationView: TabLocationView)
   func tabLocationViewDidTapShieldsButton(_ urlBar: TabLocationView)
+  func tabLocationViewDidTapBravePlayerButton(_ urlBar: TabLocationView)
   func tabLocationViewDidTapRewardsButton(_ urlBar: TabLocationView)
   func tabLocationViewDidTapWalletButton(_ urlBar: TabLocationView)
 }
@@ -43,6 +45,7 @@ class TabLocationView: UIView {
     didSet {
       updateLockImageView()
       updateURLBarWithText()
+      updateBravePlayerIcon()
       setNeedsUpdateConstraints()
     }
   }
@@ -79,6 +82,21 @@ class TabLocationView: UIView {
     case .secure, .unknown:
       lockImageView.setImage(UIImage(braveSystemNamed: "brave.lock.alt", compatibleWith: nil), for: .normal)
       lockImageView.accessibilityLabel = Strings.tabToolbarLockImageAccessibilityLabel
+    }
+  }
+  
+  private func updateBravePlayerIcon() {
+    guard let url = url else {
+      bravePlayerButton.isHidden = true
+      return
+    }
+    
+    if ShieldPreferences.hasSeenAntiAdBlockWarning.value, let etldP1 = url.baseDomain, let components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+      bravePlayerButton.isHidden = etldP1 != "youtube.com"
+        || components.path != "/watch"
+        || components.queryItems?.contains(where: { $0.name == "v" }) != true
+    } else {
+      bravePlayerButton.isHidden = true
     }
   }
 
@@ -211,6 +229,26 @@ class TabLocationView: UIView {
     button.accessibilityIdentifier = "urlBar-shieldsButton"
     return button
   }()
+  
+  lazy var bravePlayerButton: ToolbarButton = {
+    let button = ToolbarButton()
+    // Here we set the buttonimage to be a square gradient,
+    // then we apply a mask to the image view
+    let imageSize = CGRect(width: 22, height: 20)
+    let image = UIImage(braveSystemNamed: "leo.brave.player")
+    
+    let maskImageView = UIImageView(frame: imageSize)
+    maskImageView.image = image
+    button.setImage(UIImage.braveGradient(with: CGRect(width: 20, height: 20)), for: .normal)
+    button.setImage(UIImage.braveGradient(with: CGRect(width: 20, height: 20), darken: 0.7), for: .highlighted)
+    button.addTarget(self, action: #selector(didTapBravePlayerButton), for: .touchUpInside)
+    button.imageView?.contentMode = .scaleAspectFit
+    button.imageView?.mask = maskImageView
+    button.accessibilityLabel = Strings.Shields.bravePlayer
+    button.imageView?.adjustsImageSizeForAccessibilityContentSizeCategory = true
+    button.accessibilityIdentifier = "urlBar-bravePlayerButton"
+    return button
+  }()
 
   lazy var rewardsButton: RewardsButton = {
     let button = RewardsButton()
@@ -243,7 +281,7 @@ class TabLocationView: UIView {
 
     addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapLocationBar)))
     
-    var optionSubviews: [UIView] = [readerModeButton, walletButton, playlistButton]
+    var optionSubviews: [UIView] = [readerModeButton, walletButton, bravePlayerButton, playlistButton]
     if isVoiceSearchAvailable {
       optionSubviews.append(voiceSearchButton)
     }
@@ -406,6 +444,10 @@ class TabLocationView: UIView {
   @objc func didTapWalletButton() {
     delegate?.tabLocationViewDidTapWalletButton(self)
   }
+  
+  @objc func didTapBravePlayerButton() {
+    delegate?.tabLocationViewDidTapBravePlayerButton(self)
+  }
 }
 
 // MARK: - TabEventHandler
@@ -535,5 +577,30 @@ private class CustomSeparatorView: UIView {
 
   required init?(coder aDecoder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
+  }
+}
+
+extension UIImage {
+  /// Return a square gradient image
+  static func braveGradient(with frame: CGRect, darken: CGFloat? = nil) -> UIImage? {
+    let colors = [UIColor(rgb: 0xFA7250), UIColor(rgb: 0xFF1893), UIColor(rgb: 0xA78AFF)]
+    let layer = CAGradientLayer()
+    layer.backgroundColor = UIColor.black.cgColor
+    layer.frame = frame
+    layer.colors = colors.map({ color in
+      if let darken = darken {
+        return color.withAlphaComponent(darken).cgColor
+      } else {
+        return color.cgColor
+      }
+    })
+    layer.locations = [0, 0.5, 1]
+    layer.startPoint = CGPoint(x: 1, y: 1)
+    layer.endPoint = CGPoint(x: 0, y: 0)
+    UIGraphicsBeginImageContext(CGSize(width: frame.width, height: frame.height))
+    layer.render(in: UIGraphicsGetCurrentContext()!)
+    let image = UIGraphicsGetImageFromCurrentImageContext()
+    UIGraphicsEndImageContext()
+    return image
   }
 }
