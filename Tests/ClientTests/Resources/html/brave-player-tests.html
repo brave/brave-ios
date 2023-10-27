@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Brave Player Test</title>
+    
+    <script>
+      window.addEventListener("load", (event) => {
+        // Run all the navigation tests in sequence
+        setTimeout(() => {
+          document.getElementById('link-test').click();
+          
+          setTimeout(() => {
+            // Test javascript navigation (window.location)
+            window.location = '%PLAYER_URL%'
+          }, 1000)
+        }, 1000)
+      })
+    </script>
+  </head>
+
+  <body>
+    <h1>Frame test</h1>
+    <div>This test ensures that the brave player is not loaded in sub-frames</div>
+    <iframe src="%AUTHENTICATED_PLAYER_URL%"></iframe>
+
+    <h1>Navigation tests</h1>
+    <div>This test ensures that link navigation is blocked</div>
+    <a id="link-test" href="%PLAYER_URL%">Link test</a>
+  </body>
+</html>

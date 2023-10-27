@@ -12,6 +12,7 @@ import DesignSystem
 import BraveStrings
 import Strings
 import NaturalLanguage
+import BraveShields
 
 protocol TabLocationViewDelegate {
   func tabLocationViewDidTapLocation(_ tabLocationView: TabLocationView)
@@ -24,6 +25,7 @@ protocol TabLocationViewDelegate {
   func tabLocationViewDidTapVoiceSearch(_ tabLocationView: TabLocationView)
   func tabLocationViewDidTapWalletButton(_ urlBar: TabLocationView)
   func tabLocationViewDidTapSecureContentState(_ urlBar: TabLocationView)
+  func tabLocationViewDidTapBravePlayerButton(_ urlBar: TabLocationView)
 }
 
 private struct TabLocationViewUX {
@@ -107,8 +109,13 @@ class TabLocationView: UIView {
     var leadingView: UIView?
     defer { leadingItemView = leadingView }
     if !secureContentState.shouldDisplayWarning {
-      // Consider reader mode
-      leadingView = readerModeState != .unavailable ? readerModeButton : nil
+      if ShieldPreferences.hasSeenAntiAdBlockWarning.value, let url = url, PlayerUtils.makeBravePlayerURL(from: url) != nil {
+        leadingView = bravePlayerButton
+      } else {
+        // Consider reader mode
+        leadingView = readerModeState != .unavailable ? readerModeButton : nil
+      }
+      
       return
     }
     
@@ -214,6 +221,26 @@ class TabLocationView: UIView {
     $0.tintColor = .braveLabel
     $0.addTarget(self, action: #selector(didTapVoiceSearchButton), for: .touchUpInside)
   }
+  
+  private(set) lazy var bravePlayerButton: ToolbarButton = {
+    let button = ToolbarButton()
+    // Here we set the buttonimage to be a square gradient,
+    // then we apply a mask to the image view
+    let imageSize = CGRect(width: 22, height: 20)
+    let image = UIImage(braveSystemNamed: "leo.brave.player")
+    
+    let maskImageView = UIImageView(frame: imageSize)
+    maskImageView.image = image
+    button.setImage(UIImage.braveGradient(with: CGRect(width: 20, height: 20)), for: .normal)
+    button.setImage(UIImage.braveGradient(with: CGRect(width: 20, height: 20), darken: 0.7), for: .highlighted)
+    button.addTarget(self, action: #selector(didTapBravePlayerButton), for: .touchUpInside)
+    button.imageView?.contentMode = .scaleAspectFit
+    button.imageView?.mask = maskImageView
+    button.accessibilityLabel = Strings.Shields.bravePlayer
+    button.imageView?.adjustsImageSizeForAccessibilityContentSizeCategory = true
+    button.accessibilityIdentifier = "urlBar-bravePlayerButton"
+    return button
+  }()
 
   lazy var trailingTabOptionsStackView = UIStackView().then {
     $0.alignment = .center
@@ -422,14 +449,18 @@ class TabLocationView: UIView {
   }
   
   private func updateURLBarWithText() {
-    // Matches LocationBarModelImpl::GetFormattedURL in Chromium (except for omitHTTP)
-    // components/omnibox/browser/location_bar_model_impl.cc
-    // TODO: Export omnibox related APIs and use directly
-    urlDisplayLabel.text = URLFormatter.formatURL(
-      url?.absoluteString ?? "",
-      formatTypes: [.trimAfterHost, .omitHTTP, .omitHTTPS, .omitTrivialSubdomains],
-      unescapeOptions: .normal
-    )
+    if let url = url, let host = BraveSchemeHandler.host(for: url), let displayURL = host.displayURL {
+      urlDisplayLabel.text = displayURL.absoluteString
+    } else {
+      // Matches LocationBarModelImpl::GetFormattedURL in Chromium (except for omitHTTP)
+      // components/omnibox/browser/location_bar_model_impl.cc
+      // TODO: Export omnibox related APIs and use directly
+      urlDisplayLabel.text = URLFormatter.formatURL(
+        url?.absoluteString ?? "",
+        formatTypes: [.trimAfterHost, .omitHTTP, .omitHTTPS, .omitTrivialSubdomains],
+        unescapeOptions: .normal
+      )
+    }
     
     reloadButton.isHidden = url == nil
     voiceSearchButton.isHidden = (url != nil) || !isVoiceSearchAvailable
@@ -466,6 +497,10 @@ class TabLocationView: UIView {
   
   @objc func didTapWalletButton() {
     delegate?.tabLocationViewDidTapWalletButton(self)
+  }
+  
+  @objc func didTapBravePlayerButton() {
+    delegate?.tabLocationViewDidTapBravePlayerButton(self)
   }
 }
 
@@ -576,5 +611,30 @@ private class DisplayURLLabel: UILabel {
       clippingFade.isHidden = true
     }
     super.drawText(in: rect)
+  }
+}
+
+extension UIImage {
+  /// Return a square gradient image
+  static func braveGradient(with frame: CGRect, darken: CGFloat? = nil) -> UIImage? {
+    let colors = [UIColor(rgb: 0xFA7250), UIColor(rgb: 0xFF1893), UIColor(rgb: 0xA78AFF)]
+    let layer = CAGradientLayer()
+    layer.backgroundColor = UIColor.black.cgColor
+    layer.frame = frame
+    layer.colors = colors.map({ color in
+      if let darken = darken {
+        return color.withAlphaComponent(darken).cgColor
+      } else {
+        return color.cgColor
+      }
+    })
+    layer.locations = [0, 0.5, 1]
+    layer.startPoint = CGPoint(x: 1, y: 1)
+    layer.endPoint = CGPoint(x: 0, y: 0)
+    UIGraphicsBeginImageContext(CGSize(width: frame.width, height: frame.height))
+    layer.render(in: UIGraphicsGetCurrentContext()!)
+    let image = UIGraphicsGetImageFromCurrentImageContext()
+    UIGraphicsEndImageContext()
+    return image
   }
 }

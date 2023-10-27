@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<!-- Copyright 2023 The Brave Authors. All rights reserved.
+  -- This Source Code Form is subject to the terms of the Mozilla Public
+  -- License, v. 2.0. If a copy of the MPL was not distributed with this
+  -- file, You can obtain one at https://mozilla.org/MPL/2.0/.
+  -->
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'; child-src 'none'; object-src 'none'; frame-src https://www.youtube-nocookie.com">
+    <link rel="stylesheet" type="text/css" href="/styles/Player.css">
+    <script src="/scripts/Player.js"></script>
+    <title>%BRAVE_PLAYER_TITLE%</title>
+  </head>
+  <body>
+    <div id="player-container">
+      <iframe id="player" title="%PLAYER_LABEL%" width="100%" src="https://www.youtube-nocookie.com/embed/%YOUTUBE_VIDEO_ID%" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+      
+      <div id="toolbar">
+        <img src="/images/PlayerLogo.svg" alt="%PLAYER_LOGO_ALT_TEXT%">
+        <span id="product-name">%PLAYER_LABEL%</span>
+      </div>
+    </div>
+  </body>
+</html>

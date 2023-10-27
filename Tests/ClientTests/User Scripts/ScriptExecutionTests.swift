@@ -29,7 +29,8 @@ final class ScriptExecutionTests: XCTestCase {
   
   @MainActor func testSiteStateListenerScript() async throws {
     // Given
-    let viewController = MockScriptsViewController()
+    let navigationDelegate = ScriptsNavigationDelegate()
+    let viewController = MockWebViewController(navigationDelegate: navigationDelegate)
     
     // When
     let stream = viewController.attachScriptHandler(
@@ -42,9 +43,10 @@ final class ScriptExecutionTests: XCTestCase {
     viewController.add(scripts: [.siteStateListener])
     
     // Load the sample htmls page and await the first page load result
-    let htmlURL = Bundle.module.url(forResource: "index", withExtension: "html")!
+    let htmlURL = Bundle.module.url(forResource: "cosmetic-filter-tests", withExtension: "html")!
     let htmlString = try! String(contentsOf: htmlURL, encoding: .utf8)
-    try await viewController.loadHTMLStringAndWait(htmlString)
+    viewController.loadHTMLString(htmlString)
+    try await navigationDelegate.awaitPageLoad()
     
     // Then
     // Await the script handler and checks it's contents
@@ -68,8 +70,10 @@ final class ScriptExecutionTests: XCTestCase {
   
   @MainActor func testFarblingProtectionScript() async throws {
     // Given
-    let controlViewController = MockScriptsViewController()
-    let farbledViewController = MockScriptsViewController()
+    let controlNavigationDelegate = ScriptsNavigationDelegate()
+    let controlViewController = MockWebViewController(navigationDelegate: controlNavigationDelegate)
+    let farbledNavigationDelegate = ScriptsNavigationDelegate()
+    let farbledViewController = MockWebViewController(navigationDelegate: farbledNavigationDelegate)
     let etldP1 = "example.com"
     
     // When
@@ -100,10 +104,12 @@ final class ScriptExecutionTests: XCTestCase {
     controlViewController.add(userScript: testScript)
     
     // Load the sample htmls page and await the first page load result
-    let htmlURL = Bundle.module.url(forResource: "index", withExtension: "html")!
+    let htmlURL = Bundle.module.url(forResource: "cosmetic-filter-tests", withExtension: "html")!
     let htmlString = try! String(contentsOf: htmlURL, encoding: .utf8)
-    async let load1: Void = controlViewController.loadHTMLStringAndWait(htmlString)
-    async let load2: Void = farbledViewController.loadHTMLStringAndWait(htmlString)
+    controlViewController.loadHTMLString(htmlString)
+    farbledViewController.loadHTMLString(htmlString)
+    async let load1: Void = controlNavigationDelegate.awaitPageLoad()
+    async let load2: Void = farbledNavigationDelegate.awaitPageLoad()
     _ = try await (load1, load2)
     
     // Then
@@ -150,7 +156,8 @@ final class ScriptExecutionTests: XCTestCase {
   
   @MainActor func testRequestBlockingScript() async throws {
     // Given
-    let viewController = MockScriptsViewController()
+    let navigationDelegate = ScriptsNavigationDelegate()
+    let viewController = MockWebViewController(navigationDelegate: navigationDelegate)
     
     // When
     let blockingResultStream = viewController.attachScriptHandler(
@@ -177,9 +184,10 @@ final class ScriptExecutionTests: XCTestCase {
     viewController.add(userScript: testScript)
     
     // Load the sample htmls page and await the first page load result
-    let htmlURL = Bundle.module.url(forResource: "index", withExtension: "html")!
+    let htmlURL = Bundle.module.url(forResource: "cosmetic-filter-tests", withExtension: "html")!
     let htmlString = try String(contentsOf: htmlURL, encoding: .utf8)
-    try await viewController.loadHTMLStringAndWait(htmlString)
+    viewController.loadHTMLString(htmlString)
+    try await navigationDelegate.awaitPageLoad()
     
     // Then
     // Await the script handler and checks it's contents
@@ -204,7 +212,8 @@ final class ScriptExecutionTests: XCTestCase {
   
   @MainActor func testCosmeticFilteringScript() async throws {
     // Given
-    let viewController = MockScriptsViewController()
+    let navigationDelegate = ScriptsNavigationDelegate()
+    let viewController = MockWebViewController(navigationDelegate: navigationDelegate)
     let invalidSelectors = Set([
       "div.invalid-selector:has(span.update-components-actor__description:-abp-contains(/Anzeige|Sponsored|Promoted|Dipromosikan|Propagováno|Promoveret|Gesponsert|Promocionado|促銷內容|Post sponsorisé|프로모션|Post sponsorizzato|广告|プロモーション|Treść promowana|Patrocinado|Promovat|Продвигается|Marknadsfört|Nai-promote|ได้รับการโปรโมท|Öne çıkarılan içerik|Gepromoot|الترويج/))"
     ])
@@ -297,9 +306,10 @@ final class ScriptExecutionTests: XCTestCase {
     viewController.loadViewIfNeeded()
     
     // Load the sample htmls page and await the first page load result
-    let htmlURL = Bundle.module.url(forResource: "index", withExtension: "html")!
+    let htmlURL = Bundle.module.url(forResource: "cosmetic-filter-tests", withExtension: "html")!
     let htmlString = try String(contentsOf: htmlURL, encoding: .utf8)
-    try await viewController.loadHTMLStringAndWait(htmlString)
+    viewController.loadHTMLString(htmlString)
+    try await navigationDelegate.awaitPageLoad()
     
     // Execute the selectors poller script
     let script = try ScriptFactory.shared.makeScript(for: .selectorsPoller(setup))
@@ -354,5 +364,56 @@ final class ScriptExecutionTests: XCTestCase {
     XCTAssertEqual(resultsAfterPump?.hiddenIds.contains("test-ad-simple"), true)
     XCTAssertEqual(resultsAfterPump?.hiddenIds.contains("test-ad-primary-aggressive-1st-party"), true)
     XCTAssertEqual(resultsAfterPump?.hiddenIds.contains("test-ad-primary-aggressive-3rd-party"), true)
+  }
+}
+
+private class ScriptsNavigationDelegate: NSObject, WKNavigationDelegate, AsyncSequence {
+  typealias Element = (navigation: WKNavigation, error: Error?)
+  typealias AsyncIterator = MessageStream<Element>
+  
+  private let messageStream = MessageStream<Element>()
+  @MainActor private var stopped = false
+  
+  func makeAsyncIterator() -> MessageStream<Element> {
+    messageStream.start()
+    return messageStream
+  }
+  
+  func awaitPageLoad() async throws {
+    for try await message in self {
+      await stop()
+      
+      if let error = message.error {
+        throw error
+      } else {
+        // We only care about the first result because we know the page loaded
+        break
+      }
+    }
+  }
+  
+  @MainActor func stop() {
+    stopped = true
+    messageStream.stop()
+  }
+  
+  @MainActor func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    messageStream.add(message: (navigation, nil))
+  }
+  
+  @MainActor
+  func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse) async -> WKNavigationResponsePolicy {
+    guard !stopped else { return .cancel}
+    return .allow
+  }
+  
+  @MainActor
+  public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences) async -> (WKNavigationActionPolicy, WKWebpagePreferences) {
+    guard !stopped else { return (.cancel, preferences) }
+    return (.allow, preferences)
+  }
+  
+  @MainActor func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+    messageStream.add(message: (navigation, error))
   }
 }

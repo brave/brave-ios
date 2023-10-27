@@ -18,6 +18,8 @@ import Preferences
 import CertificateUtilities
 import AVFoundation
 import Playlist
+import Onboarding
+import BraveShields
 
 // MARK: - TopToolbarDelegate
 
@@ -229,7 +231,10 @@ extension BrowserViewController: TopToolbarDelegate {
   }
   
   @MainActor private func submitValidURL(_ text: String, isUserDefinedURLNavigation: Bool) async -> Bool {
-    if let url = URL(string: text), url.isIPFSScheme {
+    if let url = URL(string: text), BraveSchemeHandler.handles(url: url) {
+      finishEditingAndSubmit(url)
+      return true
+    } else if let url = URL(string: text), url.isIPFSScheme {
       return handleIPFSSchemeURL(url)
     } else if let fixupURL = URIFixup.getURL(text) {
       // Do not allow users to enter URLs with the following schemes.
@@ -578,6 +583,46 @@ extension BrowserViewController: TopToolbarDelegate {
       selectedTab.webView?.findInteraction?.dismissFindNavigator()
     }
     presentWalletPanel(from: selectedTab.getOrigin(), with: selectedTab.tabDappStore)
+  }
+  
+  func topToolbarDidTapBravePlayerButton(_ urlBar: TopToolbarView) {
+    guard let url = urlBar.currentURL, let playerURL = PlayerUtils.makeBravePlayerURL(from: url) else {
+      assertionFailure("How can this button have been pressed if we don't have any video ID?")
+      return
+    }
+    
+    guard ShieldPreferences.useBravePlayer.value else {
+      let viewController = BravePlayerInfoViewController()
+      
+      let popover = PopoverController(
+        contentController: viewController,
+        contentSizeBehavior: .preferredContentSize
+      )
+      
+      viewController.dismissCallback = { [weak self, weak popover] confirmed in
+        ShieldPreferences.useBravePlayer.value = confirmed
+        popover?.dismissPopover()
+        guard confirmed else { return }
+        self?.launchBravePlayer(for: playerURL)
+      }
+      
+      popover.arrowDirectionBehavior = .automatic
+      popover.present(from: self.topToolbar.locationView.bravePlayerButton, on: self)
+      return
+    }
+    
+    launchBravePlayer(for: playerURL)
+  }
+  
+  /// Launch a new tab that is isolated from other tabs for the given URL
+  private func launchBravePlayer(for playerURL: URL) {
+    let request = URLRequest(url: playerURL)
+    let isPrivate = tabManager.selectedTab?.isPrivate ?? false
+    
+    Task {
+      await tabManager.selectedTab?.webView?.pauseAllMediaPlayback()
+      tabManager.addTabAndSelect(request, afterTab: tabManager.selectedTab, isPrivate: isPrivate)
+    }
   }
     
   private func hideSearchController() {

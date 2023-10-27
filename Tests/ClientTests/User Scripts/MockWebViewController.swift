@@ -9,19 +9,19 @@ import WebKit
 import CryptoKit
 @testable import Brave
 
-class MockScriptsViewController: UIViewController {
+/// This is a test view controller that loads a web view and allows us to attach a custom navigation delegate
+class MockWebViewController: UIViewController {
   let webView: WKWebView
   let scriptFactory: ScriptFactory
   
   private let userScriptManager = UserScriptManager()
-  private let delegateStream = ScriptsNavigationDelegateStream()
   
-  init() {
+  init(navigationDelegate: WKNavigationDelegate) {
     let configuration = WKWebViewConfiguration()
     self.webView = WKWebView(frame: CGRect(width: 10, height: 10), configuration: configuration)
     self.scriptFactory = ScriptFactory()
     super.init(nibName: nil, bundle: nil)
-    webView.navigationDelegate = delegateStream
+    webView.navigationDelegate = navigationDelegate
   }
   
   required init?(coder: NSCoder) {
@@ -55,20 +55,8 @@ class MockScriptsViewController: UIViewController {
     webView.configuration.userContentController.addUserScript(userScript)
   }
   
-  func loadHTMLString(_ htmlString: String) -> ScriptsNavigationDelegateStream {
+  func loadHTMLString(_ htmlString: String) {
     self.webView.loadHTMLString(htmlString, baseURL: URL(string: "https://example.com"))
-    return delegateStream
-  }
-  
-  func loadHTMLStringAndWait(_ htmlString: String) async throws {
-    for try await result in loadHTMLString(htmlString) {
-      if let error = result.error {
-        throw error
-      } else {
-        // We only care about the first result because we know the page loaded
-        break
-      }
-    }
   }
   
   @discardableResult
@@ -92,39 +80,46 @@ class MockScriptsViewController: UIViewController {
   }
 }
 
-class ScriptsNavigationDelegateStream: NSObject, WKNavigationDelegate, AsyncSequence, AsyncIteratorProtocol {
-  typealias AsyncIterator = ScriptsNavigationDelegateStream
-  typealias Element = (navigation: WKNavigation, error: Error?)
-  private var messages: [Element] = []
-  private let timeout: TimeInterval
-  private var start: Date
+/// This collects messages and outputs them as a stream
+class MessageStream<Message>: NSObject, AsyncIteratorProtocol {
+  typealias AsyncIterator = MessageStream
+  typealias Element = (Message)
   
-  init(timeout: TimeInterval = 60) {
+  private let timeout: TimeInterval
+  private var startDate: Date
+  
+  @MainActor private var messages: [Element] = []
+  @MainActor private var stopped = false
+  
+  init(timeout: TimeInterval = 360) {
     self.timeout = timeout
-    self.start = Date()
+    self.startDate = Date()
   }
   
   enum LoadError: Error {
     case timedOut
   }
   
-  func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+  @MainActor func add(message: Message) {
+    guard !stopped else { return }
+    messages.append(message)
   }
   
-  func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-    messages.append((navigation, nil))
+  func start() {
+    self.startDate = Date()
   }
   
-  func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences, decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
-    decisionHandler(.allow, preferences)
+  @MainActor func stop() {
+    stopped = true
+    messages.removeAll()
   }
   
-  func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-    messages.append((navigation, error))
-  }
-  
-  func next() async throws -> Element? {
-    while Date().timeIntervalSince(start) < timeout {
+  @MainActor func next() async throws -> Element? {
+    while !stopped {
+      guard Date().timeIntervalSince(startDate) < timeout else {
+        throw LoadError.timedOut
+      }
+      
       guard !messages.isEmpty else {
         try await Task.sleep(seconds: 0.5)
         continue
@@ -133,11 +128,6 @@ class ScriptsNavigationDelegateStream: NSObject, WKNavigationDelegate, AsyncSequ
       return messages.removeFirst()
     }
     
-    throw LoadError.timedOut
-  }
-  
-  func makeAsyncIterator() -> ScriptsNavigationDelegateStream {
-    self.start = Date()
-    return self
+    return nil
   }
 }

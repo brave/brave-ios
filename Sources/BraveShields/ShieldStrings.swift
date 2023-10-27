@@ -145,4 +145,18 @@ public extension Strings.Shields {
     value: "Not Now",
     comment: "A button that ignores the brave player"
   )
+  
+  /// Text that appears below the player frame on the Brave Player page
+  static let bravePlayerPlayerText = NSLocalizedString(
+    "bravePlayerPlayerLabel", tableName: "BraveShared", bundle: .module,
+    value: "Player",
+    comment: "Text that appears below the player frame on the Brave Player page."
+  )
+  
+  /// Text that appears as alt text in the Brave Player page for the brave player logo below the player frame
+  static let bravePlayerLogoAltText = NSLocalizedString(
+    "bravePlayerPlayerLabel", tableName: "BraveShared", bundle: .module,
+    value: "Brave Player Logo",
+    comment: "Text that appears as alt text in the Brave Player page for the brave player logo below the player frame."
+  )
 }

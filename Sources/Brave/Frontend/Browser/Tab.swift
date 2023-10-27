@@ -217,12 +217,14 @@ class Tab: NSObject {
   
   var url: URL? {
     didSet {
-      if let _url = url, let internalUrl = InternalURL(_url), internalUrl.isAuthorized {
+      if let _url = url, BraveSchemeHandler.handles(url: _url) {
+        url = BraveSchemeHandler.stripAuthorization(from: _url)
+      } else if let _url = url, let internalUrl = InternalURL(_url), internalUrl.isAuthorized {
         url = URL(string: internalUrl.stripAuthorization)
       }
       
       // Setting URL in SyncTab is adding pending item to navigation manager on brave-core side
-      if let url = url, !isPrivate, !url.isLocal, !InternalURL.isValid(url: url), !url.isReaderModeURL {
+      if let url = url, !isPrivate, !url.isLocal, !InternalURL.isValid(url: url), !url.isReaderModeURL, !BraveSchemeHandler.handles(url: url) {
         syncTab?.setURL(url)
       }
     }
@@ -386,6 +388,11 @@ class Tab: NSObject {
       if configuration!.urlSchemeHandler(forURLScheme: InternalURL.scheme) == nil {
         configuration!.setURLSchemeHandler(InternalSchemeHandler(), forURLScheme: InternalURL.scheme)
       }
+      
+      if configuration!.urlSchemeHandler(forURLScheme: BraveSchemeHandler.scheme) == nil {
+        configuration?.setURLSchemeHandler(BraveSchemeHandler(), forURLScheme: BraveSchemeHandler.scheme)
+      }
+      
       let webView = TabWebView(frame: .zero, tab: self, configuration: configuration!, isPrivate: isPrivate)
       webView.delegate = self
 

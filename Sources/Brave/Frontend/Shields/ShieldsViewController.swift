@@ -21,6 +21,10 @@ class ShieldsViewController: UIViewController, PopoverContentComponent {
   private lazy var url: URL? = {
     guard let _url = tab.url else { return nil }
     
+    if let host = BraveSchemeHandler.host(for: _url) {
+      return host.displayURL ?? _url
+    }
+    
     if let tabURL = _url.stippedInternalURL {
       return tabURL
     }

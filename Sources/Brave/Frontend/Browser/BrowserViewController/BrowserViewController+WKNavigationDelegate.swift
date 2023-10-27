@@ -146,6 +146,14 @@ extension BrowserViewController: WKNavigationDelegate {
     guard var requestURL = navigationAction.request.url else {
       return (.cancel, preferences)
     }
+    
+    // Handle invalid `brave://` scheme navigations
+    if BraveSchemeHandler.handlesScheme(for: requestURL) {
+      guard BraveSchemeHandler.checkAuthorization(for: navigationAction) else {
+        return (.cancel, preferences)
+      }
+    }
+    
     if InternalURL.isValid(url: requestURL) {
       if navigationAction.navigationType != .backForward, navigationAction.isInternalUnprivileged,
           (navigationAction.sourceFrame != nil || navigationAction.targetFrame?.isMainFrame == false || navigationAction.request.cachePolicy == .useProtocolCachePolicy) {
@@ -346,7 +354,7 @@ extension BrowserViewController: WKNavigationDelegate {
     // This is the normal case, opening a http or https url, which we handle by loading them in this WKWebView. We
     // always allow this. Additionally, data URIs are also handled just like normal web pages.
 
-    if ["http", "https", "data", "blob", "file"].contains(requestURL.scheme) {
+    if BraveSchemeHandler.handles(url: requestURL) || ["http", "https", "data", "blob", "file"].contains(requestURL.scheme) {
       if navigationAction.targetFrame?.isMainFrame == true {
         tab?.updateUserAgent(webView, newURL: requestURL)
       }

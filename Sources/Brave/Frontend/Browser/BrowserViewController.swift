@@ -1645,7 +1645,7 @@ public class BrowserViewController: UIViewController {
         return
       }
 
-      tab.loadRequest(URLRequest(url: url))
+      tab.loadRequest(URLRequest(url: BraveSchemeHandler.authorizeIfNeeded(requestURL: url)))
 
       updateWebViewPageZoom(tab: tab)
     }
@@ -1818,6 +1818,14 @@ public class BrowserViewController: UIViewController {
 
       guard let serverTrust = tab.webView?.serverTrust else {
         if let url = tab.webView?.url ?? tab.url {
+          if BraveSchemeHandler.handles(url: url) {
+            tab.secureContentState = .localhost
+            if tabManager.selectedTab === tab {
+              updateToolbarSecureContentState(.localhost)
+            }
+            break
+          }
+
           if InternalURL.isValid(url: url),
             let internalUrl = InternalURL(url),
             (internalUrl.isAboutURL || internalUrl.isAboutHomeURL) {
@@ -2425,7 +2433,7 @@ public class BrowserViewController: UIViewController {
       // Whether to show search icon or + icon
       toolbar?.setSearchButtonState(url: url)
 
-      if (!InternalURL.isValid(url: url) || url.isReaderModeURL), !url.isFileURL {
+      if (!InternalURL.isValid(url: url) || url.isReaderModeURL), !url.isFileURL, !BraveSchemeHandler.handles(url: url) {
         // Fire the readability check. This is here and not in the pageShow event handler in ReaderMode.js anymore
         // because that event will not always fire due to unreliable page caching. This will either let us know that
         // the currently loaded page can be turned into reading mode or if the page already is in reading mode. We
@@ -2719,7 +2727,7 @@ extension BrowserViewController: TabDelegate {
         }
         
         popover.arrowDirectionBehavior = .automatic
-        popover.present(from: self.topToolbar.locationView.shieldsButton, on: self)
+        popover.present(from: self.topToolbar.shieldsButton, on: self)
       }),
     ]
     

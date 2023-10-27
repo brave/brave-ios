@@ -905,7 +905,7 @@ class TabManager: NSObject {
       // Provide an empty request to prevent a new tab from loading the home screen
       let request = InternalURL.isValid(url: tabURL) ?
                       PrivilegedRequest(url: tabURL) as URLRequest :
-                      URLRequest(url: tabURL)
+                      URLRequest(url: BraveSchemeHandler.authorizeIfNeeded(requestURL: savedTab.url))
         
       let tab = addTab(request,
                        flushToDisk: false,
@@ -954,7 +954,7 @@ class TabManager: NSObject {
       if let tabURL = tab.url {
         let request = InternalURL.isValid(url: tabURL) ?
                         PrivilegedRequest(url: tabURL) as URLRequest :
-                        URLRequest(url: tabURL)
+                        URLRequest(url: BraveSchemeHandler.authorizeIfNeeded(requestURL: tabURL))
         
         sessionData = (tab.lastTitle ?? tabURL.absoluteDisplayString, request)
       }
@@ -971,10 +971,21 @@ class TabManager: NSObject {
 
       let request = InternalURL.isValid(url: sessionTab.url) ?
                       PrivilegedRequest(url: sessionTab.url) as URLRequest :
-                      URLRequest(url: sessionTab.url)
+                      URLRequest(url: BraveSchemeHandler.authorizeIfNeeded(requestURL: sessionTab.url))
       
       tab.restore(webView,
                   requestRestorationData: (sessionTab.url.absoluteDisplayString, request))
+      return
+    } else if BraveSchemeHandler.handles(url: sessionTab.url) {
+      // Unfortuantely this will destroy the navigation history.
+      // Will Need to further investigate how this will be overcome.
+      let url = BraveSchemeHandler.authorizeIfNeeded(requestURL: sessionTab.url)
+      let request = URLRequest(url: url)
+      
+      tab.restore(
+        webView,
+        requestRestorationData: (url.absoluteDisplayString, request)
+      )
       return
     }
 

@@ -343,7 +343,10 @@ actor ContentBlockerManager {
   
   /// Return the valid generic types for the given domain
   @MainActor public func validGenericTypes(for domain: Domain) -> Set<GenericBlocklistType> {
-    guard !domain.areAllShieldsOff else { return [] }
+    guard domain.isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true) else {
+      return []
+    }
+    
     var results = Set<GenericBlocklistType>()
 
     // Get domain specific rule types
@@ -361,7 +364,9 @@ actor ContentBlockerManager {
   
   /// Return the enabled blocklist types for the given domain
   @MainActor private func validBlocklistTypes(for domain: Domain) -> Set<(BlocklistType)> {
-    guard !domain.areAllShieldsOff else { return [] }
+    guard domain.isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true) else {
+      return []
+    }
     
     // Get the generic types
     let genericTypes = validGenericTypes(for: domain)

@@ -32,3 +32,13 @@ extension ShieldPreferences {
     default: false
   )
 }
+
+// MARK: - BravePlayer
+
+extension ShieldPreferences {
+  /// The bool detemining if we should use the brave player
+  public static let useBravePlayer = Preferences.Option<Bool>(
+    key: "shields.use-brave-player",
+    default: false
+  )
+}
