@@ -18,6 +18,10 @@ class MockBraveWalletService: BraveWalletBraveWalletService {
   private var defaultCurrency = CurrencyCode.usd
   private var defaultCryptocurrency = "eth"
   private var coin: BraveWallet.CoinType = .eth
+  
+  func ankrSupportedChainIds(_ completion: @escaping ([String]) -> Void) {
+    completion([])
+  }
 
   func userAssets(_ chainId: String, coin: BraveWallet.CoinType, completion: @escaping ([BraveWallet.BlockchainToken]) -> Void) {
     completion(assets[chainId] ?? [])

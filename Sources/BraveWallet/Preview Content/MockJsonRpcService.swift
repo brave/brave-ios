@@ -13,11 +13,14 @@ import BraveCore
 ///
 /// - note: Do not use this directly, use ``NetworkStore.previewStore``
 class MockJsonRpcService: BraveWalletJsonRpcService {
-  
   private var chainId: String = BraveWallet.MainnetChainId
   private var networks: [BraveWallet.NetworkInfo] = [.mockMainnet, .mockGoerli, .mockSepolia, .mockPolygon, .mockCelo]
   private var networkURL: URL?
   private var observers: NSHashTable<BraveWalletJsonRpcServiceObserver> = .weakObjects()
+  
+  func ankrGetAccountBalances(_ accountAddress: String, chainIds: [String], completion: @escaping ([BraveWallet.AnkrAssetBalance], BraveWallet.ProviderError, String) -> Void) {
+    completion([], .success, "")
+  }
   
   func chainId(forOrigin coin: BraveWallet.CoinType, origin: URLOrigin, completion: @escaping (String) -> Void) {
     completion(chainId)

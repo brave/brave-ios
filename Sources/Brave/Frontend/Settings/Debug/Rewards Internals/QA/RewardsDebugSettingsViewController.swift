@@ -23,9 +23,9 @@ class RewardsDebugSettingsViewController: TableViewController {
 
     super.init(style: .grouped)
 
-    self.rewards.ads.detailsForCurrentCycle { [weak self] viewed, amount, date in
-      self?.adsInfo = (viewed, amount, date)
-    }
+//    self.rewards.ads.detailsForCurrentCycle { [weak self] viewed, amount, date in
+//      self?.adsInfo = (viewed, amount, date)
+//    }
   }
 
   @available(*, unavailable)
