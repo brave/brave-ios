@@ -18,10 +18,6 @@ class MockJsonRpcService: BraveWalletJsonRpcService {
   private var networkURL: URL?
   private var observers: NSHashTable<BraveWalletJsonRpcServiceObserver> = .weakObjects()
   
-  func ankrGetAccountBalances(_ accountAddress: String, chainIds: [String], completion: @escaping ([BraveWallet.AnkrAssetBalance], BraveWallet.ProviderError, String) -> Void) {
-    completion([], .success, "")
-  }
-  
   func chainId(forOrigin coin: BraveWallet.CoinType, origin: URLOrigin, completion: @escaping (String) -> Void) {
     completion(chainId)
   }
