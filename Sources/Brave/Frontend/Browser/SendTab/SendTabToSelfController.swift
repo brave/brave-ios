@@ -135,6 +135,8 @@ class SendTabToSelfContentController: UITableViewController {
       $0.register(CenteredButtonCell.self)
       $0.register(TwoLineTableViewCell.self)
     }
+    
+    tableView.flashScrollIndicators()
   }
   
   @objc func cancel() {
