@@ -86,7 +86,8 @@ public actor FilterListResourceDownloader {
         await self.compileFilterListEngineIfNeeded(
           fromComponentId: componentId, folderURL: folderURL,
           isAlwaysAggressive: setting.isAlwaysAggressive,
-          resourcesInfo: resourcesInfo
+          resourcesInfo: resourcesInfo,
+          compileContentBlockers: false
         )
         
         // Sleep for 1ms. This drastically reduces memory usage without much impact to usability
@@ -157,14 +158,13 @@ public actor FilterListResourceDownloader {
       localFileURL: folderURL.appendingPathComponent("rs-ABPFilterParserData.dat", conformingTo: .data),
       version: version, fileType: .dat
     )
-    
-    guard await AdBlockStats.shared.needsCompilation(for: filterListInfo, resourcesInfo: resourcesInfo) else {
-      return
-    }
+    let lazyInfo = AdBlockStats.LazyFilterListInfo(
+      filterListInfo: filterListInfo, isAlwaysAggressive: false
+    )
     
     await AdBlockStats.shared.compile(
-      filterListInfo: filterListInfo, resourcesInfo: resourcesInfo,
-      isAlwaysAggressive: false
+      lazyInfo: lazyInfo, resourcesInfo: resourcesInfo,
+      compileContentBlockers: false
     )
   }
   
@@ -172,7 +172,8 @@ public actor FilterListResourceDownloader {
   private func compileFilterListEngineIfNeeded(
     fromComponentId componentId: String, folderURL: URL,
     isAlwaysAggressive: Bool,
-    resourcesInfo: CachedAdBlockEngine.ResourcesInfo
+    resourcesInfo: CachedAdBlockEngine.ResourcesInfo,
+    compileContentBlockers: Bool
   ) async {
     let version = folderURL.lastPathComponent
     let source = CachedAdBlockEngine.Source.filterList(componentId: componentId)
@@ -181,22 +182,26 @@ public actor FilterListResourceDownloader {
       localFileURL: folderURL.appendingPathComponent("list.txt", conformingTo: .text),
       version: version, fileType: .text
     )
-    
+    let lazyInfo = AdBlockStats.LazyFilterListInfo(filterListInfo: filterListInfo, isAlwaysAggressive: isAlwaysAggressive)
     guard await AdBlockStats.shared.isEagerlyLoaded(source: source) else {
       // Don't compile unless eager
       await AdBlockStats.shared.updateIfNeeded(resourcesInfo: resourcesInfo)
       await AdBlockStats.shared.updateIfNeeded(filterListInfo: filterListInfo, isAlwaysAggressive: isAlwaysAggressive)
-      return
-    }
-    
-    guard await AdBlockStats.shared.needsCompilation(for: filterListInfo, resourcesInfo: resourcesInfo) else {
-      // Don't compile unless needed
+      
+      // To free some space, remove any rule lists that are not needed
+      if let blocklistType = lazyInfo.blocklistType {
+        do {
+          try await ContentBlockerManager.shared.removeRuleLists(for: blocklistType)
+        } catch {
+          ContentBlockerManager.log.error("Failed to remove rule lists for \(filterListInfo.debugDescription)")
+        }
+      }
       return
     }
     
     await AdBlockStats.shared.compile(
-      filterListInfo: filterListInfo, resourcesInfo: resourcesInfo,
-      isAlwaysAggressive: isAlwaysAggressive
+      lazyInfo: lazyInfo, resourcesInfo: resourcesInfo,
+      compileContentBlockers: compileContentBlockers
     )
   }
   
@@ -258,49 +263,8 @@ public actor FilterListResourceDownloader {
     // Add or remove the filter list from the engine depending if it's been enabled or not
     await self.compileFilterListEngineIfNeeded(
       fromComponentId: componentId, folderURL: folderURL, isAlwaysAggressive: isAlwaysAggressive,
-      resourcesInfo: resourcesInfo
+      resourcesInfo: resourcesInfo, compileContentBlockers: loadContentBlockers
     )
-    
-    // Compile this rule list if we haven't already or if the file has been modified
-    // We also don't load them if they are loading from cache because this will cost too much during launch
-    if loadContentBlockers {
-      let version = folderURL.lastPathComponent
-      let blocklistType = ContentBlockerManager.BlocklistType.filterList(componentId: componentId, isAlwaysAggressive: isAlwaysAggressive)
-      let modes = await blocklistType.allowedModes.asyncFilter { mode in
-        if let loadedVersion = await FilterListStorage.shared.loadedRuleListVersions.value[componentId] {
-          // if we know the loaded version we can just check it (optimization)
-          return loadedVersion != version
-        } else {
-          return true
-        }
-      }
-      
-      // No modes need to be compiled
-      guard !modes.isEmpty else { return }
-      
-      do {
-        let filterSet = try String(contentsOf: filterListURL, encoding: .utf8)
-        let result = try AdblockEngine.contentBlockerRules(fromFilterSet: filterSet)
-        
-        try await ContentBlockerManager.shared.compile(
-          encodedContentRuleList: result.rulesJSON, for: blocklistType,
-          options: .all, modes: modes
-        )
-        
-        await MainActor.run {
-          FilterListStorage.shared.loadedRuleListVersions.value[componentId] = version
-        }
-      } catch {
-        ContentBlockerManager.log.error(
-          "Failed to create content blockers for `\(componentId)` v\(version): \(error)"
-        )
-        #if DEBUG
-        ContentBlockerManager.log.debug(
-          "`\(componentId)`: \(filterListURL.absoluteString)"
-        )
-        #endif
-      }
-    }
   }
 }
 
