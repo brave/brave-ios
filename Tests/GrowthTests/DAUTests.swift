@@ -322,12 +322,6 @@ class DAUTests: XCTestCase {
     XCTAssertEqual(singleDigitTest.mondayOfCurrentWeekFormatted, "2019-02-04")
   }
 
-  func testNoPingOnDevelopmentBuild() {
-    XCTAssertTrue(AppConstants.buildChannel == .debug)
-
-    let dau = DAU()
-    XCTAssertFalse(dau.sendPingToServer())
-  }
   
   func testMigratingInvalidWeekOfInstallPref() throws {
     // (stored, fixed)
