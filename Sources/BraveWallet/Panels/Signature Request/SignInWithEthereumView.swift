@@ -33,29 +33,26 @@ struct SignInWithEthereumView: View {
       }
       .padding()
     }
-    .overlay(
-      Group {
-        if sizeCategory.isAccessibilityCategory {
-          buttonsContainer
-            .frame(maxWidth: .infinity)
-            .padding(.top)
-            .background(
-              LinearGradient(
-                stops: [
-                  .init(color: Color(.braveGroupedBackground).opacity(0), location: 0),
-                  .init(color: Color(.braveGroupedBackground).opacity(1), location: 0.05),
-                  .init(color: Color(.braveGroupedBackground).opacity(1), location: 1),
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-              )
-              .ignoresSafeArea()
-              .allowsHitTesting(false)
+    .overlay(alignment: .bottom) {
+      if sizeCategory.isAccessibilityCategory {
+        buttonsContainer
+          .frame(maxWidth: .infinity)
+          .padding(.top)
+          .background(
+            LinearGradient(
+              stops: [
+                .init(color: Color(.braveGroupedBackground).opacity(0), location: 0),
+                .init(color: Color(.braveGroupedBackground).opacity(1), location: 0.05),
+                .init(color: Color(.braveGroupedBackground).opacity(1), location: 1),
+              ],
+              startPoint: .top,
+              endPoint: .bottom
             )
-        }
-      },
-      alignment: .bottom
-    )
+            .ignoresSafeArea()
+            .allowsHitTesting(false)
+          )
+      }
+    }
     .background(Color(braveSystemName: .containerHighlight))
     .navigationTitle(Strings.Wallet.signInWithBraveWallet)
   }
@@ -104,18 +101,20 @@ struct SignInWithEthereumView: View {
         
         VStack(alignment: .leading, spacing: 6) {
           Text(Strings.Wallet.siweMessageLabel)
-            .fontWeight(.semibold)
+            .font(.headline)
           Text(verbatim: statement)
             .textSelection(.enabled)
+            .font(.subheadline)
         }
         
         VStack(alignment: .leading, spacing: 6) {
           Text(Strings.Wallet.siweResourcesLabel)
-            .fontWeight(.semibold)
+            .font(.headline)
           ForEach(resources.indices, id: \.self) { index in
             if let resource = resources[safe: index] {
               Text(verbatim: resource.absoluteString)
                 .textSelection(.enabled)
+                .font(.subheadline)
             }
           }
         }
@@ -168,7 +167,7 @@ private struct SignInWithEthereumDetailsView: View {
     ScrollView {
       LazyVStack {
         LazyVStack {
-          LazyVStack { // Max view count on `LazyVStack`
+          Group { // Max view count on `LazyVStack`
             detailRow(title: Strings.Wallet.siweOriginLabel, value: Text(originInfo: originInfo))
             Divider()
             detailRow(title: Strings.Wallet.siweAddressLabel, value: Text(verbatim: message.address))
@@ -179,7 +178,7 @@ private struct SignInWithEthereumDetailsView: View {
             Divider()
             detailRow(title: Strings.Wallet.siweURILabel, value: Text(verbatim: message.uri.absoluteString))
           }
-          LazyVStack { // Max view count on `LazyVStack`
+          Group { // Max view count on `LazyVStack`
             Divider()
             detailRow(title: Strings.Wallet.siweVersionLabel, value: Text(verbatim: "\(message.version)"))
             Divider()
@@ -212,18 +211,7 @@ private struct SignInWithEthereumDetailsView: View {
   }
   
   private func detailRow(title: String, value: String) -> some View {
-    HStack(spacing: 12) {
-      Text(title)
-        .fontWeight(.semibold)
-        .foregroundColor(Color(braveSystemName: .textSecondary))
-        .frame(width: 100, alignment: .leading)
-      Text(verbatim: value)
-        .foregroundColor(Color(braveSystemName: .textPrimary))
-        .textSelection(.enabled)
-      Spacer()
-    }
-    .padding(.vertical, 8)
-    .frame(maxWidth: .infinity)
+    detailRow(title: title, value: Text(verbatim: value))
   }
   
   private func detailRow(title: String, value: Text) -> some View {

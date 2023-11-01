@@ -2659,14 +2659,14 @@ extension Strings {
       "wallet.signatureRequestDomainTitle",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Domain",
+      value: "Domain:",
       comment: "A title displayed inside the text view in Signature Request View above the request's domain information."
     )
     public static let signatureRequestMessageTitle = NSLocalizedString(
       "wallet.signatureRequestMessageTitle",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Message",
+      value: "Message:",
       comment: "A title displayed inside the text view in Signature Request View above the request's message."
     )
     public static let sign = NSLocalizedString(

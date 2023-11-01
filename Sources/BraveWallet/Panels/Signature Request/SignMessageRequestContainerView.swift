@@ -47,12 +47,7 @@ struct SignMessageRequestContainerView: View {
           account: currentRequestAccount,
           originInfo: currentRequest.originInfo,
           message: ethSiweData,
-          action: { approved in
-            cryptoStore.handleWebpageRequestResponse(.signMessage(approved: approved, id: currentRequest.id))
-            if requests.count <= 1 {
-              onDismiss()
-            }
-          }
+          action: handleAction(approved:)
         )
       } else { // ethSignTypedData, ethStandardSignData, solanaSignData
         SignMessageRequestView(
@@ -64,12 +59,7 @@ struct SignMessageRequestContainerView: View {
           needPilcrowFormatted: $needPilcrowFormatted,
           showOrignalMessage: $showOrignalMessage,
           nextTapped: next,
-          action: { approved in
-            cryptoStore.handleWebpageRequestResponse(.signMessage(approved: approved, id: currentRequest.id))
-            if requests.count <= 1 {
-              onDismiss()
-            }
-          }
+          action: handleAction(approved:)
         )
       }
     }
@@ -90,6 +80,13 @@ struct SignMessageRequestContainerView: View {
       requestIndex = requestIndex + 1
     } else {
       requestIndex = 0
+    }
+  }
+  
+  private func handleAction(approved: Bool) {
+    cryptoStore.handleWebpageRequestResponse(.signMessage(approved: approved, id: currentRequest.id))
+    if requests.count <= 1 {
+      onDismiss()
     }
   }
 }

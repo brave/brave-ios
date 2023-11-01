@@ -36,10 +36,10 @@ struct SignMessageRequestView: View {
       return requestMessage
     }
     return """
-    \(Strings.Wallet.signatureRequestDomainTitle):
+    \(Strings.Wallet.signatureRequestDomainTitle)
     \(requestDomain)
     
-    \(Strings.Wallet.signatureRequestMessageTitle):
+    \(Strings.Wallet.signatureRequestMessageTitle)
     \(requestMessage)
     """
   }
@@ -60,10 +60,10 @@ struct SignMessageRequestView: View {
     let boldAttributes: [NSAttributedString.Key: Any] = [
       .font: boldFont, .foregroundColor: UIColor.braveLabel]
     
-    let domainTitle = NSAttributedString(string: "\(Strings.Wallet.signatureRequestDomainTitle):\n", attributes: boldAttributes)
-    let domain = NSAttributedString(string: requestDomain, attributes: regularAttributes)
-    let messageTitle = NSAttributedString(string: "\n\(Strings.Wallet.signatureRequestMessageTitle):\n", attributes: boldAttributes)
-    let message = NSAttributedString(string: requestMessage, attributes: regularAttributes)
+    let domainTitle = NSAttributedString(string: Strings.Wallet.signatureRequestDomainTitle, attributes: boldAttributes)
+    let domain = NSAttributedString(string: "\n\(requestDomain)\n\n", attributes: regularAttributes)
+    let messageTitle = NSAttributedString(string: Strings.Wallet.signatureRequestMessageTitle, attributes: boldAttributes)
+    let message = NSAttributedString(string: "\n\(requestMessage)", attributes: regularAttributes)
     
     let attrString = NSMutableAttributedString(attributedString: domainTitle)
     attrString.append(domain)
@@ -209,13 +209,15 @@ struct SignMessageRequestView: View {
         StaticTextView(text: requestDisplayText, attributedText: requestDisplayAttributedText, isMonospaced: false)
           .frame(maxWidth: .infinity)
           .frame(height: staticTextViewHeight)
-          .background(Color(.tertiaryBraveGroupedBackground))
-          .clipShape(RoundedRectangle(cornerRadius: 5, style: .continuous))
+          .background(
+            Color(.tertiaryBraveGroupedBackground),
+            in: RoundedRectangle(cornerRadius: 5, style: .continuous)
+          )
           .padding()
           .background(
-            Color(.secondaryBraveGroupedBackground)
+            Color(.secondaryBraveGroupedBackground),
+            in: RoundedRectangle(cornerRadius: 10, style: .continuous)
           )
-          .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
           .introspectTextView { textView in
             // A flash to show users message is overflowing the text view (related to issue https://github.com/brave/brave-ios/issues/6277)
             if showOrignalMessage[request.id] == true {
@@ -237,29 +239,26 @@ struct SignMessageRequestView: View {
       .padding()
     }
     .foregroundColor(Color(.braveLabel))
-    .overlay(
-      Group {
-        if sizeCategory.isAccessibilityCategory {
-          buttonsContainer
-            .frame(maxWidth: .infinity)
-            .padding(.top)
-            .background(
-              LinearGradient(
-                stops: [
-                  .init(color: Color(.braveGroupedBackground).opacity(0), location: 0),
-                  .init(color: Color(.braveGroupedBackground).opacity(1), location: 0.05),
-                  .init(color: Color(.braveGroupedBackground).opacity(1), location: 1),
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-              )
-              .ignoresSafeArea()
-              .allowsHitTesting(false)
+    .overlay(alignment: .bottom) {
+      if sizeCategory.isAccessibilityCategory {
+        buttonsContainer
+          .frame(maxWidth: .infinity)
+          .padding(.top)
+          .background(
+            LinearGradient(
+              stops: [
+                .init(color: Color(.braveGroupedBackground).opacity(0), location: 0),
+                .init(color: Color(.braveGroupedBackground).opacity(1), location: 0.05),
+                .init(color: Color(.braveGroupedBackground).opacity(1), location: 1),
+              ],
+              startPoint: .top,
+              endPoint: .bottom
             )
-        }
-      },
-      alignment: .bottom
-    )
+            .ignoresSafeArea()
+            .allowsHitTesting(false)
+          )
+      }
+    }
     .navigationTitle(Strings.Wallet.signatureRequestTitle)
   }
   
@@ -364,7 +363,7 @@ private struct NextIndexButton: View {
   }
 }
 
-extension String {
+fileprivate extension String {
   var hasUnknownUnicode: Bool {
     // same requirement as desktop. Valid: [0, 127]
     for c in unicodeScalars {
