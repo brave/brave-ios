@@ -560,9 +560,8 @@ extension BrowserViewController {
   }
   
   private func generateReferralCode(attributionData: AdAttributionData?, fetchError: Error?) -> String {
-    // Checking referral code from User Referral program exists If not send 001
-    // Prefix this code with BRV for organic iOS installs
-    var referralCode = "BRV\(UserReferralProgram.getReferralCode() ?? "001")"
+    // Prefix code "001" with BRV for organic iOS installs
+    var referralCode = "BRV001"
     
     if fetchError == nil, attributionData?.attribution == true, let campaignId = attributionData?.campaignId {
       // Adding ASA User refcode prefix to indicate

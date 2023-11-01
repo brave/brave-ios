@@ -15,7 +15,7 @@ public class DAU {
 
   private static var baseUrl: String {
     get {
-      let domain = AppConstants.buildChannel == .debug || AppConstants.buildChannel == .enterprise
+      let domain = AppConstants.buildChannel.isPublic
         ? "https://laptop-updates.brave.com/"
         : "https://laptop-updates.bravesoftware.com/"
       
