@@ -149,6 +149,18 @@ extension BrowserViewController: WKNavigationDelegate {
 
       return (.allow, preferences)
     }
+    
+    // handle brave player (uses `about:blank` so needs to be checked before about scheme check below)
+//    if let videoID = PlayerUtils.youTubeVideoID(from: requestURL) {
+//      if let playerPath = Bundle.module.path(forResource: "Player", ofType: "html"),
+//         let playerHTML = try? String(contentsOfFile: playerPath).replacingOccurrences(of: "%YOUTUBE_VIDEO_ID%", with: videoID),
+//         let playerURL = PlayerUtils.playerURL(videoID: videoID) {
+//        DispatchQueue.main.async {
+//          webView.loadSimulatedRequest(URLRequest(url: playerURL), responseHTML: playerHTML)
+//        }
+//        return (.cancel, preferences)
+//      }
+//    }
 
     if requestURL.scheme == "about" {
       return (.allow, preferences)
@@ -233,7 +245,7 @@ extension BrowserViewController: WKNavigationDelegate {
         break
       }
     }
-
+    
     let isPrivateBrowsing = privateBrowsingManager.isPrivateBrowsing
     tab?.currentRequestURL = requestURL
     
@@ -459,8 +471,14 @@ extension BrowserViewController: WKNavigationDelegate {
     }
     
     if let videoID = PlayerUtils.youTubeVideoID(from: responseURL!) {
-      tabManager.addTabAndSelect(PrivilegedRequest(url: URL(string: "\(InternalURL.baseUrl)/\(InternalURL.Path.player.rawValue)?url=\(responseURL!.absoluteString.escape()!)")!) as URLRequest, isPrivate: false)
-      return .cancel
+      if let playerPath = Bundle.module.path(forResource: "Player", ofType: "html"),
+         let playerHTML = try? String(contentsOfFile: playerPath).replacingOccurrences(of: "%YOUTUBE_VIDEO_ID%", with: videoID),
+         let playerURL = PlayerUtils.playerURL(videoID: videoID) {
+        DispatchQueue.main.async {
+          webView.loadSimulatedRequest(URLRequest(url: playerURL), responseHTML: playerHTML)
+        }
+        return .cancel
+      }
     }
 
     // We can only show this content in the web view if this web view is not pending
