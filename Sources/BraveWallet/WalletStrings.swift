@@ -4637,7 +4637,7 @@ extension Strings {
       "wallet.signInWithBraveWallet",
       tableName: "BraveWallet",
       bundle: .module,
-      value: "Sign In with Brave Wallet",
+      value: "Sign in with Brave Wallet",
       comment: "The title of the view shown above a Sign In With Ethereum request."
     )
     public static let securityRiskDetectedTitle = NSLocalizedString(
