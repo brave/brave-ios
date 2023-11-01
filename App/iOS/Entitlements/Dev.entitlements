@@ -8,6 +8,8 @@
 	<array>
 		<string>applinks:vpn.brave.com</string>
 	</array>
+	<key>com.apple.developer.authentication-services.autofill-credential-provider</key>
+	<true/>
 	<key>com.apple.developer.networking.networkextension</key>
 	<array>
 		<string>packet-tunnel-provider</string>
@@ -25,6 +27,10 @@
 	<key>com.apple.security.application-groups</key>
 	<array>
 		<string>group.$(MOZ_BUNDLE_ID).unique</string>
+	</array>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)$(MOZ_BUNDLE_ID)</string>
 	</array>
 </dict>
 </plist>

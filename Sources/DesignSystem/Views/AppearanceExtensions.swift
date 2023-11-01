@@ -3,9 +3,8 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
-import BraveShared
-import BraveUI
 import UIKit
+import Then
 
 extension UIView {
   /// Setup basic control defaults based on Brave design system colors
@@ -60,9 +59,6 @@ extension UIView {
       $0.tintColor = .braveBlurpleTint
       $0.backgroundColor = tableSecondaryColor
     }
-
-    UIImageView.appearance(whenContainedInInstancesOf: [SettingsViewController.self])
-      .tintColor = .braveLabel
 
     UILabel.appearance(whenContainedInInstancesOf: [UITableView.self]).textColor = .braveLabel
     UILabel.appearance(whenContainedInInstancesOf: [UICollectionReusableView.self])
