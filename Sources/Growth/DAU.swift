@@ -242,7 +242,7 @@ public class DAU {
   }
 
   func channelParam(for channel: AppBuildChannel = AppConstants.buildChannel) -> URLQueryItem {
-    return URLQueryItem(name: "channel", value: channel.serverChannelParam)
+    return URLQueryItem(name: "channel", value: channel.dauServerChannelParam)
   }
 
   func braveCoreParams(for braveStats: BraveStats) -> [URLQueryItem] {
