@@ -216,7 +216,7 @@ extension Preferences {
     /// The Option to download video yes / no / only wi-fi
     static let autoDownloadVideo = Option<String>(key: "playlist.autoDownload", default: PlayListDownloadType.on.rawValue)
     /// The Option to disable playlist MediaSource web-compatibility
-    static let webMediaSourceCompatibility = Option<Bool>(key: "playlist.webMediaSourceCompatibility", default: UIDevice.isIpad)
+    static let webMediaSourceCompatibility = Option<Bool>(key: "playlist.webMediaSourceCompatibility", default: false)
     /// The option to start the playback where user left-off
     static let playbackLeftOff = Option<Bool>(key: "playlist.playbackLeftOff", default: true)
     /// The option to disable long-press-to-add-to-playlist gesture.
