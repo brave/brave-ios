@@ -2820,6 +2820,11 @@ extension Strings {
         value: "Manage Subscription",
         comment: "Button to manage your VPN subscription")
     
+    public static let settingsRedeemOfferCode =
+      NSLocalizedString("vpn.settingsManageSubscription", tableName: "BraveShared", bundle: .module,
+        value: "Redeem Offer Code",
+        comment: "Button to redeem offer code subscription")
+    
     public static let settingsLinkReceipt =
       NSLocalizedString("vpn.settingsLinkReceipt", tableName: "BraveShared", bundle: .module,
         value: "Link purchase to your Brave account",
@@ -2929,6 +2934,11 @@ extension Strings {
       NSLocalizedString("vpn.vpnErrorPurchaseFailedBody", tableName: "BraveShared", bundle: .module,
         value: "Unable to complete purchase. Please try again, or check your payment details on Apple and try again.",
         comment: "Message for error when VPN could not be purchased.")
+    
+    public static let vpnErrorOfferCodeFailedBody =
+      NSLocalizedString("vpn.vpnErrorOfferCodeFailedBody", tableName: "BraveShared", bundle: .module,
+        value: "Unable to redeem offer code. Please try again, or check your offer code details and try again.",
+        comment: "Message for error when VPN offer code could not be redeemed.")
 
     public static let vpnResetAlertTitle =
       NSLocalizedString("vpn.vpnResetAlertTitle", tableName: "BraveShared", bundle: .module,

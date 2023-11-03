@@ -612,7 +612,7 @@ class SettingsViewController: TableViewController {
           case .notPurchased, .expired:
             return BraveVPN.vpnState.enableVPNDestinationVC
           case .purchased:
-            let vc = BraveVPNSettingsViewController()
+            let vc = BraveVPNSettingsViewController(iapObserver: BraveVPN.iapObserver)
             vc.openURL = { [unowned self] url in
               self.settingsDelegate?.settingsOpenURLInNewTab(url)
               self.dismiss(animated: true)
