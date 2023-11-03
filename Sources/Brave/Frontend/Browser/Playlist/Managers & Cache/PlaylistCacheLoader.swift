@@ -301,7 +301,7 @@ class PlaylistWebLoader: UIView {
     }, type: .private
   ).then {
     $0.createWebview()
-    $0.setScript(script: .playlistMediaSource, enabled: Preferences.Playlist.webMediaSourceCompatibility.value)
+    $0.setScript(script: .playlistMediaSource, enabled: true)
     $0.webView?.scrollView.layer.masksToBounds = true
   }
 
@@ -528,6 +528,18 @@ extension PlaylistWebLoader: WKNavigationDelegate {
   }
 
   func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+    // There is a bug on some sites or something where the page may load TWICE OR there is a bug in WebKit where the page fails to load
+    // Either way, WebKit returns _WKRecoveryAttempterErrorKey with a WKReloadFrameErrorRecoveryAttempter
+    // Then it automatically reloads the page. In this case, we don't want to error and cancel loading and show the user an alert
+    // We want to continue waiting for the page to load and a proper response to come to us.
+    // If there is a real error, then we handle it and display an alert to the user.
+    if let error = error as? NSError {
+      if error.userInfo["_WKRecoveryAttempterErrorKey"] == nil {
+        self.handler?(nil)
+      }
+      return
+    }
+    
     self.handler?(nil)
   }
 
