@@ -44,9 +44,7 @@ public enum AppBuildChannel: String {
       return "release"
     case .beta:
       return "beta"
-    case .dev:
-      return "dev"
-    case .debug:
+    case .dev, .debug:
       return "developer"
     case .enterprise:
       return "invalid"
