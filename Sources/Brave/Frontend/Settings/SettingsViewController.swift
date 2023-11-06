@@ -623,7 +623,18 @@ class SettingsViewController: TableViewController {
         }()
 
         guard let vcToShow = vc else { return }
-        self.navigationController?.pushViewController(vcToShow, animated: true)
+        
+        if VPNProductInfo.isComplete {
+          self.navigationController?.pushViewController(vcToShow, animated: true)
+        } else {
+          let alert = UIAlertController(
+            title: Strings.VPN.errorCantGetPricesTitle,
+            message: Strings.VPN.errorCantGetPricesBody,
+            preferredStyle: .alert)
+
+          alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
+          self.present(alert, animated: true, completion: nil)
+        }
       },
       image: Preferences.VPN.vpnReceiptStatus.value == BraveVPN.ReceiptResponse.Status.retryPeriod.rawValue
         ? UIImage(braveSystemNamed: "leo.warning.triangle-filled")?
