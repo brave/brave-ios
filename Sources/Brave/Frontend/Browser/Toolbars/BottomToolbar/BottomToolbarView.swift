@@ -90,7 +90,6 @@ class BottomToolbarView: UIView, ToolbarProtocol {
     contentView.snp.makeConstraints { make in
       make.leading.trailing.top.equalTo(self)
       make.bottom.equalTo(self.safeArea.bottom)
-      make.height.equalTo(UIConstants.toolbarHeight)
     }
     super.updateConstraints()
   }
