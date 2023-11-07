@@ -33,7 +33,6 @@ protocol TopToolbarDelegate: AnyObject {
   func topToolbarDidPressStop(_ urlBar: TopToolbarView)
   func topToolbarDidPressReload(_ urlBar: TopToolbarView)
   func topToolbarDidPressQrCodeButton(_ urlBar: TopToolbarView)
-  func topToolbarDidPressLockImageView(_ urlBar: TopToolbarView)
   func topToolbarDidTapWalletButton(_ urlBar: TopToolbarView)
 }
 
@@ -43,8 +42,8 @@ class TopToolbarView: UIView, ToolbarProtocol {
   
   struct UX {
     static let locationPadding: CGFloat = 8
-    static let locationHeight: CGFloat = 34
-    static let textFieldCornerRadius: CGFloat = 8
+    static let locationHeight: CGFloat = 44
+    static let textFieldCornerRadius: CGFloat = 10
     static let progressBarHeight: CGFloat = 3
   }
   
@@ -119,6 +118,10 @@ class TopToolbarView: UIView, ToolbarProtocol {
     $0.translatesAutoresizingMaskIntoConstraints = false
     $0.readerModeState = ReaderModeState.unavailable
     $0.delegate = self
+    $0.layer.cornerRadius = UX.textFieldCornerRadius
+    $0.layer.cornerCurve = .continuous
+    $0.clipsToBounds = true
+    $0.setContentCompressionResistancePriority(.required, for: .vertical)
   }
 
   let tabsButton = TabsButton()
@@ -164,6 +167,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
   lazy var actionButtons: [UIButton] = [
     shareButton, tabsButton, bookmarkButton,
     forwardButton, backButton, menuButton,
+    shieldsButton, rewardsButton
   ].compactMap { $0 }
 
   private let mainStackView = UIStackView().then {
@@ -179,6 +183,11 @@ class TopToolbarView: UIView, ToolbarProtocol {
   }
   
   private let trailingItemsStackView = UIStackView().then {
+    $0.distribution = .fillEqually
+    $0.spacing = 8
+  }
+  
+  private let shieldsRewardsStack = UIStackView().then {
     $0.distribution = .fillEqually
     $0.spacing = 8
   }
@@ -221,6 +230,25 @@ class TopToolbarView: UIView, ToolbarProtocol {
     $0.setContentHuggingPriority(.defaultHigh, for: .vertical)
   }
   
+  lazy var shieldsButton: ToolbarButton = {
+    let button = ToolbarButton()
+    button.setImage(UIImage(sharedNamed: "brave.logo"), for: .normal)
+    button.addTarget(self, action: #selector(didTapBraveShieldsButton), for: .touchUpInside)
+    button.imageView?.contentMode = .scaleAspectFit
+    button.accessibilityLabel = Strings.bravePanel
+    button.imageView?.adjustsImageSizeForAccessibilityContentSizeCategory = true
+    button.accessibilityIdentifier = "urlBar-shieldsButton"
+    return button
+  }()
+  
+  lazy var rewardsButton: RewardsButton = {
+    let button = RewardsButton()
+    button.addTarget(self, action: #selector(didTapBraveRewardsButton), for: .touchUpInside)
+    // Visual centering
+    button.contentEdgeInsets = .init(top: 1, left: 5, bottom: 1, right: 5)
+    return button
+  }()
+  
   private lazy var locationBarOptionsStackView = UIStackView().then {
     $0.alignment = .center
     $0.isHidden = true
@@ -234,7 +262,10 @@ class TopToolbarView: UIView, ToolbarProtocol {
     $0.backgroundColor = .clear
     $0.layer.cornerRadius = UX.textFieldCornerRadius
     $0.layer.cornerCurve = .continuous
-    $0.layer.masksToBounds = true
+    $0.layer.shadowOffset = .init(width: 0, height: 1)
+    $0.layer.shadowRadius = 2
+    $0.layer.shadowColor = UIColor.black.cgColor
+    $0.layer.shadowOpacity = 0.1
   }
   
   private var isVoiceSearchAvailable: Bool
@@ -276,8 +307,11 @@ class TopToolbarView: UIView, ToolbarProtocol {
     
     trailingItemsStackView.addArrangedSubview(tabsButton)
     trailingItemsStackView.addArrangedSubview(menuButton)
+    
+    shieldsRewardsStack.addArrangedSubview(shieldsButton)
+    shieldsRewardsStack.addArrangedSubview(rewardsButton)
 
-    [leadingItemsStackView, locationContainer, trailingItemsStackView, cancelButton].forEach {
+    [leadingItemsStackView, locationContainer, shieldsRewardsStack, trailingItemsStackView, cancelButton].forEach {
       mainStackView.addArrangedSubview($0)
     }
 
@@ -333,10 +367,10 @@ class TopToolbarView: UIView, ToolbarProtocol {
   private func updateForTraitCollection() {
     let toolbarSizeCategory = traitCollection.toolbarButtonContentSizeCategory
     let pointSize = UIFont.preferredFont(forTextStyle: .body, compatibleWith: .init(preferredContentSizeCategory: toolbarSizeCategory)).lineHeight
-    locationView.shieldsButton.snp.remakeConstraints {
+    shieldsButton.snp.remakeConstraints {
       $0.height.equalTo(pointSize)
     }
-    locationView.rewardsButton.snp.remakeConstraints {
+    rewardsButton.snp.remakeConstraints {
       $0.height.equalTo(pointSize)
     }
     let clampedTraitCollection = traitCollection.clampingSizeCategory(maximum: .accessibilityLarge)
@@ -346,6 +380,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
   private func setupConstraints() {
     locationContainer.snp.remakeConstraints {
       $0.top.bottom.equalToSuperview().inset(UX.locationPadding)
+      $0.height.greaterThanOrEqualTo(UX.locationHeight)
     }
 
     mainStackView.snp.remakeConstraints { make in
@@ -375,6 +410,11 @@ class TopToolbarView: UIView, ToolbarProtocol {
     // Increase the inset of the main stack view if there's no additional space from safe areas
     let horizontalInset: CGFloat = safeAreaInsets.left > 0 ? 0 : UX.locationPadding
     mainStackView.layoutMargins = .init(top: 0, left: horizontalInset, bottom: 0, right: horizontalInset)
+    
+    locationContainer.layer.shadowPath = UIBezierPath(
+      roundedRect: locationContainer.bounds,
+      cornerRadius: locationContainer.layer.cornerRadius
+    ).cgPath
   }
   
   override func becomeFirstResponder() -> Bool {
@@ -600,6 +640,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     forwardButton.isHidden = !toolbarIsShowing || inOverlayMode
     trailingItemsStackView.isHidden = !toolbarIsShowing || inOverlayMode
     locationView.contentView.isHidden = inOverlayMode
+    shieldsRewardsStack.isHidden = inOverlayMode
 
     let showBookmarkPref = Preferences.General.showBookmarkToolbarShortcut.value
     bookmarkButton.isHidden = showBookmarkPref ? inOverlayMode : true
@@ -614,7 +655,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     }
 
     if inOverlayMode {
-      [progressBar, leadingItemsStackView, bookmarkButton, trailingItemsStackView, locationView.contentView].forEach {
+      [progressBar, leadingItemsStackView, bookmarkButton, shieldsRewardsStack, trailingItemsStackView, locationView.contentView].forEach {
         $0?.isHidden = true
       }
 
@@ -662,7 +703,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
       shieldIcon = shieldsOffIcon
     }
 
-    locationView.shieldsButton.setImage(UIImage(sharedNamed: shieldIcon), for: .normal)
+    shieldsButton.setImage(UIImage(sharedNamed: shieldIcon), for: .normal)
   }
   
   // MARK: Actions
@@ -683,10 +724,6 @@ class TopToolbarView: UIView, ToolbarProtocol {
     delegate?.topToolbarDidTapMenuButton(self)
   }
 
-  @objc func didClickBraveShieldsButton() {
-    delegate?.topToolbarDidTapBraveShieldsButton(self)
-  }
-
   @objc func topToolbarDidPressQrCodeButton() {
     delegate?.topToolbarDidPressQrCodeButton(self)
     leaveOverlayMode(didCancel: true)
@@ -699,6 +736,14 @@ class TopToolbarView: UIView, ToolbarProtocol {
   
   @objc private func swipedLocationView() {
     delegate?.topToolbarDidPressTabs(self)
+  }
+  
+  @objc private func didTapBraveShieldsButton() {
+    delegate?.topToolbarDidTapBraveShieldsButton(self)
+  }
+  
+  @objc private func didTapBraveRewardsButton() {
+    delegate?.topToolbarDidTapBraveRewardsButton(self)
   }
 }
 
@@ -713,14 +758,6 @@ extension TopToolbarView: PreferencesObserver {
 // MARK:  TabLocationViewDelegate
 
 extension TopToolbarView: TabLocationViewDelegate {
-  func tabLocationViewDidTapShieldsButton(_ urlBar: TabLocationView) {
-    delegate?.topToolbarDidTapBraveShieldsButton(self)
-  }
-
-  func tabLocationViewDidTapRewardsButton(_ urlBar: TabLocationView) {
-    delegate?.topToolbarDidTapBraveRewardsButton(self)
-  }
-
   func tabLocationViewDidTapLocation(_ tabLocationView: TabLocationView) {
     guard let (locationText, isSearchQuery) = delegate?.topToolbarDisplayTextForURL(locationView.url as URL?) else { return }
     
@@ -731,10 +768,6 @@ extension TopToolbarView: TabLocationViewDelegate {
       overlayText = URLFormatter.formatURL(url.absoluteString, formatTypes: [], unescapeOptions: [])
     }
     enterOverlayMode(overlayText, pasted: false, search: isSearchQuery)
-  }
-
-  func tabLocationViewDidTapLockImageView(_ tabLocationView: TabLocationView) {
-    delegate?.topToolbarDidPressLockImageView(self)
   }
 
   func tabLocationViewDidTapReload(_ tabLocationView: TabLocationView) {

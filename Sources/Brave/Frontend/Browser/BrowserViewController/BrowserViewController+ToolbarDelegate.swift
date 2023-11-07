@@ -60,7 +60,9 @@ extension BrowserViewController: TopToolbarDelegate {
     present(container, animated: !isExternallyPresented)
   }
 
+  /*
   func topToolbarDidPressLockImageView(_ urlBar: TopToolbarView) {
+    // TODO: Move to menu item
     guard let webView = tabManager.selectedTab?.webView else {
       Logger.module.error("Invalid WebView")
       return
@@ -122,6 +124,7 @@ extension BrowserViewController: TopToolbarDelegate {
       }
     }
   }
+   */
 
   func topToolbarDidPressReload(_ topToolbar: TopToolbarView) {
     if let url = topToolbar.currentURL {
@@ -516,7 +519,7 @@ extension BrowserViewController: TopToolbarDelegate {
     
     let container = PopoverNavigationController(rootViewController: shields)
     let popover = PopoverController(contentController: container, contentSizeBehavior: .preferredContentSize)
-    popover.present(from: topToolbar.locationView.shieldsButton, on: self)
+    popover.present(from: topToolbar.shieldsButton, on: self)
   }
   
   func showSubmitReportView(for url: URL) {
@@ -533,8 +536,8 @@ extension BrowserViewController: TopToolbarDelegate {
     viewController.modalPresentationStyle = .popover
 
     if let popover = viewController.popoverPresentationController {
-      popover.sourceView = topToolbar.locationView.shieldsButton
-      popover.sourceRect = topToolbar.locationView.shieldsButton.bounds
+      popover.sourceView = topToolbar.shieldsButton
+      popover.sourceRect = topToolbar.shieldsButton.bounds
       
       let sheet = popover.adaptiveSheetPresentationController
       sheet.largestUndimmedDetentIdentifier = .medium

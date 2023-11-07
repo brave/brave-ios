@@ -2766,7 +2766,7 @@ extension BrowserViewController: TabDelegate {
       contentController: vc,
       contentSizeBehavior: .preferredContentSize)
     popover.addsConvenientDismissalMargins = false
-    popover.present(from: topToolbar.locationView.rewardsButton, on: self)
+    popover.present(from: topToolbar.rewardsButton, on: self)
     popover.popoverDidDismiss = { _ in
       // This gets called if popover is dismissed by user gesture
       // This does not conflict with 'Enable Rewards' button.
@@ -2783,7 +2783,7 @@ extension BrowserViewController: TabDelegate {
       let popover2 = PopoverController(
         contentController: vc2,
         contentSizeBehavior: .preferredContentSize)
-      popover2.present(from: self.topToolbar.locationView.rewardsButton, on: self)
+      popover2.present(from: self.topToolbar.rewardsButton, on: self)
     }
 
     vc.linkTapped = { [unowned self] request in

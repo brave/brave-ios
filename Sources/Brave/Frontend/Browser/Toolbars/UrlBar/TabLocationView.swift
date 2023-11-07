@@ -16,12 +16,9 @@ protocol TabLocationViewDelegate {
   func tabLocationViewDidBeginDragInteraction(_ tabLocationView: TabLocationView)
   func tabLocationViewDidTapPlaylist(_ tabLocationView: TabLocationView)
   func tabLocationViewDidTapPlaylistMenuAction(_ tabLocationView: TabLocationView, action: PlaylistURLBarButton.MenuAction)
-  func tabLocationViewDidTapLockImageView(_ tabLocationView: TabLocationView)
   func tabLocationViewDidTapReload(_ tabLocationView: TabLocationView)
   func tabLocationViewDidTapStop(_ tabLocationView: TabLocationView)
   func tabLocationViewDidTapVoiceSearch(_ tabLocationView: TabLocationView)
-  func tabLocationViewDidTapShieldsButton(_ urlBar: TabLocationView)
-  func tabLocationViewDidTapRewardsButton(_ urlBar: TabLocationView)
   func tabLocationViewDidTapWalletButton(_ urlBar: TabLocationView)
 }
 
@@ -66,20 +63,7 @@ class TabLocationView: UIView {
   }
 
   private func updateLockImageView() {
-    lockImageView.isHidden = false
-    
-    switch secureContentState {
-    case .localHost:
-      lockImageView.isHidden = true
-    case .insecure:
-      lockImageView.setImage(UIImage(braveSystemNamed: "leo.info.filled")?
-        .withRenderingMode(.alwaysOriginal)
-        .withTintColor(.braveErrorLabel), for: .normal)
-      lockImageView.accessibilityLabel = Strings.tabToolbarWarningImageAccessibilityLabel
-    case .secure, .unknown:
-      lockImageView.setImage(UIImage(braveSystemNamed: "brave.lock.alt", compatibleWith: nil), for: .normal)
-      lockImageView.accessibilityLabel = Strings.tabToolbarLockImageAccessibilityLabel
-    }
+    // TODO: Show updated UI based on secureContentState
   }
 
   deinit {
@@ -146,17 +130,6 @@ class TabLocationView: UIView {
     return urlTextField
   }()
 
-  private(set) lazy var lockImageView = ToolbarButton().then {
-    $0.setImage(UIImage(braveSystemNamed: "brave.lock.alt", compatibleWith: nil)?.withRenderingMode(.alwaysTemplate), for: .normal)
-    $0.isHidden = true
-    $0.isAccessibilityElement = true
-    $0.imageView?.contentMode = .center
-    $0.contentHorizontalAlignment = .center
-    $0.accessibilityLabel = Strings.tabToolbarLockImageAccessibilityLabel
-    $0.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-    $0.addTarget(self, action: #selector(didTapLockImageView), for: .touchUpInside)
-  }
-
   private(set) lazy var readerModeButton: ReaderModeButton = {
     let readerModeButton = ReaderModeButton(frame: .zero)
     readerModeButton.addTarget(self, action: #selector(didTapReaderModeButton), for: .touchUpInside)
@@ -202,29 +175,14 @@ class TabLocationView: UIView {
     $0.addTarget(self, action: #selector(didTapVoiceSearchButton), for: .touchUpInside)
   }
 
-  lazy var shieldsButton: ToolbarButton = {
-    let button = ToolbarButton()
-    button.setImage(UIImage(sharedNamed: "brave.logo"), for: .normal)
-    button.addTarget(self, action: #selector(didTapBraveShieldsButton), for: .touchUpInside)
-    button.imageView?.contentMode = .scaleAspectFit
-    button.accessibilityLabel = Strings.bravePanel
-    button.imageView?.adjustsImageSizeForAccessibilityContentSizeCategory = true
-    button.accessibilityIdentifier = "urlBar-shieldsButton"
-    return button
-  }()
-
-  lazy var rewardsButton: RewardsButton = {
-    let button = RewardsButton()
-    button.addTarget(self, action: #selector(didTapBraveRewardsButton), for: .touchUpInside)
-    return button
-  }()
-
-  lazy var separatorLine: UIView = CustomSeparatorView(lineSize: .init(width: 1, height: 26), cornerRadius: 2).then {
-    $0.isUserInteractionEnabled = false
-    $0.layoutMargins = UIEdgeInsets(top: 0, left: 2, bottom: 0, right: 2)
+  lazy var leadingTabOptionsStackView = UIStackView().then {
+    $0.alignment = .center
+    $0.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 3)
+    $0.isLayoutMarginsRelativeArrangement = true
+    $0.insetsLayoutMarginsFromSafeArea = false
   }
-
-  lazy var tabOptionsStackView = UIStackView().then {
+  
+  lazy var trailingTabOptionsStackView = UIStackView().then {
     $0.alignment = .center
     $0.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 3)
     $0.isLayoutMarginsRelativeArrangement = true
@@ -244,25 +202,30 @@ class TabLocationView: UIView {
 
     addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapLocationBar)))
     
-    var optionSubviews: [UIView] = [readerModeButton, walletButton, playlistButton]
-    if isVoiceSearchAvailable {
-      optionSubviews.append(voiceSearchButton)
-    }
-    optionSubviews.append(contentsOf: [reloadButton, separatorLine, shieldsButton, rewardsButton])
-    
-    optionSubviews.forEach {
+    let leadingOptionsSubviews: [UIView] = [readerModeButton]
+    leadingOptionsSubviews.forEach {
       ($0 as? UIButton)?.contentEdgeInsets = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
       $0.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
       $0.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-      tabOptionsStackView.addArrangedSubview($0)
+      leadingTabOptionsStackView.addArrangedSubview($0)
     }
-
-    // Visual centering
-    rewardsButton.contentEdgeInsets = .init(top: 1, left: 5, bottom: 1, right: 5)
+    
+    var trailingOptionSubviews: [UIView] = [walletButton, playlistButton]
+    if isVoiceSearchAvailable {
+      trailingOptionSubviews.append(voiceSearchButton)
+    }
+    trailingOptionSubviews.append(contentsOf: [reloadButton])
+    
+    trailingOptionSubviews.forEach {
+      ($0 as? UIButton)?.contentEdgeInsets = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
+      $0.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+      $0.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+      trailingTabOptionsStackView.addArrangedSubview($0)
+    }
     
     urlTextField.setContentHuggingPriority(.defaultLow, for: .horizontal)
 
-    let subviews = [lockImageView, urlTextField, tabOptionsStackView]
+    let subviews = [leadingTabOptionsStackView, urlTextField, trailingTabOptionsStackView]
     contentView = UIStackView(arrangedSubviews: subviews)
     contentView.layoutMargins = UIEdgeInsets(top: 2, left: TabLocationViewUX.spacing, bottom: 2, right: 0)
     contentView.isLayoutMarginsRelativeArrangement = true
@@ -304,7 +267,7 @@ class TabLocationView: UIView {
   
   override var accessibilityElements: [Any]? {
     get {
-      return [lockImageView, urlTextField, readerModeButton, playlistButton, reloadButton, shieldsButton].filter { !$0.isHidden }
+      return [urlTextField, readerModeButton, playlistButton, reloadButton].filter { !$0.isHidden }
     }
     set {
       super.accessibilityElements = newValue
@@ -313,10 +276,6 @@ class TabLocationView: UIView {
   
   private func updateForTraitCollection() {
     let clampedTraitCollection = traitCollection.clampingSizeCategory(maximum: .accessibilityLarge)
-    lockImageView.setPreferredSymbolConfiguration(
-      .init(pointSize: UIFont.preferredFont(forTextStyle: .body, compatibleWith: clampedTraitCollection).pointSize, weight: .heavy, scale: .small),
-      forImageIn: .normal
-    )
     let toolbarTraitCollection = UITraitCollection(preferredContentSizeCategory: traitCollection.toolbarButtonContentSizeCategory)
     urlTextField.font = .preferredFont(forTextStyle: .body, compatibleWith: clampedTraitCollection)
     let pointSize = UIFont.preferredFont(
@@ -337,10 +296,9 @@ class TabLocationView: UIView {
     backgroundColor = browserColors.containerBackground
     urlTextField.textColor = browserColors.textPrimary
     urlTextField.attributedPlaceholder = makePlaceholder(colors: browserColors)
-    separatorLine.backgroundColor = browserColors.dividerSubtle
     readerModeButton.unselectedTintColor = browserColors.iconDefault
     readerModeButton.selectedTintColor = browserColors.iconActive
-    for button in [reloadButton, lockImageView, voiceSearchButton] {
+    for button in [reloadButton, voiceSearchButton] {
       button.primaryTintColor = browserColors.iconDefault
       button.disabledTintColor = browserColors.iconDisabled
       button.selectedTintColor = browserColors.iconActive
@@ -363,12 +321,6 @@ class TabLocationView: UIView {
   }
   
   // MARK: Tap Actions
-  
-  @objc func didTapLockImageView() {
-    if !loading {
-      delegate?.tabLocationViewDidTapLockImageView(self)
-    }
-  }
 
   @objc func didTapReaderModeButton() {
     delegate?.tabLocationViewDidTapReaderMode(self)
@@ -393,14 +345,6 @@ class TabLocationView: UIView {
   @objc func didTapLocationBar(_ recognizer: UITapGestureRecognizer) {
     delegate?.tabLocationViewDidTapLocation(self)
   }
-
-  @objc func didTapBraveShieldsButton() {
-    delegate?.tabLocationViewDidTapShieldsButton(self)
-  }
-
-  @objc func didTapBraveRewardsButton() {
-    delegate?.tabLocationViewDidTapRewardsButton(self)
-  }
   
   @objc func didTapWalletButton() {
     delegate?.tabLocationViewDidTapWalletButton(self)
@@ -414,16 +358,6 @@ extension TabLocationView: TabEventHandler {
   }
 
   func tabDidChangeContentBlockerStatus(_ tab: Tab) {
-  }
-}
-
-// MARK: - Hit Test
-extension TabLocationView {
-  override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-    if lockImageView.frame.insetBy(dx: -10, dy: -30).contains(point) {
-      return lockImageView
-    }
-    return super.hitTest(point, with: event)
   }
 }
 

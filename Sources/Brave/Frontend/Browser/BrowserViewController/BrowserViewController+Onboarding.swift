@@ -275,12 +275,12 @@ extension BrowserViewController {
     }
 
     let popover = PopoverController(contentController: controller)
-    popover.previewForOrigin = .init(view: topToolbar.locationView.shieldsButton, action: { [weak self] popover in
+    popover.previewForOrigin = .init(view: topToolbar.shieldsButton, action: { [weak self] popover in
       popover.dismissPopover() {
         self?.presentBraveShieldsViewController()
       }
     })
-    popover.present(from: topToolbar.locationView.shieldsButton, on: self)
+    popover.present(from: topToolbar.shieldsButton, on: self)
 
     popover.popoverDidDismiss = { [weak self] _ in
       DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
