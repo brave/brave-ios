@@ -407,7 +407,7 @@ public class SwapTokenStore: ObservableObject, WalletObserverStore {
         signedTransaction: nil
       )
       let txDataUnion = BraveWallet.TxDataUnion(ethTxData: baseData)
-      let (success, _, _) = await txService.addUnapprovedTransaction(txDataUnion, from: accountInfo.accountId)
+      let (success, _, _) = await txService.addUnapprovedTransaction(txDataUnion, chainId: network.chainId, from: accountInfo.accountId)
       if !success {
         self.state = .error(Strings.Wallet.unknownError)
         self.clearAllAmount()
@@ -529,7 +529,7 @@ public class SwapTokenStore: ObservableObject, WalletObserverStore {
       return success
     } else {
       let txDataUnion = BraveWallet.TxDataUnion(ethTxData: baseData)
-      let (success, _, _) = await txService.addUnapprovedTransaction(txDataUnion, from: accountInfo.accountId)
+      let (success, _, _) = await txService.addUnapprovedTransaction(txDataUnion, chainId: network.chainId, from: accountInfo.accountId)
       if !success {
         self.state = .error(Strings.Wallet.unknownError)
         self.clearAllAmount()
@@ -559,7 +559,7 @@ public class SwapTokenStore: ObservableObject, WalletObserverStore {
     }
     let eip1559Data = BraveWallet.TxData1559(baseData: baseData, chainId: chainId, maxPriorityFeePerGas: maxPriorityFeePerGas, maxFeePerGas: maxFeePerGas, gasEstimation: gasEstimation)
     let txDataUnion = BraveWallet.TxDataUnion(ethTxData1559: eip1559Data)
-    let (success, _, _) = await txService.addUnapprovedTransaction(txDataUnion, from: account.accountId)
+    let (success, _, _) = await txService.addUnapprovedTransaction(txDataUnion, chainId: chainId, from: account.accountId)
     if !success {
       self.state = .error(Strings.Wallet.unknownError)
       self.clearAllAmount()
@@ -785,6 +785,7 @@ public class SwapTokenStore: ObservableObject, WalletObserverStore {
     }
     let (success, _, _) = await txService.addUnapprovedTransaction(
       .init(solanaTxData: solTxData),
+      chainId: network.chainId,
       from: accountInfo.accountId
     )
     return success
