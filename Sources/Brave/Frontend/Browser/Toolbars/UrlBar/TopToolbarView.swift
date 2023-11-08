@@ -44,7 +44,6 @@ class TopToolbarView: UIView, ToolbarProtocol {
     static let locationPadding: CGFloat = 8
     static let locationHeight: CGFloat = 44
     static let textFieldCornerRadius: CGFloat = 10
-    static let progressBarHeight: CGFloat = 3
   }
   
   // MARK: URLBarButton
@@ -74,8 +73,8 @@ class TopToolbarView: UIView, ToolbarProtocol {
     didSet {
       if isTransitioning {
         // Cancel any pending/in-progress animations related to the progress bar
-        progressBar.setProgress(1, animated: false)
-        progressBar.alpha = 0.0
+        locationView.progressBar.setProgress(1, animated: false)
+        locationView.progressBar.alpha = 0.0
       }
     }
   }
@@ -125,11 +124,6 @@ class TopToolbarView: UIView, ToolbarProtocol {
   }
 
   let tabsButton = TabsButton()
-
-  private lazy var progressBar = GradientProgressBar().then {
-    $0.clipsToBounds = false
-    $0.setGradientColors(startColor: .braveBlurpleTint, endColor: .braveBlurpleTint)
-  }
 
   private lazy var cancelButton = InsetButton().then {
     $0.setTitle(Strings.cancelButtonTitle, for: .normal)
@@ -281,7 +275,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
 
     locationContainer.addSubview(locationView)
 
-    [scrollToTopButton, tabsButton, progressBar, cancelButton].forEach(addSubview(_:))
+    [scrollToTopButton, tabsButton, cancelButton].forEach(addSubview(_:))
     addSubview(mainStackView)
 
     helper = ToolbarHelper(toolbar: self)
@@ -392,12 +386,6 @@ class TopToolbarView: UIView, ToolbarProtocol {
     scrollToTopButton.snp.makeConstraints { make in
       make.top.equalTo(self)
       make.left.right.equalTo(self.locationContainer)
-    }
-
-    progressBar.snp.makeConstraints { make in
-      make.top.equalTo(self.snp.bottom).inset(UX.progressBarHeight / 2)
-      make.height.equalTo(UX.progressBarHeight)
-      make.left.right.equalTo(self)
     }
 
     locationView.snp.makeConstraints { make in
@@ -518,18 +506,18 @@ class TopToolbarView: UIView, ToolbarProtocol {
   }
 
   func currentProgress() -> Float {
-    return progressBar.progress
+    locationView.progressBar.progress
   }
 
   func updateProgressBar(_ progress: Float) {
-    progressBar.alpha = 1
-    progressBar.isHidden = false
-    progressBar.setProgress(progress, animated: !isTransitioning)
+    locationView.progressBar.alpha = 1
+    locationView.progressBar.isHidden = false
+    locationView.progressBar.setProgress(progress, animated: !isTransitioning)
   }
 
   func hideProgressBar() {
-    progressBar.isHidden = true
-    progressBar.setProgress(0, animated: false)
+    locationView.progressBar.isHidden = true
+    locationView.progressBar.setProgress(0, animated: false)
   }
 
   func updateReaderModeState(_ state: ReaderModeState) {
@@ -641,7 +629,6 @@ class TopToolbarView: UIView, ToolbarProtocol {
     if cancelButton.isHidden == inOverlayMode {
       cancelButton.isHidden = !inOverlayMode
     }
-    progressBar.isHidden = inOverlayMode
     backButton.isHidden = !toolbarIsShowing || inOverlayMode
     forwardButton.isHidden = !toolbarIsShowing || inOverlayMode
     trailingItemsStackView.isHidden = !toolbarIsShowing || inOverlayMode
@@ -661,7 +648,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     }
 
     if inOverlayMode {
-      [progressBar, leadingItemsStackView, bookmarkButton, shieldsRewardsStack, trailingItemsStackView, locationView.contentView].forEach {
+      [leadingItemsStackView, bookmarkButton, shieldsRewardsStack, trailingItemsStackView, locationView.contentView].forEach {
         $0?.isHidden = true
       }
 

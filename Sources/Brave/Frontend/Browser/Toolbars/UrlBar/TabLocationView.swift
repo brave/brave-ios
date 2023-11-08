@@ -28,6 +28,7 @@ private struct TabLocationViewUX {
   static let TPIconSize: CGFloat = 24
   static let buttonSize = CGSize(width: 44, height: 34.0)
   static let URLBarPadding = 4
+  static let progressBarHeight: CGFloat = 3
 }
 
 class TabLocationView: UIView {
@@ -160,8 +161,6 @@ class TabLocationView: UIView {
 
   lazy var trailingTabOptionsStackView = UIStackView().then {
     $0.alignment = .center
-    $0.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 3)
-    $0.isLayoutMarginsRelativeArrangement = true
     $0.insetsLayoutMarginsFromSafeArea = false
   }
   
@@ -178,6 +177,11 @@ class TabLocationView: UIView {
     $0.identifier = "url-layout-guide"
   }
 
+  private(set) lazy var progressBar = GradientProgressBar().then {
+    $0.clipsToBounds = false
+    $0.setGradientColors(startColor: .braveBlurpleTint, endColor: .braveBlurpleTint)
+  }
+  
   init(voiceSearchSupported: Bool, privateBrowsingManager: PrivateBrowsingManager) {
     self.privateBrowsingManager = privateBrowsingManager
     isVoiceSearchAvailable = voiceSearchSupported
@@ -189,7 +193,6 @@ class TabLocationView: UIView {
     addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapLocationBar)))
     
     readerModeButton.do {
-      ($0 as? UIButton)?.contentEdgeInsets = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
       $0.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
       $0.setContentHuggingPriority(.defaultHigh, for: .horizontal)
     }
@@ -201,7 +204,6 @@ class TabLocationView: UIView {
     trailingOptionSubviews.append(contentsOf: [reloadButton])
     
     trailingOptionSubviews.forEach {
-      ($0 as? UIButton)?.contentEdgeInsets = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
       $0.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
       $0.setContentHuggingPriority(.defaultHigh, for: .horizontal)
       trailingTabOptionsStackView.addArrangedSubview($0)
@@ -216,9 +218,10 @@ class TabLocationView: UIView {
     contentView.addSubview(urlDisplayLabel)
     contentView.addSubview(trailingTabOptionsStackView)
     contentView.addSubview(placeholderLabel)
+    contentView.addSubview(progressBar)
     
     contentView.snp.makeConstraints {
-      $0.edges.equalTo(UIEdgeInsets(top: 2, left: 0, bottom: 2, right: 0))
+      $0.edges.equalToSuperview()
     }
     
     urlDisplayLabel.snp.makeConstraints {
@@ -228,27 +231,33 @@ class TabLocationView: UIView {
     }
     
     readerModeButton.snp.makeConstraints {
-      $0.leading.equalToSuperview().inset(TabLocationViewUX.spacing)
+      $0.leading.equalToSuperview()
       $0.top.bottom.equalToSuperview()
     }
     
     trailingTabOptionsStackView.snp.makeConstraints {
-      $0.trailing.equalToSuperview().inset(TabLocationViewUX.spacing)
+      $0.trailing.equalToSuperview()
       $0.top.bottom.equalToSuperview()
     }
     
     urlLayoutGuide.snp.makeConstraints {
-      $0.leading.equalTo(readerModeButton.snp.trailing).offset(TabLocationViewUX.spacing)
-      $0.trailing.equalTo(trailingTabOptionsStackView.snp.leading).offset(-TabLocationViewUX.spacing)
+      $0.leading.equalTo(readerModeButton.snp.trailing)
+      $0.trailing.equalTo(trailingTabOptionsStackView.snp.leading)
       $0.top.bottom.equalTo(self)
     }
     
     placeholderLabel.snp.makeConstraints {
       $0.top.bottom.equalToSuperview()
       $0.leading.equalToSuperview().inset(TabLocationViewUX.spacing * 2) // Needs double spacing to line up
-      $0.trailing.lessThanOrEqualTo(trailingTabOptionsStackView).inset(TabLocationViewUX.spacing)
+      $0.trailing.lessThanOrEqualTo(trailingTabOptionsStackView.snp.leading)
     }
     
+    progressBar.snp.makeConstraints {
+      $0.bottom.equalToSuperview()
+      $0.height.equalTo(TabLocationViewUX.progressBarHeight)
+      $0.leading.trailing.equalToSuperview()
+    }
+
     privateModeCancellable = privateBrowsingManager.$isPrivateBrowsing
       .removeDuplicates()
       .receive(on: RunLoop.main)
@@ -298,8 +307,16 @@ class TabLocationView: UIView {
       .init(pointSize: pointSize, weight: .regular, scale: .large),
       forImageIn: .normal
     )
+    voiceSearchButton.setPreferredSymbolConfiguration(
+      .init(pointSize: pointSize, weight: .regular, scale: .large),
+      forImageIn: .normal
+    )
+    let width = UIFontMetrics(forTextStyle: .body).scaledValue(for: 44, compatibleWith: toolbarTraitCollection)
     reloadButton.snp.remakeConstraints {
-      $0.width.equalTo(UIFontMetrics(forTextStyle: .body).scaledValue(for: 32, compatibleWith: toolbarTraitCollection))
+      $0.width.equalTo(width)
+    }
+    voiceSearchButton.snp.remakeConstraints {
+      $0.width.equalTo(width)
     }
   }
   
