@@ -299,6 +299,9 @@ class TopToolbarView: UIView, ToolbarProtocol {
     }
     bookmarkButton.contentEdgeInsets = .init(top: 0, left: 0, bottom: 0, right: 2)
     
+    if UIDevice.current.userInterfaceIdiom == .phone {
+      trailingItemsStackView.addArrangedSubview(addTabButton)
+    }
     trailingItemsStackView.addArrangedSubview(tabsButton)
     trailingItemsStackView.addArrangedSubview(menuButton)
     
