@@ -80,6 +80,7 @@ class TabLocationView: UIView {
       if newReaderModeState != self.readerModeButton.readerModeState {
         let wasHidden = readerModeButton.isHidden
         self.readerModeButton.readerModeState = newReaderModeState
+        readerModeButton.isHidden = readerModeState == .unavailable
         if wasHidden != (newReaderModeState == ReaderModeState.unavailable) {
           UIAccessibility.post(notification: .layoutChanged, argument: nil)
           if !readerModeButton.isHidden {

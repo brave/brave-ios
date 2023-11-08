@@ -51,7 +51,6 @@ class TopToolbarView: UIView, ToolbarProtocol {
   enum URLBarButton {
     case wallet
     case playlist
-    case readerMode
   }
   
   // MARK: Internal
@@ -192,7 +191,6 @@ class TopToolbarView: UIView, ToolbarProtocol {
     didSet {
       locationView.walletButton.isHidden = currentURLBarButton != .wallet
       locationView.playlistButton.isHidden = currentURLBarButton != .playlist
-      locationView.readerModeButton.isHidden = currentURLBarButton != .readerMode
     }
   }
   
@@ -542,8 +540,6 @@ class TopToolbarView: UIView, ToolbarProtocol {
       currentURLBarButton = .wallet
     } else if locationView.playlistButton.buttonState != .none {
       currentURLBarButton = .playlist
-    } else if locationView.readerModeState != .unavailable {
-      currentURLBarButton = .readerMode
     } else {
       currentURLBarButton = nil
     }
