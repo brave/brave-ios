@@ -297,6 +297,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         ActivityShortcutManager.shared.performShortcutActivity(
           type: .openHistoryList, using: browserViewController)
       }
+      
+      return
+    case ActivityType.openBookmarks.identifier:
+      if let browserViewController = scene.browserViewController {
+        ActivityShortcutManager.shared.performShortcutActivity(
+          type: .openBookmarks, using: browserViewController)
+      }
 
       return
     case ActivityType.clearBrowsingHistory.identifier:

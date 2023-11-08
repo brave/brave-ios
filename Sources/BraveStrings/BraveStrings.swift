@@ -2395,6 +2395,11 @@ extension Strings {
         value: "Open a New Private Browser Tab",
         comment: "")
     
+    public static let activityTypeOpenBookmarksTitle =
+      NSLocalizedString("shortcuts.activityTypeOpenBookmarksTitle", tableName: "BraveShared", bundle: .module,
+        value: "Open Brave Browser Bookmarks",
+        comment: "")
+    
     public static let activityTypeOpenHistoryListTitle =
       NSLocalizedString("shortcuts.activityTypeOpenHistoryListTitle", tableName: "BraveShared", bundle: .module,
         value: "Open Brave Browser History",
@@ -2430,6 +2435,11 @@ extension Strings {
         value: "Start Searching the Web Securely with Brave",
         comment: "")
 
+    public static let activityTypeOpenBookmarksDescription =
+      NSLocalizedString("shortcuts.activityTypeOpenBookmarksDescription", tableName: "BraveShared", bundle: .module,
+        value: "Open Browser Bookmarks Screen",
+        comment: "")
+    
     public static let activityTypeOpenHistoryListDescription =
       NSLocalizedString("shortcuts.activityTypeClearHistoryDescription", tableName: "BraveShared", bundle: .module,
         value: "Open Browser History Screen",
@@ -2470,8 +2480,13 @@ extension Strings {
         value: "Open New Private Tab",
         comment: "")
 
+    public static let activityTypeOpenBookmarksSuggestedPhrase =
+      NSLocalizedString("shortcuts.activityTypeOpenBookmarksSuggestedPhrase", tableName: "BraveShared", bundle: .module,
+        value: "Open Bookmarks",
+        comment: "")
+    
     public static let activityTypeOpenHistoryListSuggestedPhrase =
-      NSLocalizedString("shortcuts.activityTypeOpenHistoryListDescription", tableName: "BraveShared", bundle: .module,
+      NSLocalizedString("shortcuts.activityTypeOpenHistoryListSuggestedPhrase", tableName: "BraveShared", bundle: .module,
         value: "Open Browser History",
         comment: "")
     
@@ -2540,6 +2555,16 @@ extension Strings {
         value: "Use Shortcuts to open a new private tab via Siri - Voice Assistant",
         comment: "")
 
+    public static let shortcutSettingsOpenBookmarksTitle =
+      NSLocalizedString("shortcuts.shortcutSettingsOpenBookmarksTitle", tableName: "BraveShared", bundle: .module,
+        value: "Open Bookmarks",
+        comment: "")
+    
+    public static let shortcutSettingsOpenBookmarksDescription =
+      NSLocalizedString("shortcuts.shortcutSettingsOpenBookmarksDescription", tableName: "BraveShared", bundle: .module,
+        value: "Use Shortcuts to open bookmarks screen via Siri - Voice Assistant",
+        comment: "")
+    
     public static let shortcutSettingsOpenHistoryListTitle =
       NSLocalizedString("shortcuts.shortcutSettingsOpenHistoryListTitle", tableName: "BraveShared", bundle: .module,
         value: "Open Browser History",

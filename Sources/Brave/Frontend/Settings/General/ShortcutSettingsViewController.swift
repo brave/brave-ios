@@ -58,6 +58,18 @@ class ShortcutSettingsViewController: TableViewController {
       Section(
         rows: [
           Row(
+            text: Strings.Shortcuts.shortcutSettingsOpenBookmarksTitle,
+            selection: { [unowned self] in
+              manageShortcutActivity(for: .openBookmarks)
+            }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self)
+        ],
+        footer: .title(Strings.Shortcuts.shortcutSettingsOpenBookmarksDescription))
+    )
+    
+    dataSource.sections.append(
+      Section(
+        rows: [
+          Row(
             text: Strings.Shortcuts.shortcutSettingsOpenHistoryListTitle,
             selection: { [unowned self] in
               manageShortcutActivity(for: .openHistoryList)
