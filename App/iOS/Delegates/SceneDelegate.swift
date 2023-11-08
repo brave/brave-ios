@@ -326,6 +326,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
           type: .openPlayList, using: browserViewController)
       }
 
+    case ActivityType.openSyncedTabs.identifier:
+      if let browserViewController = scene.browserViewController {
+        ActivityShortcutManager.shared.performShortcutActivity(
+          type: .openSyncedTabs, using: browserViewController)
+      }
       return
     default:
       break

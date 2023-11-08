@@ -27,6 +27,7 @@ public enum ActivityType: String {
   case enableBraveVPN = "EnableBraveVPN"
   case openBraveNews = "OpenBraveNews"
   case openPlayList = "OpenPlayList"
+  case openSyncedTabs = "OpenSyncedTabs"
 
   public var identifier: String {
     return "\(Bundle.main.bundleIdentifier ?? "").\(self.rawValue)"
@@ -49,6 +50,8 @@ public enum ActivityType: String {
       return Strings.Shortcuts.activityTypeOpenBraveNewsTitle
     case .openPlayList:
       return Strings.Shortcuts.activityTypeOpenPlaylistTitle
+    case .openSyncedTabs:
+      return Strings.Shortcuts.activityTypeOpenSyncedTabsTitle
     }
   }
 
@@ -67,6 +70,8 @@ public enum ActivityType: String {
       return Strings.Shortcuts.activityTypeBraveNewsDescription
     case .openPlayList:
       return Strings.Shortcuts.activityTypeOpenPlaylistDescription
+    case .openSyncedTabs:
+      return Strings.Shortcuts.activityTypeOpenSyncedTabsDescription
     }
   }
 
@@ -87,6 +92,8 @@ public enum ActivityType: String {
       return Strings.Shortcuts.activityTypeOpenBraveNewsSuggestedPhrase
     case .openPlayList:
       return Strings.Shortcuts.activityTypeOpenPlaylistSuggestedPhrase
+    case .openSyncedTabs:
+      return Strings.Shortcuts.activityTypeOpenSyncedTabsSuggestedPhrase
     }
   }
 }
@@ -195,6 +202,9 @@ public class ActivityShortcutManager: NSObject {
         PlaylistP3A.recordUsage()
         bvc.present(playlistController, animated: true)
       }
+    case .openSyncedTabs:
+      bvc.popToBVC()
+      bvc.showTabTray()
     }
   }
 

@@ -118,6 +118,18 @@ class ShortcutSettingsViewController: TableViewController {
       Section(
         rows: [
           Row(
+            text: Strings.Shortcuts.shortcutSettingsOpenSyncedTabsTitle,
+            selection: { [unowned self] in
+              manageShortcutActivity(for: .openSyncedTabs)
+            }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self)
+        ],
+        footer: .title(Strings.Shortcuts.shortcutSettingsOpenSyncedTabsDescription))
+    )
+
+    dataSource.sections.append(
+      Section(
+        rows: [
+          Row(
             text: Strings.Shortcuts.shortcutOpenApplicationSettingsTitle,
             selection: { [unowned self] in
               let style: UIAlertController.Style = UIDevice.current.userInterfaceIdiom == .pad ? .alert : .actionSheet
