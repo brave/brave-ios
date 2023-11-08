@@ -293,6 +293,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     leadingItemsStackView.addArrangedSubview(backButton)
     leadingItemsStackView.addArrangedSubview(forwardButton)
     leadingItemsStackView.addArrangedSubview(bookmarkButton)
+    leadingItemsStackView.addArrangedSubview(shareButton)
 
     [backButton, forwardButton].forEach {
       $0.contentEdgeInsets = UIEdgeInsets(
@@ -631,6 +632,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     }
     backButton.isHidden = !toolbarIsShowing || inOverlayMode
     forwardButton.isHidden = !toolbarIsShowing || inOverlayMode
+    shareButton.isHidden = !toolbarIsShowing || inOverlayMode
     trailingItemsStackView.isHidden = !toolbarIsShowing || inOverlayMode
     locationView.contentView.isHidden = inOverlayMode
     shieldsRewardsStack.isHidden = inOverlayMode
