@@ -2,8 +2,8 @@
 
 ## [1.52.1](https://github.com/brave/brave-ios/releases/tag/v1.52.1)
 
+- Resolved web compatibility issue on YouTube desktop site. ([#7714](https://github.com/brave/brave-ios/issues/7714))
 - Fixed a crash when reordering Favorites on New Tab Page. ([#7714](https://github.com/brave/brave-ios/issues/7714))
-- Reverted cosmetic filtering changes which causes performance issues on https://youtube.com. ([#7714](https://github.com/brave/brave-ios/issues/7714))
 
 ## [1.52](https://github.com/brave/brave-ios/releases/tag/v1.52)
 
