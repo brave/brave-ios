@@ -174,6 +174,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     $0.spacing = 8
     $0.isLayoutMarginsRelativeArrangement = true
     $0.insetsLayoutMarginsFromSafeArea = false
+    $0.alignment = .center
   }
 
   private let leadingItemsStackView = UIStackView().then {
@@ -366,7 +367,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
   
   private func updateForTraitCollection() {
     let toolbarSizeCategory = traitCollection.toolbarButtonContentSizeCategory
-    let pointSize = UIFont.preferredFont(forTextStyle: .body, compatibleWith: .init(preferredContentSizeCategory: toolbarSizeCategory)).lineHeight
+    let pointSize = UIFont.preferredFont(forTextStyle: .headline, compatibleWith: .init(preferredContentSizeCategory: toolbarSizeCategory)).lineHeight
     shieldsButton.snp.remakeConstraints {
       $0.height.equalTo(pointSize)
     }
@@ -374,7 +375,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
       $0.height.equalTo(pointSize)
     }
     let clampedTraitCollection = traitCollection.clampingSizeCategory(maximum: .accessibilityLarge)
-    locationTextField?.font = .preferredFont(forTextStyle: .body, compatibleWith: clampedTraitCollection)
+    locationTextField?.font = .preferredFont(forTextStyle: .subheadline, compatibleWith: clampedTraitCollection)
   }
   
   private func setupConstraints() {
@@ -411,6 +412,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     let horizontalInset: CGFloat = safeAreaInsets.left > 0 ? 0 : UX.locationPadding
     mainStackView.layoutMargins = .init(top: 0, left: horizontalInset, bottom: 0, right: horizontalInset)
     
+    locationContainer.layoutIfNeeded()
     locationContainer.layer.shadowPath = UIBezierPath(
       roundedRect: locationContainer.bounds,
       cornerRadius: locationContainer.layer.cornerRadius
@@ -421,12 +423,16 @@ class TopToolbarView: UIView, ToolbarProtocol {
     return self.locationTextField?.becomeFirstResponder() ?? false
   }
   
+  private func makePlaceholder(colors: some BrowserColors) -> NSAttributedString {
+    NSAttributedString(string: Strings.tabToolbarSearchAddressPlaceholderText, attributes: [.foregroundColor: colors.textTertiary])
+  }
+  
   private func updateColors() {
     let browserColors = privateBrowsingManager.browserColors
     backgroundColor = browserColors.chromeBackground
     locationTextField?.backgroundColor = browserColors.containerBackground
     locationTextField?.textColor = browserColors.textPrimary
-    locationTextField?.attributedPlaceholder = locationView.makePlaceholder(colors: browserColors)
+    locationTextField?.attributedPlaceholder = makePlaceholder(colors: browserColors)
   }
     
   /// Created whenever the location bar on top is selected
@@ -453,7 +459,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
       $0.font = .preferredFont(forTextStyle: .body)
       $0.accessibilityIdentifier = "address"
       $0.accessibilityLabel = Strings.URLBarViewLocationTextViewAccessibilityLabel
-      $0.attributedPlaceholder = self.locationView.makePlaceholder(colors: .standard)
+      $0.attributedPlaceholder = self.makePlaceholder(colors: .standard)
       $0.clearButtonMode = .whileEditing
       $0.rightViewMode = .never
       if let dropInteraction = $0.textDropInteraction {
@@ -827,7 +833,7 @@ extension TopToolbarView: AutocompleteTextFieldDelegate {
 
   func autocompleteTextFieldDidBeginEditing(_ autocompleteTextField: AutocompleteTextField) {
     autocompleteTextField.highlightAll()
-    updateLocationBarRightView(showToolbarActions: locationView.urlTextField.text?.isEmpty == true)
+    updateLocationBarRightView(showToolbarActions: locationView.urlDisplayLabel.text?.isEmpty == true)
   }
 
   func autocompleteTextFieldShouldClear(_ autocompleteTextField: AutocompleteTextField) -> Bool {

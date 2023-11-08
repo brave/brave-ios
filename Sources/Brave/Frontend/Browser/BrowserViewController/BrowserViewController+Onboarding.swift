@@ -84,7 +84,7 @@ extension BrowserViewController {
     }
             
     let frame = view.convert(
-      topToolbar.locationView.urlTextField.frame,
+      topToolbar.locationView.urlDisplayLabel.frame,
       from: topToolbar.locationView).insetBy(dx: -7.0, dy: -1.0)
     
     // Present the popover

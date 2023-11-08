@@ -32,7 +32,7 @@ private struct TabLocationViewUX {
 
 class TabLocationView: UIView {
   var delegate: TabLocationViewDelegate?
-  var contentView: UIStackView!
+  let contentView = UIView()
   private var tabObservers: TabObservers!
   private var privateModeCancellable: AnyCancellable?
 
@@ -97,37 +97,20 @@ class TabLocationView: UIView {
     }
   }
 
-  func makePlaceholder(colors: some BrowserColors) -> NSAttributedString {
-    NSAttributedString(string: Strings.tabToolbarSearchAddressPlaceholderText, attributes: [NSAttributedString.Key.foregroundColor: colors.textSecondary])
-  }
-
-  lazy var urlTextField: UITextField = {
-    let urlTextField = DisplayTextField()
+  lazy var urlDisplayLabel: UILabel = {
+    let urlDisplayLabel = DisplayURLLabel()
 
     // Prevent the field from compressing the toolbar buttons on the 4S in landscape.
-    urlTextField.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 250), for: .horizontal)
-    urlTextField.setContentCompressionResistancePriority(.required, for: .vertical)
-    urlTextField.attributedPlaceholder = makePlaceholder(colors: .standard)
-    urlTextField.accessibilityIdentifier = "url"
-    urlTextField.font = .preferredFont(forTextStyle: .body)
-    urlTextField.backgroundColor = .clear
-    urlTextField.clipsToBounds = true
-    urlTextField.isEnabled = false
-    urlTextField.defaultTextAttributes[.paragraphStyle] = {
-      let paragraphStyle = (urlTextField
-        .defaultTextAttributes[.paragraphStyle, default: NSParagraphStyle.default] as! NSParagraphStyle)
-        .mutableCopy() as! NSMutableParagraphStyle
-      paragraphStyle.alignment = .center
-      paragraphStyle.lineBreakMode = .byTruncatingHead
-      return paragraphStyle
-    }()
-    // Remove the default drop interaction from the URL text field so that our
-    // custom drop interaction on the BVC can accept dropped URLs.
-    if let dropInteraction = urlTextField.textDropInteraction {
-      urlTextField.removeInteraction(dropInteraction)
-    }
-
-    return urlTextField
+    urlDisplayLabel.setContentCompressionResistancePriority(UILayoutPriority(rawValue: 250), for: .horizontal)
+    urlDisplayLabel.setContentCompressionResistancePriority(.required, for: .vertical)
+    urlDisplayLabel.accessibilityIdentifier = "url"
+    urlDisplayLabel.font = .preferredFont(forTextStyle: .subheadline)
+    urlDisplayLabel.backgroundColor = .clear
+    urlDisplayLabel.clipsToBounds = true
+    urlDisplayLabel.textAlignment = .right
+    urlDisplayLabel.lineBreakMode = .byClipping
+    urlDisplayLabel.numberOfLines = 1
+    return urlDisplayLabel
   }()
 
   private(set) lazy var readerModeButton: ReaderModeButton = {
@@ -175,22 +158,25 @@ class TabLocationView: UIView {
     $0.addTarget(self, action: #selector(didTapVoiceSearchButton), for: .touchUpInside)
   }
 
-  lazy var leadingTabOptionsStackView = UIStackView().then {
-    $0.alignment = .center
-    $0.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 3)
-    $0.isLayoutMarginsRelativeArrangement = true
-    $0.insetsLayoutMarginsFromSafeArea = false
-  }
-  
   lazy var trailingTabOptionsStackView = UIStackView().then {
     $0.alignment = .center
     $0.layoutMargins = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 3)
     $0.isLayoutMarginsRelativeArrangement = true
     $0.insetsLayoutMarginsFromSafeArea = false
   }
-
+  
   private var isVoiceSearchAvailable: Bool
   private let privateBrowsingManager: PrivateBrowsingManager
+  
+  private let placeholderLabel = UILabel().then {
+    $0.text = Strings.tabToolbarSearchAddressPlaceholderText
+    $0.isHidden = true
+  }
+  
+  // A layout guide defining the available space for the URL itself
+  private let urlLayoutGuide = UILayoutGuide().then {
+    $0.identifier = "url-layout-guide"
+  }
 
   init(voiceSearchSupported: Bool, privateBrowsingManager: PrivateBrowsingManager) {
     self.privateBrowsingManager = privateBrowsingManager
@@ -202,12 +188,10 @@ class TabLocationView: UIView {
 
     addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapLocationBar)))
     
-    let leadingOptionsSubviews: [UIView] = [readerModeButton]
-    leadingOptionsSubviews.forEach {
+    readerModeButton.do {
       ($0 as? UIButton)?.contentEdgeInsets = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 5)
       $0.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
       $0.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-      leadingTabOptionsStackView.addArrangedSubview($0)
     }
     
     var trailingOptionSubviews: [UIView] = [walletButton, playlistButton]
@@ -223,19 +207,46 @@ class TabLocationView: UIView {
       trailingTabOptionsStackView.addArrangedSubview($0)
     }
     
-    urlTextField.setContentHuggingPriority(.defaultLow, for: .horizontal)
-
-    let subviews = [leadingTabOptionsStackView, urlTextField, trailingTabOptionsStackView]
-    contentView = UIStackView(arrangedSubviews: subviews)
-    contentView.layoutMargins = UIEdgeInsets(top: 2, left: TabLocationViewUX.spacing, bottom: 2, right: 0)
-    contentView.isLayoutMarginsRelativeArrangement = true
-    contentView.insetsLayoutMarginsFromSafeArea = false
-    contentView.spacing = 8
-    contentView.setCustomSpacing(4, after: urlTextField)
+    urlDisplayLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
+    
+    addLayoutGuide(urlLayoutGuide)
+    
     addSubview(contentView)
-
-    contentView.snp.makeConstraints { make in
-      make.leading.trailing.top.bottom.equalTo(self)
+    contentView.addSubview(readerModeButton)
+    contentView.addSubview(urlDisplayLabel)
+    contentView.addSubview(trailingTabOptionsStackView)
+    contentView.addSubview(placeholderLabel)
+    
+    contentView.snp.makeConstraints {
+      $0.edges.equalTo(UIEdgeInsets(top: 2, left: 0, bottom: 2, right: 0))
+    }
+    
+    urlDisplayLabel.snp.makeConstraints {
+      $0.center.equalToSuperview()
+      $0.leading.greaterThanOrEqualTo(urlLayoutGuide)
+      $0.trailing.lessThanOrEqualTo(urlLayoutGuide)
+    }
+    
+    readerModeButton.snp.makeConstraints {
+      $0.leading.equalToSuperview().inset(TabLocationViewUX.spacing)
+      $0.top.bottom.equalToSuperview()
+    }
+    
+    trailingTabOptionsStackView.snp.makeConstraints {
+      $0.trailing.equalToSuperview().inset(TabLocationViewUX.spacing)
+      $0.top.bottom.equalToSuperview()
+    }
+    
+    urlLayoutGuide.snp.makeConstraints {
+      $0.leading.equalTo(readerModeButton.snp.trailing).offset(TabLocationViewUX.spacing)
+      $0.trailing.equalTo(trailingTabOptionsStackView.snp.leading).offset(-TabLocationViewUX.spacing)
+      $0.top.bottom.equalTo(self)
+    }
+    
+    placeholderLabel.snp.makeConstraints {
+      $0.top.bottom.equalToSuperview()
+      $0.leading.equalToSuperview().inset(TabLocationViewUX.spacing * 2) // Needs double spacing to line up
+      $0.trailing.lessThanOrEqualTo(trailingTabOptionsStackView).inset(TabLocationViewUX.spacing)
     }
     
     privateModeCancellable = privateBrowsingManager.$isPrivateBrowsing
@@ -267,7 +278,7 @@ class TabLocationView: UIView {
   
   override var accessibilityElements: [Any]? {
     get {
-      return [urlTextField, readerModeButton, playlistButton, reloadButton].filter { !$0.isHidden }
+      return [urlDisplayLabel, placeholderLabel, readerModeButton, playlistButton, reloadButton].filter { !$0.isHidden }
     }
     set {
       super.accessibilityElements = newValue
@@ -277,7 +288,8 @@ class TabLocationView: UIView {
   private func updateForTraitCollection() {
     let clampedTraitCollection = traitCollection.clampingSizeCategory(maximum: .accessibilityLarge)
     let toolbarTraitCollection = UITraitCollection(preferredContentSizeCategory: traitCollection.toolbarButtonContentSizeCategory)
-    urlTextField.font = .preferredFont(forTextStyle: .body, compatibleWith: clampedTraitCollection)
+    urlDisplayLabel.font = .preferredFont(forTextStyle: .subheadline, compatibleWith: clampedTraitCollection)
+    placeholderLabel.font = urlDisplayLabel.font
     let pointSize = UIFont.preferredFont(
       forTextStyle: .footnote,
       compatibleWith: toolbarTraitCollection
@@ -294,8 +306,8 @@ class TabLocationView: UIView {
   private func updateColors() {
     let browserColors = privateBrowsingManager.browserColors
     backgroundColor = browserColors.containerBackground
-    urlTextField.textColor = browserColors.textPrimary
-    urlTextField.attributedPlaceholder = makePlaceholder(colors: browserColors)
+    urlDisplayLabel.textColor = browserColors.textPrimary
+    placeholderLabel.textColor = browserColors.textTertiary
     readerModeButton.unselectedTintColor = browserColors.iconDefault
     readerModeButton.selectedTintColor = browserColors.iconActive
     for button in [reloadButton, voiceSearchButton] {
@@ -314,10 +326,12 @@ class TabLocationView: UIView {
     // --
     // The requirement to remove scheme comes from Desktop. Also we do not remove the path like in other browsers either.
     // Therefore, we follow Brave Desktop instead of Chrome or Safari iOS
-    urlTextField.text = URLFormatter.formatURLOrigin(forSecurityDisplay: url?.withoutWWW.absoluteString ?? "", schemeDisplay: .omitHttpAndHttps)
+    urlDisplayLabel.text = URLFormatter.formatURLOrigin(forSecurityDisplay: url?.withoutWWW.absoluteString ?? "", schemeDisplay: .omitHttpAndHttps)
     
     reloadButton.isHidden = url == nil
     voiceSearchButton.isHidden = (url != nil) || !isVoiceSearchAvailable
+    placeholderLabel.isHidden = url != nil
+    urlDisplayLabel.isHidden = url == nil
   }
   
   // MARK: Tap Actions
@@ -361,16 +375,22 @@ extension TabLocationView: TabEventHandler {
   }
 }
 
-class DisplayTextField: UITextField {
-  weak var accessibilityActionsSource: AccessibilityActionsSource?
+private class DisplayURLLabel: UILabel {
   let pathPadding: CGFloat = 5.0
   
-  private let leadingClippingFade = GradientView(
+  let leadingClippingFade = GradientView(
     colors: [.braveBackground, .braveBackground.withAlphaComponent(0.0)],
     positions: [0, 1],
     startPoint: .init(x: 0, y: 0.5),
     endPoint: .init(x: 1, y: 0.5)
   )
+  
+  override var preferredMaxLayoutWidth: CGFloat {
+    didSet {
+      setNeedsLayout()
+      setNeedsDisplay()
+    }
+  }
   
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -382,10 +402,27 @@ class DisplayTextField: UITextField {
     }
   }
   
+  private var textSize: CGSize = .zero
+  
+  override var font: UIFont! {
+    didSet {
+      updateTextSize(from: text)
+    }
+  }
+  
   override var text: String? {
+    willSet {
+      updateTextSize(from: newValue)
+    }
     didSet {
       leadingClippingFade.isHidden = true
     }
+  }
+  
+  private func updateTextSize(from value: String?) {
+    textSize = (value as? NSString)?.size(withAttributes: [.font: font!]) ?? .zero
+    setNeedsLayout()
+    setNeedsDisplay()
   }
   
   @available(*, unavailable)
@@ -402,15 +439,6 @@ class DisplayTextField: UITextField {
       $0.resolvedColor(with: traitCollection).cgColor
     }
   }
-
-  override var accessibilityCustomActions: [UIAccessibilityCustomAction]? {
-    get {
-      return accessibilityActionsSource?.accessibilityCustomActionsForView(self)
-    }
-    set {
-      super.accessibilityCustomActions = newValue
-    }
-  }
   
   override var accessibilityTraits: UIAccessibilityTraits {
     get { [.staticText, .button] }
@@ -424,48 +452,18 @@ class DisplayTextField: UITextField {
   // This override is done in case the eTLD+1 string overflows the width of textField.
   // In that case the textRect is adjusted to show right aligned and truncate left.
   // Since this textField changes with WebView domain change, performance implications are low.
-  override func textRect(forBounds bounds: CGRect) -> CGRect {
-    var rect: CGRect = super.textRect(forBounds: bounds)
-
-    if let size: CGSize = (self.text as NSString?)?.size(withAttributes: [.font: self.font!]) {
-      if size.width > self.bounds.width {
-        rect.origin.x = rect.origin.x - (size.width + pathPadding - self.bounds.width)
-        rect.size.width = size.width + pathPadding
-        bringSubviewToFront(leadingClippingFade)
-        leadingClippingFade.isHidden = false
-      }
+  override func drawText(in rect: CGRect) {
+    var rect = rect
+    if textSize.width > bounds.width {
+      let delta = (textSize.width - bounds.width)
+      rect.origin.x -= delta
+      rect.size.width += delta
+      
+      bringSubviewToFront(leadingClippingFade)
+      leadingClippingFade.isHidden = false
+    } else {
+      leadingClippingFade.isHidden = true
     }
-    return rect
-  }
-}
-
-private class CustomSeparatorView: UIView {
-
-  private let innerView: UIView
-  init(lineSize: CGSize, cornerRadius: CGFloat = 0) {
-    innerView = UIView(frame: .init(origin: .zero, size: lineSize))
-    super.init(frame: .zero)
-    backgroundColor = .clear
-    innerView.layer.cornerRadius = cornerRadius
-    innerView.layer.cornerCurve = .continuous
-    addSubview(innerView)
-    innerView.snp.makeConstraints {
-      $0.width.height.equalTo(lineSize)
-      $0.centerY.equalTo(self)
-      $0.leading.trailing.equalTo(self.layoutMarginsGuide)
-    }
-  }
-
-  override var backgroundColor: UIColor? {
-    get {
-      return innerView.backgroundColor
-    }
-    set {
-      innerView.backgroundColor = newValue
-    }
-  }
-
-  required init?(coder aDecoder: NSCoder) {
-    fatalError("init(coder:) has not been implemented")
+    super.drawText(in: rect)
   }
 }
