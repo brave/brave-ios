@@ -22,6 +22,7 @@ import UniformTypeIdentifiers
 public enum ActivityType: String {
   case newTab = "NewTab"
   case newPrivateTab = "NewPrivateTab"
+  case openHistoryList = "OpenHistoryList"
   case clearBrowsingHistory = "ClearBrowsingHistory"
   case enableBraveVPN = "EnableBraveVPN"
   case openBraveNews = "OpenBraveNews"
@@ -38,6 +39,8 @@ public enum ActivityType: String {
       return Strings.Shortcuts.activityTypeNewTabTitle
     case .newPrivateTab:
       return Strings.Shortcuts.activityTypeNewPrivateTabTitle
+    case .openHistoryList:
+      return Strings.Shortcuts.activityTypeOpenHistoryListTitle
     case .clearBrowsingHistory:
       return Strings.Shortcuts.activityTypeClearHistoryTitle
     case .enableBraveVPN:
@@ -54,6 +57,8 @@ public enum ActivityType: String {
     switch self {
     case .newTab, .newPrivateTab:
       return Strings.Shortcuts.activityTypeTabDescription
+    case .openHistoryList:
+      return Strings.Shortcuts.activityTypeOpenHistoryListDescription
     case .clearBrowsingHistory:
       return Strings.Shortcuts.activityTypeClearHistoryDescription
     case .enableBraveVPN:
@@ -72,6 +77,8 @@ public enum ActivityType: String {
       return Strings.Shortcuts.activityTypeNewTabSuggestedPhrase
     case .newPrivateTab:
       return Strings.Shortcuts.activityTypeNewPrivateTabSuggestedPhrase
+    case .openHistoryList:
+      return Strings.Shortcuts.activityTypeOpenHistoryListSuggestedPhrase
     case .clearBrowsingHistory:
       return Strings.Shortcuts.activityTypeClearHistorySuggestedPhrase
     case .enableBraveVPN:
@@ -134,6 +141,9 @@ public class ActivityShortcutManager: NSObject {
     case .newPrivateTab:
       bvc.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: true, isExternal: true)
       bvc.popToBVC()
+    case .openHistoryList:
+      bvc.popToBVC()
+      bvc.navigationHelper.openHistory()
     case .clearBrowsingHistory:
       bvc.clearHistoryAndOpenNewTab()
     case .enableBraveVPN:

@@ -2394,6 +2394,11 @@ extension Strings {
       NSLocalizedString("shortcuts.activityTypeNewPrivateTabTitle", tableName: "BraveShared", bundle: .module,
         value: "Open a New Private Browser Tab",
         comment: "")
+    
+    public static let activityTypeOpenHistoryListTitle =
+      NSLocalizedString("shortcuts.activityTypeOpenHistoryListTitle", tableName: "BraveShared", bundle: .module,
+        value: "Open Brave Browser History",
+        comment: "")
 
     public static let activityTypeClearHistoryTitle =
       NSLocalizedString("shortcuts.activityTypeClearHistoryTitle", tableName: "BraveShared", bundle: .module,
@@ -2418,6 +2423,11 @@ extension Strings {
     public static let activityTypeTabDescription =
       NSLocalizedString("shortcuts.activityTypeTabDescription", tableName: "BraveShared", bundle: .module,
         value: "Start Searching the Web Securely with Brave",
+        comment: "")
+
+    public static let activityTypeOpenHistoryListDescription =
+      NSLocalizedString("shortcuts.activityTypeClearHistoryDescription", tableName: "BraveShared", bundle: .module,
+        value: "Open Browser History Screen",
         comment: "")
 
     public static let activityTypeClearHistoryDescription =
@@ -2450,6 +2460,11 @@ extension Strings {
         value: "Open New Private Tab",
         comment: "")
 
+    public static let activityTypeOpenHistoryListSuggestedPhrase =
+      NSLocalizedString("shortcuts.activityTypeOpenHistoryListDescription", tableName: "BraveShared", bundle: .module,
+        value: "Open Browser History",
+        comment: "")
+    
     public static let activityTypeClearHistorySuggestedPhrase =
       NSLocalizedString("shortcuts.activityTypeClearHistorySuggestedPhrase", tableName: "BraveShared", bundle: .module,
         value: "Clear Browser History",
@@ -2510,6 +2525,16 @@ extension Strings {
         value: "Use Shortcuts to open a new private tab via Siri - Voice Assistant",
         comment: "")
 
+    public static let shortcutSettingsOpenHistoryListTitle =
+      NSLocalizedString("shortcuts.shortcutSettingsOpenHistoryListTitle", tableName: "BraveShared", bundle: .module,
+        value: "Use Shortcuts to open browser history screen via Siri - Voice Assistant",
+        comment: "")
+    
+    public static let shortcutSettingsOpenHistoryListDescription =
+      NSLocalizedString("shortcuts.shortcutSettingsOpenHistoryListDescription", tableName: "BraveShared", bundle: .module,
+        value: "Use Shortcuts to open browser history screen via Siri - Voice Assistant",
+        comment: "")
+    
     public static let shortcutSettingsClearBrowserHistoryTitle =
       NSLocalizedString("shortcuts.shortcutSettingsClearBrowserHistoryTitle", tableName: "BraveShared", bundle: .module,
         value: "Clear Browser History",

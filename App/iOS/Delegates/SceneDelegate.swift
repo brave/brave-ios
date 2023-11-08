@@ -292,6 +292,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       }
 
       return
+    case ActivityType.openHistoryList.identifier:
+      if let browserViewController = scene.browserViewController {
+        ActivityShortcutManager.shared.performShortcutActivity(
+          type: .openHistoryList, using: browserViewController)
+      }
+
+      return
     case ActivityType.clearBrowsingHistory.identifier:
       if let browserViewController = scene.browserViewController {
         ActivityShortcutManager.shared.performShortcutActivity(
