@@ -84,7 +84,7 @@ class TabLocationView: UIView {
     case .unknown, .localhost, .secure:
       break
     case .invalidCert:
-      configuration.baseForegroundColor = UIColor(braveSystemName: .systemfeedbackErrorText)
+      configuration.baseForegroundColor = UIColor(braveSystemName: .systemfeedbackErrorIcon)
       if isTitleVisible {
         configuration.attributedTitle = title
       }
