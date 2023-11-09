@@ -10,6 +10,10 @@ import Preferences
 
 extension BrowserViewController {
   
+  private enum PageZoomChangeStatus {
+    case increment, decrement
+  }
+  
   // MARK: Actions
   
   @objc private func reloadTabKeyCommand() {
@@ -192,6 +196,58 @@ extension BrowserViewController {
     RecentlyClosed.remove(with: recentlyClosed.url)
   }
   
+  @objc private func zoomInPageKeyCommand() {
+    changeZoomLevel(.increment)
+  }
+  
+  @objc private func zoomOutPageKeyCommand() {
+    changeZoomLevel(.decrement)
+  }
+  
+  private func changeZoomLevel(_ status: PageZoomChangeStatus) {
+    guard let webView = tabManager.selectedTab?.webView else { return }
+    
+    let steps = [0.5, 0.75, 0.85,
+                 1.0, 1.15, 1.25,
+                 1.50, 1.75, 2.00,
+                 2.50, 3.0]
+    
+    var currentValue: Double
+    let propertyName = "viewScale"
+    
+    // Fetch the current value for zoom
+    if let url = webView.url, let domain = Domain.getPersistedDomain(for: url) {
+      currentValue = domain.zoom_level?.doubleValue ?? Preferences.General.defaultPageZoomLevel.value
+    } else {
+      currentValue = webView.value(forKey: propertyName) as? Double ?? Preferences.General.defaultPageZoomLevel.value
+    }
+    
+    switch status {
+    case .increment:
+      guard let index = steps.firstIndex(of: currentValue),
+            index + 1 < steps.count else { return }
+      
+      currentValue = steps[index + 1]
+    case .decrement:
+      guard let index = PageZoomView.steps.firstIndex(of: currentValue),
+            index - 1 >= 0 else { return }
+      currentValue = PageZoomView.steps[index - 1]
+    }
+    
+    // Setting the value
+    guard let url = webView.url else { return }
+    webView.setValue(currentValue, forKey: propertyName)
+    
+    // Do NOT store the changes in the Domain if private domain
+    if !privateBrowsingManager.isPrivateBrowsing {
+      let domain = Domain.getPersistedDomain(for: url)?.then {
+        $0.zoom_level = currentValue == $0.zoom_level?.doubleValue ? nil : NSNumber(value: currentValue)
+      }
+      
+      try? domain?.managedObjectContext?.save()
+    }
+  }
+  
   // MARK: KeyCommands
   
   override public var keyCommands: [UIKeyCommand]? {
@@ -216,6 +272,11 @@ extension BrowserViewController {
       UIKeyCommand(input: "]", modifierFlags: .command, action: #selector(goForwardKeyCommand)),
     ]
     
+    navigationCommands += [
+      UIKeyCommand(title: Strings.Hotkey.zoomInTitle, action: #selector(zoomInPageKeyCommand), input: "+", modifierFlags: .command),
+      UIKeyCommand(title: Strings.Hotkey.zoomOutTitle, action: #selector(zoomOutPageKeyCommand), input: "-", modifierFlags: .command)
+    ]
+    
     // URL Bar - Tab Key Commands
     navigationCommands += [
       UIKeyCommand(title: Strings.Hotkey.selectLocationBarTitle, action: #selector(selectLocationBarKeyCommand), input: "l", modifierFlags: .command),
@@ -225,7 +286,8 @@ extension BrowserViewController {
     
     if !privateBrowsingManager.isPrivateBrowsing {
       navigationCommands += [
-        UIKeyCommand(title: Strings.Hotkey.recentlyClosedTabTitle, action: #selector(reopenRecentlyClosedTabCommand), input: "t", modifierFlags: [.command, .shift])
+        UIKeyCommand(title: Strings.Hotkey.recentlyClosedTabTitle, action: #selector(reopenRecentlyClosedTabCommand), input: "t", modifierFlags: [.command, .shift]),
+        UIKeyCommand(action: #selector(reopenRecentlyClosedTabCommand), input: "t", modifierFlags: [.control, .shift])
       ]
     }
     
@@ -299,7 +361,8 @@ extension BrowserViewController {
 
     // Additional Commands which will have priority over system
     let additionalPriorityCommandKeys = [
-      UIKeyCommand(input: "\t", modifierFlags: .control, action: #selector(nextTabKeyCommand))
+      UIKeyCommand(input: "\t", modifierFlags: .control, action: #selector(nextTabKeyCommand)),
+      UIKeyCommand(input: "\t", modifierFlags: [.control, .shift], action: #selector(previousTabKeyCommand))
     ]
     
     var keyCommandList = navigationCommands + tabNavigationCommands + bookmarkEditingCommands + shareCommands + findTextCommands + additionalPriorityCommandKeys
