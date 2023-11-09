@@ -84,7 +84,15 @@ struct TransactionSummaryViewContainer: View {
         time: parsedTransaction.transaction.createdTime
       )
     case .other:
-      EmptyView()
+      SendTransactionSummaryView(
+        sentFromAccountName: parsedTransaction.namedFromAddress,
+        token: nil,
+        network: parsedTransaction.network,
+        valueSent: nil,
+        fiatValueSent: nil,
+        status: parsedTransaction.transaction.txStatus,
+        time: parsedTransaction.transaction.createdTime
+      )
     }
   }
 }
