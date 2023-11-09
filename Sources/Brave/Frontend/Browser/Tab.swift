@@ -58,10 +58,22 @@ protocol URLChangeDelegate {
 }
 
 enum TabSecureContentState {
-  case localHost
-  case secure
-  case insecure
   case unknown
+  case localhost
+  case secure
+  case invalidCert
+  case missingSSL
+  case mixedContent
+  case unsupportedProtocol
+  
+  var shouldDisplayWarning: Bool {
+    switch self {
+    case .invalidCert, .missingSSL, .mixedContent, .unsupportedProtocol:
+      return true
+    case .unknown, .localhost, .secure:
+      return false
+    }
+  }
 }
 
 class Tab: NSObject {

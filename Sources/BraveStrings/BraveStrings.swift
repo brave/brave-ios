@@ -444,7 +444,7 @@ extension Strings {
   public static let findOnPageSectionHeader = NSLocalizedString("FindOnPageSectionHeader", tableName: "BraveShared", bundle: .module, value: "On This Page", comment: "Section header for find in page option")
   public static let searchHistorySectionHeader = NSLocalizedString("SearchHistorySectionHeader", tableName: "BraveShared", bundle: .module, value: "Open Tabs & Bookmarks & History", comment: "Section header for history and bookmarks and open tabs option")
   public static let searchSuggestionOpenTabActionTitle = NSLocalizedString("searchSuggestionOpenTabActionTitle", tableName: "BraveShared", bundle: .module, value: "Switch to this tab", comment: "Action title for Switching to an existing tab for the suggestion item shown on the table list")
-  
+  public static let tabToolbarNotSecureTitle = NSLocalizedString("tabToolbarNotSecureTitle", tableName: "BraveShared", bundle: .module, value: "Not Secure", comment: "A label shown next to a URL that loaded in some insecure way")
 }
 
 // MARK:-  TabToolbar.swift

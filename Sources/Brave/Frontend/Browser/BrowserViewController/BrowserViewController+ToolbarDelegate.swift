@@ -62,7 +62,7 @@ extension BrowserViewController: TopToolbarDelegate {
 
   /*
   func topToolbarDidPressLockImageView(_ urlBar: TopToolbarView) {
-    // TODO: Move to menu item
+    // TODO(url-bar-revamp): Move to menu item
     guard let webView = tabManager.selectedTab?.webView else {
       Logger.module.error("Invalid WebView")
       return
@@ -936,6 +936,10 @@ extension BrowserViewController: ToolbarDelegate {
 
   func tabToolbarDidPressTabs(_ tabToolbar: ToolbarProtocol, button: UIButton) {
     showTabTray()
+  }
+  
+  func topToolbarDidTapSecureContentState(_ urlBar: TopToolbarView) {
+    // TODO(url-bar-revamp): Show small menu
   }
 
   func showBackForwardList() {

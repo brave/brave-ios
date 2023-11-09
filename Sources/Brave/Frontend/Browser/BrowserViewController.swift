@@ -1782,7 +1782,7 @@ public class BrowserViewController: UIViewController {
       }
 
       if tab.secureContentState == .secure && !webView.hasOnlySecureContent {
-        tab.secureContentState = .insecure
+        tab.secureContentState = .mixedContent
       }
 
       if tabManager.selectedTab === tab {
@@ -1801,9 +1801,9 @@ public class BrowserViewController: UIViewController {
             let internalUrl = InternalURL(url),
             (internalUrl.isAboutURL || internalUrl.isAboutHomeURL) {
 
-            tab.secureContentState = .localHost
+            tab.secureContentState = .localhost
             if tabManager.selectedTab === tab {
-              updateToolbarSecureContentState(.localHost)
+              updateToolbarSecureContentState(.localhost)
             }
             break
           }
@@ -1813,9 +1813,9 @@ public class BrowserViewController: UIViewController {
             internalUrl.isErrorPage {
 
             if ErrorPageHelper.certificateError(for: url) != 0 {
-              tab.secureContentState = .insecure
+              tab.secureContentState = .invalidCert
               if tabManager.selectedTab === tab {
-                updateToolbarSecureContentState(.insecure)
+                updateToolbarSecureContentState(.invalidCert)
               }
               break
             }
@@ -1830,10 +1830,10 @@ public class BrowserViewController: UIViewController {
           }
 
           // All our checks failed, we show the page as insecure
-          tab.secureContentState = .insecure
+          tab.secureContentState = .missingSSL
         } else {
           // When there is no URL, it's likely a new tab.
-          tab.secureContentState = .localHost
+          tab.secureContentState = .localhost
         }
 
         if tabManager.selectedTab === tab {
@@ -1844,7 +1844,7 @@ public class BrowserViewController: UIViewController {
       
       guard let scheme = tab.webView?.url?.scheme,
             let host = tab.webView?.url?.host else {
-        tab.secureContentState = .insecure
+        tab.secureContentState = .unsupportedProtocol
         self.updateURLBar()
         return
       }
@@ -1872,10 +1872,10 @@ public class BrowserViewController: UIViewController {
             try await BraveCertificateUtils.evaluateTrust(serverTrust, for: host)
             tab.secureContentState = .secure
           } else {
-            tab.secureContentState = .insecure
+            tab.secureContentState = .invalidCert
           }
         } catch {
-          tab.secureContentState = .insecure
+          tab.secureContentState = .invalidCert
         }
         
         Task { @MainActor in

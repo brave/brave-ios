@@ -9,6 +9,8 @@ import Preferences
 import Combine
 import BraveCore
 import DesignSystem
+import BraveStrings
+import Strings
 
 protocol TabLocationViewDelegate {
   func tabLocationViewDidTapLocation(_ tabLocationView: TabLocationView)
@@ -20,6 +22,7 @@ protocol TabLocationViewDelegate {
   func tabLocationViewDidTapStop(_ tabLocationView: TabLocationView)
   func tabLocationViewDidTapVoiceSearch(_ tabLocationView: TabLocationView)
   func tabLocationViewDidTapWalletButton(_ urlBar: TabLocationView)
+  func tabLocationViewDidTapSecureContentState(_ urlBar: TabLocationView)
 }
 
 private struct TabLocationViewUX {
@@ -39,7 +42,7 @@ class TabLocationView: UIView {
 
   var url: URL? {
     didSet {
-      updateLockImageView()
+      updateLeadingItem()
       updateURLBarWithText()
       setNeedsUpdateConstraints()
     }
@@ -47,7 +50,7 @@ class TabLocationView: UIView {
 
   var secureContentState: TabSecureContentState = .unknown {
     didSet {
-      updateLockImageView()
+      updateLeadingItem()
     }
   }
 
@@ -62,9 +65,61 @@ class TabLocationView: UIView {
       }
     }
   }
+  
+  private var secureContentStateButtonConfiguration: UIButton.Configuration {
+    let clampedTraitCollection = traitCollection.clampingSizeCategory(maximum: .accessibilityLarge)
+    var configuration = UIButton.Configuration.plain()
+    configuration.preferredSymbolConfigurationForImage = .init(font: .preferredFont(forTextStyle: .subheadline, compatibleWith: clampedTraitCollection), scale: .small)
+    configuration.buttonSize = .small
+    configuration.imagePadding = 4
+    // A bit extra on the leading edge for visual spacing
+    configuration.contentInsets = .init(top: 0, leading: 12, bottom: 0, trailing: 8)
+    
+    var title = AttributedString(Strings.tabToolbarNotSecureTitle)
+    title.font = .preferredFont(forTextStyle: .subheadline, compatibleWith: clampedTraitCollection)
+    
+    let isTitleVisible = !traitCollection.preferredContentSizeCategory.isAccessibilityCategory
+    
+    switch secureContentState {
+    case .unknown, .localhost, .secure:
+      break
+    case .invalidCert:
+      configuration.baseForegroundColor = UIColor(braveSystemName: .systemfeedbackErrorText)
+      if isTitleVisible {
+        configuration.attributedTitle = title
+      }
+      configuration.image = UIImage(braveSystemNamed: "leo.warning.triangle-filled")
+    case .missingSSL, .mixedContent:
+      configuration.baseForegroundColor = UIColor(braveSystemName: .textTertiary)
+      if isTitleVisible {
+        configuration.attributedTitle = title
+      }
+      configuration.image = UIImage(braveSystemNamed: "leo.warning.triangle-filled")
+    case .unsupportedProtocol:
+      configuration.baseForegroundColor = UIColor(braveSystemName: .iconDefault)
+      configuration.image = UIImage(braveSystemNamed: "leo.warning.circle-filled")
+    }
+    return configuration
+  }
 
-  private func updateLockImageView() {
-    // TODO: Show updated UI based on secureContentState
+  private func updateLeadingItem() {
+    var leadingView: UIView?
+    defer { leadingItemView = leadingView }
+    if !secureContentState.shouldDisplayWarning {
+      // Consider reader mode
+      leadingView = readerModeState != .unavailable ? readerModeButton : nil
+      return
+    }
+    
+    let button = UIButton(configuration: secureContentStateButtonConfiguration, primaryAction: .init(handler: { [weak self] _ in
+      guard let self = self else { return }
+      self.delegate?.tabLocationViewDidTapSecureContentState(self)
+    }))
+    button.configurationUpdateHandler = { [unowned self] btn in
+      btn.configuration = secureContentStateButtonConfiguration
+    }
+    secureContentStateButton = button
+    leadingView = button
   }
 
   deinit {
@@ -77,10 +132,10 @@ class TabLocationView: UIView {
       return readerModeButton.readerModeState
     }
     set(newReaderModeState) {
+      defer { updateLeadingItem() }
       if newReaderModeState != self.readerModeButton.readerModeState {
-        let wasHidden = readerModeButton.isHidden
+        let wasHidden = leadingItemView == nil
         self.readerModeButton.readerModeState = newReaderModeState
-        readerModeButton.isHidden = readerModeState == .unavailable
         if wasHidden != (newReaderModeState == ReaderModeState.unavailable) {
           UIAccessibility.post(notification: .layoutChanged, argument: nil)
           if !readerModeButton.isHidden {
@@ -119,7 +174,6 @@ class TabLocationView: UIView {
     let readerModeButton = ReaderModeButton(frame: .zero)
     readerModeButton.addTarget(self, action: #selector(didTapReaderModeButton), for: .touchUpInside)
     readerModeButton.isAccessibilityElement = true
-    readerModeButton.isHidden = true
     readerModeButton.imageView?.contentMode = .scaleAspectFit
     readerModeButton.accessibilityLabel = Strings.tabToolbarReaderViewButtonAccessibilityLabel
     readerModeButton.accessibilityIdentifier = "TabLocationView.readerModeButton"
@@ -177,6 +231,23 @@ class TabLocationView: UIView {
   private let urlLayoutGuide = UILayoutGuide().then {
     $0.identifier = "url-layout-guide"
   }
+  
+  private let leadingItemContainerView = UIView()
+  private var leadingItemView: UIView? {
+    willSet {
+      leadingItemView?.removeFromSuperview()
+    }
+    didSet {
+      if let leadingItemView {
+        leadingItemContainerView.addSubview(leadingItemView)
+        leadingItemView.snp.makeConstraints {
+          $0.edges.equalToSuperview()
+        }
+      }
+    }
+  }
+  
+  private var secureContentStateButton: UIButton?
 
   private(set) lazy var progressBar = GradientProgressBar().then {
     $0.clipsToBounds = false
@@ -215,7 +286,7 @@ class TabLocationView: UIView {
     addLayoutGuide(urlLayoutGuide)
     
     addSubview(contentView)
-    contentView.addSubview(readerModeButton)
+    contentView.addSubview(leadingItemContainerView)
     contentView.addSubview(urlDisplayLabel)
     contentView.addSubview(trailingTabOptionsStackView)
     contentView.addSubview(placeholderLabel)
@@ -226,12 +297,12 @@ class TabLocationView: UIView {
     }
     
     urlDisplayLabel.snp.makeConstraints {
-      $0.center.equalToSuperview()
+      $0.center.equalToSuperview().priority(.low)
       $0.leading.greaterThanOrEqualTo(urlLayoutGuide)
       $0.trailing.lessThanOrEqualTo(urlLayoutGuide)
     }
     
-    readerModeButton.snp.makeConstraints {
+    leadingItemContainerView.snp.makeConstraints {
       $0.leading.equalToSuperview()
       $0.top.bottom.equalToSuperview()
     }
@@ -242,7 +313,8 @@ class TabLocationView: UIView {
     }
     
     urlLayoutGuide.snp.makeConstraints {
-      $0.leading.equalTo(readerModeButton.snp.trailing)
+      $0.leading.greaterThanOrEqualTo(TabLocationViewUX.spacing * 2)
+      $0.leading.equalTo(leadingItemContainerView.snp.trailing).priority(.medium)
       $0.trailing.equalTo(trailingTabOptionsStackView.snp.leading)
       $0.top.bottom.equalTo(self)
     }
