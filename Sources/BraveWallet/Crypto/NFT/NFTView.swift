@@ -125,18 +125,21 @@ struct NFTView: View {
           }
         }
         .pickerStyle(.inline)
+        .disabled(nftStore.isShowingNFTLoadingState)
       } label: {
         HStack(spacing: 12) {
           Text(nftStore.displayType.dropdownTitle)
             .font(.subheadline.weight(.semibold))
-          Text("\(nftStore.totalDisplayedNFTCount)")
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .font(.caption2.weight(.semibold))
-            .background(
-              Color(braveSystemName: .primary20)
-                .cornerRadius(4)
-            )
+          if !nftStore.isShowingNFTLoadingState {
+            Text("\(nftStore.totalDisplayedNFTCount)")
+              .padding(.horizontal, 8)
+              .padding(.vertical, 4)
+              .font(.caption2.weight(.semibold))
+              .background(
+                Color(braveSystemName: .primary20)
+                  .cornerRadius(4)
+              )
+          }
           Image(braveSystemName: "leo.carat.down")
             .font(.subheadline.weight(.semibold))
         }
@@ -149,7 +152,9 @@ struct NFTView: View {
       Spacer()
       addCustomAssetButton
         .padding(.trailing, 10)
+        .disabled(nftStore.isShowingNFTLoadingState)
       filtersButton
+        .disabled(nftStore.isShowingNFTLoadingState)
     }
     .padding(.horizontal)
     .frame(maxWidth: .infinity, alignment: .leading)
