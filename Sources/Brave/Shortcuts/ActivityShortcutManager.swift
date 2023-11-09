@@ -160,7 +160,7 @@ public class ActivityShortcutManager: NSObject {
       bvc.navigationHelper.openBookmarks()
     case .openHistoryList:
       bvc.popToBVC()
-      bvc.navigationHelper.openHistory()
+      bvc.navigationHelper.openHistory(isModal: true)
     case .clearBrowsingHistory:
       bvc.clearHistoryAndOpenNewTab()
     case .enableBraveVPN:
@@ -214,7 +214,7 @@ public class ActivityShortcutManager: NSObject {
       }
     case .openSyncedTabs:
       bvc.popToBVC()
-      bvc.showTabTray()
+      bvc.showTabTray(isExternallyPresented: true)
     }
   }
 
