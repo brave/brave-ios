@@ -10,7 +10,7 @@ struct TransactionSummaryViewContainer: View {
   
   let parsedTransaction: ParsedTransaction
   
-  var body: some View { // TODO: tx statuses?
+  var body: some View {
     switch parsedTransaction.details {
     case .ethSend(let details),
       .erc20Transfer(let details),
@@ -22,6 +22,7 @@ struct TransactionSummaryViewContainer: View {
         network: parsedTransaction.network,
         valueSent: details.fromAmount,
         fiatValueSent: details.fromFiat ?? "",
+        status: parsedTransaction.transaction.txStatus,
         time: parsedTransaction.transaction.createdTime
       )
     case .filSend(let details):
@@ -31,6 +32,7 @@ struct TransactionSummaryViewContainer: View {
         network: parsedTransaction.network,
         valueSent: details.sendAmount,
         fiatValueSent: details.sendFiat ?? "",
+        status: parsedTransaction.transaction.txStatus,
         time: parsedTransaction.transaction.createdTime
       )
     case .ethSwap(let details):
@@ -41,12 +43,14 @@ struct TransactionSummaryViewContainer: View {
         network: parsedTransaction.network,
         fromValue: details.fromAmount,
         toValue: details.minBuyAmount,
+        status: parsedTransaction.transaction.txStatus,
         time: parsedTransaction.transaction.createdTime
       )
     case .solSwapTransaction:
       SolanaSwapTransactionSummaryView(
         swappedOnAccountName: parsedTransaction.namedFromAddress,
         network: parsedTransaction.network,
+        status: parsedTransaction.transaction.txStatus,
         time: parsedTransaction.transaction.createdTime
       )
     case .ethErc20Approve(let details):
@@ -56,6 +60,7 @@ struct TransactionSummaryViewContainer: View {
         network: parsedTransaction.network,
         valueApproved: details.approvalAmount,
         fiatValueApproved: details.approvalFiat,
+        status: parsedTransaction.transaction.txStatus,
         time: parsedTransaction.transaction.createdTime
       )
     case .erc721Transfer(let details):
@@ -65,6 +70,7 @@ struct TransactionSummaryViewContainer: View {
         network: parsedTransaction.network,
         valueSent: nil,
         fiatValueSent: nil,
+        status: parsedTransaction.transaction.txStatus,
         time: parsedTransaction.transaction.createdTime
       )
     case .solDappTransaction:
@@ -74,6 +80,7 @@ struct TransactionSummaryViewContainer: View {
         network: parsedTransaction.network,
         valueSent: nil,
         fiatValueSent: nil,
+        status: parsedTransaction.transaction.txStatus,
         time: parsedTransaction.transaction.createdTime
       )
     case .other:
@@ -89,6 +96,7 @@ struct SendTransactionSummaryView: View {
   let network: BraveWallet.NetworkInfo
   let valueSent: String?
   let fiatValueSent: String?
+  let status: BraveWallet.TransactionStatus
   let time: Date
   
   init(
@@ -97,6 +105,7 @@ struct SendTransactionSummaryView: View {
     network: BraveWallet.NetworkInfo,
     valueSent: String?,
     fiatValueSent: String?,
+    status: BraveWallet.TransactionStatus,
     time: Date
   ) {
     self.sentFromAccountName = sentFromAccountName
@@ -104,6 +113,7 @@ struct SendTransactionSummaryView: View {
     self.network = network
     self.valueSent = valueSent
     self.fiatValueSent = fiatValueSent
+    self.status = status
     self.time = time
   }
   
@@ -131,34 +141,41 @@ struct SendTransactionSummaryView: View {
       .frame(maxWidth: .infinity, alignment: .leading)
       
       HStack {
-        if let token {
-          if token.isNft || token.isErc721 {
-            NFTIconView(
-              token: token,
-              network: network,
-              url: nil,
-              shouldShowNetworkIcon: true,
-              length: length,
-              maxLength: maxLength,
-              tokenLogoLength: networkSymbolLength,
-              maxTokenLogoLength: maxNetworkSymbolLength
-            )
+        Group {
+          if let token {
+            if token.isNft || token.isErc721 {
+              NFTIconView(
+                token: token,
+                network: network,
+                url: nil,
+                shouldShowNetworkIcon: true,
+                length: length,
+                maxLength: maxLength,
+                tokenLogoLength: networkSymbolLength,
+                maxTokenLogoLength: maxNetworkSymbolLength
+              )
+            } else {
+              AssetIconView(
+                token: token,
+                network: network,
+                shouldShowNetworkIcon: true,
+                length: length,
+                maxLength: maxLength,
+                networkSymbolLength: networkSymbolLength,
+                maxNetworkSymbolLength: maxNetworkSymbolLength
+              )
+            }
           } else {
-            AssetIconView(
-              token: token,
-              network: network,
-              shouldShowNetworkIcon: true,
+            GenericAssetIconView(
               length: length,
-              maxLength: maxLength,
-              networkSymbolLength: networkSymbolLength,
-              maxNetworkSymbolLength: maxNetworkSymbolLength
+              maxLength: maxLength
             )
           }
-        } else {
-          GenericAssetIconView(
-            length: length,
-            maxLength: maxLength
-          )
+        }
+        .overlay(alignment: .topLeading) {
+          if status.shouldShowTransactionStatus {
+            TransactionStatusBubble(status: status)
+          }
         }
         VStack(alignment: .leading) {
           Text(token?.name ?? "")
@@ -198,6 +215,7 @@ struct SwapTransactionSummaryView: View {
   let network: BraveWallet.NetworkInfo
   let fromValue: String
   let toValue: String
+  let status: BraveWallet.TransactionStatus
   let time: Date
   
   init(
@@ -207,6 +225,7 @@ struct SwapTransactionSummaryView: View {
     network: BraveWallet.NetworkInfo,
     fromValue: String,
     toValue: String,
+    status: BraveWallet.TransactionStatus,
     time: Date
   ) {
     self.swappedOnAccountName = swappedOnAccountName
@@ -215,6 +234,7 @@ struct SwapTransactionSummaryView: View {
     self.network = network
     self.fromValue = fromValue
     self.toValue = toValue
+    self.status = status
     self.time = time
   }
   
@@ -251,6 +271,11 @@ struct SwapTransactionSummaryView: View {
           networkSymbolLength: networkSymbolLength,
           maxNetworkSymbolLength: maxNetworkSymbolLength
         )
+        .overlay(alignment: .topLeading) {
+          if status.shouldShowTransactionStatus {
+            TransactionStatusBubble(status: status)
+          }
+        }
         HStack {
           Text(fromToken?.symbol ?? "")
             .font(primaryFont)
@@ -289,15 +314,18 @@ struct SolanaSwapTransactionSummaryView: View {
   
   let swappedOnAccountName: String
   let network: BraveWallet.NetworkInfo
+  let status: BraveWallet.TransactionStatus
   let time: Date
   
   init(
     swappedOnAccountName: String,
     network: BraveWallet.NetworkInfo,
+    status: BraveWallet.TransactionStatus,
     time: Date
   ) {
     self.swappedOnAccountName = swappedOnAccountName
     self.network = network
+    self.status = status
     self.time = time
   }
   
@@ -334,6 +362,11 @@ struct SolanaSwapTransactionSummaryView: View {
           networkSymbolLength: networkSymbolLength,
           maxNetworkSymbolLength: maxNetworkSymbolLength
         )
+        .overlay(alignment: .topLeading) {
+          if status.shouldShowTransactionStatus {
+            TransactionStatusBubble(status: status)
+          }
+        }
         HStack {
           Text("Solana Swap")
             .font(primaryFont)
@@ -357,6 +390,7 @@ struct ApprovalTransactionSummaryView: View {
   let network: BraveWallet.NetworkInfo
   let valueApproved: String
   let fiatValueApproved: String
+  let status: BraveWallet.TransactionStatus
   let time: Date
   
   init(
@@ -365,6 +399,7 @@ struct ApprovalTransactionSummaryView: View {
     network: BraveWallet.NetworkInfo,
     valueApproved: String,
     fiatValueApproved: String,
+    status: BraveWallet.TransactionStatus,
     time: Date
   ) {
     self.fromAccountName = fromAccountName
@@ -372,6 +407,7 @@ struct ApprovalTransactionSummaryView: View {
     self.network = network
     self.valueApproved = valueApproved
     self.fiatValueApproved = fiatValueApproved
+    self.status = status
     self.time = time
   }
   
@@ -399,21 +435,28 @@ struct ApprovalTransactionSummaryView: View {
       .frame(maxWidth: .infinity, alignment: .leading)
       
       HStack {
-        if let token {
-          AssetIconView(
-            token: token,
-            network: network,
-            shouldShowNetworkIcon: true,
-            length: length,
-            maxLength: maxLength,
-            networkSymbolLength: networkSymbolLength,
-            maxNetworkSymbolLength: maxNetworkSymbolLength
-          )
-        } else {
-          GenericAssetIconView(
-            length: length,
-            maxLength: maxLength
-          )
+        Group {
+          if let token {
+            AssetIconView(
+              token: token,
+              network: network,
+              shouldShowNetworkIcon: true,
+              length: length,
+              maxLength: maxLength,
+              networkSymbolLength: networkSymbolLength,
+              maxNetworkSymbolLength: maxNetworkSymbolLength
+            )
+          } else {
+            GenericAssetIconView(
+              length: length,
+              maxLength: maxLength
+            )
+          }
+        }
+        .overlay(alignment: .topLeading) {
+          if status.shouldShowTransactionStatus {
+            TransactionStatusBubble(status: status)
+          }
         }
         VStack(alignment: .leading) {
           Text(token?.name ?? "")
@@ -444,7 +487,7 @@ struct ApprovalTransactionSummaryView: View {
 }
 
 #if DEBUG
-struct TransactionSummaryViews_Previews: PreviewProvider {
+struct TransactionSummaryRow_Previews: PreviewProvider {
   static var previews: some View {
     VStack {
       SendTransactionSummaryView(
@@ -453,6 +496,7 @@ struct TransactionSummaryViews_Previews: PreviewProvider {
         network: .mockMainnet,
         valueSent: "37.8065",
         fiatValueSent: "$37.80",
+        status: .unapproved,
         time: Date()
       )
       Divider()
@@ -462,6 +506,7 @@ struct TransactionSummaryViews_Previews: PreviewProvider {
         network: .mockMainnet,
         valueSent: nil,
         fiatValueSent: nil,
+        status: .submitted,
         time: Date()
       )
       Divider()
@@ -472,12 +517,14 @@ struct TransactionSummaryViews_Previews: PreviewProvider {
         network: .mockMainnet,
         fromValue: "0.02",
         toValue: "189.301",
+        status: .confirmed,
         time: Date()
       )
       Divider()
       SolanaSwapTransactionSummaryView(
         swappedOnAccountName: "Account 1",
         network: .mockMainnet,
+        status: .error,
         time: Date()
       )
       Divider()
@@ -487,10 +534,86 @@ struct TransactionSummaryViews_Previews: PreviewProvider {
         network: .mockMainnet,
         valueApproved: "Unlimited",
         fiatValueApproved: "Unlimited",
+        status: .submitted,
         time: Date()
       )
     }
     .previewLayout(.sizeThatFits)
+  }
+}
+#endif
+
+private struct TransactionStatusBubble: View {
+  
+  let status: BraveWallet.TransactionStatus
+  
+  var body: some View {
+    Circle()
+      .fill(status.bubbleBackgroundColor)
+      .frame(width: 12, height: 12)
+      .overlay(
+        Circle()
+          .stroke(lineWidth: 1)
+          .foregroundColor(Color(braveSystemName: .containerBackground))
+      )
+      .overlay {
+        if status.shouldShowLoadingAnimation {
+          ProgressView()
+          .progressViewStyle(.braveCircular(size: .mini))
+        } else {
+          Image(braveSystemName: "leo.loading.spinner")
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .foregroundColor(Color(braveSystemName: .textDisabled))
+            .padding(2)
+        }
+      }
+  }
+}
+
+private extension BraveWallet.TransactionStatus {
+  /// If we should show transaction status bubble
+  var shouldShowTransactionStatus: Bool {
+    switch self {
+    case .approved, .confirmed, .signed:
+      return false
+    default:
+      return true
+    }
+  }
+  
+  /// If we should show transaction status as loading
+  var shouldShowLoadingAnimation: Bool {
+    switch self {
+    case .unapproved, .submitted:
+      return true
+    default:
+      return false
+    }
+  }
+  
+  /// Color of status bubble
+  var bubbleBackgroundColor: Color {
+    switch self {
+    case .confirmed, .approved:
+      return Color(braveSystemName: .systemfeedbackSuccessBackground)
+    case .rejected, .error, .dropped:
+      return Color(braveSystemName: .systemfeedbackErrorIcon)
+    case .unapproved:
+      return Color(braveSystemName: .legacyInteractive8)
+    case .submitted, .signed:
+      return Color(braveSystemName: .blue40)
+    @unknown default:
+      return Color.clear
+    }
+  }
+}
+
+#if DEBUG
+struct TransactionStatusBubble_Previews: PreviewProvider {
+  static var previews: some View {
+    TransactionStatusBubble(status: .unapproved)
+      .previewLayout(.sizeThatFits)
   }
 }
 #endif
