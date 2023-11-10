@@ -3337,7 +3337,6 @@ extension Strings {
         "SyncImportFolderName", tableName: "BraveShared", bundle: .module,
         value: "Imported Bookmarks",
         comment: "Folder name for where bookmarks are imported into when the root folder is not empty.")
-    /// History Migration localization text
     public static let syncConfigurationInformationText =
       NSLocalizedString(
         "sync.syncConfigurationInformationText", tableName: "BraveShared", bundle: .module,
