@@ -18,15 +18,13 @@ private struct ZoomView: View {
   var maxValue: Double
   @Binding var value: Double
   
-  var onDecrement: ()
-  var onReset: ()
-  var onIncrement: ()
+  var onDecrement: () -> Void
+  var onReset: () -> Void
+  var onIncrement: () -> Void
   
   var body: some View {
     HStack(spacing: 0.0) {
-      Button(action: {
-        onDecrement
-      }) {
+      Button(action: onDecrement) {
         Image(systemName: "minus")
           .font(.system(.footnote).weight(.medium))
           .foregroundColor(value == minValue ? .accentColor : Color(UIColor.braveLabel))
@@ -47,9 +45,7 @@ private struct ZoomView: View {
       
       Divider()
       
-      Button(action: {
-        onIncrement
-      }) {
+      Button(action: onIncrement) {
         Image(systemName: "plus")
           .font(.system(.footnote).weight(.medium))
           .foregroundColor(value == maxValue ? .accentColor : Color(UIColor.braveLabel))
@@ -64,9 +60,7 @@ private struct ZoomView: View {
   }
   
   private var resetZoomButton: some View {
-    Button(action: {
-      onReset
-    }) {
+    Button(action: onReset) {
       Text(NSNumber(value: value), formatter: PageZoomView.percentFormatter)
         .font(.system(.footnote).weight(.medium))
         .foregroundColor((value == (isPrivateBrowsing ? 1.0 : Preferences.General.defaultPageZoomLevel.value)) ? .accentColor : Color(UIColor.braveLabel))
@@ -116,9 +110,9 @@ struct PageZoomView: View {
           minValue: minValue,
           maxValue: maxValue,
           value: $zoomHandler.currentValue,
-          onDecrement: zoomHandler.changeZoomLevel(.decrement),
-          onReset: zoomHandler.reset(),
-          onIncrement: zoomHandler.changeZoomLevel(.increment))
+          onDecrement: decrement,
+          onReset: reset,
+          onIncrement: increment)
         .frame(maxWidth: .infinity)
         Button {
           dismiss?()
@@ -134,14 +128,25 @@ struct PageZoomView: View {
     }
     .background(Color(UIColor.braveBackground))
   }
+  
+  private func increment() {
+    zoomHandler.changeZoomLevel(.increment)
+  }
+
+  private func reset() {
+    zoomHandler.reset()
+  }
+
+  private func decrement() {
+    zoomHandler.changeZoomLevel(.decrement)
+  }
 }
 
-//
-//#if DEBUG
-//struct PageZoomView_Previews: PreviewProvider {
-//  static var previews: some View {
-//    PageZoomView(zoomHandler: nil)
-//      .previewLayout(PreviewLayout.sizeThatFits)
-//  }
-//}
-//#endif
+#if DEBUG
+struct PageZoomView_Previews: PreviewProvider {
+  static var previews: some View {
+    PageZoomView(zoomHandler: PageZoomHandler(tab: nil, isPrivateBrowsing: false))
+      .previewLayout(PreviewLayout.sizeThatFits)
+  }
+}
+#endif

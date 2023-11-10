@@ -24,8 +24,8 @@ class PageZoomHandler: ObservableObject {
   static let propertyName = "viewScale"
   @Published var currentValue: Double = 1.0
 
-  required init(tab: Tab, isPrivateBrowsing: Bool) {
-    self.webView = tab.webView
+  required init(tab: Tab?, isPrivateBrowsing: Bool) {
+    self.webView = tab?.webView
     self.isPrivateBrowsing = isPrivateBrowsing
     
     // Private Browsing on Safari iOS always defaults to 100%, and isn't persistently saved.
