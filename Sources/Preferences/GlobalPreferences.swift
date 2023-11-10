@@ -56,11 +56,9 @@ extension Preferences {
   }
   
   public final class Rewards {
-    public static let myFirstAdShown = Option<Bool>(key: "rewards.ads.my-first-ad-shown", default: false)
     public static let hideRewardsIcon = Option<Bool>(key: "rewards.new-hide-rewards-icon", default: false)
     public static let rewardsToggledOnce = Option<Bool>(key: "rewards.rewards-toggled-once", default: false)
     public static let isUsingBAP = Option<Bool?>(key: "rewards.is-using-bap", default: nil)
-    public static let seenDataMigrationFailureError = Option<Bool>(key: "rewards.seen-data-migration-failure-error", default: false)
     public static let adaptiveCaptchaFailureCount = Option<Int>(key: "rewards.adaptive-captcha-failure-count", default: 0)
     public static let adsEnabledTimestamp = Option<Date?>(key: "rewards.ads.last-time-enabled", default: nil)
     public static let adsDisabledTimestamp = Option<Date?>(key: "rewards.ads.last-time-disabled", default: nil)

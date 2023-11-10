@@ -294,9 +294,6 @@ fileprivate extension Preferences {
       }
     }
 
-    // Security
-    NSKeyedUnarchiver.setClass(AuthenticationKeychainInfo.self, forClassName: "AuthenticationKeychainInfo")
-
     // Shields
     migrate(key: "braveBlockAdsAndTracking", to: DeprecatedPreferences.blockAdsAndTracking)
     migrate(key: "braveHttpsEverywhere", to: Preferences.Shields.httpsEverywhere)
