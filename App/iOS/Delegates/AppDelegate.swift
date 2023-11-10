@@ -186,11 +186,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       AppState.shared.profile.searchEngines.searchEngineSetup()
     }
 
-    // Migration of Yahoo Search Engines
-    if !Preferences.Search.yahooEngineMigrationCompleted.value {
-      AppState.shared.profile.searchEngines.migrateDefaultYahooSearchEngines()
-    }
-
     if isFirstLaunch {
       Preferences.DAU.installationDate.value = Date()
 
