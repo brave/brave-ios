@@ -170,9 +170,7 @@ public class Migration {
     if Preferences.Migration.coreDataCompleted.value { return }
 
     TabMO.deleteAllPrivateTabs()
-  
-    Domain.migrateShieldOverrides()
-  
+    
     Preferences.Migration.coreDataCompleted.value = true
   }
   
