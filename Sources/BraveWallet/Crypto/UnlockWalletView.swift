@@ -142,6 +142,10 @@ struct UnlockWalletView: View {
         return Image(systemName: "faceid")
       case .touchID:
         return Image(systemName: "touchid")
+#if swift(>=5.9)
+      case .opticID:
+        return Image(systemName: "opticid")
+#endif
       case .none:
         return nil
       @unknown default:
@@ -192,24 +196,23 @@ private struct WalletUnlockStyleModifier<Failure: LocalizedError & Equatable>: V
                 .fill(Color(braveSystemName: .containerBackground))
             )
         )
-      if let error = error {
-        HStack(alignment: .firstTextBaseline, spacing: 4) {
-          Image(braveSystemName: "leo.warning.triangle-outline")
-          Text(error.localizedDescription)
-            .fixedSize(horizontal: false, vertical: true)
-            .animation(nil, value: error.localizedDescription)  // Dont animate the text change, just alpha
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .transition(
-          .asymmetric(
-            insertion: .opacity.animation(.default),
-            removal: .identity
-          )
-        )
-        .font(.footnote)
-        .foregroundColor(Color(.braveErrorLabel))
-        .padding(.leading, 8)
+      HStack(alignment: .firstTextBaseline, spacing: 4) {
+        Image(braveSystemName: "leo.warning.triangle-outline")
+        Text(error?.localizedDescription ?? " ") // maintain space when not showing an error, `hidden()` below
+          .fixedSize(horizontal: false, vertical: true)
+          .animation(nil, value: error?.localizedDescription)  // Dont animate the text change, just alpha
       }
+      .frame(maxWidth: .infinity, alignment: .leading)
+      .transition(
+        .asymmetric(
+          insertion: .opacity.animation(.default),
+          removal: .identity
+        )
+      )
+      .font(.footnote)
+      .foregroundColor(Color(.braveErrorLabel))
+      .padding(.leading, 8)
+      .hidden(isHidden: error == nil)
     }
   }
 }
