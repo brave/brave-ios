@@ -45,6 +45,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     static let locationPadding: CGFloat = 8
     static let locationHeight: CGFloat = 44
     static let textFieldCornerRadius: CGFloat = 10
+    static let buttonWidth: CGFloat = 32
   }
   
   // MARK: URLBarButton
@@ -142,6 +143,9 @@ class TopToolbarView: UIView, ToolbarProtocol {
     $0.setImage(UIImage(braveSystemNamed: "leo.product.bookmarks"), for: .normal)
     $0.accessibilityLabel = Strings.bookmarksMenuItem
     $0.addTarget(self, action: #selector(didClickBookmarkButton), for: .touchUpInside)
+    $0.snp.makeConstraints {
+      $0.width.greaterThanOrEqualTo(UX.buttonWidth)
+    }
   }
 
   var forwardButton = ToolbarButton()
@@ -184,7 +188,8 @@ class TopToolbarView: UIView, ToolbarProtocol {
   
   private let shieldsRewardsStack = UIStackView().then {
     $0.distribution = .fillEqually
-    $0.spacing = 8
+    $0.spacing = 0 // buttons contain padding
+    $0.setContentHuggingPriority(.required, for: .horizontal)
   }
 
   /// The currently visible URL bar button beside the refresh button.
@@ -239,7 +244,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     let button = RewardsButton()
     button.addTarget(self, action: #selector(didTapBraveRewardsButton), for: .touchUpInside)
     // Visual centering
-    button.contentEdgeInsets = .init(top: 1, left: 5, bottom: 1, right: 5)
+    button.contentEdgeInsets = .init(top: 1, left: 0, bottom: 1, right: 0)
     return button
   }()
   
@@ -308,7 +313,6 @@ class TopToolbarView: UIView, ToolbarProtocol {
       $0.contentEdgeInsets = UIEdgeInsets(
         top: 0, left: UX.locationPadding, bottom: 0, right: UX.locationPadding)
     }
-    bookmarkButton.contentEdgeInsets = .init(top: 0, left: 0, bottom: 0, right: 2)
     
     if UIDevice.current.userInterfaceIdiom == .phone {
       trailingItemsStackView.addArrangedSubview(addTabButton)
@@ -376,9 +380,11 @@ class TopToolbarView: UIView, ToolbarProtocol {
     let toolbarSizeCategory = traitCollection.toolbarButtonContentSizeCategory
     let pointSize = UIFont.preferredFont(forTextStyle: .headline, compatibleWith: .init(preferredContentSizeCategory: toolbarSizeCategory)).lineHeight
     shieldsButton.snp.remakeConstraints {
+      $0.width.greaterThanOrEqualTo(UX.buttonWidth)
       $0.height.equalTo(pointSize)
     }
     rewardsButton.snp.remakeConstraints {
+      $0.width.greaterThanOrEqualTo(UX.buttonWidth)
       $0.height.equalTo(pointSize)
     }
     let clampedTraitCollection = traitCollection.clampingSizeCategory(maximum: .accessibilityLarge)
@@ -672,9 +678,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
 
       cancelButton.isHidden = false
     } else {
-      UIView.animate(withDuration: 0.3) {
-        self.updateViewsForOverlayModeAndToolbarChanges()
-      }
+      updateViewsForOverlayModeAndToolbarChanges()
     }
 
     layoutIfNeeded()
