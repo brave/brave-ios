@@ -512,63 +512,69 @@ struct ApprovalTransactionSummaryView: View {
 struct TransactionSummaryRow_Previews: PreviewProvider {
   static var previews: some View {
     VStack {
-      SendTransactionSummaryView(
-        sentFromAccountName: "Account 1",
-        token: .mockUSDCToken,
-        network: .mockMainnet,
-        valueSent: "37.8065",
-        fiatValueSent: "$37.80",
-        status: .unapproved,
-        time: Date()
-      )
+      Group {
+        SendTransactionSummaryView(
+          sentFromAccountName: "Account 1",
+          token: .mockUSDCToken,
+          network: .mockMainnet,
+          valueSent: "37.8065",
+          fiatValueSent: "$37.80",
+          status: .unapproved,
+          time: Date()
+        )
+        Divider()
+        SendTransactionSummaryView(
+          sentFromAccountName: "Account 1",
+          token: .mockERC721NFTToken,
+          network: .mockMainnet,
+          valueSent: nil,
+          fiatValueSent: nil,
+          status: .submitted,
+          time: Date()
+        )
+      }
       Divider()
-      SendTransactionSummaryView(
-        sentFromAccountName: "Account 1",
-        token: .mockERC721NFTToken,
-        network: .mockMainnet,
-        valueSent: nil,
-        fiatValueSent: nil,
-        status: .submitted,
-        time: Date()
-      )
+      Group {
+        SwapTransactionSummaryView(
+          swappedOnAccountName: "Account 1",
+          fromToken: .previewToken,
+          toToken: .previewDaiToken,
+          network: .mockMainnet,
+          fromValue: "0.02",
+          toValue: "189.301",
+          status: .confirmed,
+          time: Date()
+        )
+        Divider()
+        SolanaSwapTransactionSummaryView(
+          swappedOnAccountName: "Account 1",
+          network: .mockMainnet,
+          status: .error,
+          time: Date()
+        )
+      }
       Divider()
-      SwapTransactionSummaryView(
-        swappedOnAccountName: "Account 1",
-        fromToken: .previewToken,
-        toToken: .previewDaiToken,
-        network: .mockMainnet,
-        fromValue: "0.02",
-        toValue: "189.301",
-        status: .confirmed,
-        time: Date()
-      )
-      Divider()
-      SolanaSwapTransactionSummaryView(
-        swappedOnAccountName: "Account 1",
-        network: .mockMainnet,
-        status: .error,
-        time: Date()
-      )
-      Divider()
-      ApprovalTransactionSummaryView(
-        fromAccountName: "Account 1",
-        token: .previewToken,
-        network: .mockMainnet,
-        valueApproved: "Unlimited",
-        fiatValueApproved: "Unlimited",
-        status: .submitted,
-        time: Date()
-      )
-      Divider()
-      ApprovalTransactionSummaryView(
-        fromAccountName: "Account 1",
-        token: .mockUSDCToken,
-        network: .mockMainnet,
-        valueApproved: "1",
-        fiatValueApproved: "$1,500",
-        status: .submitted,
-        time: Date()
-      )
+      Group {
+        ApprovalTransactionSummaryView(
+          fromAccountName: "Account 1",
+          token: .previewToken,
+          network: .mockMainnet,
+          valueApproved: "Unlimited",
+          fiatValueApproved: "Unlimited",
+          status: .submitted,
+          time: Date()
+        )
+        Divider()
+        ApprovalTransactionSummaryView(
+          fromAccountName: "Account 1",
+          token: .mockUSDCToken,
+          network: .mockMainnet,
+          valueApproved: "1",
+          fiatValueApproved: "$1,500",
+          status: .submitted,
+          time: Date()
+        )
+      }
     }
     .previewLayout(.sizeThatFits)
   }
