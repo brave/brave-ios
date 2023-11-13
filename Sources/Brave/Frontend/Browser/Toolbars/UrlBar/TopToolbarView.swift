@@ -262,6 +262,15 @@ class TopToolbarView: UIView, ToolbarProtocol {
     $0.layer.shadowOpacity = 0.1
   }
   
+  // The location container has a second shadow but we can't apply 2 shadows in UIKit, so adding a second view
+  private let secondLocationShadowView = UIView().then {
+    $0.backgroundColor = .clear
+    $0.layer.shadowOffset = .init(width: 0, height: 4)
+    $0.layer.shadowRadius = 16
+    $0.layer.shadowOpacity = 0.08
+    $0.layer.shadowColor = UIColor.black.cgColor
+  }
+  
   private var isVoiceSearchAvailable: Bool
 
   // MARK: Lifecycle
@@ -272,6 +281,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     
     super.init(frame: .zero)
 
+    addSubview(secondLocationShadowView)
     locationContainer.addSubview(locationView)
 
     [scrollToTopButton, tabsButton, cancelButton].forEach(addSubview(_:))
@@ -405,7 +415,13 @@ class TopToolbarView: UIView, ToolbarProtocol {
     
     locationContainer.layoutIfNeeded()
     locationContainer.layer.shadowPath = UIBezierPath(
-      roundedRect: locationContainer.bounds,
+      roundedRect: locationContainer.bounds.insetBy(dx: 1, dy: 1), // -1 spread in Figma
+      cornerRadius: locationContainer.layer.cornerRadius
+    ).cgPath
+    
+    secondLocationShadowView.frame = locationContainer.frame
+    secondLocationShadowView.layer.shadowPath = UIBezierPath(
+      roundedRect: secondLocationShadowView.bounds.insetBy(dx: 2, dy: 2), // -2 spread in Figma
       cornerRadius: locationContainer.layer.cornerRadius
     ).cgPath
   }

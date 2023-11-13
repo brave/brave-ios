@@ -343,7 +343,6 @@ class TabLocationView: UIView {
     }
     
     updateForTraitCollection()
-    
     updateColors()
   }
 
@@ -353,9 +352,8 @@ class TabLocationView: UIView {
   
   override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
     super.traitCollectionDidChange(previousTraitCollection)
-    if previousTraitCollection?.preferredContentSizeCategory != traitCollection.preferredContentSizeCategory {
-      updateForTraitCollection()
-    }
+    updateForTraitCollection()
+    updateColors()
   }
   
   override var accessibilityElements: [Any]? {
@@ -400,6 +398,13 @@ class TabLocationView: UIView {
     placeholderLabel.textColor = browserColors.textTertiary
     readerModeButton.unselectedTintColor = browserColors.iconDefault
     readerModeButton.selectedTintColor = browserColors.iconActive
+    // swiftlint:disable:next force_cast
+    (urlDisplayLabel as! DisplayURLLabel).leadingClippingFade.gradientLayer.colors = [
+      browserColors.containerBackground,
+      browserColors.containerBackground.withAlphaComponent(0.0)
+    ].map {
+      $0.resolvedColor(with: traitCollection).cgColor
+    }
     for button in [reloadButton, voiceSearchButton] {
       button.primaryTintColor = browserColors.iconDefault
       button.disabledTintColor = browserColors.iconDisabled
@@ -518,16 +523,6 @@ private class DisplayURLLabel: UILabel {
   @available(*, unavailable)
   required init(coder: NSCoder) {
     fatalError()
-  }
-  
-  override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-    super.traitCollectionDidChange(previousTraitCollection)
-    leadingClippingFade.gradientLayer.colors = [
-      UIColor.braveBackground,
-      UIColor.braveBackground.withAlphaComponent(0.0)
-    ].map {
-      $0.resolvedColor(with: traitCollection).cgColor
-    }
   }
   
   override var accessibilityTraits: UIAccessibilityTraits {
