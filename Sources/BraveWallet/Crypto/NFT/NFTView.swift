@@ -451,16 +451,8 @@ struct SkeletonLoadingNFTView: View {
     LazyVGrid(columns: nftGrids) {
       ForEach(0..<6) { _ in
         VStack(alignment: .leading, spacing: 6) {
-          Color(braveSystemName: .containerHighlight)
+          LoadingNFTView()
             .frame(height: 176)
-            .cornerRadius(4)
-            .redacted(reason: .placeholder)
-            .shimmer(true)
-            .overlay {
-              Image(braveSystemName: "leo.nft")
-                .foregroundColor(Color(braveSystemName: .containerBackground))
-                .font(.system(size: 60))
-            }
           Group {
             Color(braveSystemName: .containerHighlight)
               .frame(width: 148, height: 12)

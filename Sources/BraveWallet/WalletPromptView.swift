@@ -51,6 +51,7 @@ struct WalletPromptContentView<Content, Footer>: View where Content: View, Foote
               Text(secondaryButton.title)
                 .font(.footnote.weight(.semibold))
                 .foregroundColor(Color(.bravePrimary))
+                .frame(maxWidth: .infinity)
             }
           }
         } else {
