@@ -1082,6 +1082,7 @@ extension Strings {
   public static let addToFavorites = NSLocalizedString("AddToFavorites", tableName: "BraveShared", bundle: .module, value: "Add to Favorites", comment: "Add to favorites share action.")
   public static let createPDF = NSLocalizedString("CreatePDF", tableName: "BraveShared", bundle: .module, value: "Create PDF", comment: "Create PDF share action.")
   public static let displayCertificate = NSLocalizedString("DisplayCertificate", tableName: "BraveShared", bundle: .module, value: "Security Certificate", comment: "Button title that when tapped displays a websites HTTPS security certificate information")
+  public static let toggleReaderMode = NSLocalizedString("ToggleReaderMode", tableName: "BraveShared", bundle: .module, value: "Toggle Reader Mode", comment: "Button title that when tapped toggles the web page in our out of reader mode")
 
   public static let showBookmarks = NSLocalizedString("ShowBookmarks", tableName: "BraveShared", bundle: .module, value: "Show Bookmarks", comment: "Button to show the bookmarks list")
   public static let showHistory = NSLocalizedString("ShowHistory", tableName: "BraveShared", bundle: .module, value: "Show History", comment: "Button to show the history list")

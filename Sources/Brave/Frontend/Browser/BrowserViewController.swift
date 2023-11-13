@@ -2111,6 +2111,22 @@ public class BrowserViewController: UIViewController {
       activities.append(sendTabToSelfActivity)
     }
     
+    if let tab = self.tabManager.selectedTab, tab.secureContentState.shouldDisplayWarning {
+      if tab.readerModeAvailableOrActive {
+        // If the reader mode button is occluded due to a secure content state warning add it as an activity
+        activities.append(
+          BasicMenuActivity(
+            title: Strings.toggleReaderMode,
+            braveSystemImage: "leo.product.speedreader",
+            callback: { [weak self] in
+              self?.toggleReaderMode()
+            }
+          )
+        )
+      }
+      // Any other buttons on the leading side of the location view should be added here as well
+    }
+    
     let findInPageActivity = FindInPageActivity() { [unowned self] in
       if #available(iOS 16.0, *), let findInteraction = self.tabManager.selectedTab?.webView?.findInteraction {
         findInteraction.searchText = ""
@@ -2245,7 +2261,7 @@ public class BrowserViewController: UIViewController {
     }
     
     if let secureState = tabManager.selectedTab?.secureContentState, secureState != .missingSSL && secureState != .unknown {
-      let displayCertificateActivity = DisplayCertificateActivity { [weak self] in
+      let displayCertificateActivity = BasicMenuActivity(title: Strings.displayCertificate, braveSystemImage: "leo.lock.plain") { [weak self] in
         self?.displayPageCertificateInfo()
       }
       activities.append(displayCertificateActivity)
@@ -2459,6 +2475,20 @@ public class BrowserViewController: UIViewController {
       let alert = UIAlertController(title: Strings.scanQRCodeViewTitle, message: Strings.scanQRCodePermissionErrorMessage, preferredStyle: .alert)
       alert.addAction(UIAlertAction(title: Strings.scanQRCodeErrorOKButton, style: .default, handler: nil))
       self.present(alert, animated: true, completion: nil)
+    }
+  }
+  
+  func toggleReaderMode() {
+    guard let tab = tabManager.selectedTab else { return }
+    if let readerMode = tab.getContentScript(name: ReaderModeScriptHandler.scriptName) as? ReaderModeScriptHandler {
+      switch readerMode.state {
+      case .available:
+        enableReaderMode()
+      case .active:
+        disableReaderMode()
+      case .unavailable:
+        break
+      }
     }
   }
   
