@@ -247,7 +247,7 @@ class TabLocationView: UIView {
     }
   }
   
-  private var secureContentStateButton: UIButton?
+  private(set) var secureContentStateButton: UIButton?
 
   private(set) lazy var progressBar = GradientProgressBar().then {
     $0.clipsToBounds = false
@@ -415,12 +415,6 @@ class TabLocationView: UIView {
   private func updateURLBarWithText() {
     // Note: Only use `URLFormatter.formatURLOrigin(forSecurityDisplay: url?.withoutWWW.absoluteString ?? "", schemeDisplay: .omitHttpAndHttps)`
     // If displaying the host ONLY! This follows Google Chrome and Safari.
-    // However, for Brave as no decision has been made on what shows YET, we will display the entire URL (truncated!)
-    // Therefore we only omit defaults (username & password, http [not https], and trailing slash) + omit "www".
-    // We must NOT un-escape the URL!
-    // --
-    // The requirement to remove scheme comes from Desktop. Also we do not remove the path like in other browsers either.
-    // Therefore, we follow Brave Desktop instead of Chrome or Safari iOS
     urlDisplayLabel.text = URLFormatter.formatURLOrigin(forSecurityDisplay: url?.withoutWWW.absoluteString ?? "", schemeDisplay: .omitHttpAndHttps)
     
     reloadButton.isHidden = url == nil

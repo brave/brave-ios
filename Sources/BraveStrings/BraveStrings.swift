@@ -447,6 +447,16 @@ extension Strings {
   public static let tabToolbarNotSecureTitle = NSLocalizedString("tabToolbarNotSecureTitle", tableName: "BraveShared", bundle: .module, value: "Not Secure", comment: "A label shown next to a URL that loaded in some insecure way")
 }
 
+// MARK: - PageSecurityView.swift
+extension Strings {
+  public enum PageSecurityView {
+    public static let pageNotSecureTitle = NSLocalizedString("pageSecurityView.pageNotSecureTitle", tableName: "BraveShared", bundle: .module, value: "Your connection to this site is not secure.", comment: "")
+    public static let pageNotFullySecureTitle = NSLocalizedString("pageSecurityView.pageNotFullySecureTitle", tableName: "BraveShared", bundle: .module, value: "Your connection to this site is not fully secure.", comment: "")
+    public static let pageNotSecureDetailedWarning = NSLocalizedString("pageSecurityView.pageNotSecureDetailedWarning", tableName: "BraveShared", bundle: .module, value: "You should not enter any sensitive information on this site (for example, passwords or credit cards), because it could be stolen by attackers.", comment: "")
+    public static let viewCertificateButtonTitle = NSLocalizedString("pageSecurityView.viewCertificateButtonTitle", tableName: "BraveShared", bundle: .module, value: "View Certificate", comment: "")
+  }
+}
+
 // MARK:-  TabToolbar.swift
 extension Strings {
   public static let tabToolbarBackButtonAccessibilityLabel = NSLocalizedString("TabToolbarBackButtonAccessibilityLabel", tableName: "BraveShared", bundle: .module, value: "Back", comment: "Accessibility label for the Back button in the tab toolbar.")
