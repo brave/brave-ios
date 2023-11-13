@@ -1930,7 +1930,7 @@ public class BrowserViewController: UIViewController {
       updateToolbarSecureContentState(tab.secureContentState)
     }
 
-    let isPage = tab.url?.displayURL?.isWebPage() ?? false
+    let isPage = tab.url?.isWebPage() ?? false
     navigationToolbar.updatePageStatus(isPage)
     updateWebViewPageZoom(tab: tab)
   }
