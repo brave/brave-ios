@@ -2244,6 +2244,13 @@ public class BrowserViewController: UIViewController {
       activities.append(addSearchEngineActivity)
     }
     
+    if let secureState = tabManager.selectedTab?.secureContentState, secureState != .missingSSL && secureState != .unknown {
+      let displayCertificateActivity = DisplayCertificateActivity { [weak self] in
+        self?.displayPageCertificateInfo()
+      }
+      activities.append(displayCertificateActivity)
+    }
+    
     activities.append(ReportWebCompatibilityIssueActivity() { [weak self] in
       self?.showSubmitReportView(for: url)
     })
@@ -3390,6 +3397,73 @@ extension BrowserViewController: IAPObserverDelegate {
     Task.delayed(bySeconds: 2.0) { @MainActor in
       self.popToBVC()
       self.navigationHelper.openVPNBuyScreen(iapObserver: self.iapObserver)
+    }
+  }
+}
+
+// Certificate info
+extension BrowserViewController {
+  
+  func displayPageCertificateInfo() {
+    guard let webView = tabManager.selectedTab?.webView else {
+      Logger.module.error("Invalid WebView")
+      return
+    }
+    
+    let getServerTrustForErrorPage = { () -> SecTrust? in
+      do {
+        if let url = webView.url {
+          return try ErrorPageHelper.serverTrust(from: url)
+        }
+      } catch {
+        Logger.module.error("\(error.localizedDescription)")
+      }
+      
+      return nil
+    }
+    
+    guard let trust = webView.serverTrust ?? getServerTrustForErrorPage() else {
+      return
+    }
+    
+    let host = webView.url?.host
+    
+    Task.detached {
+      let serverCertificates: [SecCertificate] = SecTrustCopyCertificateChain(trust) as? [SecCertificate] ?? []
+      
+      // TODO: Instead of showing only the first cert in the chain,
+      // have a UI that allows users to select any certificate in the chain (similar to Desktop browsers)
+      if let serverCertificate = serverCertificates.first,
+         let certificate = BraveCertificateModel(certificate: serverCertificate) {
+        
+        var errorDescription: String?
+        
+        do {
+          try await BraveCertificateUtils.evaluateTrust(trust, for: host)
+        } catch {
+          Logger.module.error("\(error.localizedDescription)")
+          
+          // Remove the common-name from the first part of the error message
+          // This is because the certificate viewer already displays it.
+          // If it doesn't match, it won't be removed, so this is fine.
+          errorDescription = error.localizedDescription
+          if let range = errorDescription?.range(of: "“\(certificate.subjectName.commonName)” ") ??
+              errorDescription?.range(of: "\"\(certificate.subjectName.commonName)\" ") {
+            errorDescription = errorDescription?.replacingCharacters(in: range, with: "").capitalizeFirstLetter
+          }
+        }
+        
+        await MainActor.run { [errorDescription] in
+          if #available(iOS 16.0, *) {
+            // System components sit on top so we want to dismiss it
+            webView.findInteraction?.dismissFindNavigator()
+          }
+          let certificateViewController = CertificateViewController(certificate: certificate, evaluationError: errorDescription)
+          certificateViewController.modalPresentationStyle = .pageSheet
+          certificateViewController.sheetPresentationController?.detents = [.medium(), .large()]
+          self.present(certificateViewController, animated: true)
+        }
+      }
     }
   }
 }

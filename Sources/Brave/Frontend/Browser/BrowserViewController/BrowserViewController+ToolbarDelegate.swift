@@ -60,72 +60,6 @@ extension BrowserViewController: TopToolbarDelegate {
     present(container, animated: !isExternallyPresented)
   }
 
-  /*
-  func topToolbarDidPressLockImageView(_ urlBar: TopToolbarView) {
-    // TODO(url-bar-revamp): Move to menu item
-    guard let webView = tabManager.selectedTab?.webView else {
-      Logger.module.error("Invalid WebView")
-      return
-    }
-    
-    let getServerTrustForErrorPage = { () -> SecTrust? in
-      do {
-        if let url = webView.url {
-          return try ErrorPageHelper.serverTrust(from: url)
-        }
-      } catch {
-        Logger.module.error("\(error.localizedDescription)")
-      }
-      
-      return nil
-    }
-    
-    guard let trust = webView.serverTrust ?? getServerTrustForErrorPage() else {
-      return
-    }
-    
-    let host = webView.url?.host
-
-    Task.detached {
-      let serverCertificates: [SecCertificate] = SecTrustCopyCertificateChain(trust) as? [SecCertificate] ?? []
-      
-      // TODO: Instead of showing only the first cert in the chain,
-      // have a UI that allows users to select any certificate in the chain (similar to Desktop browsers)
-      if let serverCertificate = serverCertificates.first,
-         let certificate = BraveCertificateModel(certificate: serverCertificate) {
-        
-        var errorDescription: String?
-        
-        do {
-          try await BraveCertificateUtils.evaluateTrust(trust, for: host)
-        } catch {
-          Logger.module.error("\(error.localizedDescription)")
-
-          // Remove the common-name from the first part of the error message
-          // This is because the certificate viewer already displays it.
-          // If it doesn't match, it won't be removed, so this is fine.
-          errorDescription = error.localizedDescription
-          if let range = errorDescription?.range(of: "“\(certificate.subjectName.commonName)” ") ??
-              errorDescription?.range(of: "\"\(certificate.subjectName.commonName)\" ") {
-            errorDescription = errorDescription?.replacingCharacters(in: range, with: "").capitalizeFirstLetter
-          }
-        }
-        
-        await MainActor.run { [errorDescription] in
-          if #available(iOS 16.0, *) {
-            // System components sit on top so we want to dismiss it
-            webView.findInteraction?.dismissFindNavigator()
-          }
-          let certificateViewController = CertificateViewController(certificate: certificate, evaluationError: errorDescription)
-          let popover = PopoverController(contentController: certificateViewController, contentSizeBehavior: .autoLayout(.phoneBounds))
-          popover.addsConvenientDismissalMargins = true
-          popover.present(from: self.topToolbar.locationView.lockImageView.imageView!, on: self)
-        }
-      }
-    }
-  }
-   */
-
   func topToolbarDidPressReload(_ topToolbar: TopToolbarView) {
     if let url = topToolbar.currentURL {
       if url.isIPFSScheme {
@@ -887,8 +821,15 @@ extension BrowserViewController: ToolbarDelegate {
     let selectedTabURL: URL? = {
       guard let url = tabManager.selectedTab?.url else { return nil }
 
-      if (InternalURL.isValid(url: url) || url.isLocal) && !url.isReaderModeURL { return nil }
-
+      if let internalURL = InternalURL(url) {
+        if internalURL.isErrorPage {
+          return internalURL.originalURLFromErrorPage
+        }
+        if internalURL.isReaderModePage {
+          return internalURL.extractedUrlParam
+        }
+        return nil
+      }
       return url
     }()
     
