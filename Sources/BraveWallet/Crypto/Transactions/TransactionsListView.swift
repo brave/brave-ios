@@ -86,7 +86,7 @@ struct TransactionsListView: View {
   private var searchBarAndFiltersContainer: some View {
     VStack(spacing: 0) {
       HStack(spacing: 10) {
-        SearchBar(text: $query, placeholder: "Search")
+        SearchBar(text: $query, placeholder: Strings.Wallet.search)
         AssetButton(braveSystemName: "leo.filter.settings", action: filtersButtonTapped)
       }
       .padding(.vertical, 8)

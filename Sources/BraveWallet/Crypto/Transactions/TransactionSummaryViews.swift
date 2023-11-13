@@ -135,6 +135,13 @@ struct SendTransactionSummaryView: View {
   @ScaledMetric private var networkSymbolLength: CGFloat = 15
   private let maxNetworkSymbolLength: CGFloat = 30
   
+  private var sendTitle: String {
+    String.localizedStringWithFormat(
+      Strings.Wallet.transactionSummaryIntentLabel,
+      Strings.Wallet.sent
+    )
+  }
+  
   var body: some View {
     VStack {
       HStack { // header
@@ -142,7 +149,7 @@ struct SendTransactionSummaryView: View {
         Image(braveSystemName: "leo.send")
           .imageScale(.small)
           .foregroundColor(Color(braveSystemName: .iconDefault))
-        Text("Send from ") + Text(sentFromAccountName).bold()
+        Text(sendTitle) + Text(" " + sentFromAccountName).bold()
       }
       .font(secondaryFont)
       .foregroundColor(secondaryTextColor)
@@ -263,7 +270,7 @@ struct SwapTransactionSummaryView: View {
         Image(braveSystemName: "leo.currency.exchange")
           .imageScale(.small)
           .foregroundColor(Color(braveSystemName: .iconDefault))
-        Text("Swap on ") + Text(swappedOnAccountName).bold()
+        Text(Strings.Wallet.transactionSummarySwapOn) + Text(" " + swappedOnAccountName).bold()
       }
       .font(secondaryFont)
       .foregroundColor(secondaryTextColor)
@@ -354,7 +361,7 @@ struct SolanaSwapTransactionSummaryView: View {
         Image(braveSystemName: "leo.currency.exchange")
           .imageScale(.small)
           .foregroundColor(Color(braveSystemName: .iconDefault))
-        Text("Swap on ") + Text(swappedOnAccountName).bold()
+        Text(Strings.Wallet.transactionSummarySwapOn) + Text(" " + swappedOnAccountName).bold()
       }
       .font(secondaryFont)
       .foregroundColor(secondaryTextColor)
@@ -376,7 +383,7 @@ struct SolanaSwapTransactionSummaryView: View {
           }
         }
         HStack {
-          Text("Solana Swap")
+          Text(Strings.Wallet.transactionSummarySolanaSwap)
             .font(primaryFont)
         }
         .foregroundColor(primaryTextColor)
@@ -429,6 +436,13 @@ struct ApprovalTransactionSummaryView: View {
   @ScaledMetric private var networkSymbolLength: CGFloat = 15
   private let maxNetworkSymbolLength: CGFloat = 30
   
+  private var approvedTitle: String {
+    String.localizedStringWithFormat(
+      Strings.Wallet.transactionSummaryIntentLabel,
+      Strings.Wallet.transactionTypeApprove
+    )
+  }
+  
   var body: some View {
     VStack {
       HStack { // header
@@ -436,7 +450,7 @@ struct ApprovalTransactionSummaryView: View {
         Image(braveSystemName: "leo.check.normal")
           .imageScale(.small)
           .foregroundColor(Color(braveSystemName: .iconDefault))
-        Text("Approved from ") + Text(fromAccountName).bold()
+        Text(approvedTitle) + Text(" " + fromAccountName).bold()
       }
       .font(secondaryFont)
       .foregroundColor(secondaryTextColor)
@@ -542,6 +556,16 @@ struct TransactionSummaryRow_Previews: PreviewProvider {
         network: .mockMainnet,
         valueApproved: "Unlimited",
         fiatValueApproved: "Unlimited",
+        status: .submitted,
+        time: Date()
+      )
+      Divider()
+      ApprovalTransactionSummaryView(
+        fromAccountName: "Account 1",
+        token: .mockUSDCToken,
+        network: .mockMainnet,
+        valueApproved: "1",
+        fiatValueApproved: "$1,500",
         status: .submitted,
         time: Date()
       )
