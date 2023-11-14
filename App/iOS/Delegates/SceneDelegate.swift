@@ -48,8 +48,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     let conditions = scene.activationConditions
     conditions.canActivateForTargetContentIdentifierPredicate = NSPredicate(value: true)
-    if let windowId = session.userInfo?["WindowID"] as? UUID {
-      let preferPredicate = NSPredicate(format: "self == %@", windowId.uuidString)
+    if let windowId = session.userInfo?["WindowID"] as? String {
+      let preferPredicate = NSPredicate(format: "self == %@", windowId)
         conditions.prefersToActivateForTargetContentIdentifierPredicate = preferPredicate
     }
     
@@ -435,68 +435,64 @@ extension SceneDelegate {
     
     if let userActivity = userActivity {
       // Restore the scene with the WindowID from the User-Activity
-      
-      let windowIdString = userActivity.userInfo?["WindowID"] as? String ?? ""
-      windowId = UUID(uuidString: windowIdString) ?? UUID()
-      isPrivate = userActivity.userInfo?["isPrivate"] as? Bool == true
-      urlToOpen = userActivity.userInfo?["OpenURL"] as? URL
+      let windowInfo = BrowserState.getWindowInfo(from: userActivity)
+      windowId = UUID(uuidString: windowInfo.windowId ?? "") ?? UUID()
+      isPrivate = windowInfo.isPrivate
+      urlToOpen = windowInfo.openURL
       privateBrowsingManager.isPrivateBrowsing = isPrivate
       
       // Create a new session window
-      SessionWindow.createWindow(isPrivate: false, isSelected: true, uuid: windowId)
+      SessionWindow.createWindow(isPrivate: isPrivate, isSelected: true, uuid: windowId)
       
-      scene.userActivity = BrowserState.userActivity(for: windowId, isPrivate: isPrivate)
-      scene.session.userInfo?["WindowID"] = windowId
-      scene.session.userInfo?["isPrivate"] = isPrivate
-    } else if let sceneWindowId = scene.session.userInfo?["WindowID"] as? String,
-              let sceneIsPrivate = scene.session.userInfo?["isPrivate"] as? Bool,
-              let windowUUID = UUID(uuidString: sceneWindowId) {
-      
-      // Restore the scene from the Session's User-Info WindowID
-      
-      windowId = windowUUID
-      isPrivate = sceneIsPrivate
-      privateBrowsingManager.isPrivateBrowsing = sceneIsPrivate
-      urlToOpen = scene.session.userInfo?["OpenURL"] as? URL
-      
-      scene.userActivity = BrowserState.userActivity(for: windowId, isPrivate: isPrivate)
+      scene.userActivity = BrowserState.userActivity(for: windowId.uuidString, isPrivate: isPrivate)
+      BrowserState.setWindowInfo(for: scene.session, windowId: windowId.uuidString, isPrivate: isPrivate)
     } else {
-      // Should NOT be possible to get here.
-      // However, if a controller is NOT active, and tapping the app-icon opens a New-Window
-      // Then we need to make sure not to restore that "New" Window
-      // So we iterate all the windows and if there is no active window, then we need to "Restore" one.
-      // If a window is already active, we need to create a new blank window.
-      
-      if let activeWindowId = SessionWindow.getActiveWindow(context: DataController.swiftUIContext)?.windowId {
-        let activeSession = UIApplication.shared.openSessions
-          .compactMap({ $0.userInfo?["WindowID"] as? String })
-          .first(where: { $0 == activeWindowId.uuidString })
+      let windowInfo = BrowserState.getWindowInfo(from: scene.session)
+      if let sceneWindowId = windowInfo.windowId,
+         let windowUUID = UUID(uuidString: sceneWindowId) {
         
-        if activeSession != nil {
-          // An existing window is already active on screen
-          // So create a new window
-          let newWindowId = UUID()
-          SessionWindow.createWindow(isPrivate: false, isSelected: true, uuid: newWindowId)
-          windowId = newWindowId
-        } else {
-          // Restore the active window since none is active on screen
-          windowId = activeWindowId
-        }
+        // Restore the scene from the Session's User-Info WindowID
+        windowId = windowUUID
+        isPrivate = windowInfo.isPrivate
+        privateBrowsingManager.isPrivateBrowsing = windowInfo.isPrivate
+        urlToOpen = windowInfo.openURL
+        
+        scene.userActivity = BrowserState.userActivity(for: windowId.uuidString, isPrivate: isPrivate)
       } else {
-        // Should be impossible to get here. There must always be an active window.
-        // However, if for some reason there is none, then we should create one.
-        let newWindowId = UUID()
-        SessionWindow.createWindow(isPrivate: false, isSelected: true, uuid: newWindowId)
-        windowId = newWindowId
+        // Should NOT be possible to get here.
+        // However, if a controller is NOT active, and tapping the app-icon opens a New-Window
+        // Then we need to make sure not to restore that "New" Window
+        // So we iterate all the windows and if there is no active window, then we need to "Restore" one.
+        // If a window is already active, we need to create a new blank window.
+        
+        if let activeWindowId = SessionWindow.getActiveWindow(context: DataController.swiftUIContext)?.windowId {
+          let activeSession = UIApplication.shared.openSessions
+            .compactMap({ BrowserState.getWindowInfo(from: $0) })
+            .first(where: { $0.windowId == activeWindowId.uuidString })
+          
+          if activeSession != nil {
+            // An existing window is already active on screen
+            // So create a new window
+            windowId = UUID()
+            SessionWindow.createWindow(isPrivate: false, isSelected: true, uuid: windowId)
+          } else {
+            // Restore the active window since none is active on screen
+            windowId = activeWindowId
+          }
+        } else {
+          // Should be impossible to get here. There must always be an active window.
+          // However, if for some reason there is none, then we should create one.
+          windowId = UUID()
+          SessionWindow.createWindow(isPrivate: false, isSelected: true, uuid: windowId)
+        }
+        
+        isPrivate = false
+        privateBrowsingManager.isPrivateBrowsing = false
+        urlToOpen = nil
+        
+        scene.userActivity = BrowserState.userActivity(for: windowId.uuidString, isPrivate: false)
+        BrowserState.setWindowInfo(for: scene.session, windowId: windowId.uuidString, isPrivate: false)
       }
-      
-      isPrivate = false
-      privateBrowsingManager.isPrivateBrowsing = false
-      urlToOpen = nil
-      
-      scene.userActivity = BrowserState.userActivity(for: windowId, isPrivate: false)
-      scene.session.userInfo = ["WindowID": windowId.uuidString,
-                                "isPrivate": false]
     }
 
     // Create a browser instance
@@ -528,7 +524,7 @@ extension SceneDelegate {
        let tabId = UUID(uuidString: tabIdString) {
       
       let currentTabScene = UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene }).filter({
-        guard let sceneWindowId = $0.session.userInfo?["WindowID"] as? String else {
+        guard let sceneWindowId = BrowserState.getWindowInfo(from: $0.session).windowId else {
           return false
         }
         
