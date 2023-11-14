@@ -172,6 +172,7 @@ struct NFTDetailView: View {
               .foregroundColor(Color(.braveLabel))
           }
         }
+        .listRowBackground(Color(.secondaryBraveGroupedBackground))
       } header: {
         Text(Strings.Wallet.nftDetailOverview)
           .listRowInsets(.zero)
@@ -181,6 +182,7 @@ struct NFTDetailView: View {
           Text(description)
             .font(.subheadline)
             .foregroundColor(Color(.braveLabel))
+            .listRowBackground(Color(.secondaryBraveGroupedBackground))
         } header: {
           Text(Strings.Wallet.nftDetailDescription)
             .listRowInsets(.zero)
@@ -197,12 +199,14 @@ struct NFTDetailView: View {
               }
             }
           }
+          .listRowBackground(Color(.secondaryBraveGroupedBackground))
         } header: {
           Text(Strings.Wallet.nftDetailProperties)
             .listRowInsets(.zero)
         }
       }
     }
+    .listBackgroundColor(Color(.braveGroupedBackground))
     .onChange(of: nftDetailStore.nftMetadata, perform: { newValue in
       if let newMetadata = newValue {
         onNFTMetadataRefreshed?(newMetadata)
