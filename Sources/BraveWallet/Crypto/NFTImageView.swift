@@ -66,12 +66,13 @@ struct NFTImageView<Placeholder: View>: View {
 }
 
 struct LoadingNFTView: View {
+  var shimmer: Bool = true
   @State var viewSize: CGSize = .zero
   var body: some View {
     Color(braveSystemName: .containerHighlight)
       .cornerRadius(4)
       .redacted(reason: .placeholder)
-      .shimmer(true)
+      .shimmer(shimmer)
       .overlay {
         Image(braveSystemName: "leo.nft")
           .foregroundColor(Color(braveSystemName: .containerBackground))
@@ -83,6 +84,7 @@ struct LoadingNFTView: View {
             .preference(key: SizePreferenceKey.self, value: geometryProxy.size)
         }
       )
+      .frame(minHeight: viewSize.width)
       .onPreferenceChange(SizePreferenceKey.self) { newSize in
         viewSize = newSize
       }

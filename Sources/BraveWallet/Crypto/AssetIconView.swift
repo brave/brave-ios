@@ -163,12 +163,7 @@ struct NFTIconView: View {
   
   var body: some View {
     NFTImageView(urlString: url?.absoluteString ?? "", isLoading: isLoadingMetadata) {
-      AssetIconView(
-        token: token,
-        network: network,
-        shouldShowNetworkIcon: shouldShowNetworkIcon,
-        length: length
-      )
+      LoadingNFTView(shimmer: false)
     }
     .cornerRadius(5)
     .frame(

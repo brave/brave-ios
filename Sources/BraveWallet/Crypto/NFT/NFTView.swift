@@ -88,24 +88,13 @@ struct NFTView: View {
     Group {
       if let urlString = nftViewModel.nftMetadata?.imageURLString {
         NFTImageView(urlString: urlString) {
-          noImageView(nftViewModel)
+          LoadingNFTView(shimmer: false)
         }
       } else {
-        noImageView(nftViewModel)
+        LoadingNFTView(shimmer: false)
       }
     }
     .cornerRadius(4)
-  }
-  
-  @ViewBuilder private func noImageView(_ nftViewModel: NFTAssetViewModel) -> some View {
-    Blockie(address: nftViewModel.token.contractAddress, shape: .rectangle)
-      .overlay(
-        Text(nftViewModel.token.symbol.first?.uppercased() ?? "")
-          .font(.system(size: 80, weight: .bold, design: .rounded))
-          .foregroundColor(.white)
-          .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
-      )
-      .aspectRatio(1.0, contentMode: .fit)
   }
   
   private var filtersButton: some View {
