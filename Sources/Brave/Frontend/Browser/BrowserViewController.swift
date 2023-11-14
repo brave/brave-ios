@@ -3367,6 +3367,10 @@ extension BrowserViewController: IAPObserverDelegate {
   
   public func handlePromotedInAppPurchase() {
     // Open VPN Buy Screen before system triggers buy action
-    navigationHelper.openVPNBuyScreen(iapObserver: iapObserver)
+    // Delaying the VPN Screen launch delibrately to syncronize promoted purcahse launch
+    Task.delayed(bySeconds: 2.0) { @MainActor in
+      self.popToBVC()
+      self.navigationHelper.openVPNBuyScreen(iapObserver: self.iapObserver)
+    }
   }
 }
