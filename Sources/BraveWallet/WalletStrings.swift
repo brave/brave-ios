@@ -3766,7 +3766,7 @@ extension Strings {
       tableName: "BraveWallet",
       bundle: .module,
       value: "Owned by",
-      comment: "The section header that displays the all the properties/attributes information of this NFT."
+      comment: "The title of the row under `Overview` section in NFT details screen. When this NFT has an owner."
     )
     public static let signTransactionSignRisk = NSLocalizedString(
       "wallet.signTransactionSignRisk",
