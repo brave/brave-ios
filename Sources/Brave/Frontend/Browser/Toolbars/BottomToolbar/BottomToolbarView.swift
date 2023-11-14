@@ -147,9 +147,9 @@ class BottomToolbarView: UIView, ToolbarProtocol {
     if canGoForward, let shareIndex = contentView.arrangedSubviews.firstIndex(of: shareButton) {
       shareButton.removeFromSuperview()
       contentView.insertArrangedSubview(forwardButton, at: shareIndex)
-    } else if !canGoForward, let shareIndex = contentView.arrangedSubviews.firstIndex(of: forwardButton) {
+    } else if !canGoForward, let forwardIndex = contentView.arrangedSubviews.firstIndex(of: forwardButton) {
       forwardButton.removeFromSuperview()
-      contentView.insertArrangedSubview(shareButton, at: shareIndex)
+      contentView.insertArrangedSubview(shareButton, at: forwardIndex)
     }
   }
 }

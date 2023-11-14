@@ -479,13 +479,6 @@ private class DisplayURLLabel: UILabel {
     endPoint: .init(x: 1, y: 0.5)
   )
   
-  override var preferredMaxLayoutWidth: CGFloat {
-    didSet {
-      setNeedsLayout()
-      setNeedsDisplay()
-    }
-  }
-  
   override init(frame: CGRect) {
     super.init(frame: frame)
     
@@ -493,6 +486,7 @@ private class DisplayURLLabel: UILabel {
   }
   
   private var textSize: CGSize = .zero
+  private var isRightToLeft: Bool = false
   
   override var font: UIFont! {
     didSet {
@@ -501,14 +495,10 @@ private class DisplayURLLabel: UILabel {
   }
   
   override var text: String? {
-    willSet {
-      if newValue != text {
-        updateTextSize(from: newValue)
-      }
-    }
     didSet {
       clippingFade.isHidden = true
       if oldValue != text {
+        updateTextSize(from: text)
         detectLanguageForNaturalDirectionClipping()
       }
       setNeedsDisplay()
@@ -558,8 +548,6 @@ private class DisplayURLLabel: UILabel {
       height: bounds.height
     )
   }
-  
-  private var isRightToLeft: Bool = false
 
   // This override is done in case the eTLD+1 string overflows the width of textField.
   // In that case the textRect is adjusted to show right aligned and truncate left.

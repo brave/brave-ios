@@ -229,7 +229,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     $0.setContentHuggingPriority(.defaultHigh, for: .vertical)
   }
   
-  lazy var shieldsButton: ToolbarButton = {
+  private(set) lazy var shieldsButton: ToolbarButton = {
     let button = ToolbarButton()
     button.setImage(UIImage(sharedNamed: "brave.logo"), for: .normal)
     button.addTarget(self, action: #selector(didTapBraveShieldsButton), for: .touchUpInside)
@@ -240,7 +240,7 @@ class TopToolbarView: UIView, ToolbarProtocol {
     return button
   }()
   
-  lazy var rewardsButton: RewardsButton = {
+  private(set) lazy var rewardsButton: RewardsButton = {
     let button = RewardsButton()
     button.addTarget(self, action: #selector(didTapBraveRewardsButton), for: .touchUpInside)
     // Visual centering

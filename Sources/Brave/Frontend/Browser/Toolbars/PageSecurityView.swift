@@ -13,7 +13,7 @@ import Shared
 ///
 /// Currently this is only shown when the page security requires a visible warning on the URL bar
 struct PageSecurityView: View {
-  var url: URL
+  var displayURL: String
   var secureState: TabSecureContentState
   var hasCertificate: Bool
   var presentCertificateViewer: () -> Void
@@ -29,20 +29,6 @@ struct PageSecurityView: View {
     case .mixedContent:
       return Strings.PageSecurityView.pageNotFullySecureTitle
     }
-  }
-  
-  private var displayURL: String {
-    let urlToFormat: URL = {
-      if let internalURL = InternalURL(url), internalURL.isErrorPage {
-        return internalURL.originalURLFromErrorPage ?? url
-      }
-      return url
-    }()
-    return URLFormatter.formatURL(
-      urlToFormat.absoluteString,
-      formatTypes: [.trimAfterHost, .omitHTTP, .omitHTTPS, .omitTrivialSubdomains],
-      unescapeOptions: .normal
-    )
   }
   
   var body: some View {
@@ -63,6 +49,7 @@ struct PageSecurityView: View {
           }
         }
       }
+      .multilineTextAlignment(.leading)
       .font(.subheadline)
       .padding()
       if hasCertificate {
@@ -104,7 +91,7 @@ extension PageSecurityView: PopoverContentComponent {
 #if DEBUG
 #Preview {
   PageSecurityView(
-    url: URL(string: "https://http.badssl.com/")!,
+    displayURL: "http.badssl.com",
     secureState: .missingSSL,
     hasCertificate: false,
     presentCertificateViewer: { }
