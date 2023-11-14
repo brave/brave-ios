@@ -610,6 +610,15 @@ public class NFTStore: ObservableObject, WalletObserverStore {
       isShowingNFTLoadingState = false
     }
   }
+  
+  func owner(for nft: BraveWallet.BlockchainToken) -> BraveWallet.AccountInfo? {
+    guard let allBalances = nftBalancesCache[nft.id],
+          let address = allBalances.first(where: { address, balance in
+            balance > 0
+          })?.key
+    else { return nil }
+    return allAccounts.first { $0.address.caseInsensitiveCompare(address) == .orderedSame }
+  }
 }
 
 extension NFTStore: PreferencesObserver {

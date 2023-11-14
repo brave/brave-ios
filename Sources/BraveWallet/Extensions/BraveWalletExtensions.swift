@@ -288,7 +288,7 @@ extension BraveWallet.BlockchainToken {
   
   var nftTokenTitle: String {
     if isErc721, let tokenId = Int(tokenId.removingHexPrefix, radix: 16) {
-      return "\(name) #\(tokenId)"
+      return "\(symbol) #\(tokenId)"
     } else {
       return name
     }
