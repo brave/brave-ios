@@ -11,6 +11,7 @@ import BraveCore
 import DesignSystem
 import BraveStrings
 import Strings
+import NaturalLanguage
 
 protocol TabLocationViewDelegate {
   func tabLocationViewDidTapLocation(_ tabLocationView: TabLocationView)
@@ -164,7 +165,6 @@ class TabLocationView: UIView {
     urlDisplayLabel.font = .preferredFont(forTextStyle: .subheadline)
     urlDisplayLabel.backgroundColor = .clear
     urlDisplayLabel.clipsToBounds = true
-    urlDisplayLabel.textAlignment = .right
     urlDisplayLabel.lineBreakMode = .byClipping
     urlDisplayLabel.numberOfLines = 1
     return urlDisplayLabel
@@ -399,7 +399,7 @@ class TabLocationView: UIView {
     readerModeButton.unselectedTintColor = browserColors.iconDefault
     readerModeButton.selectedTintColor = browserColors.iconActive
     // swiftlint:disable:next force_cast
-    (urlDisplayLabel as! DisplayURLLabel).leadingClippingFade.gradientLayer.colors = [
+    (urlDisplayLabel as! DisplayURLLabel).clippingFade.gradientLayer.colors = [
       browserColors.containerBackground,
       browserColors.containerBackground.withAlphaComponent(0.0)
     ].map {
@@ -413,9 +413,14 @@ class TabLocationView: UIView {
   }
   
   private func updateURLBarWithText() {
-    // Note: Only use `URLFormatter.formatURLOrigin(forSecurityDisplay: url?.withoutWWW.absoluteString ?? "", schemeDisplay: .omitHttpAndHttps)`
-    // If displaying the host ONLY! This follows Google Chrome and Safari.
-    urlDisplayLabel.text = URLFormatter.formatURLOrigin(forSecurityDisplay: url?.withoutWWW.absoluteString ?? "", schemeDisplay: .omitHttpAndHttps)
+    // Matches LocationBarModelImpl::GetFormattedURL in Chromium (except for omitHTTP)
+    // components/omnibox/browser/location_bar_model_impl.cc
+    // TODO: Export omnibox related APIs and use directly
+    urlDisplayLabel.text = URLFormatter.formatURL(
+      url?.absoluteString ?? "",
+      formatTypes: [.trimAfterHost, .omitHTTP, .omitHTTPS, .omitTrivialSubdomains],
+      unescapeOptions: .normal
+    )
     
     reloadButton.isHidden = url == nil
     voiceSearchButton.isHidden = (url != nil) || !isVoiceSearchAvailable
@@ -467,7 +472,7 @@ extension TabLocationView: TabEventHandler {
 private class DisplayURLLabel: UILabel {
   let pathPadding: CGFloat = 5.0
   
-  let leadingClippingFade = GradientView(
+  let clippingFade = GradientView(
     colors: [.braveBackground, .braveBackground.withAlphaComponent(0.0)],
     positions: [0, 1],
     startPoint: .init(x: 0, y: 0.5),
@@ -484,11 +489,7 @@ private class DisplayURLLabel: UILabel {
   override init(frame: CGRect) {
     super.init(frame: frame)
     
-    addSubview(leadingClippingFade)
-    leadingClippingFade.snp.makeConstraints {
-      $0.leading.top.bottom.equalToSuperview()
-      $0.width.equalTo(20)
-    }
+    addSubview(clippingFade)
   }
   
   private var textSize: CGSize = .zero
@@ -501,10 +502,16 @@ private class DisplayURLLabel: UILabel {
   
   override var text: String? {
     willSet {
-      updateTextSize(from: newValue)
+      if newValue != text {
+        updateTextSize(from: newValue)
+      }
     }
     didSet {
-      leadingClippingFade.isHidden = true
+      clippingFade.isHidden = true
+      if oldValue != text {
+        detectLanguageForNaturalDirectionClipping()
+      }
+      setNeedsDisplay()
     }
   }
   
@@ -512,6 +519,19 @@ private class DisplayURLLabel: UILabel {
     textSize = (value as? NSString)?.size(withAttributes: [.font: font!]) ?? .zero
     setNeedsLayout()
     setNeedsDisplay()
+  }
+  
+  private func detectLanguageForNaturalDirectionClipping() {
+    guard let text, let language = NLLanguageRecognizer.dominantLanguage(for: text) else { return }
+    switch language {
+    case .arabic, .hebrew, .persian, .urdu:
+      isRightToLeft = true
+    default:
+      isRightToLeft = false
+    }
+    // Update clipping fade direction
+    clippingFade.gradientLayer.startPoint = .init(x: isRightToLeft ? 1 : 0, y: 0.5)
+    clippingFade.gradientLayer.endPoint = .init(x: isRightToLeft ? 0 : 1, y: 0.5)
   }
   
   @available(*, unavailable)
@@ -527,6 +547,19 @@ private class DisplayURLLabel: UILabel {
   override var canBecomeFirstResponder: Bool {
     return false
   }
+  
+  override func layoutSubviews() {
+    super.layoutSubviews()
+    
+    clippingFade.frame = .init(
+      x: isRightToLeft ? bounds.width - 20 : 0,
+      y: 0,
+      width: 20,
+      height: bounds.height
+    )
+  }
+  
+  private var isRightToLeft: Bool = false
 
   // This override is done in case the eTLD+1 string overflows the width of textField.
   // In that case the textRect is adjusted to show right aligned and truncate left.
@@ -535,13 +568,14 @@ private class DisplayURLLabel: UILabel {
     var rect = rect
     if textSize.width > bounds.width {
       let delta = (textSize.width - bounds.width)
-      rect.origin.x -= delta
-      rect.size.width += delta
-      
-      bringSubviewToFront(leadingClippingFade)
-      leadingClippingFade.isHidden = false
+      if !isRightToLeft {
+        rect.origin.x -= delta
+        rect.size.width += delta
+      }
+      bringSubviewToFront(clippingFade)
+      clippingFade.isHidden = false
     } else {
-      leadingClippingFade.isHidden = true
+      clippingFade.isHidden = true
     }
     super.drawText(in: rect)
   }

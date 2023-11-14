@@ -38,7 +38,11 @@ struct PageSecurityView: View {
       }
       return url
     }()
-    return URLFormatter.formatURLOrigin(forSecurityDisplay: urlToFormat.withoutWWW.absoluteString, schemeDisplay: .omitHttpAndHttps)
+    return URLFormatter.formatURL(
+      urlToFormat.absoluteString,
+      formatTypes: [.trimAfterHost, .omitHTTP, .omitHTTPS, .omitTrivialSubdomains],
+      unescapeOptions: .normal
+    )
   }
   
   var body: some View {
