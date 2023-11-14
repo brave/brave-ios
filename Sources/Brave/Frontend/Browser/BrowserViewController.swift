@@ -1814,11 +1814,13 @@ public class BrowserViewController: UIViewController {
 
             if ErrorPageHelper.certificateError(for: url) != 0 {
               tab.secureContentState = .invalidCert
-              if tabManager.selectedTab === tab {
-                updateToolbarSecureContentState(.invalidCert)
-              }
-              break
+            } else {
+              tab.secureContentState = .missingSSL
             }
+            if tabManager.selectedTab === tab {
+              updateToolbarSecureContentState(tab.secureContentState)
+            }
+            break
           }
 
           if url.isReaderModeURL || InternalURL.isValid(url: url) {
