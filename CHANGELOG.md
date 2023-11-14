@@ -36,7 +36,7 @@
 - Resolved an issue with audio files not being added to Playlist using long press gesture. ([#7667](https://github.com/brave/brave-ios/issues/7667))
 - Resolved an issue with ad notifications not working as expected. ([#7586](https://github.com/brave/brave-ios/issues/7586))
 - Resolved displaying correct settings screen after unlocking browser. ([#7657](https://github.com/brave/brave-ios/issues/7657))
-- Resolved OpenSearch issues relating to https://hackerone.com/reports/2057565. ([#7702](https://github.com/brave/brave-ios/issues/7702))
+- Resolved issue of OpenSearch allowing to add rogue suggestion providers as reported on HackerOne by nishimunea. ([#7702](https://github.com/brave/brave-ios/issues/7702))
 - Fixed script blocking embedded video player on https://puredarwin.org.  ([#7822](https://github.com/brave/brave-ios/issues/7822))
 - Fixed crash when launching browser with hundreds of tabs open. ([#7804](https://github.com/brave/brave-ios/issues/7804))
 - Fixed voice search popup presentation on iPad when “Split View” is enabled. ([#7693](https://github.com/brave/brave-ios/issues/7693))
