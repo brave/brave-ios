@@ -150,6 +150,7 @@ public class Migration {
   }
   
   public static func migrateLostTabsActiveWindow() {
+    if UIApplication.shared.supportsMultipleScenes { return }
     if Preferences.Migration.lostTabsWindowIDMigrationOne.value { return }
     
     let sessionWindows = SessionWindow.all()
@@ -159,9 +160,10 @@ public class Migration {
     
     let windowIds = UIApplication.shared.openSessions
       .compactMap({ BrowserState.getWindowInfo(from: $0).windowId })
+      .filter({ $0 != activeWindow.windowId.uuidString })
     
     let zombieTabs = sessionWindows
-      .filter({ !windowIds.contains($0.windowId.uuidString) })
+      .filter({ windowIds.contains($0.windowId.uuidString) })
       .compactMap({
         $0.sessionTabs
       })
@@ -257,7 +259,7 @@ fileprivate extension Preferences {
     
     static let lostTabsWindowIDMigrationOne = Option<Bool>(
       key: "migration.lost-tabs-window-id-one",
-      default: !UIDevice.isPhone
+      default: !UIApplication.shared.supportsMultipleScenes
     )
   }
 
