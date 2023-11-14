@@ -265,11 +265,8 @@ public class BrowserViewController: UIViewController {
   var processAddressBarTask: Task<(), Never>?
   var topToolbarDidPressReloadTask: Task<(), Never>?
   
-  
-  
+  /// In app purchase obsever for VPN Subscription action
   let iapObserver: IAPObserver
-
-  
 
   public init(
     windowId: UUID,
@@ -3361,15 +3358,15 @@ extension BrowserViewController {
 
 extension BrowserViewController: IAPObserverDelegate {
   public func purchasedOrRestoredProduct(validateReceipt: Bool) {
-    
+    // No-op
   }
   
   public func purchaseFailed(error: IAPObserver.PurchaseError) {
-    
+    // No-op
   }
   
   public func handlePromotedInAppPurchase() {
-    print("test test test2 test test test")
-    
+    // Open VPN Buy Screen before system triggers buy action
+    navigationHelper.openVPNBuyScreen(iapObserver: iapObserver)
   }
 }

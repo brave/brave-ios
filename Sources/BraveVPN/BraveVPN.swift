@@ -670,6 +670,14 @@ public class BraveVPN {
     }
   }
   
+  public static func activatePaymentTypeForStoredPromotion(savedPayment: SKPayment?) {
+    if let payment = savedPayment {
+      SKPaymentQueue.default().add(payment)
+    }
+      
+    iapObserver.savedPayment = nil
+  }
+  
   // MARK: - Error Handling
   
   /// Stores a in-memory list of vpn errors encountered during current browsing session.

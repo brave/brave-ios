@@ -23,7 +23,8 @@ public class IAPObserver: NSObject, SKPaymentTransactionObserver {
   }
 
   public weak var delegate: IAPObserverDelegate?
-
+  public var savedPayment: SKPayment?
+  
   // MARK: - Handling transactions
   
   public func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
@@ -105,19 +106,16 @@ public class IAPObserver: NSObject, SKPaymentTransactionObserver {
   // MARK: - Handling promoted in-app purchases
   
   public func paymentQueue(_ queue: SKPaymentQueue, shouldAddStorePayment payment: SKPayment, for product: SKProduct) -> Bool {
-//    // Check if ther eis an active onboarding happening
-//    let shouldDeferPayment = Preferences.AppState.isOnboardingActive.value
-//    
-//    // If you need to defer until onboarding is complete, save the payment and return false.
-//    if shouldDeferPayment {
-//        self.savedPayment = payment
-//        return false
-//    }
+    // Check if ther eis an active onboarding happening
+    let shouldDeferPayment = Preferences.AppState.isOnboardingActive.value
     
-    print("test test test test test test")
+    // If you need to defer until onboarding is complete, save the payment and return false.
+    if shouldDeferPayment {
+      savedPayment = payment
+      return false
+    }
     
     delegate?.handlePromotedInAppPurchase()
-    
     return true
   }
 }
