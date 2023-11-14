@@ -264,6 +264,12 @@ public class BrowserViewController: UIViewController {
   
   var processAddressBarTask: Task<(), Never>?
   var topToolbarDidPressReloadTask: Task<(), Never>?
+  
+  
+  
+  let iapObserver: IAPObserver
+
+  
 
   public init(
     windowId: UUID,
@@ -324,9 +330,13 @@ public class BrowserViewController: UIViewController {
     if Locale.current.regionCode == "JP" {
       benchmarkBlockingDataSource = BlockingSummaryDataSource()
     }
+    
+    iapObserver = BraveVPN.iapObserver
 
     super.init(nibName: nil, bundle: nil)
     didInit()
+    
+    iapObserver.delegate = self
 
     rewards.rewardsServiceDidStart = { [weak self] _ in
       self?.setupLedger()
@@ -3346,5 +3356,20 @@ extension BrowserViewController {
     }
     
     self.present(host, animated: true)
+  }
+}
+
+extension BrowserViewController: IAPObserverDelegate {
+  public func purchasedOrRestoredProduct(validateReceipt: Bool) {
+    
+  }
+  
+  public func purchaseFailed(error: IAPObserver.PurchaseError) {
+    
+  }
+  
+  public func handlePromotedInAppPurchase() {
+    print("test test test2 test test test")
+    
   }
 }

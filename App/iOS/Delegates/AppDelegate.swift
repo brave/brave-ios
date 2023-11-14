@@ -25,6 +25,7 @@ import BraveTalk
 #endif
 import Onboarding
 import os
+import BraveVPN
 import BraveWallet
 import Preferences
 import BraveShields
@@ -116,7 +117,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // IAPs can trigger on the app as soon as it launches,
     // for example when a previous transaction was not finished and is in pending state.
     SKPaymentQueue.default().add(BraveVPN.iapObserver)
-
+    // Editing Product Promotion List
+    Task { @MainActor in
+      await BraveVPN.updateStorePromotionOrder()
+    }
+    
     // Override point for customization after application launch.
     var shouldPerformAdditionalDelegateHandling = true
     AdblockEngine.setDomainResolver()

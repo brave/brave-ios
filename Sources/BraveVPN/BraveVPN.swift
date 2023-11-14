@@ -650,6 +650,26 @@ public class BraveVPN {
     }
   }
   
+  // MARK: - Promotion
+  
+  /// Editing product promotiuon order first yearly and monthly after
+  @MainActor public static func updateStorePromotionOrder() async {
+    let storePromotionController = SKProductStorePromotionController.default()
+    // Fetch Products
+    guard let yearlyProduct = VPNProductInfo.yearlySubProduct,
+          let monthlyProduct = VPNProductInfo.monthlySubProduct else {
+      Logger.module.debug("Found empty while fetching SKProducts for promotion order")
+      return
+    }
+    
+    // Update the order
+    do {
+      try await storePromotionController.update(promotionOrder: [yearlyProduct, monthlyProduct])
+    } catch {
+      Logger.module.debug("Error while opdating product promotion order ")
+    }
+  }
+  
   // MARK: - Error Handling
   
   /// Stores a in-memory list of vpn errors encountered during current browsing session.

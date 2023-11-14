@@ -224,6 +224,10 @@ extension BuyVPNViewController: IAPObserverDelegate {
     handleTransactionError(error: error)
   }
   
+  func handlePromotedInAppPurchase() {
+    
+  }
+  
   @objc func handleRestoreTimeoutFailure() {
     // Handle Restore error from timeout
     guard isLoading else {
