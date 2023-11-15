@@ -2909,6 +2909,11 @@ extension Strings {
       NSLocalizedString("vpn.vpnConfigPermissionDeniedErrorTitle", tableName: "BraveShared", bundle: .module,
         value: "Permission denied",
         comment: "Title for an alert when the user didn't allow to install VPN profile")
+    
+    public static let vpnRedeemCodeButtonActionTitle =
+      NSLocalizedString("vpn.vpnRedeemCodeButtonActionTitle", tableName: "BraveShared", bundle: .module,
+        value: "Redeem Code",
+        comment: "Title for a button for enabling the Redeem Code flow")
 
     public static let vpnConfigPermissionDeniedErrorBody =
       NSLocalizedString("vpn.vpnConfigPermissionDeniedErrorBody", tableName: "BraveShared", bundle: .module,

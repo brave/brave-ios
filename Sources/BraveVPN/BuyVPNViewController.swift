@@ -68,8 +68,8 @@ class BuyVPNViewController: VPNSetupLoadingController {
     }
     
     let redeemButton = UIButton().then {
-      $0.setTitle("Redeem Code", for: .normal)
-      $0.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
+      $0.setTitle(Strings.VPN.vpnRedeemCodeButtonActionTitle, for: .normal)
+      $0.titleLabel?.font = .systemFont(ofSize: 13, weight: .medium)
       $0.titleLabel?.textAlignment = .center
       
       $0.addTarget(self, action: #selector(redeemOfferSubscriptionCode), for: .touchUpInside)
