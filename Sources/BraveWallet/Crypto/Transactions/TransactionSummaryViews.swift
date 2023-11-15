@@ -205,9 +205,17 @@ struct SendTransactionSummaryView: View {
         
         if let valueSent, let fiatValueSent {
           VStack(alignment: .trailing) {
-            Text("-\(valueSent)")
-              .font(primaryFont)
-              .foregroundColor(primaryTextColor)
+            Group {
+              if let symbol = token?.symbol {
+                Text("-\(valueSent) \(symbol)")
+                  .font(primaryFont)
+                  .foregroundColor(primaryTextColor)
+              } else {
+                Text("-\(valueSent)")
+              }
+            }
+            .font(primaryFont)
+            .foregroundColor(primaryTextColor)
             Text(fiatValueSent)
               .font(secondaryFont)
               .foregroundColor(secondaryTextColor)
