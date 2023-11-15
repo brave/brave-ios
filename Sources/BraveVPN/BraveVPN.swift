@@ -295,6 +295,29 @@ public class BraveVPN {
     helper.mainCredential?.hostnameDisplayValue
   }
 
+  /// Type of vpnsubscription
+  public enum SubscriptionType: Equatable {
+    case monthly, yearly, other
+  }
+  
+  /// Type of the active purchased vpn plan
+  public static var activeSubscriptionType: SubscriptionType {
+    guard let credential = GRDSubscriberCredential.current() else {
+      logAndStoreError("subscriptionName: failed to retrieve subscriber credentials")
+      return .other
+    }
+    let productId = credential.subscriptionType
+    
+    switch productId {
+    case VPNProductInfo.ProductIdentifiers.monthlySub:
+      return .monthly
+    case VPNProductInfo.ProductIdentifiers.yearlySub:
+      return .yearly
+    default:
+      return .other
+    }
+  }
+  
   /// Name of the purchased vpn plan.
   public static var subscriptionName: String {
     guard let credential = GRDSubscriberCredential.current() else {
@@ -652,7 +675,7 @@ public class BraveVPN {
   
   // MARK: - Promotion
   
-  /// Editing product promotiuon order first yearly and monthly after
+  /// Editing product promotion order first monthly and yearly after
   @MainActor public static func updateStorePromotionOrder() async {
     let storePromotionController = SKProductStorePromotionController.default()
     // Fetch Products
@@ -664,9 +687,41 @@ public class BraveVPN {
     
     // Update the order
     do {
-      try await storePromotionController.update(promotionOrder: [yearlyProduct, monthlyProduct])
+      try await storePromotionController.update(promotionOrder: [monthlyProduct, yearlyProduct])
     } catch {
       Logger.module.debug("Error while opdating product promotion order ")
+    }
+  }
+  
+  /// Hiding Store pormotion if the active subscription for the type
+  @MainActor public static func hideActiveStorePromotion() async {
+    let storePromotionController = SKProductStorePromotionController.default()
+    
+    // Fetch Products
+    guard let yearlyProduct = VPNProductInfo.yearlySubProduct,
+          let monthlyProduct = VPNProductInfo.monthlySubProduct else {
+      Logger.module.debug("Found empty while fetching SKProducts for promotion order")
+      return
+    }
+    
+    // Hide the promotion
+    let activeSubscriptionType = BraveVPN.activeSubscriptionType
+    
+    switch activeSubscriptionType {
+    case .monthly:
+      await hideSubscriptionType(monthlyProduct)
+    case .yearly:
+      await hideSubscriptionType(yearlyProduct)
+    default:
+      break
+    }
+    
+    func hideSubscriptionType(_ product: SKProduct) async {
+      do {
+        try await storePromotionController.update(promotionVisibility: .hide, for: product)
+      } catch {
+        Logger.module.debug("Error while opdating product promotion order ")
+      }
     }
   }
   
