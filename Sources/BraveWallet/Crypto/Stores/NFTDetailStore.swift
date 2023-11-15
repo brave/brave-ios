@@ -67,9 +67,10 @@ struct NFTAttribute: Codable, Equatable, Identifiable {
 
 class NFTDetailStore: ObservableObject, WalletObserverStore {
   private let assetManager: WalletUserAssetManagerType
+  private let keyringService: BraveWalletKeyringService
   private let rpcService: BraveWalletJsonRpcService
   private let ipfsApi: IpfsAPI
-  let owner: BraveWallet.AccountInfo?
+  @Published var owner: BraveWallet.AccountInfo?
   @Published var nft: BraveWallet.BlockchainToken
   @Published var isLoading: Bool = false
   @Published var nftMetadata: NFTMetadata?
@@ -79,6 +80,7 @@ class NFTDetailStore: ObservableObject, WalletObserverStore {
 
   init(
     assetManager: WalletUserAssetManagerType,
+    keyringService: BraveWalletKeyringService,
     rpcService: BraveWalletJsonRpcService,
     ipfsApi: IpfsAPI,
     nft: BraveWallet.BlockchainToken,
@@ -86,6 +88,7 @@ class NFTDetailStore: ObservableObject, WalletObserverStore {
     owner: BraveWallet.AccountInfo?
   ) {
     self.assetManager = assetManager
+    self.keyringService = keyringService
     self.rpcService = rpcService
     self.ipfsApi = ipfsApi
     self.nft = nft
@@ -98,6 +101,38 @@ class NFTDetailStore: ObservableObject, WalletObserverStore {
       let allNetworks = await rpcService.allNetworks(nft.coin)
       if let network = allNetworks.first(where: { $0.chainId.caseInsensitiveCompare(nft.chainId) == .orderedSame }) {
         networkInfo = network
+      }
+      
+      if owner == nil {
+        let accounts = await keyringService.allAccounts().accounts
+        let nftBalances: [String: Int] = await withTaskGroup(
+          of: [String: Int].self,
+          body: { @MainActor [rpcService, networkInfo, nft] group in
+            for account in accounts where account.coin == nft.coin {
+              group.addTask { @MainActor in
+                let balanceForToken = await rpcService.balance(
+                  for: nft,
+                  in: account,
+                  network: networkInfo
+                )
+                return [account.address: Int(balanceForToken ?? 0)]
+              }
+            }
+            return await group.reduce(into: [String: Int](), { partialResult, new in
+              for key in new.keys {
+                partialResult[key] = new[key]
+              }
+            })
+          }
+        )
+        if let address = nftBalances.first(where: { address, balance in
+          balance > 0
+        })?.key,
+           let account = accounts.first(where: { accountInfo in
+             accountInfo.address.caseInsensitiveCompare(address) == .orderedSame
+           }) {
+          owner = account
+        }
       }
       
       if nftMetadata == nil {

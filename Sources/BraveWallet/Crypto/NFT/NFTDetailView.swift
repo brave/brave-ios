@@ -10,6 +10,7 @@ import BraveUI
 import SDWebImageSwiftUI
 
 struct NFTDetailView: View {
+  @ObservedObject var keyringStore: KeyringStore
   @ObservedObject var nftDetailStore: NFTDetailStore
   @Binding var buySendSwapDestination: BuySendSwapDestination? 
   var onNFTMetadataRefreshed: ((NFTMetadata) -> Void)?
@@ -95,7 +96,7 @@ struct NFTDetailView: View {
               .offset(y: 16)
             }
           VStack(alignment: .leading, spacing: 8) {
-            Text(nftDetailStore.nft.nftTokenTitle)
+            Text(nftDetailStore.nft.nftDetailTitle)
               .font(.title3.weight(.semibold))
               .foregroundColor(Color(.braveLabel))
             Text(nftDetailStore.nft.name)
@@ -130,35 +131,21 @@ struct NFTDetailView: View {
           NFTDetailRow(title: nftDetailStore.nft.isErc721 ? Strings.Wallet.contractAddressAccessibilityLabel : Strings.Wallet.tokenMintAddress) {
             Button {
               if nftDetailStore.nft.isErc721 {
-                if let explorerURL = nftDetailStore.networkInfo.blockExplorerUrls.first {
-                  let baseURL = "\(explorerURL)/token/\(nftDetailStore.nft.contractAddress)"
-                  var nftURL = URL(string: baseURL)
-                  if let tokenId = Int(nftDetailStore.nft.tokenId.removingHexPrefix, radix: 16) {
-                    nftURL = URL(string: "\(baseURL)?a=\(tokenId)")
-                  }
-                  
-                  if let url = nftURL {
-                    openWalletURL(url)
-                  }
+                if let url = nftDetailStore.networkInfo.erc721TokenBlockExplorerURL(nftDetailStore.nft) {
+                  openWalletURL(url)
                 }
               } else {
-                if WalletConstants.supportedTestNetworkChainIds.contains(nftDetailStore.networkInfo.chainId) {
-                  if let components = nftDetailStore.networkInfo.blockExplorerUrls.first?.separatedBy("/?cluster="), let baseURL = components.first {
-                    let cluster = components.last ?? ""
-                    if let nftURL = URL(string: "\(baseURL)/address/\(nftDetailStore.nft.contractAddress)/?cluster=\(cluster)") {
-                      openWalletURL(nftURL)
-                    }
-                  }
-                } else {
-                  if let explorerURL = nftDetailStore.networkInfo.blockExplorerUrls.first, let nftURL = URL(string: "\(explorerURL)/address/\(nftDetailStore.nft.contractAddress)") {
-                    openWalletURL(nftURL)
-                  }
+                if let url = nftDetailStore.networkInfo.splTokenBlockExplorerURL(nftDetailStore.nft) {
+                  openWalletURL(url)
                 }
               }
             } label: {
-              Text(nftDetailStore.nft.contractAddress.truncatedAddress)
-                .font(.subheadline)
-                .foregroundColor(Color(.braveBlurpleTint))
+              HStack {
+                Text(nftDetailStore.nft.contractAddress.truncatedAddress)
+                Image(systemName: "arrow.up.forward.square")
+              }
+              .font(.subheadline)
+              .foregroundColor(Color(.braveBlurpleTint))
             }
           }
           NFTDetailRow(title: Strings.Wallet.nftDetailBlockchain) {
@@ -212,11 +199,17 @@ struct NFTDetailView: View {
         onNFTMetadataRefreshed?(newMetadata)
       }
     })
+    .onChange(of: keyringStore.isWalletLocked, perform: { isLocked in
+      guard isLocked else { return }
+      if isPresentingRemoveAlert {
+        isPresentingRemoveAlert = false
+      }
+    })
     .onAppear {
       nftDetailStore.update()
     }
     .background(Color(UIColor.braveGroupedBackground).ignoresSafeArea())
-    .navigationBarTitle(nftDetailStore.nft.nftTokenTitle)
+    .navigationBarTitle(nftDetailStore.nft.nftDetailTitle)
     .toolbar {
       ToolbarItemGroup(placement: .navigationBarTrailing) {
         Menu {
@@ -291,6 +284,7 @@ struct NFTDetailView: View {
               .font(.footnote)
               .foregroundStyle(Color(.secondaryBraveLabel))
           }
+          .padding(.bottom, 28)
         })
     )
   }

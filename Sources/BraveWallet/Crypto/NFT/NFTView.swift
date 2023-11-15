@@ -301,6 +301,7 @@ struct NFTView: View {
         destination: {
           if let nftViewModel = selectedNFTViewModel {
             NFTDetailView(
+              keyringStore: keyringStore,
               nftDetailStore: cryptoStore.nftDetailStore(for: nftViewModel.token, nftMetadata: nftViewModel.nftMetadata, owner: nftStore.owner(for: nftViewModel.token)),
               buySendSwapDestination: buySendSwapDestination,
               onNFTMetadataRefreshed: {  nftMetadata in

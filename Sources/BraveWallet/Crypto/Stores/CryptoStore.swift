@@ -516,6 +516,7 @@ public class CryptoStore: ObservableObject, WalletObserverStore {
     }
     let store = NFTDetailStore(
       assetManager: userAssetManager,
+      keyringService: keyringService,
       rpcService: rpcService,
       ipfsApi: ipfsApi,
       nft: nft,

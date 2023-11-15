@@ -121,6 +121,8 @@ extension BraveWallet.CoinType {
       return [.filecoin, .filecoinTestnet]
     case .btc:
       return [.bitcoin84, .bitcoin84Testnet]
+    case .zec:
+      return [.zCashMainnet, .zCashTestnet]
     @unknown default:
       return [.default]
     }
@@ -134,7 +136,7 @@ extension BraveWallet.CoinType {
       return Strings.Wallet.coinTypeSolana
     case .fil:
       return Strings.Wallet.coinTypeFilecoin
-    case .btc:
+    case .btc, .zec:
       fallthrough
     @unknown default:
       return Strings.Wallet.coinTypeUnknown
@@ -149,7 +151,7 @@ extension BraveWallet.CoinType {
       return Strings.Wallet.coinTypeSolanaDescription
     case .fil:
       return Strings.Wallet.coinTypeFilecoinDescription
-    case .btc:
+    case .btc, .zec:
       fallthrough
     @unknown default:
       return Strings.Wallet.coinTypeUnknown
@@ -164,7 +166,7 @@ extension BraveWallet.CoinType {
       return "sol-asset-icon"
     case .fil:
       return "filecoin-asset-icon"
-    case .btc:
+    case .btc, .zec:
       fallthrough
     @unknown default:
       return ""
@@ -179,7 +181,7 @@ extension BraveWallet.CoinType {
       return Strings.Wallet.defaultSolAccountName
     case .fil:
       return Strings.Wallet.defaultFilAccountName
-    case .btc:
+    case .btc, .zec:
       fallthrough
     @unknown default:
       return ""
@@ -194,7 +196,7 @@ extension BraveWallet.CoinType {
       return Strings.Wallet.defaultSecondarySolAccountName
     case .fil:
       return Strings.Wallet.defaultSecondaryFilAccountName
-    case .btc:
+    case .btc, .zec:
       fallthrough
     @unknown default:
       return ""
@@ -210,7 +212,7 @@ extension BraveWallet.CoinType {
       return 2
     case .fil:
       return 3
-    case .btc:
+    case .btc, .zec:
       fallthrough
     @unknown default:
       return 10
@@ -259,6 +261,38 @@ extension BraveWallet.NetworkInfo {
     }
     return nil
   }
+  
+  /// Generate the explorer link for the given ERC721 token with the current NetworkInfo
+  func erc721TokenBlockExplorerURL(_ token: BraveWallet.BlockchainToken) -> URL? {
+    guard token.isErc721,
+          let explorerURL = blockExplorerUrls.first
+    else { return nil }
+    
+    let baseURL = "\(explorerURL)/token/\(token.contractAddress)"
+    var tokenURL = URL(string: baseURL)
+    if let tokenId = Int(token.tokenId.removingHexPrefix, radix: 16) {
+      tokenURL = URL(string: "\(baseURL)?a=\(tokenId)")
+    }
+    return tokenURL
+  }
+  
+  /// Generate the explorer link for the given SPL token with the current NetworkInfo
+  func splTokenBlockExplorerURL(_ token: BraveWallet.BlockchainToken) -> URL? {
+    guard !token.isErc721, !token.isErc20, !token.isErc1155 else { return nil }
+    if WalletConstants.supportedTestNetworkChainIds.contains(chainId) {
+      if let components = blockExplorerUrls.first?.separatedBy("/?cluster="), let baseURL = components.first {
+        let cluster = components.last ?? ""
+        if let tokenURL = URL(string: "\(baseURL)/address/\(token.contractAddress)/?cluster=\(cluster)") {
+          return tokenURL
+        }
+      }
+    } else {
+      if let explorerURL = blockExplorerUrls.first, let tokenURL = URL(string: "\(explorerURL)/address/\(token.contractAddress)") {
+        return tokenURL
+      }
+    }
+    return nil
+  }
 }
 
 extension BraveWallet.BlockchainToken {
@@ -287,6 +321,14 @@ extension BraveWallet.BlockchainToken {
   }
   
   var nftTokenTitle: String {
+    if isErc721, let tokenId = Int(tokenId.removingHexPrefix, radix: 16) {
+      return "\(name) #\(tokenId)"
+    } else {
+      return name
+    }
+  }
+  
+  var nftDetailTitle: String {
     if isErc721, let tokenId = Int(tokenId.removingHexPrefix, radix: 16) {
       return "\(symbol) #\(tokenId)"
     } else {
@@ -436,6 +478,8 @@ extension BraveWallet.KeyringId {
       return chainId == BraveWallet.FilecoinMainnet ? .filecoin : .filecoinTestnet
     case.btc:
       return chainId == BraveWallet.BitcoinMainnet ? .bitcoin84 : .bitcoin84Testnet
+    case .zec:
+      return chainId == BraveWallet.ZCashMainnet ? .zCashMainnet: .zCashTestnet
     @unknown default:
       return .default
     }
