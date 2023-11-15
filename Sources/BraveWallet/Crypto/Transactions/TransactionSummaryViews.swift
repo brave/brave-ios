@@ -76,7 +76,7 @@ struct TransactionSummaryViewContainer: View {
     case .solDappTransaction:
       SendTransactionSummaryView(
         sentFromAccountName: parsedTransaction.namedFromAddress,
-        token: nil,
+        token: parsedTransaction.network.nativeToken,
         network: parsedTransaction.network,
         valueSent: nil,
         fiatValueSent: nil,
@@ -203,7 +203,7 @@ struct SendTransactionSummaryView: View {
         
         Spacer()
         
-        if let valueSent, let fiatValueSent {
+        if let valueSent {
           VStack(alignment: .trailing) {
             Group {
               if let symbol = token?.symbol {
@@ -216,7 +216,7 @@ struct SendTransactionSummaryView: View {
             }
             .font(primaryFont)
             .foregroundColor(primaryTextColor)
-            Text(fiatValueSent)
+            Text(fiatValueSent ?? "")
               .font(secondaryFont)
               .foregroundColor(secondaryTextColor)
           }
