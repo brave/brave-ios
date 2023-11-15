@@ -4753,7 +4753,7 @@ extension Strings {
       comment: "The title of the details view for Sign In With Ethereum/Brave Wallet requests."
     )
     public static let transactionSummaryIntentLabel = NSLocalizedString(
-      "wallet.transactionSummarySendType",
+      "wallet.transactionSummaryIntentLabel",
       tableName: "BraveWallet",
       bundle: .module,
       value: "%@ from",
