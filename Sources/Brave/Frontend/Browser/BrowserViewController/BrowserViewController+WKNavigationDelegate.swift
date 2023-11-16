@@ -67,8 +67,10 @@ extension BrowserViewController: WKNavigationDelegate {
     if let selectedTab = tabManager.selectedTab,
        selectedTab.url?.origin != webView.url?.origin {
       // reset secure content state to unknown until page can be evaluated
-      selectedTab.secureContentState = .unknown
-      updateToolbarSecureContentState(.unknown)
+      if let url = webView.url, !InternalURL.isValid(url: url) {
+        selectedTab.secureContentState = .unknown
+        updateToolbarSecureContentState(.unknown)
+      }
       // new site has a different origin, hide wallet icon.
       tabManager.selectedTab?.isWalletIconVisible = false
       // new site, reset connected addresses

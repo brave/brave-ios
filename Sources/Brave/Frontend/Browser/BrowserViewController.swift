@@ -1782,6 +1782,9 @@ public class BrowserViewController: UIViewController {
       }
 
       if tab.secureContentState == .secure && !webView.hasOnlySecureContent {
+        if let url = tab.webView?.url, url.isReaderModeURL {
+          break
+        }
         tab.secureContentState = .mixedContent
       }
 
@@ -1824,9 +1827,9 @@ public class BrowserViewController: UIViewController {
           }
 
           if url.isReaderModeURL || InternalURL.isValid(url: url) {
-            tab.secureContentState = .unknown
+            tab.secureContentState = .localhost
             if tabManager.selectedTab === tab {
-              updateToolbarSecureContentState(.unknown)
+              updateToolbarSecureContentState(.localhost)
             }
             break
           }
