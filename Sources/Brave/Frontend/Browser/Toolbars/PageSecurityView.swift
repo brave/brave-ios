@@ -22,9 +22,9 @@ struct PageSecurityView: View {
   
   private var warningTitle: String {
     switch secureState {
-    case .unknown, .secure, .localhost:
+    case .secure, .localhost:
       return ""
-    case .invalidCert, .missingSSL, .unsupportedProtocol:
+    case .unknown, .invalidCert, .missingSSL:
       return Strings.PageSecurityView.pageNotSecureTitle
     case .mixedContent:
       return Strings.PageSecurityView.pageNotFullySecureTitle
@@ -71,7 +71,7 @@ struct PageSecurityView: View {
       }
     }
     .background(Color(.braveBackground))
-    .frame(maxWidth: BraveUX.baseDimensionValue)
+    .frame(maxWidth: BraveUX.baseDimensionValue, alignment: .leading)
 #if DEBUG
     .onAppear {
       assert(secureState.shouldDisplayWarning, 

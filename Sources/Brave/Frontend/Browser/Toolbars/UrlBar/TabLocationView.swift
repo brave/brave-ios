@@ -82,7 +82,7 @@ class TabLocationView: UIView {
     let isTitleVisible = !traitCollection.preferredContentSizeCategory.isAccessibilityCategory
     
     switch secureContentState {
-    case .unknown, .localhost, .secure:
+    case .localhost, .secure:
       break
     case .invalidCert:
       configuration.baseForegroundColor = UIColor(braveSystemName: .systemfeedbackErrorIcon)
@@ -96,7 +96,7 @@ class TabLocationView: UIView {
         configuration.attributedTitle = title
       }
       configuration.image = UIImage(braveSystemNamed: "leo.warning.triangle-filled")
-    case .unsupportedProtocol:
+    case .unknown:
       configuration.baseForegroundColor = UIColor(braveSystemName: .iconDefault)
       configuration.image = UIImage(braveSystemNamed: "leo.warning.circle-filled")
     }
@@ -426,6 +426,7 @@ class TabLocationView: UIView {
     voiceSearchButton.isHidden = (url != nil) || !isVoiceSearchAvailable
     placeholderLabel.isHidden = url != nil
     urlDisplayLabel.isHidden = url == nil
+    leadingItemContainerView.isHidden = url == nil
   }
   
   // MARK: Tap Actions

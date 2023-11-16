@@ -64,13 +64,12 @@ enum TabSecureContentState {
   case invalidCert
   case missingSSL
   case mixedContent
-  case unsupportedProtocol
   
   var shouldDisplayWarning: Bool {
     switch self {
-    case .invalidCert, .missingSSL, .mixedContent, .unsupportedProtocol:
+    case .unknown, .invalidCert, .missingSSL, .mixedContent:
       return true
-    case .unknown, .localhost, .secure:
+    case .localhost, .secure:
       return false
     }
   }

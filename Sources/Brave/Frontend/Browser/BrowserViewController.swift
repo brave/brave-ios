@@ -656,7 +656,7 @@ public class BrowserViewController: UIViewController {
     updateTabsBarVisibility()
   }
   
-  private func updateToolbarSecureContentState(_ secureContentState: TabSecureContentState) {
+  func updateToolbarSecureContentState(_ secureContentState: TabSecureContentState) {
     topToolbar.secureContentState = secureContentState
     collapsedURLBarView.secureContentState = secureContentState
   }
@@ -1846,7 +1846,7 @@ public class BrowserViewController: UIViewController {
       
       guard let scheme = tab.webView?.url?.scheme,
             let host = tab.webView?.url?.host else {
-        tab.secureContentState = .unsupportedProtocol
+        tab.secureContentState = .unknown
         self.updateURLBar()
         return
       }

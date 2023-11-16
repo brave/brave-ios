@@ -65,7 +65,7 @@ class CollapsedURLBarView: UIView {
     let isTitleVisible = !traitCollection.preferredContentSizeCategory.isAccessibilityCategory
     
     switch secureContentState {
-    case .unknown, .localhost, .secure:
+    case .localhost, .secure:
       break
     case .invalidCert:
       configuration.baseForegroundColor = UIColor(braveSystemName: .systemfeedbackErrorIcon)
@@ -79,7 +79,7 @@ class CollapsedURLBarView: UIView {
         configuration.attributedTitle = title
       }
       configuration.image = UIImage(braveSystemNamed: "leo.warning.triangle-filled")
-    case .unsupportedProtocol:
+    case .unknown:
       configuration.baseForegroundColor = UIColor(braveSystemName: .iconDefault)
       configuration.image = UIImage(braveSystemNamed: "leo.warning.circle-filled")
     }

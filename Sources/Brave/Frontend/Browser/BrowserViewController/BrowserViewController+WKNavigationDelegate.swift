@@ -63,8 +63,12 @@ extension BrowserViewController: WKNavigationDelegate {
     }
     toolbarVisibilityViewModel.toolbarState = .expanded
 
+    // check if web view is loading a different origin than the one currently loaded
     if let selectedTab = tabManager.selectedTab,
        selectedTab.url?.origin != webView.url?.origin {
+      // reset secure content state to unknown until page can be evaluated
+      selectedTab.secureContentState = .unknown
+      updateToolbarSecureContentState(.unknown)
       // new site has a different origin, hide wallet icon.
       tabManager.selectedTab?.isWalletIconVisible = false
       // new site, reset connected addresses
