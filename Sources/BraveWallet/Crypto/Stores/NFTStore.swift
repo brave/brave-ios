@@ -304,7 +304,7 @@ public class NFTStore: ObservableObject, WalletObserverStore {
         allNFTs.append(contentsOf: networkAssets.flatMap(\.tokens))
       }
       // if we're not hiding unowned or grouping by account, balance isn't needed
-      if filters.isHidingUnownedNFTs {
+      if filters.isHidingUnownedNFTs || filters.groupBy == .accounts {
         let allAccounts = filters.accounts.map(\.model)
         nftBalancesCache = await withTaskGroup(
           of: [String: [String: Int]].self,

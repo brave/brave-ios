@@ -130,14 +130,8 @@ struct NFTDetailView: View {
           }
           NFTDetailRow(title: nftDetailStore.nft.isErc721 ? Strings.Wallet.contractAddressAccessibilityLabel : Strings.Wallet.tokenMintAddress) {
             Button {
-              if nftDetailStore.nft.isErc721 {
-                if let url = nftDetailStore.networkInfo.erc721TokenBlockExplorerURL(nftDetailStore.nft) {
-                  openWalletURL(url)
-                }
-              } else {
-                if let url = nftDetailStore.networkInfo.splTokenBlockExplorerURL(nftDetailStore.nft) {
-                  openWalletURL(url)
-                }
+              if let url = nftDetailStore.networkInfo.nftBlockExplorerURL(nftDetailStore.nft) {
+                openWalletURL(url)
               }
             } label: {
               HStack {
@@ -162,7 +156,6 @@ struct NFTDetailView: View {
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
       } header: {
         Text(Strings.Wallet.nftDetailOverview)
-          .listRowInsets(.zero)
       }
       if let nftMetadata = nftDetailStore.nftMetadata, let description = nftMetadata.description, !description.isEmpty {
         Section {
@@ -170,9 +163,16 @@ struct NFTDetailView: View {
             .font(.subheadline)
             .foregroundColor(Color(.braveLabel))
             .listRowBackground(Color(.secondaryBraveGroupedBackground))
+            .osAvailabilityModifiers({
+              if #unavailable(iOS 16) {
+                // iOS 15 missing default row insect in section
+                $0.listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
+              } else {
+                $0
+              }
+            })
         } header: {
           Text(Strings.Wallet.nftDetailDescription)
-            .listRowInsets(.zero)
         }
       }
       if let attributes = nftDetailStore.nftMetadata?.attributes {
@@ -189,7 +189,6 @@ struct NFTDetailView: View {
           .listRowBackground(Color(.secondaryBraveGroupedBackground))
         } header: {
           Text(Strings.Wallet.nftDetailProperties)
-            .listRowInsets(.zero)
         }
       }
     }

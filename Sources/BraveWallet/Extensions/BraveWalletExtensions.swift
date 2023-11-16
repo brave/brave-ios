@@ -262,33 +262,31 @@ extension BraveWallet.NetworkInfo {
     return nil
   }
   
-  /// Generate the explorer link for the given ERC721 token with the current NetworkInfo
-  func erc721TokenBlockExplorerURL(_ token: BraveWallet.BlockchainToken) -> URL? {
-    guard token.isErc721,
-          let explorerURL = blockExplorerUrls.first
-    else { return nil }
-    
-    let baseURL = "\(explorerURL)/token/\(token.contractAddress)"
-    var tokenURL = URL(string: baseURL)
-    if let tokenId = Int(token.tokenId.removingHexPrefix, radix: 16) {
-      tokenURL = URL(string: "\(baseURL)?a=\(tokenId)")
-    }
-    return tokenURL
-  }
-  
-  /// Generate the explorer link for the given SPL token with the current NetworkInfo
-  func splTokenBlockExplorerURL(_ token: BraveWallet.BlockchainToken) -> URL? {
-    guard !token.isErc721, !token.isErc20, !token.isErc1155 else { return nil }
-    if WalletConstants.supportedTestNetworkChainIds.contains(chainId) {
-      if let components = blockExplorerUrls.first?.separatedBy("/?cluster="), let baseURL = components.first {
-        let cluster = components.last ?? ""
-        if let tokenURL = URL(string: "\(baseURL)/address/\(token.contractAddress)/?cluster=\(cluster)") {
+  /// Generate the explorer link for the given NFT token with the current NetworkInfo
+  func nftBlockExplorerURL(_ token: BraveWallet.BlockchainToken) -> URL? {
+    if token.isErc721 { // when NFT is ERC721 token standard
+      guard let explorerURL = blockExplorerUrls.first else { return nil }
+      
+      let baseURL = "\(explorerURL)/token/\(token.contractAddress)"
+      var tokenURL = URL(string: baseURL)
+      if let tokenId = Int(token.tokenId.removingHexPrefix, radix: 16) {
+        tokenURL = URL(string: "\(baseURL)?a=\(tokenId)")
+      }
+      return tokenURL
+    } else if token.isErc1155 {
+      return nil // ERC1155 is not yet supported
+    } else if token.isNft { // when NFT is a SPL NFT
+      if WalletConstants.supportedTestNetworkChainIds.contains(chainId) {
+        if let components = blockExplorerUrls.first?.separatedBy("/?cluster="), let baseURL = components.first {
+          let cluster = components.last ?? ""
+          if let tokenURL = URL(string: "\(baseURL)/address/\(token.contractAddress)/?cluster=\(cluster)") {
+            return tokenURL
+          }
+        }
+      } else {
+        if let explorerURL = blockExplorerUrls.first, let tokenURL = URL(string: "\(explorerURL)/address/\(token.contractAddress)") {
           return tokenURL
         }
-      }
-    } else {
-      if let explorerURL = blockExplorerUrls.first, let tokenURL = URL(string: "\(explorerURL)/address/\(token.contractAddress)") {
-        return tokenURL
       }
     }
     return nil
