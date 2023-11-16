@@ -236,6 +236,7 @@ extension TransactionsActivityStore {
     blockchainRegistry: MockBlockchainRegistry(),
     txService: MockTxService(),
     solTxManagerProxy: BraveWallet.TestSolanaTxManagerProxy.previewProxy,
+    ipfsApi: TestIpfsAPI(),
     userAssetManager: TestableWalletUserAssetManager()
   )
 }

@@ -431,6 +431,7 @@ extension TransactionSummary {
       userAssets: [.previewToken, .previewDaiToken],
       allTokens: [],
       assetRatios: [BraveWallet.BlockchainToken.previewToken.assetRatioId.lowercased(): 1],
+      nftMetadata: [:],
       solEstimatedTxFee: nil,
       currencyFormatter: .usdCurrencyFormatter
     )
@@ -451,6 +452,7 @@ extension ParsedTransaction {
       userAssets: [.previewToken, .previewDaiToken],
       allTokens: [],
       assetRatios: [BraveWallet.BlockchainToken.previewToken.assetRatioId.lowercased(): 1],
+      nftMetadata: [:],
       solEstimatedTxFee: nil,
       currencyFormatter: .usdCurrencyFormatter
     )
