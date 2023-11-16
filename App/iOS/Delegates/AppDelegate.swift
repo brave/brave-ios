@@ -119,6 +119,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // Editing Product Promotion List
     Task { @MainActor in
       await BraveVPN.updateStorePromotionOrder()
+      await BraveVPN.hideActiveStorePromotion()
     }
     
     // Override point for customization after application launch.

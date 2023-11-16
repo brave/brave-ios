@@ -675,7 +675,7 @@ public class BraveVPN {
   
   // MARK: - Promotion
   
-  /// Editing product promotion order first monthly and yearly after
+  /// Editing product promotion order first yearly and monthly after
   @MainActor public static func updateStorePromotionOrder() async {
     let storePromotionController = SKProductStorePromotionController.default()
     // Fetch Products
@@ -687,7 +687,7 @@ public class BraveVPN {
     
     // Update the order
     do {
-      try await storePromotionController.update(promotionOrder: [monthlyProduct, yearlyProduct])
+      try await storePromotionController.update(promotionOrder: [yearlyProduct, monthlyProduct])
     } catch {
       Logger.module.debug("Error while opdating product promotion order ")
     }
@@ -701,6 +701,14 @@ public class BraveVPN {
     guard let yearlyProduct = VPNProductInfo.yearlySubProduct,
           let monthlyProduct = VPNProductInfo.monthlySubProduct else {
       Logger.module.debug("Found empty while fetching SKProducts for promotion order")
+      return
+    }
+    
+    // No promotion for VPN is purchased through website side
+    if Preferences.VPN.skusCredential.value != nil {
+      await hideSubscriptionType(yearlyProduct)
+      await hideSubscriptionType(monthlyProduct)
+      
       return
     }
     
