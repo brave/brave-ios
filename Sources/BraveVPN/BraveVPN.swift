@@ -295,7 +295,7 @@ public class BraveVPN {
     helper.mainCredential?.hostnameDisplayValue
   }
 
-  /// Type of vpnsubscription
+  /// Type of the vpn subscription
   public enum SubscriptionType: Equatable {
     case monthly, yearly, other
   }
