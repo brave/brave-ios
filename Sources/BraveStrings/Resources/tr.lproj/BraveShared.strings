@@ -2900,10 +2900,10 @@
 "shortcuts.shortcutSettingsOpenPlaylistTitle" = "Oynatma Listesi Aç";
 
 /* Description of Open Tabs from Other Devices Shortcut in Settings Screen */
-"shortcuts.shortcutSettingsOpenSyncedTabsDescription" = "Sesli Yardımcı Siri aracılığıyla Sekmeleri Diğer Cihazlardan açmak için Kısayolları kullanın";
+"shortcuts.shortcutSettingsOpenSyncedTabsDescription" = "Sesli Yardımcı Siri aracılığıyla Diğer Cihazlardaki Sekmeleri açmak için Kısayolları kullanın";
 
 /* No comment provided by engineer. */
-"shortcuts.shortcutSettingsOpenSyncedTabsTitle" = "Sekmeleri Diğer Cihazlardan Aç";
+"shortcuts.shortcutSettingsOpenSyncedTabsTitle" = "Diğer Cihazlardaki Sekmeleri Aç";
 
 /* No comment provided by engineer. */
 "shortcuts.shortcutSettingsTitle" = "Siri Kestirmeleri";
@@ -3566,7 +3566,7 @@
 "vpn.checkboxGeoLocation" = "Coğrafi/ülke konumunuzu seçin";
 
 /* Text for a checkbox to present the user benefits for using Brave VPN */
-"vpn.checkboxNoIPLog" = "Brave, etkinliklerinizi asla günlüğe kaydetmez";
+"vpn.checkboxNoIPLog" = "Brave, sizin aktivitenizi asla kaydetmez";
 
 /* Text for a checkbox to present the user benefits for using Brave VPN */
 "vpn.checkboxProtectYourDevices" = "Her uygulamayı ve tüm cihazınızı koruyun";
