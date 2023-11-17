@@ -31,16 +31,16 @@ class TabBarCell: UICollectionViewCell {
     $0.layer.shadowRadius = 2
   }
   
-  private let separatorLine = UIView()
-
-  let separatorLineRight = UIView().then {
+  private let separatorLine = UIView().then {
     $0.isHidden = true
   }
 
   var currentIndex: Int = -1 {
     didSet {
       isSelected = currentIndex == tabManager?.currentDisplayedIndex
-      separatorLine.isHidden = currentIndex == 0
+      separatorLine.isHidden = isSelected || 
+        currentIndex == 0 ||
+        currentIndex == (tabManager?.currentDisplayedIndex ?? 0) + 1
     }
   }
   weak var tab: Tab?
@@ -63,7 +63,7 @@ class TabBarCell: UICollectionViewCell {
   override init(frame: CGRect) {
     super.init(frame: frame)
     
-    [highlightView, closeButton, titleLabel, separatorLine, separatorLineRight].forEach { contentView.addSubview($0) }
+    [highlightView, closeButton, titleLabel, separatorLine].forEach { contentView.addSubview($0) }
     initConstraints()
     updateFont()
     
@@ -74,10 +74,7 @@ class TabBarCell: UICollectionViewCell {
   private func updateColors() {
     let browserColors: any BrowserColors = tabManager?.privateBrowsingManager.browserColors ?? .standard
     backgroundColor = browserColors.tabBarTabBackground
-    
-    separatorLine.backgroundColor = .red // browserColors.dividerSubtle
-    separatorLineRight.backgroundColor = .red // browserColors.dividerSubtle
-    
+    separatorLine.backgroundColor = browserColors.dividerSubtle
     highlightView.backgroundColor = isSelected ? browserColors.tabBarTabActiveBackground : .clear
     highlightView.layer.shadowOpacity = isSelected ? 0.05 : 0.0
     highlightView.layer.shadowColor = UIColor.black.cgColor
@@ -109,15 +106,7 @@ class TabBarCell: UICollectionViewCell {
     separatorLine.snp.makeConstraints { make in
       make.left.equalToSuperview()
       make.width.equalTo(1)
-      make.height.equalTo((frame.height * 0.65))
-      make.centerY.equalToSuperview()
-    }
-
-    separatorLineRight.snp.makeConstraints { make in
-      make.right.equalToSuperview()
-      make.width.equalTo(1)
-      make.height.equalTo((frame.height * 0.65))
-      make.centerY.equalToSuperview()
+      make.top.bottom.equalToSuperview().inset(5)
     }
   }
 
@@ -174,19 +163,5 @@ class TabBarCell: UICollectionViewCell {
     super.layoutSubviews()
     
     highlightView.layer.shadowPath = UIBezierPath(roundedRect: highlightView.bounds, cornerRadius: 4).cgPath
-    
-    separatorLine.snp.remakeConstraints { make in
-      make.left.equalToSuperview()
-      make.width.equalTo(1)
-      make.height.equalTo((frame.height * 0.65))
-      make.centerY.equalToSuperview()
-    }
-
-    separatorLineRight.snp.remakeConstraints { make in
-      make.right.equalToSuperview()
-      make.width.equalTo(1)
-      make.height.equalTo((frame.height * 0.65))
-      make.centerY.equalToSuperview()
-    }
   }
 }
