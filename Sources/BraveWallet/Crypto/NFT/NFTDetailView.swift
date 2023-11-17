@@ -103,6 +103,10 @@ struct NFTDetailView: View {
             Text(nftDetailStore.nft.name)
               .foregroundColor(Color(.secondaryBraveLabel))
           }
+          .transaction { transaction in
+            transaction.animation = nil
+            transaction.disablesAnimations = true
+          }
         }
         .listRowInsets(.zero)
         .listRowBackground(Color.clear)
