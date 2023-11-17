@@ -18,6 +18,7 @@ struct NFTDetailView: View {
   
   @Environment(\.openURL) private var openWalletURL
   @Environment(\.presentationMode) @Binding private var presentationMode
+  @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   
   @State private var isPresentingRemoveAlert: Bool = false
   
@@ -164,8 +165,7 @@ struct NFTDetailView: View {
             .foregroundColor(Color(.braveLabel))
             .listRowBackground(Color(.secondaryBraveGroupedBackground))
             .osAvailabilityModifiers({
-              if #unavailable(iOS 16) {
-                // iOS 15 missing default row insect in section
+              if horizontalSizeClass == .regular {
                 $0.listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
               } else {
                 $0
