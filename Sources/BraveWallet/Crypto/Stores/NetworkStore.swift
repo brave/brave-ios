@@ -267,6 +267,7 @@ public class NetworkStore: ObservableObject, WalletObserverStore {
         if let oldNetwork = allChains.filter({ $0.coin == .eth }).first(where: { $0.id.lowercased() == network.id.lowercased() }) {
           let (_, addOldStatus, _) = await rpcService.addChain(oldNetwork)
           guard addOldStatus == .success else {
+            isAddingNewNetwork = false
             return (false, errMsg)
           }
           customNetworkNativeAssetMigration(network)
@@ -285,6 +286,7 @@ public class NetworkStore: ObservableObject, WalletObserverStore {
     } else {
       let (_, addStatus, errMsg) = await rpcService.addChain(network)
       guard addStatus == .success else {
+        isAddingNewNetwork = false
         return (false, errMsg)
       }
       customNetworkNativeAssetMigration(network)
