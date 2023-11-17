@@ -8,10 +8,10 @@
 - Added “Group by” filter to Portfolio tab in Brave Wallet. ([#7765](https://github.com/brave/brave-ios/issues/7765))
 - Added NFT filters and display settings in the NFT tab for Brave Wallet. ([#7699](https://github.com/brave/brave-ios/issues/7699))
 - Added new UI for the Brave Wallet onboarding flow. ([#7619](https://github.com/brave/brave-ios/issues/7619))
-- Added handling of empty state(s) for Brave Wallet Portfolio filters. ([#7618](https://github.com/brave/brave-ios/issues/7618))
+- Added handling of empty state for Brave Wallet Portfolio filters. ([#7618](https://github.com/brave/brave-ios/issues/7618))
 - Added filters and display settings for Portfolio tab in Brave Wallet. ([#7585](https://github.com/brave/brave-ios/issues/7585))
 - Enabled Sardine On-ramp purchase option for all wallet users. ([#7608](https://github.com/brave/brave-ios/issues/7608))
-- Fixed crash when switching to Polygon Network in Brave Wallet “Swap” view. ([#7907](https://github.com/brave/brave-ios/issues/7907))
+- Fixed crash when switching to Polygon network in Brave Wallet “Swap” view. ([#7907](https://github.com/brave/brave-ios/issues/7907))
 - Fixed “Select Account” panel to always show checkmark for the selected account. ([#7823](https://github.com/brave/brave-ios/issues/7823))
 
 ### General
@@ -36,7 +36,7 @@
 - Updated that VPN Support Contact Form to append the issue category to the email subject field as well as body. ([#7828](https://github.com/brave/brave-ios/issues/7828))
 - Fixed issue with “Block Cookie Consent Notices” toggle switch being enabled when upgrading browser version. ([#7920](https://github.com/brave/brave-ios/issues/7920))
 - Fixed issue with Google OAuth window not auto-closing after successfully authenticating. ([#6966](https://github.com/brave/brave-ios/issues/6966))
-- Fixed URLs for i.redd.it posts on subreddits from forming incorrectly when using [old.reddit.com](http://old.reddit.com/) website redirect. ([#7873](https://github.com/brave/brave-ios/issues/7873))
+- Fixed URLs for "i.redd.it" posts on subreddits from forming incorrectly when using [old.reddit.com](http://old.reddit.com/) website redirect. ([#7873](https://github.com/brave/brave-ios/issues/7873))
 - Fixed issue allowing users to bypass the Browser Lock window using the “Cancel” button. ([#7893](https://github.com/brave/brave-ios/issues/7893))
 - Fixed “Brave can now be set as your default browser…” prompt to not be shown 14 days after installation. ([#7977](https://github.com/brave/brave-ios/issues/7977))
 - Fixed crash when migrating with very many tabs open. ([#7857](https://github.com/brave/brave-ios/issues/7857))
@@ -45,7 +45,7 @@
 - Fixed restored but unopened tabs from being added to “Recently Closed Tabs” page. ([#7832](https://github.com/brave/brave-ios/issues/7832))
 - Fixed tabs to close properly with window.close(). ([#7796](https://github.com/brave/brave-ios/issues/7796))
 - Fixed crash in tab view when tapping “Private” flag while actively dragging a tab. ([#7737](https://github.com/brave/brave-ios/issues/7737))
-- Fixed Recent Searches to update UI when using “clear” button. ([#4923](https://github.com/brave/brave-ios/issues/4923))
+- Fixed "Recent Searches" to update UI when using “clear” button. ([#4923](https://github.com/brave/brave-ios/issues/4923))
 
 ## [1.56](https://github.com/brave/brave-ios/releases/tag/v1.56)
 
