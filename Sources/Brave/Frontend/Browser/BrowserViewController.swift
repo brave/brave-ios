@@ -1781,7 +1781,8 @@ public class BrowserViewController: UIViewController {
         break
       }
 
-      if tab.secureContentState == .secure && !webView.hasOnlySecureContent {
+      if tab.secureContentState == .secure, !webView.hasOnlySecureContent,
+         tab.url?.origin == tab.webView?.url?.origin {
         if let url = tab.webView?.url, url.isReaderModeURL {
           break
         }
