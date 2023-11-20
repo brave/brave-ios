@@ -340,15 +340,15 @@ public class BrowserViewController: UIViewController {
     }
 
     rewards.ads.captchaHandler = self
-    let shouldStartAds = rewards.ads.isEnabled || Preferences.BraveNews.isEnabled.value
-    if shouldStartAds {
-      // Only start rewards service automatically if ads is enabled
-      if rewards.isEnabled {
-        rewards.startRewardsService(nil)
-      } else {
-        rewards.ads.initialize() { _ in }
-      }
-    }
+//    let shouldStartAds = rewards.ads.isEnabled || Preferences.BraveNews.isEnabled.value
+//    if shouldStartAds {
+//      // Only start rewards service automatically if ads is enabled
+//      if rewards.isEnabled {
+//        rewards.startRewardsService(nil)
+//      } else {
+//        rewards.ads.initialize() { _ in }
+//      }
+//    }
 
     self.feedDataSource.getAdsAPI = {
       // The ads object gets re-recreated when shutdown, so we need to make sure News fetches it out of
@@ -2619,17 +2619,17 @@ extension BrowserViewController: TabDelegate {
       FocusScriptHandler(tab: tab),
       BraveGetUA(tab: tab),
       BraveSearchScriptHandler(tab: tab, profile: profile, rewards: rewards),
-      ResourceDownloadScriptHandler(tab: tab),
+//      ResourceDownloadScriptHandler(tab: tab),
       DownloadContentScriptHandler(browserController: self, tab: tab),
       WindowRenderScriptHandler(tab: tab),
       PlaylistScriptHandler(tab: tab),
       PlaylistFolderSharingScriptHandler(tab: tab),
-      RewardsReportingScriptHandler(rewards: rewards, tab: tab),
-      AdsMediaReportingScriptHandler(rewards: rewards, tab: tab),
+//      RewardsReportingScriptHandler(rewards: rewards, tab: tab),
+//      AdsMediaReportingScriptHandler(rewards: rewards, tab: tab),
       ReadyStateScriptHandler(tab: tab),
-      DeAmpScriptHandler(tab: tab),
+//      DeAmpScriptHandler(tab: tab),
       SiteStateListenerScriptHandler(tab: tab),
-      CosmeticFiltersScriptHandler(tab: tab),
+//      CosmeticFiltersScriptHandler(tab: tab),
       URLPartinessScriptHandler(tab: tab),
       FaviconScriptHandler(tab: tab),
       Web3NameServiceScriptHandler(tab: tab),

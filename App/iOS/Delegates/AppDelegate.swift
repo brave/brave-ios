@@ -246,13 +246,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       await self.cleanUpLargeTemporaryDirectory()
     }
     
-    Task(priority: .high) {
-      // Start preparing the ad-block services right away
-      // So it's ready a lot faster
-      await LaunchHelper.shared.prepareAdBlockServices(
-        adBlockService: AppState.shared.braveCore.adblockService
-      )
-    }
+//    Task(priority: .high) {
+//      // Start preparing the ad-block services right away
+//      // So it's ready a lot faster
+//      await LaunchHelper.shared.prepareAdBlockServices(
+//        adBlockService: AppState.shared.braveCore.adblockService
+//      )
+//    }
     
     // Setup Playlist
     // This restores the playlist incomplete downloads. So if a download was started

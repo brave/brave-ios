@@ -20,7 +20,7 @@ class UserScriptManager {
   
   private let alwaysEnabledScripts: [ScriptType] = [
     .faviconFetcher,
-    .rewardsReporting,
+//    .rewardsReporting,
     .playlist,
     .resourceDownloader,
     .windowRenderHelper,
@@ -91,13 +91,13 @@ class UserScriptManager {
   enum ScriptType: String, CaseIterable {
     case faviconFetcher
     case cookieBlocking
-    case rewardsReporting
+//    case rewardsReporting
     case mediaBackgroundPlay
     case playlistMediaSource
     case playlist
     case nightMode
-    case deAmp
-    case requestBlocking
+//    case deAmp
+//    case requestBlocking
     case trackerProtectionStats
     case resourceDownloader
     case windowRenderHelper
@@ -113,15 +113,15 @@ class UserScriptManager {
       case .mediaBackgroundPlay: return loadScript(named: "MediaBackgroundingScript")
       case .playlistMediaSource: return loadScript(named: "PlaylistSwizzlerScript")
       case .nightMode: return NightModeScriptHandler.userScript
-      case .deAmp: return DeAmpScriptHandler.userScript
-      case .requestBlocking: return RequestBlockingContentScriptHandler.userScript
+//      case .deAmp: return DeAmpScriptHandler.userScript
+//      case .requestBlocking: return RequestBlockingContentScriptHandler.userScript
       case .trackerProtectionStats: return ContentBlockerHelper.userScript
       case .ethereumProvider: return EthereumProviderScriptHandler.userScript
       case .solanaProvider: return SolanaProviderScriptHandler.userScript
         
       // Always enabled scripts
       case .faviconFetcher: return FaviconScriptHandler.userScript
-      case .rewardsReporting: return RewardsReportingScriptHandler.userScript
+//      case .rewardsReporting: return RewardsReportingScriptHandler.userScript
       case .playlist: return PlaylistScriptHandler.userScript
       case .resourceDownloader: return ResourceDownloadScriptHandler.userScript
       case .windowRenderHelper: return WindowRenderScriptHandler.userScript
@@ -245,12 +245,12 @@ class UserScriptManager {
         scriptController.addUserScript(script)
       }
       
-      // Inject specifically RequestBlocking BEFORE other scripts
-      // this is because it needs to hook requests before RewardsReporting
-      if scripts.contains(.requestBlocking), let script = self.dynamicScripts[.requestBlocking] {
-        scripts.remove(.requestBlocking)
-        scriptController.addUserScript(script)
-      }
+//      // Inject specifically RequestBlocking BEFORE other scripts
+//      // this is because it needs to hook requests before RewardsReporting
+//      if scripts.contains(.requestBlocking), let script = self.dynamicScripts[.requestBlocking] {
+//        scripts.remove(.requestBlocking)
+//        scriptController.addUserScript(script)
+//      }
       
       // Inject all static scripts
       self.staticScripts.forEach {

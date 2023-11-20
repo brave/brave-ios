@@ -246,11 +246,11 @@ extension BrowserViewController: WKNavigationDelegate {
       return (.cancel, preferences)
     }
     
-    // before loading any ad-block scripts
-    // await the preparation of the ad-block services
-    await LaunchHelper.shared.prepareAdBlockServices(
-      adBlockService: self.braveCore.adblockService
-    )
+//    // before loading any ad-block scripts
+//    // await the preparation of the ad-block services
+//    await LaunchHelper.shared.prepareAdBlockServices(
+//      adBlockService: self.braveCore.adblockService
+//    )
     
     if let mainDocumentURL = navigationAction.request.mainDocumentURL {
       if mainDocumentURL != tab?.currentPageData?.mainFrameURL {
@@ -278,14 +278,14 @@ extension BrowserViewController: WKNavigationDelegate {
       // Set some additional user scripts
       if navigationAction.targetFrame?.isMainFrame == true {
         tab?.setScripts(scripts: [
-          // Add de-amp script
-          // The user script manager will take care to not reload scripts if this value doesn't change
-          .deAmp: Preferences.Shields.autoRedirectAMPPages.value,
-          
-          // Add request blocking script
-          // This script will block certian `xhr` and `window.fetch()` requests
-          .requestBlocking: requestURL.isWebPage(includeDataURIs: false) &&
-                            domainForMainFrame.isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true),
+//          // Add de-amp script
+//          // The user script manager will take care to not reload scripts if this value doesn't change
+//          .deAmp: Preferences.Shields.autoRedirectAMPPages.value,
+//          
+//          // Add request blocking script
+//          // This script will block certian `xhr` and `window.fetch()` requests
+//          .requestBlocking: requestURL.isWebPage(includeDataURIs: false) &&
+//                            domainForMainFrame.isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true),
           
           // The tracker protection script
           // This script will track what is blocked and increase stats
@@ -367,9 +367,9 @@ extension BrowserViewController: WKNavigationDelegate {
         // Identify specific block lists that need to be applied to the requesting domain
         let domainForShields = Domain.getOrCreate(forUrl: mainDocumentURL, persistent: !isPrivateBrowsing)
         
-        // Load rule lists
-        let ruleLists = await ContentBlockerManager.shared.ruleLists(for: domainForShields)
-        tab?.contentBlocker.set(ruleLists: ruleLists)
+//        // Load rule lists
+//        let ruleLists = await ContentBlockerManager.shared.ruleLists(for: domainForShields)
+//        tab?.contentBlocker.set(ruleLists: ruleLists)
       }
       
       let documentTargetURL: URL? = navigationAction.request.mainDocumentURL ??

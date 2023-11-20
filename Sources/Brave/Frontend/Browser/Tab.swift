@@ -398,7 +398,7 @@ class Tab: NSObject {
         .cookieBlocking: Preferences.Privacy.blockAllCookies.value,
         .mediaBackgroundPlay: Preferences.General.mediaAutoBackgrounding.value,
         .nightMode: Preferences.General.nightModeEnabled.value,
-        .deAmp: Preferences.Shields.autoRedirectAMPPages.value,
+//        .deAmp: Preferences.Shields.autoRedirectAMPPages.value,
         .playlistMediaSource: Preferences.Playlist.webMediaSourceCompatibility.value,
       ]
       
@@ -1128,8 +1128,8 @@ extension Tab {
   }
   
   private func updateInjectedScripts() {
-    UserScriptManager.shared.loadCustomScripts(into: self,
-                                               userScripts: userScripts,
-                                               customScripts: customUserScripts)
+//    UserScriptManager.shared.loadCustomScripts(into: self,
+//                                               userScripts: userScripts,
+//                                               customScripts: customUserScripts)
   }
 }
