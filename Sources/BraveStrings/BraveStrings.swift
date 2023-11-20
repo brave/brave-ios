@@ -2821,7 +2821,7 @@ extension Strings {
         comment: "Button to manage your VPN subscription")
     
     public static let settingsRedeemOfferCode =
-      NSLocalizedString("vpn.settingsManageSubscription", tableName: "BraveShared", bundle: .module,
+      NSLocalizedString("vpn.settingsRedeemOfferCode", tableName: "BraveShared", bundle: .module,
         value: "Redeem Offer Code",
         comment: "Button to redeem offer code subscription")
     
