@@ -1605,7 +1605,6 @@ public class BrowserViewController: UIViewController {
   ///   - url: The url submitted
   ///   - isUserDefinedURLNavigation: Boolean for  determining if url navigation is done from user defined spot
   ///     user defined spot like Favourites or Bookmarks
-  var isUserDefinedURLNavigation = false
   func finishEditingAndSubmit(_ url: URL, isUserDefinedURLNavigation: Bool = false) {
     if url.isBookmarklet {
       topToolbar.leaveOverlayMode()
