@@ -268,10 +268,6 @@ public class BrowserViewController: UIViewController {
   /// In app purchase obsever for VPN Subscription action
   let iapObserver: IAPObserver
 
-  /// Used to determine if url navigation is done from user defined spot
-  /// Favourites - Bookmarks
-  var isUserDefinedURLNavigation = false
-  
   public init(
     windowId: UUID,
     profile: Profile,
@@ -1607,12 +1603,14 @@ public class BrowserViewController: UIViewController {
   /// using isUserDefinedURLNavigation
   /// - Parameters:
   ///   - url: The url submitted
-  func finishEditingAndSubmit(_ url: URL) {
+  ///   - isUserDefinedURLNavigation: Boolean for  determining if url navigation is done from user defined spot
+  ///     user defined spot like Favourites or Bookmarks
+  var isUserDefinedURLNavigation = false
+  func finishEditingAndSubmit(_ url: URL, isUserDefinedURLNavigation: Bool = false) {
     if url.isBookmarklet {
       topToolbar.leaveOverlayMode()
 
       guard let tab = tabManager.selectedTab else {
-        isUserDefinedURLNavigation = false
         return
       }
 
@@ -1636,7 +1634,6 @@ public class BrowserViewController: UIViewController {
       topToolbar.leaveOverlayMode()
 
       guard let tab = tabManager.selectedTab else {
-        isUserDefinedURLNavigation = false
         return
       }
 
@@ -1644,8 +1641,6 @@ public class BrowserViewController: UIViewController {
 
       updateWebViewPageZoom(tab: tab)
     }
-    
-    isUserDefinedURLNavigation = false
   }
   
   func showIPFSInterstitialPage(originalURL: URL) {
@@ -2981,15 +2976,15 @@ extension BrowserViewController: ToolbarUrlActionsDelegate {
   func openInNewTab(_ url: URL, isPrivate: Bool) {
     topToolbar.leaveOverlayMode()
       
-    select(url, action: .openInNewTab(isPrivate: isPrivate))
+    select(url, action: .openInNewTab(isPrivate: isPrivate), isUserDefinedURLNavigation: false)
   }
 
   func copy(_ url: URL) {
-    select(url, action: .copy)
+    select(url, action: .copy, isUserDefinedURLNavigation: false)
   }
 
   func share(_ url: URL) {
-    select(url, action: .share)
+    select(url, action: .share, isUserDefinedURLNavigation: false)
   }
 
   func batchOpen(_ urls: [URL]) {
@@ -3006,14 +3001,14 @@ extension BrowserViewController: ToolbarUrlActionsDelegate {
   }
 #endif
   
-  func select(url: URL) {
-    select(url, action: .openInCurrentTab)
+  func select(url: URL, isUserDefinedURLNavigation: Bool) {
+    select(url, action: .openInCurrentTab, isUserDefinedURLNavigation: isUserDefinedURLNavigation)
   }
 
-  private func select(_ url: URL, action: ToolbarURLAction) {
+  private func select(_ url: URL, action: ToolbarURLAction, isUserDefinedURLNavigation: Bool) {
     switch action {
     case .openInCurrentTab:
-      finishEditingAndSubmit(url)
+      finishEditingAndSubmit(url, isUserDefinedURLNavigation: isUserDefinedURLNavigation)
       updateURLBarWalletButton()
     case .openInNewTab(let isPrivate):
       let tab = tabManager.addTab(PrivilegedRequest(url: url) as URLRequest, afterTab: tabManager.selectedTab, isPrivate: isPrivate)
@@ -3117,10 +3112,8 @@ extension BrowserViewController: NewTabPageDelegate {
     }
     
     // Used to determine url navigation coming from a bookmark
-    // And handle it differently under finishEditingAndSubmit for bookmarklets
-    isUserDefinedURLNavigation = isFavourite
-    
-    processAddressBar(text: input)
+    // And handle it differently under finishEditingAndSubmit for bookmarklets    
+    processAddressBar(text: input, isUserDefinedURLNavigation: isFavourite)
   }
 
   func focusURLBar() {

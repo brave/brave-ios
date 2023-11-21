@@ -481,12 +481,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
               ActivityShortcutManager.shared.donateCustomIntent(for: .openBookmarks, with: url.absoluteString)
             }
 
-            // Used to determine url navigation coming from a bookmark
-            // And handle it differently under finishEditingAndSubmit for bookmarklets
-            let bvc = self.currentScene?.browserViewController
-            bvc?.isUserDefinedURLNavigation = true
-            
-            self.toolbarUrlActionsDelegate?.select(url: url)
+            self.toolbarUrlActionsDelegate?.select(url: url, isUserDefinedURLNavigation: true)
           }
 
           if presentingViewController is MenuViewController {
