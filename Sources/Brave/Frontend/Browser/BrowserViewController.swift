@@ -1589,7 +1589,15 @@ public class BrowserViewController: UIViewController {
     UIApplication.shared.shortcutItems = Preferences.Privacy.privateBrowsingOnly.value ? [privateTabItem, scanQRCodeItem] : [newTabItem, privateTabItem, scanQRCodeItem]
   }
 
-  func finishEditingAndSubmit(_ url: URL) {
+  /// The method that executes the url and make changes in UI to reset the toolbars
+  /// for urls coming from various sources
+  /// If url is bookmarklet check if it is coming from user defined source to decide whether to execute
+  /// using isUserDefinedURLNavigation
+  /// - Parameters:
+  ///   - url: The url submitted
+  ///   - isUserDefinedURLNavigation: Boolean for  determining if url navigation is done from user defined spot
+  ///     user defined spot like Favourites or Bookmarks
+  func finishEditingAndSubmit(_ url: URL, isUserDefinedURLNavigation: Bool = false) {
     if url.isBookmarklet {
       topToolbar.leaveOverlayMode()
 
@@ -1601,7 +1609,7 @@ public class BrowserViewController: UIViewController {
       // Disable any sort of privileged execution contexts
       // IE: The user must explicitly tap a bookmark they have saved.
       // Block all other contexts such as redirects, downloads, embed, linked, etc..
-      if let webView = tab.webView, let code = url.bookmarkletCodeComponent {
+      if isUserDefinedURLNavigation, let webView = tab.webView, let code = url.bookmarkletCodeComponent {
         webView.evaluateSafeJavaScript(
           functionName: code,
           contentWorld: .bookmarkletSandbox,
@@ -2952,15 +2960,15 @@ extension BrowserViewController: ToolbarUrlActionsDelegate {
   func openInNewTab(_ url: URL, isPrivate: Bool) {
     topToolbar.leaveOverlayMode()
       
-    select(url, action: .openInNewTab(isPrivate: isPrivate))
+    select(url, action: .openInNewTab(isPrivate: isPrivate), isUserDefinedURLNavigation: false)
   }
 
   func copy(_ url: URL) {
-    select(url, action: .copy)
+    select(url, action: .copy, isUserDefinedURLNavigation: false)
   }
 
   func share(_ url: URL) {
-    select(url, action: .share)
+    select(url, action: .share, isUserDefinedURLNavigation: false)
   }
 
   func batchOpen(_ urls: [URL]) {
@@ -2977,14 +2985,14 @@ extension BrowserViewController: ToolbarUrlActionsDelegate {
   }
 #endif
   
-  func select(url: URL) {
-    select(url, action: .openInCurrentTab)
+  func select(url: URL, isUserDefinedURLNavigation: Bool) {
+    select(url, action: .openInCurrentTab, isUserDefinedURLNavigation: isUserDefinedURLNavigation)
   }
 
-  private func select(_ url: URL, action: ToolbarURLAction) {
+  private func select(_ url: URL, action: ToolbarURLAction, isUserDefinedURLNavigation: Bool) {
     switch action {
     case .openInCurrentTab:
-      finishEditingAndSubmit(url)
+      finishEditingAndSubmit(url, isUserDefinedURLNavigation: isUserDefinedURLNavigation)
       updateURLBarWalletButton()
     case .openInNewTab(let isPrivate):
       let tab = tabManager.addTab(PrivilegedRequest(url: url) as URLRequest, afterTab: tabManager.selectedTab, isPrivate: isPrivate)
@@ -3033,11 +3041,7 @@ extension BrowserViewController: ToolbarUrlActionsDelegate {
 
 extension BrowserViewController: NewTabPageDelegate {
   func navigateToInput(_ input: String, inNewTab: Bool, switchingToPrivateMode: Bool) {
-    let isPrivate = privateBrowsingManager.isPrivateBrowsing || switchingToPrivateMode
-    if inNewTab {
-      tabManager.addTabAndSelect(isPrivate: isPrivate)
-    }
-    processAddressBar(text: input)
+    handleURLInput(input, inNewTab: inNewTab, switchingToPrivateMode: switchingToPrivateMode, isFavourite: false)
   }
 
   func handleFavoriteAction(favorite: Favorite, action: BookmarksAction) {
@@ -3047,18 +3051,20 @@ extension BrowserViewController: NewTabPageDelegate {
       if switchingToPrivateMode, Preferences.Privacy.privateBrowsingLock.value {
         self.askForLocalAuthentication { [weak self] success, error in
           if success {
-            self?.navigateToInput(
+            self?.handleURLInput(
               url,
               inNewTab: inNewTab,
-              switchingToPrivateMode: switchingToPrivateMode
+              switchingToPrivateMode: switchingToPrivateMode,
+              isFavourite: true
             )
           }
         }
       } else {
-        navigateToInput(
+        handleURLInput(
           url,
           inNewTab: inNewTab,
-          switchingToPrivateMode: switchingToPrivateMode
+          switchingToPrivateMode: switchingToPrivateMode,
+          isFavourite: true
         )
       }
     case .edited:
@@ -3080,6 +3086,18 @@ extension BrowserViewController: NewTabPageDelegate {
         }
       self.present(editPopup, animated: true)
     }
+  }
+  
+  /// Handling url input action and passing down if input is launched from favourites
+  private func handleURLInput(_ input: String, inNewTab: Bool, switchingToPrivateMode: Bool, isFavourite: Bool ) {
+    let isPrivate = privateBrowsingManager.isPrivateBrowsing || switchingToPrivateMode
+    if inNewTab {
+      tabManager.addTabAndSelect(isPrivate: isPrivate)
+    }
+    
+    // Used to determine url navigation coming from a bookmark
+    // And handle it differently under finishEditingAndSubmit for bookmarklets    
+    processAddressBar(text: input, isUserDefinedURLNavigation: isFavourite)
   }
 
   func focusURLBar() {

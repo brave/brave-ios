@@ -489,7 +489,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
               ActivityShortcutManager.shared.donateCustomIntent(for: .openBookmarks, with: url.absoluteString)
             }
 
-            self.toolbarUrlActionsDelegate?.select(url: url)
+            self.toolbarUrlActionsDelegate?.select(url: url, isUserDefinedURLNavigation: true)
           }
 
           if presentingViewController is MenuViewController {
