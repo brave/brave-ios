@@ -138,6 +138,7 @@ public class TransactionConfirmationStore: ObservableObject, WalletObserverStore
   private let ethTxManagerProxy: BraveWalletEthTxManagerProxy
   private let keyringService: BraveWalletKeyringService
   private let solTxManagerProxy: BraveWalletSolanaTxManagerProxy
+  private let ipfsApi: IpfsAPI
   private let assetManager: WalletUserAssetManagerType
   private var selectedChain: BraveWallet.NetworkInfo = .init()
   private var txServiceObserver: TxServiceObserver?
@@ -156,6 +157,7 @@ public class TransactionConfirmationStore: ObservableObject, WalletObserverStore
     ethTxManagerProxy: BraveWalletEthTxManagerProxy,
     keyringService: BraveWalletKeyringService,
     solTxManagerProxy: BraveWalletSolanaTxManagerProxy,
+    ipfsApi: IpfsAPI,
     userAssetManager: WalletUserAssetManagerType
   ) {
     self.assetRatioService = assetRatioService
@@ -166,6 +168,7 @@ public class TransactionConfirmationStore: ObservableObject, WalletObserverStore
     self.ethTxManagerProxy = ethTxManagerProxy
     self.keyringService = keyringService
     self.solTxManagerProxy = solTxManagerProxy
+    self.ipfsApi = ipfsApi
     self.assetManager = userAssetManager
 
     self.setupObservers()
@@ -339,14 +342,22 @@ public class TransactionConfirmationStore: ObservableObject, WalletObserverStore
   
   func activeTxDetailsStore() -> TransactionDetailsStore {
     let tx = allTxs.first { $0.id == activeTransactionId } ?? activeParsedTransaction.transaction
+    let parsedTransaction: ParsedTransaction?
+    if activeParsedTransaction.transaction.id == tx.id {
+      parsedTransaction = activeParsedTransaction
+    } else {
+      parsedTransaction = nil
+    }
     return TransactionDetailsStore(
       transaction: tx,
+      parsedTransaction: parsedTransaction,
       keyringService: keyringService,
       walletService: walletService,
       rpcService: rpcService,
       assetRatioService: assetRatioService,
       blockchainRegistry: blockchainRegistry,
       solanaTxManagerProxy: solTxManagerProxy,
+      ipfsApi: ipfsApi,
       userAssetManager: assetManager
     )
   }

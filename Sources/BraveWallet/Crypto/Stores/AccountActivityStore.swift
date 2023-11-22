@@ -314,12 +314,14 @@ class AccountActivityStore: ObservableObject, WalletObserverStore {
   func transactionDetailsStore(for transaction: BraveWallet.TransactionInfo) -> TransactionDetailsStore {
     TransactionDetailsStore(
       transaction: transaction,
+      parsedTransaction: nil,
       keyringService: keyringService,
       walletService: walletService,
       rpcService: rpcService,
       assetRatioService: assetRatioService,
       blockchainRegistry: blockchainRegistry,
       solanaTxManagerProxy: solTxManagerProxy,
+      ipfsApi: ipfsApi,
       userAssetManager: assetManager
     )
   }

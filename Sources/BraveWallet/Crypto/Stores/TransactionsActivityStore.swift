@@ -5,6 +5,7 @@
 
 import BraveCore
 import SwiftUI
+import Preferences
 
 class TransactionsActivityStore: ObservableObject, WalletObserverStore {
   /// Sections of transactions for display. Each section represents one date.
@@ -73,7 +74,7 @@ class TransactionsActivityStore: ObservableObject, WalletObserverStore {
     self.assetManager = userAssetManager
     
     self.setupObservers()
-
+    Preferences.Wallet.showTestNetworks.observe(from: self)
     Task { @MainActor in
       self.currencyCode = await walletService.defaultBaseCurrency()
     }
@@ -288,15 +289,38 @@ class TransactionsActivityStore: ObservableObject, WalletObserverStore {
   func transactionDetailsStore(
     for transaction: BraveWallet.TransactionInfo
   ) -> TransactionDetailsStore {
-    TransactionDetailsStore(
+    let parsedTransaction = transactionSections
+      .flatMap(\.transactions)
+      .first(where: { $0.transaction.id == transaction.id })
+    return TransactionDetailsStore(
       transaction: transaction,
+      parsedTransaction: parsedTransaction,
       keyringService: keyringService,
       walletService: walletService,
       rpcService: rpcService,
       assetRatioService: assetRatioService,
       blockchainRegistry: blockchainRegistry,
       solanaTxManagerProxy: solTxManagerProxy,
+      ipfsApi: ipfsApi,
       userAssetManager: assetManager
     )
+  }
+}
+
+extension TransactionsActivityStore: PreferencesObserver {
+  public func preferencesDidChange(for key: String) {
+    guard key == Preferences.Wallet.showTestNetworks.key else { return }
+    Task { @MainActor in
+      let allNetworks = await self.rpcService.allNetworksForSupportedCoins()
+      self.networkFilters = allNetworks.map { network in
+        // if user previously de-selected a network, keep it de-selected
+        let isSelected: Bool = self.networkFilters
+          .first(where: { selectedNetworkModel in
+            selectedNetworkModel.model.chainId == network.chainId
+            && selectedNetworkModel.model.coin == network.coin
+          })?.isSelected ?? true
+        return .init(isSelected: isSelected, model: network)
+      }
+    }
   }
 }

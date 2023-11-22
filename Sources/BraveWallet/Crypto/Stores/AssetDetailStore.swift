@@ -76,6 +76,7 @@ class AssetDetailStore: ObservableObject, WalletObserverStore {
   private let txService: BraveWalletTxService
   private let blockchainRegistry: BraveWalletBlockchainRegistry
   private let solTxManagerProxy: BraveWalletSolanaTxManagerProxy
+  private let ipfsApi: IpfsAPI
   private let swapService: BraveWalletSwapService
   private let assetManager: WalletUserAssetManagerType
   /// A list of tokens that are supported with the current selected network for all supported
@@ -119,6 +120,7 @@ class AssetDetailStore: ObservableObject, WalletObserverStore {
     txService: BraveWalletTxService,
     blockchainRegistry: BraveWalletBlockchainRegistry,
     solTxManagerProxy: BraveWalletSolanaTxManagerProxy,
+    ipfsApi: IpfsAPI,
     swapService: BraveWalletSwapService,
     userAssetManager: WalletUserAssetManagerType,
     assetDetailType: AssetDetailType
@@ -130,6 +132,7 @@ class AssetDetailStore: ObservableObject, WalletObserverStore {
     self.txService = txService
     self.blockchainRegistry = blockchainRegistry
     self.solTxManagerProxy = solTxManagerProxy
+    self.ipfsApi = ipfsApi
     self.swapService = swapService
     self.assetManager = userAssetManager
     self.assetDetailType = assetDetailType
@@ -386,12 +389,14 @@ class AssetDetailStore: ObservableObject, WalletObserverStore {
   func transactionDetailsStore(for transaction: BraveWallet.TransactionInfo) -> TransactionDetailsStore {
     TransactionDetailsStore(
       transaction: transaction,
+      parsedTransaction: nil,
       keyringService: keyringService,
       walletService: walletService,
       rpcService: rpcService,
       assetRatioService: assetRatioService,
       blockchainRegistry: blockchainRegistry,
       solanaTxManagerProxy: solTxManagerProxy,
+      ipfsApi: ipfsApi,
       userAssetManager: assetManager
     )
   }
@@ -452,7 +457,7 @@ extension AssetDetailStore: BraveWalletTxServiceObserver {
     update()
   }
   func onTxServiceReset() {
-  }  
+  }
 }
 
 extension AssetDetailStore: BraveWalletBraveWalletServiceObserver {
