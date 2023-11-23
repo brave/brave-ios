@@ -34,6 +34,11 @@ struct BackupWalletView: View {
       // user can press return in field to execute when continue button is disabled
       return
     }
+    
+    // password filed resign first responder in case ScrollView gets changed
+    // which could effect the next step. Details see #8445
+    resignFirstResponder()
+    
     keyringStore.recoveryPhrase(password: password) { words in
       if words.isEmpty {
         passwordError = .incorrectPassword
@@ -41,6 +46,10 @@ struct BackupWalletView: View {
         recoveryWords = words
       }
     }
+  }
+  
+  private func resignFirstResponder() {
+    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
   }
 
   var body: some View {
