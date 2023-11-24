@@ -37,7 +37,8 @@ platform :ios do
     run_tests(
       project: "App/Client.xcodeproj",
       scheme: "Debug",
-      devices: options[:test_all] ? ["iPhone 14 (16.4)", "iPhone 14 (17.0)"] : ["iPhone 14 (16.4)"],
+      # Note: At the moment Xcode 15.0.1 on GH Actions does not support older sim versions.
+      devices: options[:test_all] ? ["iPhone 14 (17.0.1)"] : ["iPhone 14 (17.0.1)"],
       code_coverage: true,
       ensure_devices_found: true,
       skip_testing: [
@@ -71,7 +72,8 @@ platform :ios do
     run_tests(
       project: "App/Client.xcodeproj",
       scheme: "Debug",
-      devices: options[:test_all] ? ["iPad (10th generation) (16.4)", "iPad (10th generation) (17.0)"] : ["iPad (10th generation) (16.4)"],
+      # Note: At the moment Xcode 15.0.1 on GH Actions does not support older sim versions.
+      devices: options[:test_all] ? ["iPad (10th generation) (17.0)"] : ["iPad (10th generation) (17.0)"],
       code_coverage: true,
       ensure_devices_found: true,
       skip_testing: [
