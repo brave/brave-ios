@@ -35,8 +35,11 @@ struct BackupWalletView: View {
       return
     }
     
-    // password filed resign first responder in case ScrollView gets changed
-    // which could effect the next step. Details see #8445
+    // Dismiss keyboard for password field before leaving this view #8445.
+    // Without dismissal, it's possible the scroll view in the detail view
+    // has incorrect frame (sitting above the area the keyboard used to be)
+    // which can show the scroll view contents out of the scroll bounds
+    // but will block tap interactions.
     resignFirstResponder()
     
     keyringStore.recoveryPhrase(password: password) { words in
