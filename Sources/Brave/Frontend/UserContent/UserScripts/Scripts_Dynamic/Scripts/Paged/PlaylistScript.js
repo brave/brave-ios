@@ -93,6 +93,18 @@ window.__firefox__.includeOnce("Playlist", function($) {
     })();
   });
   
+  function isVideoNode(node) {
+    return node.constructor.name === 'HTMLVideoElement' || node.tagName === 'VIDEO';
+  }
+  
+  function isAudioNode(node) {
+    return node.constructor.name === 'HTMLAudioElement' || node.tagName === 'AUDIO';
+  }
+  
+  function isSourceNode(node) {
+    return node.constructor.name === 'HTMLSourceElement' || node.tagName === "SOURCE";
+  }
+  
   function notifyNode(target, type, detected, ignoreSource) {
     if (target) {
       var name = target.title;
@@ -105,16 +117,16 @@ window.__firefox__.includeOnce("Playlist", function($) {
       }
     
       if (!type || type == "") {
-        if (target.constructor.name == 'HTMLVideoElement') {
+        if (isVideoNode(target)) {
           type = 'video';
         }
 
-        if (target.constructor.name == 'HTMLAudioElement') {
+        if (isAudioNode(target)) {
           type = 'audio';
         }
         
-        if (target.constructor.name == 'HTMLSourceElement') {
-          if (target.parentNode.constructor.name == "HTMLVideoElement") {
+        if (isSourceNode(target)) {
+          if (isVideoNode(target.parentNode)) {
             type = 'video'
           } else {
             type = 'audio'
@@ -128,7 +140,7 @@ window.__firefox__.includeOnce("Playlist", function($) {
       }
       else {
         for (node of target.children) {
-          if (node.constructor.name == "HTMLSourceElement") {
+          if (isSourceNode(node)) {
             if (node.src && node.src !== "") {
               tagNode(target);
               sendMessage(name, node, target, type, detected);
@@ -165,14 +177,14 @@ window.__firefox__.includeOnce("Playlist", function($) {
       
         function execute(page, offsetX, offsetY) {
           var targets = page.document.elementsFromPoint(localX - offsetX, localY - offsetY).filter((e) => {
-            return e.constructor.name == "HTMLVideoElement" || e.constructor.name == "HTMLAudioElement";
+            return isVideoNode(e) || isAudioNode(e);
           }).filter((e) => {
             return isElementVisible(e);
           });
           
           
           if (targets.length == 0) {
-            var targetAudio = document.querySelector('audio');
+            var targetAudio = page.document.querySelector('audio');
             if (targetAudio) {
               tagNode(targetAudio);
               notifyNode(targetAudio, 'audio', false, false);
@@ -209,11 +221,11 @@ window.__firefox__.includeOnce("Playlist", function($) {
   
   function setupDetector() {
     function getAllVideoElements() {
-      return document.querySelectorAll('video');
+      return [...document.querySelectorAll('video')].reverse();
     }
 
     function getAllAudioElements() {
-      return document.querySelectorAll('audio');
+      return [...document.querySelectorAll('audio')].reverse();
     }
     
     function requestWhenIdleShim(fn) {
@@ -250,8 +262,8 @@ window.__firefox__.includeOnce("Playlist", function($) {
         let observeNode = function(node) {
           function processNode(node) {
             // Observe video or audio elements
-            let isVideoElement = (node.constructor.name == "HTMLVideoElement");
-            let isAudioElement = (node.constructor.name == "HTMLAudioElement");
+            let isVideoElement = isVideoNode(node);
+            let isAudioElement = isAudioNode(node);
             if (isVideoElement || isAudioElement) {
               let type = isVideoElement ? 'video' : 'audio';
               node.observer = new MutationObserver(function (mutations) {
@@ -433,13 +445,13 @@ window.__firefox__.includeOnce("Playlist", function($) {
             return;
           }
         
-          for (element of document.querySelectorAll('video')) {
+          for (const element of getAllVideoElements()) {
             if (element.$<tagUUID> == tag) {
               return clamp_duration(element.currentTime);
             }
           }
           
-          for (element of document.querySelectorAll('audio')) {
+          for (const element of getAllAudioElements()) {
             if (element.$<tagUUID> == tag) {
               return clamp_duration(element.currentTime);
             }
@@ -459,11 +471,11 @@ window.__firefox__.includeOnce("Playlist", function($) {
               return;
             }
           
-            for (element of document.querySelectorAll('video')) {
+            for (element of getAllVideoElements()) {
               element.pause();
             }
             
-            for (element of document.querySelectorAll('audio')) {
+            for (element of getAllAudioElements()) {
               element.pause();
             }
             
