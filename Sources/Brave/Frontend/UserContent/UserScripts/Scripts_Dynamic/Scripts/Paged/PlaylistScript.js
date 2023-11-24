@@ -139,8 +139,17 @@ window.__firefox__.includeOnce("Playlist", function($) {
     }
   }
   
-  function notify(target, type, detected) {
-    notifyNode(target, type, detected, false);
+  function isElementVisible(e) {
+    if (!!(e.offsetWidth && e.offsetHeight && e.getClientRects().length)) {
+      return true;
+    }
+    
+    var style = page.getComputedStyle(e);
+    return style.width != 0 &&
+           style.height !== 0 &&
+           style.opacity > 0 &&
+           style.display !== 'none' &&
+           style.visibility !== 'hidden';
   }
   
   function setupLongPress() {
@@ -155,73 +164,26 @@ window.__firefox__.includeOnce("Playlist", function($) {
         }
       
         function execute(page, offsetX, offsetY) {
-          var target = page.document.elementFromPoint(localX - offsetX, localY - offsetY);
-          var targetVideo = target ? target.closest("video") : null;
-          var targetAudio = target ? target.closest("audio") : null;
-
-          // Video or Audio might have some sort of overlay..
-          // Like player controls for pause/play, etc..
-          // So we search for video/audio elements relative to touch position.
-          if (!targetVideo && !targetAudio) {
-            var touchX = localX + (page.scrollX + offsetX);
-            var touchY = localY + (page.scrollY + offsetY);
-        
-            var videoElements = page.document.querySelectorAll('video');
-            for (element of videoElements) {
-              var rect = element.getBoundingClientRect();
-              var x = rect.left + (page.scrollX + offsetX);
-              var y = rect.top + (page.scrollY + offsetY);
-              var w = rect.right - rect.left;
-              var h = rect.bottom - rect.top;
-              
-              if (touchX >= x && touchX <= (x + w) && touchY >= y && touchY <= (y + h)) {
-                targetVideo = element;
-                break;
-              }
+          var targets = page.document.elementsFromPoint(localX - offsetX, localY - offsetY).filter((e) => {
+            return e.constructor.name == "HTMLVideoElement" || e.constructor.name == "HTMLAudioElement";
+          }).filter((e) => {
+            return isElementVisible(e);
+          });
+          
+          
+          if (targets.length == 0) {
+            var targetAudio = document.querySelector('audio');
+            if (targetAudio) {
+              tagNode(targetAudio);
+              notifyNode(targetAudio, 'audio', false, false);
             }
-            
-            var audioElements = page.document.querySelectorAll('audio');
-            for (element of audioElements) {
-              var rect = element.getBoundingClientRect();
-              var x = rect.left + (page.scrollX + offsetX);
-              var y = rect.top + (page.scrollY + offsetY);
-              var w = rect.right - rect.left;
-              var h = rect.bottom - rect.top;
-              
-              if (touchX >= x && touchX <= (x + w) && touchY >= y && touchY <= (y + h)) {
-                targetAudio = element;
-                break;
-              }
-            }
-            
-            // No elements found nearby
-            // Select the first of each IF found because some websites can have video elements with zero size.
-            // In such cases, the gesture would not be on or inside the element, so this is a fallback.
-            if (!targetVideo && !targetAudio) {
-              if (videoElements.length > 0) {
-                targetVideo = videoElements[0];
-              }
-              
-              if (audioElements.length > 0) {
-                targetAudio = audioElements[0];
-              }
-            }
-            
-            // No elements found nearby so do nothing..
-            if (!targetVideo && !targetAudio) {
-              return;
-            }
+            return;
           }
           
-          // Elements found
+          var targetVideo = targets[0];
           if (targetVideo) {
             tagNode(targetVideo);
-            notify(targetVideo, 'video', false);
-          }
-
-          if (targetAudio) {
-            tagNode(targetAudio);
-            notify(targetAudio, 'audio', false);
+            notifyNode(targetVideo, 'video', false, false);
           }
         }
         
@@ -232,11 +194,13 @@ window.__firefox__.includeOnce("Playlist", function($) {
         // Any videos in a `iframe.contentWindow.document`
         // will have an offset of (0, 0) relative to its contentWindow.
         // However, it will have an offset of (X, Y) relative to the current window.
-        for (frame of document.querySelectorAll('iframe')) {
-          // Get the frame's bounds relative to the current window.
-          var bounds = frame.getBoundingClientRect();
-          execute(frame.contentWindow, bounds.left, bounds.top);
-        }
+        try {
+          for (frame of document.querySelectorAll('iframe')) {
+            // Get the frame's bounds relative to the current window.
+            var bounds = frame.getBoundingClientRect();
+            execute(frame.contentWindow, bounds.left, bounds.top);
+          }
+        } catch {}
       }
     });
   }
@@ -291,15 +255,15 @@ window.__firefox__.includeOnce("Playlist", function($) {
             if (isVideoElement || isAudioElement) {
               let type = isVideoElement ? 'video' : 'audio';
               node.observer = new MutationObserver(function (mutations) {
-                notify(node, type, true);
+                notifyNode(node, type, true, false);
               });
               
               node.observer.observe(node, { attributes: true, attributeFilter: ["src"] });
               node.addEventListener('loadedmetadata', function() {
-                notify(node, type, true);
+                notifyNode(node, type, true, false);
               });
               
-              notify(node, type, true);
+              notifyNode(node, type, true, false);
             }
           }
           
@@ -344,7 +308,7 @@ window.__firefox__.includeOnce("Playlist", function($) {
         HTMLVideoElement.prototype.setAttribute = $(function(key, value) {
           setVideoAttribute.call(this, key, value);
           if (key.toLowerCase() == 'src') {
-            notify(this, 'video', true);
+            notifyNode(this, 'video', true, false);
           }
         });
 
@@ -352,7 +316,7 @@ window.__firefox__.includeOnce("Playlist", function($) {
         HTMLAudioElement.prototype.setAttribute = $(function(key, value) {
           setAudioAttribute.call(this, key, value);
           if (key.toLowerCase() == 'src') {
-            notify(this, 'audio', true);
+            notifyNode(this, 'audio', true, false);
           }
         });
       }
@@ -362,7 +326,7 @@ window.__firefox__.includeOnce("Playlist", function($) {
           if (tag === 'audio' || tag === 'video') {
               var node = document_createElement.call(this, tag);
               observeNode(node);
-              notify(node, tag, true);
+              notifyNode(node, tag, true, false);
               return node;
           }
           return document_createElement.call(this, tag);
