@@ -9,6 +9,7 @@ import BraveCore
 import SwiftUI
 import Combine
 import BraveUI
+import Shared
 
 /// Displays a summary of the users wallet when they are visiting a webpage that wants to connect with the
 /// users wallet
@@ -53,6 +54,10 @@ public class WalletPanelHostingController: UIHostingController<WalletPanelContai
               completion: {
                 let walletHostingController = WalletHostingViewController(walletStore: walletStore, webImageDownloader: webImageDownloader, presentingContext: .buySendSwap(destination))
                 walletHostingController.delegate = self.delegate
+                
+                DeviceOrientation.shared.allowOnlyPortrait = UIDevice.current.userInterfaceIdiom != .pad
+                DeviceOrientation.shared.changeOrientationToPortraitOnPhone()
+
                 self.present(walletHostingController, animated: true)
               })
           })

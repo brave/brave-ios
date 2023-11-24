@@ -288,6 +288,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
   func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
     if let presentedViewController = window?.rootViewController?.presentedViewController {
+      if DeviceOrientation.shared.allowOnlyPortrait {
+        return [.portrait, .portraitUpsideDown]
+      }
       return presentedViewController.supportedInterfaceOrientations
     } else {
       return window?.rootViewController?.supportedInterfaceOrientations ?? .portraitUpsideDown

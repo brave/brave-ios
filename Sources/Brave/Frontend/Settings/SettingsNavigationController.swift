@@ -3,10 +3,28 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import UIKit
+import Shared
 
 class SettingsNavigationController: UINavigationController {
   var popoverDelegate: PresentingModalViewControllerDelegate?
 
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+
+    if #available(iOS 16.0, *) {
+      self.setNeedsUpdateOfSupportedInterfaceOrientations()
+    }
+  }
+
+  override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+
+    DeviceOrientation.shared.allowOnlyPortrait = false
+    if #available(iOS 16.0, *) {
+      self.setNeedsUpdateOfSupportedInterfaceOrientations()
+    }
+  }
+  
   @objc func done() {
     if let delegate = popoverDelegate {
       delegate.dismissPresentedModalViewController(self, animated: true)
@@ -23,15 +41,11 @@ class SettingsNavigationController: UINavigationController {
   }
 
   override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-    return .portrait
+    return [.portrait, .portraitUpsideDown]
   }
 
   override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
     return .portrait
-  }
-
-  override var shouldAutorotate: Bool {
-    return false
   }
 }
 
