@@ -153,8 +153,6 @@ public class NFTStore: ObservableObject, WalletObserverStore {
   private var metadataCache: [String: NFTMetadata] = [:]
   /// Spam from SimpleHash in form of `NetworkAssets`
   private var simpleHashSpamNFTs: [NetworkAssets] = []
-  /// All User NFTs that includes visible, hidden, spam
-  private var allUserNFTs: [BraveWallet.BlockchainToken] = []
   
   var isObserving: Bool {
     rpcServiceObserver != nil && keyringServiceObserver != nil && walletServiveObserber != nil
@@ -271,12 +269,13 @@ public class NFTStore: ObservableObject, WalletObserverStore {
         simpleHashSpamNFTs: simpleHashSpamNFTs
       )
       
-      (userNFTGroups, allUserNFTs) = buildNFTGroupModels(
+      let (userNFTGroups, allUserNFTs) = buildNFTGroupModels(
         groupBy: filters.groupBy,
         spams: unionedSpamNFTs,
         selectedAccounts: selectedAccounts,
         selectedNetworks: selectedNetworks
       )
+      self.userNFTGroups = userNFTGroups
       
       // if we're not hiding unowned or grouping by account, balance isn't needed
       if filters.isHidingUnownedNFTs || filters.groupBy == .accounts {
@@ -318,12 +317,13 @@ public class NFTStore: ObservableObject, WalletObserverStore {
       }
       
       guard !Task.isCancelled else { return }
-      (userNFTGroups, allUserNFTs) = buildNFTGroupModels(
+      let (userNFTGroupsWithBalance, _) = buildNFTGroupModels(
         groupBy: filters.groupBy,
         spams: unionedSpamNFTs,
         selectedAccounts: selectedAccounts,
         selectedNetworks: selectedNetworks
       )
+      self.userNFTGroups = userNFTGroupsWithBalance
       
       // fetch nft metadata for all NFTs
       let allMetadata = await rpcService.fetchNFTMetadata(tokens: allUserNFTs, ipfsApi: ipfsApi)
@@ -331,12 +331,13 @@ public class NFTStore: ObservableObject, WalletObserverStore {
         metadataCache[key] = value
       }
       guard !Task.isCancelled else { return }
-      (userNFTGroups, allUserNFTs) = buildNFTGroupModels(
+      let (userNFTGroupsWithMetadata, _) = buildNFTGroupModels(
         groupBy: filters.groupBy,
         spams: unionedSpamNFTs,
         selectedAccounts: selectedAccounts,
         selectedNetworks: selectedNetworks
       )
+      self.userNFTGroups = userNFTGroupsWithMetadata
       
       isShowingNFTLoadingState = false
     }
@@ -525,10 +526,7 @@ public class NFTStore: ObservableObject, WalletObserverStore {
       computedSpamNFTs: spams
     )
     
-    var allUserNFTs: [BraveWallet.BlockchainToken] = []
-    for networkAssets in [userVisibleNFTs, userHiddenNFTs, spams] {
-      allUserNFTs.append(contentsOf: networkAssets.flatMap(\.tokens))
-    }
+    let allUserNFTs = (userVisibleNFTs + userHiddenNFTs + spams).flatMap(\.tokens)
 
     let groups: [NFTGroupViewModel]
     switch filters.groupBy {
