@@ -752,9 +752,9 @@ class TabTrayController: AuthenticationController {
           syncProfileService: braveCore.syncProfileService,
           tabManager: tabManager,
           windowProtection: windowProtection)
-        
+       
         syncSettingsScreen.syncStatusDelegate = self
-        
+      
         openInsideSettingsNavigation(with: syncSettingsScreen)
       default:
         return
@@ -772,7 +772,6 @@ class TabTrayController: AuthenticationController {
     settingsNavigationController.navigationBar.topItem?.leftBarButtonItem =
       UIBarButtonItem(barButtonSystemItem: .done, target: settingsNavigationController, action: #selector(settingsNavigationController.done))
     
-//    DeviceOrientation.shared.allowOnlyPortrait = UIDevice.current.userInterfaceIdiom != .pad
     DeviceOrientation.shared.changeOrientationToPortraitOnPhone()
 
     present(settingsNavigationController, animated: true)
@@ -794,7 +793,7 @@ class TabTrayController: AuthenticationController {
   }
 }
 
-// MARK: - InterfaceOrientation
+// MARK: InterfaceOrientation
 
 extension TabTrayController {
   

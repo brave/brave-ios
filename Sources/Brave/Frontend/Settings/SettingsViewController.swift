@@ -355,10 +355,7 @@ class SettingsViewController: TableViewController {
                 syncProfileService:
                   syncProfileServices,
                 tabManager: tabManager,
-                windowProtection: windowProtection)
-              
-//              DeviceOrientation.shared.allowOnlyPortrait = UIDevice.current.userInterfaceIdiom != .pad
-              DeviceOrientation.shared.changeOrientationToPortraitOnPhone()
+                windowProtection: windowProtection)  
 
               self.navigationController?
                 .pushViewController(syncSettingsViewController, animated: true)

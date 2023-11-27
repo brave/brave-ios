@@ -13,8 +13,6 @@ public final class DeviceOrientation {
   
   public static let shared: DeviceOrientation = DeviceOrientation()
   
-//  public var allowOnlyPortrait = false
-
   public func changeOrientation(_ orientationMask: UIInterfaceOrientationMask) {
     if #available(iOS 16.0, *) {
       windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: orientationMask))

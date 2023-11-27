@@ -214,7 +214,7 @@ class MenuViewController: UINavigationController, UIPopoverPresentationControlle
   }
 }
 
-// MARK: - PanModalPresentable
+// MARK: PanModalPresentable
 
 extension MenuViewController: PanModalPresentable {
   var panScrollable: UIScrollView? {
@@ -338,6 +338,8 @@ private class MenuHostingController<MenuContent: View>: UIHostingController<Menu
     }
   }
 }
+
+// MARK: MenuNavigationControllerDelegate
 
 private class MenuNavigationControllerDelegate: NSObject, UINavigationControllerDelegate {
   weak var panModal: (UIViewController & PanModalPresentable)?

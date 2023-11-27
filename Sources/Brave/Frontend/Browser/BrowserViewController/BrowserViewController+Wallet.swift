@@ -152,9 +152,6 @@ extension BrowserViewController: BraveWalletDelegate {
     )
     walletHostingController.delegate = self
     
-//    DeviceOrientation.shared.allowOnlyPortrait = UIDevice.current.userInterfaceIdiom != .pad
-    DeviceOrientation.shared.changeOrientationToPortraitOnPhone()
-
     switch presentWalletWithContext {
     case .default, .settings:
       // Dismiss Wallet Panel first, then present Wallet

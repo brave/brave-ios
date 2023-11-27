@@ -1011,7 +1011,7 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
   }
 }
 
-// MARK: - UINavigationControllerDelegate
+// MARK: UINavigationControllerDelegate
 
 extension BrowserViewController: UINavigationControllerDelegate {
   public func navigationControllerSupportedInterfaceOrientations(_ navigationController: UINavigationController) -> UIInterfaceOrientationMask {

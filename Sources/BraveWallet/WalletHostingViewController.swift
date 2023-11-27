@@ -121,6 +121,11 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
   public override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     view.window?.addGestureRecognizer(gesture)
+    
+    DeviceOrientation.shared.changeOrientationToPortraitOnPhone()
+    if #available(iOS 16.0, *) {
+      self.setNeedsUpdateOfSupportedInterfaceOrientations()
+    }
   }
   
   public override func viewDidLoad() {
@@ -128,28 +133,14 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
     walletStore?.isPresentingFullWallet = true
   }
   
-  public override func viewWillAppear(_ animated: Bool) {
-    super.viewWillAppear(animated)
-
-    if #available(iOS 16.0, *) {
-      self.setNeedsUpdateOfSupportedInterfaceOrientations()
-    }
-  }
-
-  public override func viewWillDisappear(_ animated: Bool) {
-    super.viewWillDisappear(animated)
-
-//    DeviceOrientation.shared.allowOnlyPortrait = false
-    
-    if #available(iOS 16.0, *) {
-      self.setNeedsUpdateOfSupportedInterfaceOrientations()
-    }
-  }
-  
   // MARK: -
   
   public override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
     [.portrait, .portraitUpsideDown]
+  }
+  
+  public override var shouldAutorotate: Bool {
+    true
   }
 }
 

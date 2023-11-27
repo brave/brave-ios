@@ -54,10 +54,6 @@ public class WalletPanelHostingController: UIHostingController<WalletPanelContai
               completion: {
                 let walletHostingController = WalletHostingViewController(walletStore: walletStore, webImageDownloader: webImageDownloader, presentingContext: .buySendSwap(destination))
                 walletHostingController.delegate = self.delegate
-                
-//                DeviceOrientation.shared.allowOnlyPortrait = UIDevice.current.userInterfaceIdiom != .pad
-                DeviceOrientation.shared.changeOrientationToPortraitOnPhone()
-
                 self.present(walletHostingController, animated: true)
               })
           })
