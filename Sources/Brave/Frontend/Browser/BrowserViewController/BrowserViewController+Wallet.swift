@@ -152,7 +152,7 @@ extension BrowserViewController: BraveWalletDelegate {
     )
     walletHostingController.delegate = self
     
-    DeviceOrientation.shared.allowOnlyPortrait = UIDevice.current.userInterfaceIdiom != .pad
+//    DeviceOrientation.shared.allowOnlyPortrait = UIDevice.current.userInterfaceIdiom != .pad
     DeviceOrientation.shared.changeOrientationToPortraitOnPhone()
 
     switch presentWalletWithContext {

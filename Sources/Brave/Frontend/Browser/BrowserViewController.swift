@@ -1502,7 +1502,7 @@ public class BrowserViewController: UIViewController {
       .init(barButtonSystemItem: .cancel, target: nav, action: #selector(nav.done))
     let idiom = UIDevice.current.userInterfaceIdiom
 
-    DeviceOrientation.shared.allowOnlyPortrait = UIDevice.current.userInterfaceIdiom != .pad
+//    DeviceOrientation.shared.allowOnlyPortrait = UIDevice.current.userInterfaceIdiom != .pad
     DeviceOrientation.shared.changeOrientationToPortraitOnPhone()
 
     nav.modalPresentationStyle = idiom == .phone ? .pageSheet : .formSheet
@@ -2086,7 +2086,7 @@ public class BrowserViewController: UIViewController {
       UIBarButtonItem(barButtonSystemItem: .done, target: settingsNavigationController, action: #selector(settingsNavigationController.done))
 
     // All menu views should be opened in portrait on iPhones.
-    DeviceOrientation.shared.allowOnlyPortrait = UIDevice.current.userInterfaceIdiom != .pad
+//    DeviceOrientation.shared.allowOnlyPortrait = UIDevice.current.userInterfaceIdiom != .pad
     DeviceOrientation.shared.changeOrientationToPortraitOnPhone()
 
     present(settingsNavigationController, animated: true)

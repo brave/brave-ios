@@ -214,6 +214,8 @@ class MenuViewController: UINavigationController, UIPopoverPresentationControlle
   }
 }
 
+// MARK: - PanModalPresentable
+
 extension MenuViewController: PanModalPresentable {
   var panScrollable: UIScrollView? {
     // For SwiftUI:
@@ -349,6 +351,14 @@ private class MenuNavigationControllerDelegate: NSObject, UINavigationController
     animated: Bool
   ) {
     panModal?.panModalSetNeedsLayoutUpdate()
+  }
+  
+  public func navigationControllerSupportedInterfaceOrientations(_ navigationController: UINavigationController) -> UIInterfaceOrientationMask {
+    return navigationController.visibleViewController?.supportedInterfaceOrientations ?? navigationController.supportedInterfaceOrientations
+  }
+
+  public func navigationControllerPreferredInterfaceOrientationForPresentation(_ navigationController: UINavigationController) -> UIInterfaceOrientation {
+    return navigationController.visibleViewController?.preferredInterfaceOrientationForPresentation ?? navigationController.preferredInterfaceOrientationForPresentation
   }
 }
 

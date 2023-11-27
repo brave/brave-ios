@@ -203,7 +203,7 @@ extension BrowserViewController {
     let vc = WalletHostingViewController(walletStore: walletStore, webImageDownloader: braveCore.webImageDownloader)
     vc.delegate = self
 
-    DeviceOrientation.shared.allowOnlyPortrait = UIDevice.current.userInterfaceIdiom != .pad
+//    DeviceOrientation.shared.allowOnlyPortrait = UIDevice.current.userInterfaceIdiom != .pad
     DeviceOrientation.shared.changeOrientationToPortraitOnPhone()
 
     self.dismiss(animated: true) {

@@ -19,7 +19,7 @@ class SettingsNavigationController: UINavigationController {
   override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
 
-    DeviceOrientation.shared.allowOnlyPortrait = false
+//    DeviceOrientation.shared.allowOnlyPortrait = false
     if #available(iOS 16.0, *) {
       self.setNeedsUpdateOfSupportedInterfaceOrientations()
     }
@@ -41,11 +41,11 @@ class SettingsNavigationController: UINavigationController {
   }
 
   override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-    return [.portrait, .portraitUpsideDown]
+    return self.topViewController?.supportedInterfaceOrientations ?? .portrait
   }
-
+  
   override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
-    return .portrait
+    return self.topViewController?.preferredInterfaceOrientationForPresentation ?? .portrait
   }
 }
 

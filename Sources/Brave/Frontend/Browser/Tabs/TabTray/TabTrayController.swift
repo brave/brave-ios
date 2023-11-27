@@ -772,7 +772,7 @@ class TabTrayController: AuthenticationController {
     settingsNavigationController.navigationBar.topItem?.leftBarButtonItem =
       UIBarButtonItem(barButtonSystemItem: .done, target: settingsNavigationController, action: #selector(settingsNavigationController.done))
     
-    DeviceOrientation.shared.allowOnlyPortrait = UIDevice.current.userInterfaceIdiom != .pad
+//    DeviceOrientation.shared.allowOnlyPortrait = UIDevice.current.userInterfaceIdiom != .pad
     DeviceOrientation.shared.changeOrientationToPortraitOnPhone()
 
     present(settingsNavigationController, animated: true)
@@ -791,6 +791,19 @@ class TabTrayController: AuthenticationController {
     if traitCollection.horizontalSizeClass == .compact {
       doneAction()
     }
+  }
+}
+
+// MARK: - InterfaceOrientation
+
+extension TabTrayController {
+  
+  override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
+    return self.presentedViewController?.preferredInterfaceOrientationForPresentation ?? super.preferredInterfaceOrientationForPresentation
+  }
+  
+  override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+    return self.presentedViewController?.supportedInterfaceOrientations ?? super.supportedInterfaceOrientations
   }
 }
 

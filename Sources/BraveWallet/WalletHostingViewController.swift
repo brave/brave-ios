@@ -139,7 +139,7 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
   public override func viewWillDisappear(_ animated: Bool) {
     super.viewWillDisappear(animated)
 
-    DeviceOrientation.shared.allowOnlyPortrait = false
+//    DeviceOrientation.shared.allowOnlyPortrait = false
     
     if #available(iOS 16.0, *) {
       self.setNeedsUpdateOfSupportedInterfaceOrientations()

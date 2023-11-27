@@ -357,7 +357,7 @@ class SettingsViewController: TableViewController {
                 tabManager: tabManager,
                 windowProtection: windowProtection)
               
-              DeviceOrientation.shared.allowOnlyPortrait = UIDevice.current.userInterfaceIdiom != .pad
+//              DeviceOrientation.shared.allowOnlyPortrait = UIDevice.current.userInterfaceIdiom != .pad
               DeviceOrientation.shared.changeOrientationToPortraitOnPhone()
 
               self.navigationController?
