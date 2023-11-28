@@ -181,6 +181,7 @@ public class TransactionConfirmationStore: ObservableObject, WalletObserverStore
   func tearDown() {
     txServiceObserver = nil
     walletServiceObserver = nil
+    txDetailsStore?.tearDown()
   }
   
   func setupObservers() {
@@ -340,6 +341,7 @@ public class TransactionConfirmationStore: ObservableObject, WalletObserverStore
     }
   }
   
+  private var txDetailsStore: TransactionDetailsStore?
   func activeTxDetailsStore() -> TransactionDetailsStore {
     let tx = allTxs.first { $0.id == activeTransactionId } ?? activeParsedTransaction.transaction
     let parsedTransaction: ParsedTransaction?
@@ -348,7 +350,7 @@ public class TransactionConfirmationStore: ObservableObject, WalletObserverStore
     } else {
       parsedTransaction = nil
     }
-    return TransactionDetailsStore(
+    let txDetailsStore = TransactionDetailsStore(
       transaction: tx,
       parsedTransaction: parsedTransaction,
       keyringService: keyringService,
@@ -356,10 +358,18 @@ public class TransactionConfirmationStore: ObservableObject, WalletObserverStore
       rpcService: rpcService,
       assetRatioService: assetRatioService,
       blockchainRegistry: blockchainRegistry,
+      txService: txService,
       solanaTxManagerProxy: solTxManagerProxy,
       ipfsApi: ipfsApi,
       userAssetManager: assetManager
     )
+    self.txDetailsStore = txDetailsStore
+    return txDetailsStore
+  }
+  
+  func closeTxDetailsStore() {
+    self.txDetailsStore?.tearDown()
+    self.txDetailsStore = nil
   }
   
   private func clearTrasactionInfoBeforeUpdate() {

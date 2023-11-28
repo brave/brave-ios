@@ -502,7 +502,7 @@ private struct TransactionStatusBadgeView: View {
           .foregroundColor(Color(braveSystemName: .systemfeedbackSuccessIcon))
       } else if status.shouldShowErrorStatus {
         Image(braveSystemName: "leo.warning.circle-outline")
-          .foregroundColor(Color(braveSystemName: .systemfeedbackSuccessIcon))
+          .foregroundColor(Color(braveSystemName: .systemfeedbackErrorIcon))
       }
       Text(status.localizedDescription)
         .foregroundColor(status.badgeTextColor)
@@ -570,7 +570,7 @@ private extension BraveWallet.TransactionStatus {
     case .confirmed, .approved:
       return Color(braveSystemName: .systemfeedbackSuccessBackground)
     case .rejected, .error, .dropped:
-      return Color(braveSystemName: .systemfeedbackErrorIcon)
+      return Color(braveSystemName: .systemfeedbackErrorBackground)
     case .unapproved:
       return Color(braveSystemName: .dividerStrong)
     case .submitted, .signed:

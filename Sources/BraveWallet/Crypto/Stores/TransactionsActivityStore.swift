@@ -84,6 +84,7 @@ class TransactionsActivityStore: ObservableObject, WalletObserverStore {
     keyringServiceObserver = nil
     txServiceObserver = nil
     walletServiceObserver = nil
+    transactionDetailsStore?.tearDown()
   }
   
   func setupObservers() {
@@ -286,13 +287,14 @@ class TransactionsActivityStore: ObservableObject, WalletObserverStore {
     }
   }
   
+  private var transactionDetailsStore: TransactionDetailsStore?
   func transactionDetailsStore(
     for transaction: BraveWallet.TransactionInfo
   ) -> TransactionDetailsStore {
     let parsedTransaction = transactionSections
       .flatMap(\.transactions)
       .first(where: { $0.transaction.id == transaction.id })
-    return TransactionDetailsStore(
+    let transactionDetailsStore = TransactionDetailsStore(
       transaction: transaction,
       parsedTransaction: parsedTransaction,
       keyringService: keyringService,
@@ -300,10 +302,18 @@ class TransactionsActivityStore: ObservableObject, WalletObserverStore {
       rpcService: rpcService,
       assetRatioService: assetRatioService,
       blockchainRegistry: blockchainRegistry,
+      txService: txService,
       solanaTxManagerProxy: solTxManagerProxy,
       ipfsApi: ipfsApi,
       userAssetManager: assetManager
     )
+    self.transactionDetailsStore = transactionDetailsStore
+    return transactionDetailsStore
+  }
+  
+  func closeTransactionDetailsStore() {
+    self.transactionDetailsStore?.tearDown()
+    self.transactionDetailsStore = nil
   }
 }
 

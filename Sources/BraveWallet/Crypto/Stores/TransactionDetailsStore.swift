@@ -30,6 +30,7 @@ class TransactionDetailsStore: ObservableObject, WalletObserverStore {
   private let rpcService: BraveWalletJsonRpcService
   private let assetRatioService: BraveWalletAssetRatioService
   private let blockchainRegistry: BraveWalletBlockchainRegistry
+  private let txService: BraveWalletTxService
   private let solanaTxManagerProxy: BraveWalletSolanaTxManagerProxy
   private let ipfsApi: IpfsAPI
   private let assetManager: WalletUserAssetManagerType
@@ -38,7 +39,11 @@ class TransactionDetailsStore: ObservableObject, WalletObserverStore {
   private var tokenInfoCache: [String: BraveWallet.BlockchainToken] = [:]
   private var nftMetadataCache: [String: NFTMetadata] = [:]
   
-  var isObserving: Bool = false
+  var isObserving: Bool {
+    txServiceObserver != nil
+  }
+
+  private var txServiceObserver: TxServiceObserver?
   
   init(
     transaction: BraveWallet.TransactionInfo,
@@ -48,6 +53,7 @@ class TransactionDetailsStore: ObservableObject, WalletObserverStore {
     rpcService: BraveWalletJsonRpcService,
     assetRatioService: BraveWalletAssetRatioService,
     blockchainRegistry: BraveWalletBlockchainRegistry,
+    txService: BraveWalletTxService,
     solanaTxManagerProxy: BraveWalletSolanaTxManagerProxy,
     ipfsApi: IpfsAPI,
     userAssetManager: WalletUserAssetManagerType
@@ -59,13 +65,39 @@ class TransactionDetailsStore: ObservableObject, WalletObserverStore {
     self.rpcService = rpcService
     self.assetRatioService = assetRatioService
     self.blockchainRegistry = blockchainRegistry
+    self.txService = txService
     self.solanaTxManagerProxy = solanaTxManagerProxy
     self.ipfsApi = ipfsApi
     self.assetManager = userAssetManager
     
+    setupObservers()
+    
     walletService.defaultBaseCurrency { [self] currencyCode in
       self.currencyCode = currencyCode
     }
+  }
+  
+  func setupObservers() {
+    guard !isObserving else { return }
+    self.txServiceObserver = TxServiceObserver(
+      txService: txService,
+      _onNewUnapprovedTx: { [weak self] _ in
+        self?.update()
+      },
+      _onUnapprovedTxUpdated: { [weak self] _ in
+        self?.update()
+      },
+      _onTransactionStatusChanged: { [weak self] _ in
+        self?.update()
+      },
+      _onTxServiceReset: { [weak self] in
+        self?.update()
+      }
+    )
+  }
+  
+  func tearDown() {
+    txServiceObserver = nil
   }
   
   func update() {

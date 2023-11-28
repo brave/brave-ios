@@ -148,6 +148,7 @@ class AssetDetailStore: ObservableObject, WalletObserverStore {
     keyringServiceObserver = nil
     txServiceObserver = nil
     walletServiceObserver = nil
+    transactionDetailsStore?.tearDown()
   }
   
   func setupObservers() {
@@ -386,8 +387,9 @@ class AssetDetailStore: ObservableObject, WalletObserverStore {
       }
   }
   
+  private var transactionDetailsStore: TransactionDetailsStore?
   func transactionDetailsStore(for transaction: BraveWallet.TransactionInfo) -> TransactionDetailsStore {
-    TransactionDetailsStore(
+    let transactionDetailsStore = TransactionDetailsStore(
       transaction: transaction,
       parsedTransaction: nil,
       keyringService: keyringService,
@@ -395,10 +397,18 @@ class AssetDetailStore: ObservableObject, WalletObserverStore {
       rpcService: rpcService,
       assetRatioService: assetRatioService,
       blockchainRegistry: blockchainRegistry,
+      txService: txService,
       solanaTxManagerProxy: solTxManagerProxy,
       ipfsApi: ipfsApi,
       userAssetManager: assetManager
     )
+    self.transactionDetailsStore = transactionDetailsStore
+    return transactionDetailsStore
+  }
+  
+  func closeTransactionDetailsStore() {
+    self.transactionDetailsStore?.tearDown()
+    self.transactionDetailsStore = nil
   }
   
   /// Should be called after dismissing create account. Returns true if an account was created
