@@ -4,13 +4,12 @@
 
 ### Web3
 
-- Added Coinbase Pay on-ramp for Brave Wallet buy flows. [(#7880](https://github.com/brave/brave-ios/issues/7880))
-- Added Stripe on-ramp for Brave Wallet buy flows. ([#7794](https://github.com/brave/brave-ios/issues/7794))
+- Added Coinbase Pay as an On-ramp provider. ([#7880](https://github.com/brave/brave-ios/issues/7880))
+- Added Stripe as an On-ramp provider. ([#7794](https://github.com/brave/brave-ios/issues/7794))
 - Added Filecoin support in Brave Wallet. ([#7809](https://github.com/brave/brave-ios/issues/7809))
-- Added the ability for users to choose which Solana account to choose when connecting to Solana DApps. ([#7637](https://github.com/brave/brave-ios/issues/7637))
-- Updated default buy currency and removed field placeholder for Stripe on ramp flow. ([#7709](https://github.com/brave/brave-ios/issues/7709))
-- Refactored Selected Account in Brave Wallet. ([#7723](https://github.com/brave/brave-ios/issues/7723))
-- Fixed backup flow to show as completed when initiated from “Accounts” tab. ([#8120](https://github.com/brave/brave-ios/issues/8120))
+- Added ability to choose Solana account when connecting to Solana DApp. ([#7637](https://github.com/brave/brave-ios/issues/7637))
+- Removed placeholder value in "Buy" screen and updated default currency to USD. ([#7709](https://github.com/brave/brave-ios/issues/7709))
+- Fixed wallet backup flow when initiated from "Accounts" tab. ([#8120](https://github.com/brave/brave-ios/issues/8120))
 - Fixed Solana DApps to disconnect when permission is revoked. ([#7688](https://github.com/brave/brave-ios/issues/7688))
 
 ### General 
