@@ -793,19 +793,6 @@ class TabTrayController: AuthenticationController {
   }
 }
 
-// MARK: InterfaceOrientation
-
-extension TabTrayController {
-  
-  override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
-    return self.presentedViewController?.preferredInterfaceOrientationForPresentation ?? super.preferredInterfaceOrientationForPresentation
-  }
-  
-  override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-    return self.presentedViewController?.supportedInterfaceOrientations ?? super.supportedInterfaceOrientations
-  }
-}
-
 // MARK: PresentingModalViewControllerDelegate
 
 extension TabTrayController: PresentingModalViewControllerDelegate {

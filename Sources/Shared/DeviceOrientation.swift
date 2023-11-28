@@ -38,7 +38,7 @@ public final class DeviceOrientation {
     }
   }
     
-  public var isLandscape: Bool {
+  private var isLandscape: Bool {
     if #available(iOS 16.0, *) {
       return windowScene?.interfaceOrientation.isLandscape ?? false
     }
@@ -46,7 +46,7 @@ public final class DeviceOrientation {
     return UIDevice.current.orientation.isLandscape
   }
     
-  public var isPortrait: Bool {
+  private var isPortrait: Bool {
     if #available(iOS 16.0, *) {
       return windowScene?.interfaceOrientation.isPortrait ?? false
     }
