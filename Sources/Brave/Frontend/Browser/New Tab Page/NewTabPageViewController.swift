@@ -186,8 +186,7 @@ class NewTabPageViewController: UIViewController {
         
         self?.present(host, animated: true)
       }, hidePrivacyHubPressed: { [weak self] in
-        Preferences.NewTabPage.showNewTabPrivacyHub.value = false
-        self?.collectionView.reloadData()
+        self?.hidePrivacyHub()
       }),
       FavoritesSectionProvider(action: { [weak self] bookmark, action in
         self?.handleFavoriteAction(favorite: bookmark, action: action)
@@ -787,6 +786,23 @@ class NewTabPageViewController: UIViewController {
       return
     }
     feedDataSource.load(completion)
+  }
+  
+  private func hidePrivacyHub() {
+    let alert = UIAlertController(
+      title: "Hide Privacy Hub Widget",
+      message: "Do you want to hide Privacy Hub from New Tab Page?\n\nTo alter visiblity settings in future check out New Tab Page section under Settings.",
+      preferredStyle: .alert)
+    
+    alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel))
+
+    alert.addAction(UIAlertAction(title: Strings.OKString, style: .default) { [weak self] _ in
+      Preferences.NewTabPage.showNewTabPrivacyHub.value = false
+      self?.collectionView.reloadData()
+    })
+    
+    UIImpactFeedbackGenerator(style: .medium).bzzt()
+    present(alert, animated: true, completion: nil)
   }
 
   // MARK: - Actions
