@@ -5,32 +5,37 @@
 
 import Foundation
 import SwiftUI
+import BraveUI
 import DesignSystem
 import Strings
 import struct Shared.AppConstants
 
-struct RestorePackage {
-  let recoveryWords: [String]
-  let onRestoreCompleted: (_ status: Bool, _ validPassword: String) -> Void
-  var isLegacyWallet: Bool {
-    recoveryWords.count == .legacyWalletRecoveryPhraseNumber
-  }
-}
-
 struct CreateWalletContainerView: View {
   @ObservedObject var keyringStore: KeyringStore
-  var restorePackage: RestorePackage?
+  let setupOption: OnboardingSetupOption
+  let onValidPasswordEntered: ((_ validPassword: String) -> Void)?
+  // Used to dismiss all of Wallet
+  let dismissAction: () -> Void
   
-  init(keyringStore: KeyringStore, restorePackage: RestorePackage? = nil) {
+  init(
+    keyringStore: KeyringStore,
+    setupOption: OnboardingSetupOption,
+    onValidPasswordEntered: ((_ validPassword: String) -> Void)? = nil,
+    dismissAction: @escaping () -> Void
+  ) {
     self.keyringStore = keyringStore
-    self.restorePackage = restorePackage
+    self.setupOption = setupOption
+    self.onValidPasswordEntered = onValidPasswordEntered
+    self.dismissAction = dismissAction
   }
   
   var body: some View {
     ScrollView(.vertical) {
       CreateWalletView(
         keyringStore: keyringStore,
-        restorePackage: restorePackage
+        setupOption: setupOption,
+        onValidPasswordEntered: onValidPasswordEntered,
+        dismissAction: dismissAction
       )
       .background(Color(.braveBackground))
     }
@@ -55,7 +60,10 @@ private enum ValidationError: LocalizedError, Equatable {
 
 private struct CreateWalletView: View {
   @ObservedObject var keyringStore: KeyringStore
-  var restorePackage: RestorePackage?
+  let setupOption: OnboardingSetupOption
+  let onValidPasswordEntered: ((_ validPassword: String) -> Void)?
+  // Used to dismiss all of Wallet
+  let dismissAction: () -> Void
 
   @State private var password: String = ""
   @State private var repeatedPassword: String = ""
@@ -63,24 +71,26 @@ private struct CreateWalletView: View {
   @State private var isNewWalletCreated: Bool = false
   @State private var passwordStatus: PasswordStatus = .none
   @State private var isInputsMatch: Bool = false
+  /// If this view is showing `Creating Wallet...` overlay, blocking input fields.
+  /// Using a local flag for the view instead of `keyringStore.isCreatingWallet` so we
+  /// only show `CreatingWalletView` on the `RestoreWalletView` when restoring.
+  @State private var isShowingCreatingWallet: Bool = false
   
   @FocusState private var isFieldFocused: Bool
 
   private func createWallet() {
-    if let restorePackage {
-      // restore wallet with recovery phrases and a new password
-      keyringStore.restoreWallet(
-        words: restorePackage.recoveryWords,
-        password: password,
-        isLegacyBraveWallet: restorePackage.isLegacyWallet
-      ) { success in
-        restorePackage.onRestoreCompleted(success, password)
-      }
-    } else {
+    switch setupOption {
+    case .new:
+      isShowingCreatingWallet = true
       keyringStore.createWallet(password: password) { mnemonic in
+        defer { self.isShowingCreatingWallet = false }
         if let mnemonic, !mnemonic.isEmpty {
           isNewWalletCreated = true
         }
+      }
+    case .restore:
+      if isInputsMatch {
+        onValidPasswordEntered?(password)
       }
     }
   }
@@ -224,6 +234,23 @@ private struct CreateWalletView: View {
     )
     .onChange(of: password, perform: handleInputChange)
     .onChange(of: repeatedPassword, perform: handleInputChange)
+    .navigationBarBackButtonHidden(isShowingCreatingWallet)
+    .overlay {
+      if isShowingCreatingWallet {
+        CreatingWalletView()
+      }
+    }
+    .toolbar(content: {
+      ToolbarItem(placement: .topBarLeading) {
+        if isShowingCreatingWallet {
+          Button(action: dismissAction) { // dismiss all of wallet
+            Image("wallet-dismiss", bundle: .module)
+              .renderingMode(.template)
+              .foregroundColor(Color(.braveBlurpleTint))
+          }
+        }
+      }
+    })
     .onAppear {
       isFieldFocused = true
     }
@@ -234,10 +261,32 @@ private struct CreateWalletView: View {
 struct CreateWalletView_Previews: PreviewProvider {
   static var previews: some View {
     NavigationView {
-      CreateWalletContainerView(keyringStore: .previewStore)
+      CreateWalletContainerView(
+        keyringStore: .previewStore,
+        setupOption: .new,
+        dismissAction: {}
+      )
     }
     .previewLayout(.sizeThatFits)
     .previewColorSchemes()
   }
 }
 #endif
+
+/// View shown as an overlay over `CreateWalletView` or `RestoreWalletView`
+/// when waiting for Wallet to be created & wallet data files downloaded.
+struct CreatingWalletView: View {
+  
+  var body: some View {
+    VStack(spacing: 24) {
+      Spacer()
+      ProgressView()
+        .progressViewStyle(.braveCircular(size: .normal, tint: .braveBlurpleTint))
+      Text(Strings.Wallet.creatingWallet)
+        .font(.title)
+      Spacer()
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .background(Color(braveSystemName: .containerBackground))
+  }
+}
