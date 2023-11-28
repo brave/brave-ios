@@ -383,13 +383,24 @@ public class KeyringStore: ObservableObject, WalletObserverStore {
     }
     isOnboarding = true
     isCreatingWallet = true
-    keyringService.createWallet(password) { [weak self] mnemonic in
-      self?.isCreatingWallet = false
-      self?.updateInfo()
-      if !mnemonic.isEmpty {
-        self?.passwordToSaveInBiometric = password
+    keyringService.isWalletCreated { [weak self] isWalletCreated in
+      guard let self else { return }
+      guard !isWalletCreated else {
+        // Wallet was created already (possible with multi-window) #8425
+        self.isOnboarding = false
+        self.isCreatingWallet = false
+        // Dismiss onboarding if wallet is already setup
+        self.isOnboardingVisible = false
+        return
       }
-      completion?(mnemonic)
+      keyringService.createWallet(password) { mnemonic in
+        self.isCreatingWallet = false
+        self.updateInfo()
+        if !mnemonic.isEmpty {
+          self.passwordToSaveInBiometric = password
+        }
+        completion?(mnemonic)
+      }
     }
   }
 
