@@ -339,6 +339,7 @@ public class SwapTokenStore: ObservableObject, WalletObserverStore {
       buyAmountInWei = weiFormatter.weiString(from: buyAmount.normalizedDecimals, radix: .decimal, decimals: Int(buyToken.decimals)) ?? "0"
     }
     let swapParams = BraveWallet.SwapParams(
+      chainId: network.chainId,
       takerAddress: accountInfo.address,
       sellAmount: sellAmountInWei,
       buyAmount: buyAmountInWei,
@@ -650,6 +651,7 @@ public class SwapTokenStore: ObservableObject, WalletObserverStore {
     // 0.5% is 50bps. We store 0.5% as 0.005, so multiply by 10_000
     let slippageBps = Int32(swapParams.slippagePercentage * 10_000)
     let jupiterQuoteParams: BraveWallet.JupiterQuoteParams = .init(
+      chainId: network.chainId,
       inputMint: swapParams.sellToken,
       outputMint: swapParams.buyToken,
       amount: swapParams.sellAmount,
@@ -748,6 +750,7 @@ public class SwapTokenStore: ObservableObject, WalletObserverStore {
     }
     let network = await rpcService.network(.sol, origin: nil)
     let jupiterSwapParams: BraveWallet.JupiterSwapParams = .init(
+      chainId: network.chainId,
       route: route,
       userPublicKey: accountInfo.address,
       inputMint: selectedFromToken.contractAddress(in: network),
