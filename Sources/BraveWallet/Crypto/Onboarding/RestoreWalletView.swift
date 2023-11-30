@@ -201,7 +201,7 @@ private struct RestoreWalletView: View {
       }
     }
     .toolbar(content: {
-      ToolbarItem(placement: .topBarLeading) {
+      ToolbarItem(placement: .navigationBarLeading) {
         if isShowingCreatingWallet {
           Button(action: dismissAction) { // dismiss all of wallet
             Image("wallet-dismiss", bundle: .module)
