@@ -549,25 +549,20 @@ public class PortfolioStore: ObservableObject, WalletObserverStore {
   private func buildHistory(_ assetViewModels: [AssetViewModel]) async -> [BalanceTimePrice] {
     // Filter out assets that we did not find price history for (We only fetch history for assets with balance).
     let assetsWithHistory = assetViewModels.filter { !$0.history.isEmpty }  // [[AssetTimePrice]]
-    // Get the unique dates received, sorted from earliest to latest
-    let allHistoryDates = Array(Set(assetsWithHistory.flatMap(\.history).map {
-      let dateComponents = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: $0.date)
-      return Calendar.current.date(from: dateComponents) ?? $0.date
-    })).sorted()
+    let datesForTimeframe = timeframe.datesForTimeframe(from: assetsWithHistory)
     // Last known price of an asset as we iterate through each date. Key in the token.id.
     var lastKnownPrices: [String: Double] = [:]
     // The total balance of the users walet on a given date. Each date is a new element in the array.
     var historicalBalances: [BalanceTimePrice] = []
-    for date in allHistoryDates {
+    for date in datesForTimeframe {
       // Calculate the total value of a users total balance on this date.
       // Build an array of the total value (asset balance * asset price) for each asset with a balance and known price.
       let assetValuesForDate: [Double] = assetsWithHistory.compactMap { assetViewModel in
         let priceOfAsset: Double?
-        if let history = assetViewModel.history.first(where: { assetTimePrice in
-          // exclude seconds from the date comparison
-          let dateComponents = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: assetTimePrice.date)
-          return (Calendar.current.date(from: dateComponents) ?? assetTimePrice.date) == date
-        }), let priceOfAssetOnDate = Double(history.price) {
+        // Find the index of the first date after the date we are looking for.
+        if let historyIndex = assetViewModel.history.firstIndex(where: { $0.date > date }),
+           let history = assetViewModel.history[safe: historyIndex - 1], // last known price
+           let priceOfAssetOnDate = Double(history.price) {
           // price of this asset on this `date`/time
           priceOfAsset = priceOfAssetOnDate
           // update last known price of this asset
@@ -800,5 +795,73 @@ extension Array {
   @inlinable public func optionallySort(shouldSort: Bool, by sort: (Element, Element) throws -> Bool) rethrows -> [Element] {
     guard shouldSort else { return self }
     return try sorted(by: sort)
+  }
+}
+
+extension BraveWallet.AssetPriceTimeframe {
+  func datesForTimeframe(from assetsWithHistory: [AssetViewModel]) -> [Date] {
+    let now = Date()
+    switch self {
+    case .live: // 1 hour
+      guard let oneDayAgo = Calendar.current.date(byAdding: .hour, value: -1, to: now) else {
+        return []
+      }
+      // one point every minute for past hour
+      return dates(from: oneDayAgo, to: now, interval: DateComponents(minute: 1))
+    case .oneDay:
+      guard let oneDayAgo = Calendar.current.date(byAdding: .day, value: -1, to: now) else {
+        return []
+      }
+      // one point every 15 minutes for past day
+      return dates(from: oneDayAgo, to: now, interval: DateComponents(minute: 15))
+    case .oneWeek:
+      guard let oneWeekAgo = Calendar.current.date(byAdding: .weekday, value: -1, to: now) else {
+        return []
+      }
+      // one point every hour for past week
+      return dates(from: oneWeekAgo, to: now, interval: DateComponents(hour: 1))
+    case .oneMonth:
+      guard let oneMonthAgo = Calendar.current.date(byAdding: .month, value: -1, to: now) else {
+        return []
+      }
+      // one point every 12 hours for past month
+      return dates(from: oneMonthAgo, to: now, interval: DateComponents(hour: 12))
+    case .threeMonths:
+      guard let threeMonthsAgo = Calendar.current.date(byAdding: .month, value: -3, to: now) else {
+        return []
+      }
+      // one point every day for past 3 months
+      return dates(from: threeMonthsAgo, to: now, interval: DateComponents(day: 1))
+    case .oneYear:
+      guard let oneYearAgo = Calendar.current.date(byAdding: .year, value: -1, to: now) else {
+        return []
+      }
+      // one point every day for past year
+      return dates(from: oneYearAgo, to: now, interval: DateComponents(day: 1))
+    case .all:
+      // Get the unique dates received, sorted from earliest to latest
+      let allHistoryDates = Array(Set(assetsWithHistory.flatMap(\.history).map {
+        let dateComponents = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: $0.date)
+        return Calendar.current.date(from: dateComponents) ?? $0.date
+      })).sorted()
+      guard let firstHistoryDate = allHistoryDates.first, let mostRecentHistoryDate = allHistoryDates.last else {
+        return []
+      }
+      // one point every day from the first historical date received to the current.
+      return dates(from: firstHistoryDate, to: mostRecentHistoryDate, interval: DateComponents(day: 1))
+    @unknown default:
+      return []
+    }
+  }
+  
+  private func dates(from startDate: Date, to endDate: Date, interval: DateComponents) -> [Date] {
+    var dates: [Date] = []
+    var date = startDate
+    while date <= endDate {
+      dates.append(date)
+      guard let newDate = Calendar.current.date(byAdding: interval, to: date) else { break }
+      date = newDate
+    }
+    return dates
   }
 }
