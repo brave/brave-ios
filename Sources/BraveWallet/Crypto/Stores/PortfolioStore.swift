@@ -521,18 +521,7 @@ public class PortfolioStore: ObservableObject, WalletObserverStore {
         .reduce(0.0, +)
       balance = currencyFormatter.string(from: NSNumber(value: currentBalance)) ?? "–"
       // Compute historical balances based on historical prices and current balances
-      let assetsWithHistory = allAssets.filter { !$0.history.isEmpty }  // [[AssetTimePrice]]
-      let minCount = assetsWithHistory.map(\.history.count).min() ?? 0  // Shortest array count
-      historicalBalances = (0..<minCount).map { index in
-        let value = assetsWithHistory.reduce(0.0, {
-          $0 + ((Double($1.history[index].price) ?? 0.0) * $1.totalBalance)
-        })
-        return .init(
-          date: assetsWithHistory.map { $0.history[index].date }.max() ?? .init(),
-          price: value,
-          formattedPrice: currencyFormatter.string(from: NSNumber(value: value)) ?? "0.00"
-        )
-      }
+      historicalBalances = await buildHistory(allAssets)
       
       if let oldestHistoricalValue = historicalBalances.first {
         let priceDifference = currentBalance - oldestHistoricalValue.price
@@ -555,6 +544,52 @@ public class PortfolioStore: ObservableObject, WalletObserverStore {
       
       isLoadingBalances = false
     }
+  }
+  
+  private func buildHistory(_ assetViewModels: [AssetViewModel]) async -> [BalanceTimePrice] {
+    // Filter out assets that we did not find price history for (We only fetch history for assets with balance).
+    let assetsWithHistory = assetViewModels.filter { !$0.history.isEmpty }  // [[AssetTimePrice]]
+    // Get the unique dates received, sorted from earliest to latest
+    let allHistoryDates = Array(Set(assetsWithHistory.flatMap(\.history).map {
+      let dateComponents = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: $0.date)
+      return Calendar.current.date(from: dateComponents) ?? $0.date
+    })).sorted()
+    // Last known price of an asset as we iterate through each date. Key in the token.id.
+    var lastKnownPrices: [String: Double] = [:]
+    // The total balance of the users walet on a given date. Each date is a new element in the array.
+    var historicalBalances: [BalanceTimePrice] = []
+    for date in allHistoryDates {
+      // Calculate the total value of a users total balance on this date.
+      // Build an array of the total value (asset balance * asset price) for each asset with a balance and known price.
+      let assetValuesForDate: [Double] = assetsWithHistory.compactMap { assetViewModel in
+        let priceOfAsset: Double?
+        if let history = assetViewModel.history.first(where: { assetTimePrice in
+          // exclude seconds from the date comparison
+          let dateComponents = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: assetTimePrice.date)
+          return (Calendar.current.date(from: dateComponents) ?? assetTimePrice.date) == date
+        }), let priceOfAssetOnDate = Double(history.price) {
+          // price of this asset on this `date`/time
+          priceOfAsset = priceOfAssetOnDate
+          // update last known price of this asset
+          lastKnownPrices[assetViewModel.token.id] = priceOfAssetOnDate
+        } else if let lastKnownPrice = lastKnownPrices[assetViewModel.token.id] {
+          // price on `date` is unknown, use the last known price.
+          priceOfAsset = lastKnownPrice
+        } else {
+          // unknown price on `date` & no last known price for this token (no history before this date)
+          return nil
+        }
+        guard let priceOfAsset else { return nil }
+        return priceOfAsset * assetViewModel.totalBalance
+      }
+      let totalValueForDate = assetValuesForDate.reduce(0.0) { $0 + $1 }
+      historicalBalances.append(.init(
+        date: date,
+        price: totalValueForDate,
+        formattedPrice: currencyFormatter.string(from: NSNumber(value: totalValueForDate)) ?? "0.00"
+      ))
+    }
+    return historicalBalances
   }
   
   private func buildAssetGroupViewModels(
