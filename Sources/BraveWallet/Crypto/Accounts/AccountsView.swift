@@ -48,7 +48,7 @@ struct AccountsView: View {
             selectedAccount = account
           } label: {
             AddressView(address: account.address) {
-              AccountView(address: account.address, name: account.name)
+              AccountView(address: account.address, name: account.name, blockieShape: .rectangle)
             }
           }
         }

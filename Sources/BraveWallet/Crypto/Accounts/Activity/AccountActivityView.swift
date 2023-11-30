@@ -188,8 +188,9 @@ private struct AccountActivityHeaderView: View {
 
   var body: some View {
     VStack {
-      Blockie(address: account.address)
+      Blockie(address: account.address, shape: .rectangle)
         .frame(width: 64, height: 64)
+        .clipShape(RoundedRectangle(cornerRadius: 4))
         .accessibilityHidden(true)
       VStack(spacing: 4) {
         Text(account.name)

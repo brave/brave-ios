@@ -235,7 +235,7 @@ private struct SiteConnectionDetailView: View {
     List {
       Section(header: Text(String.localizedStringWithFormat(Strings.Wallet.manageSiteConnectionsDetailHeader, siteConnection.coin.localizedTitle))) {
         ForEach(siteConnection.connectedAddresses, id: \.self) { address in
-          AccountView(address: address, name: siteConnectionStore.accountInfo(for: address)?.name ?? "")
+          AccountView(address: address, name: siteConnectionStore.accountInfo(for: address)?.name ?? "", blockieShape: .rectangle)
             .swipeActions(edge: .trailing) {
               Button(role: .destructive, action: {
                 withAnimation(.default) {
