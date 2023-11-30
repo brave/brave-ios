@@ -789,20 +789,25 @@ class NewTabPageViewController: UIViewController {
   }
   
   private func hidePrivacyHub() {
-    let alert = UIAlertController(
-      title: "Hide Privacy Hub Widget",
-      message: "Do you want to hide Privacy Hub from New Tab Page?\n\nTo alter visiblity settings in future check out New Tab Page section under Settings.",
-      preferredStyle: .alert)
-    
-    alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel))
-
-    alert.addAction(UIAlertAction(title: Strings.OKString, style: .default) { [weak self] _ in
+    if Preferences.NewTabPage.hidePrivacyHubAlertShown.value {
       Preferences.NewTabPage.showNewTabPrivacyHub.value = false
-      self?.collectionView.reloadData()
-    })
-    
-    UIImpactFeedbackGenerator(style: .medium).bzzt()
-    present(alert, animated: true, completion: nil)
+      collectionView.reloadData()
+    } else {
+      let alert = UIAlertController(
+        title: Strings.PrivacyHub.hidePrivacyHubWidgetActionTitle,
+        message: Strings.PrivacyHub.hidePrivacyHubWidgetAlertDescription,
+        preferredStyle: .alert)
+      
+      alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel))
+      alert.addAction(UIAlertAction(title: Strings.OKString, style: .default) { [weak self] _ in
+        Preferences.NewTabPage.showNewTabPrivacyHub.value = false
+        Preferences.NewTabPage.hidePrivacyHubAlertShown.value = true
+        self?.collectionView.reloadData()
+      })
+      
+      UIImpactFeedbackGenerator(style: .medium).bzzt()
+      present(alert, animated: true, completion: nil)
+    }
   }
 
   // MARK: - Actions

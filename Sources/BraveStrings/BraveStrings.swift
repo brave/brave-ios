@@ -4709,6 +4709,11 @@ extension Strings {
       comment: "The title of the button action which hides the privacy hub"
     )
     
+    public static let hidePrivacyHubWidgetAlertDescription = NSLocalizedString("privacyHub.hidePrivacyHubWidgetAlertDescription", tableName: "BraveShared", bundle: .module,
+      value: "Do you want to hide Privacy Hub from New Tab Page?\n\nTo alter the visibility settings in future check out New Tab Page section under Settings.",
+      comment: "The description in alert of the hide action which hides the privacy hub"
+    )
+    
     public static let openPrivacyHubWidgetActionTitle = NSLocalizedString("privacyHub.openPrivacyHubWidgetActionTitle", tableName: "BraveShared", bundle: .module,
       value: "Open Privacy Hub",
       comment: "The title of the button action which open the privacy hub"
