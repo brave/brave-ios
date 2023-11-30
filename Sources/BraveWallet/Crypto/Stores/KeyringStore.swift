@@ -213,6 +213,14 @@ public class KeyringStore: ObservableObject, WalletObserverStore {
   
   public func setupObservers() {
     guard !isObserving else { return }
+    Task { @MainActor in
+      // For case where Wallet is dismissed while wallet is being created.
+      // Ex. User creates wallet, dismisses & re-opens Wallet before
+      // create wallet completion callback. Callback is held with
+      // strong ref which keeps `KeyringStore` alive.
+      let isWalletCreated = await keyringService.isWalletCreated()
+      self.isOnboardingVisible = !isWalletCreated
+    }
     self.keyringServiceObserver = KeyringServiceObserver(
       keyringService: keyringService,
       _walletReset: { [weak self] in
@@ -270,6 +278,14 @@ public class KeyringStore: ObservableObject, WalletObserverStore {
   }
   
   public func tearDown() {
+    Task { @MainActor in
+      // For case where Wallet is dismissed while wallet is being created.
+      // Ex. User creates wallet, dismisses & re-opens Wallet before
+      // create wallet completion callback. Callback is held with
+      // strong ref which keeps `KeyringStore` alive.
+      let isWalletCreated = await keyringService.isWalletCreated()
+      self.isOnboardingVisible = !isWalletCreated
+    }
     keyringServiceObserver = nil
     rpcServiceObserver = nil
   }
