@@ -260,6 +260,14 @@ class MockJsonRpcService: BraveWalletJsonRpcService {
   func ankrGetAccountBalances(_ accountAddress: String, chainIds: [String], completion: @escaping ([BraveWallet.AnkrAssetBalance], BraveWallet.ProviderError, String) -> Void) {
     completion([], .internalError, "Error Message")
   }
+
+  func ethTokenName(_ contractAddress: String, chainId: String, completion: @escaping (String, BraveWallet.ProviderError, String) -> Void) {
+    completion("", .internalError, "Error Message")
+  }
+  
+  func ethTokenInfo(_ contractAddress: String, chainId: String, completion: @escaping (BraveWallet.BlockchainToken?, BraveWallet.ProviderError, String) -> Void) {
+    completion(nil, .internalError, "Error Message")
+  }
 }
 
 extension BraveWallet.NetworkInfo {

@@ -202,6 +202,7 @@ public class UserAssetsStore: ObservableObject, WalletObserverStore {
 
   func tokenInfo(
     address: String,
+    chainId: String,
     completion: @escaping (BraveWallet.BlockchainToken?) -> Void
   ) {
     // First check user's visible assets
@@ -218,10 +219,14 @@ public class UserAssetsStore: ObservableObject, WalletObserverStore {
         block: { [weak self] _ in
           guard let self = self else { return }
           self.isSearchingToken = true
-          self.assetRatioService.tokenInfo(address) { token in
-            self.isSearchingToken = false
-            completion(token)
-          }
+          self.rpcService.ethTokenInfo(
+            address,
+            chainId: chainId,
+            completion: { token, status, error in
+              self.isSearchingToken = false
+              completion(token)
+            }
+          )
         })
     }
   }

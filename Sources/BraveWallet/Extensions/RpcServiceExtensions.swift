@@ -385,34 +385,6 @@ extension BraveWalletJsonRpcService {
       })
     }
   }
-
-  /// Helper to fetch `symbol` and `decimals` ONLY given a token contract address & chainId.
-  /// This function will be replaced by a BraveCore function that will also fetch `name` & `coingeckoId`.
-  func getEthTokenInfo(
-    contractAddress: String,
-    chainId: String
-  ) async -> BraveWallet.BlockchainToken? {
-    let (symbol, symbolStatus, _) = await ethTokenSymbol(contractAddress, chainId: chainId)
-    let (decimals, decimalsStatus, _) = await ethTokenDecimals(contractAddress, chainId: chainId)
-    guard symbolStatus == .success || decimalsStatus == .success else { return nil }
-    return .init(
-      contractAddress: contractAddress,
-      name: "",
-      logo: "",
-      isErc20: false, // rpcService.getSupportsInterface() is private / internal.
-      isErc721: false, // rpcService.getSupportsInterface() is private / internal.
-      isErc1155: false, // rpcService.getSupportsInterface() is private / internal.
-      isNft: false,
-      isSpam: false,
-      symbol: symbol,
-      decimals: Int32(decimals.removingHexPrefix, radix: 16) ?? 0,
-      visible: false,
-      tokenId: "",
-      coingeckoId: "", // blockchainRegistry can fetch this for us, but not needed in Tx Confirmation.
-      chainId: chainId,
-      coin: .eth
-    )
-  }
   
   /// Fetches the BlockchainToken for the given contract addresses. The token for a given contract
   /// address is not guaranteed to be found, and will not be provided in the result if not found.
@@ -422,8 +394,8 @@ extension BraveWalletJsonRpcService {
     await withTaskGroup(of: [BraveWallet.BlockchainToken?].self) { @MainActor group in
       for contractAddressesChainIdPair in contractAddressesChainIdPairs {
         group.addTask {
-          let token = await self.getEthTokenInfo(
-            contractAddress: contractAddressesChainIdPair.contractAddress,
+          let (token, _, _) = await self.ethTokenInfo(
+            contractAddressesChainIdPair.contractAddress,
             chainId: contractAddressesChainIdPair.chainId
           )
           if let token {

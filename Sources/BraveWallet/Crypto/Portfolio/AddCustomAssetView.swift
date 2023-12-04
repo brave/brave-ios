@@ -82,8 +82,9 @@ struct AddCustomAssetView: View {
         ) {
           TextField(Strings.Wallet.enterAddress, text: $addressInput)
             .onChange(of: addressInput) { newValue in
-              guard !newValue.isEmpty else { return }
-              userAssetStore.tokenInfo(address: newValue) { token in
+              guard !newValue.isEmpty, 
+                      let network = networkSelectionStore.networkSelectionInForm else { return }
+              userAssetStore.tokenInfo(address: newValue, chainId: network.chainId) { token in
                 guard let token else { return }
                 if nameInput.isEmpty {
                   nameInput = token.name
