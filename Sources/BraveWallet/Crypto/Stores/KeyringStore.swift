@@ -285,6 +285,11 @@ public class KeyringStore: ObservableObject, WalletObserverStore {
       // strong ref which keeps `KeyringStore` alive.
       let isWalletCreated = await keyringService.isWalletCreated()
       self.isOnboardingVisible = !isWalletCreated
+      if isRestoringWallet && isWalletCreated {
+        // user dismissed wallet while restoring, but after wallet was created in core.
+        keyringService.notifyWalletBackupComplete()
+        self.isWalletBackedUp = await keyringService.isWalletBackedUp()
+      }
     }
     keyringServiceObserver = nil
     rpcServiceObserver = nil
