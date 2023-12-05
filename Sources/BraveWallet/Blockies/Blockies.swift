@@ -123,7 +123,7 @@ struct Blockie: View {
   }
   
   var address: String
-  var shape: Shape = .circle
+  var shape: Shape = .rectangle
   
   private var base: some View {
     Image(uiImage: Blockies(seed: address.lowercased()).image(length: 4, scale: 25))
@@ -136,7 +136,7 @@ struct Blockie: View {
         .clipShape(Circle())
     } else {
       base
-        .clipShape(Rectangle())
+        .clipShape(RoundedRectangle(cornerRadius: 4))
     }
   }
 }
