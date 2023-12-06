@@ -78,3 +78,4 @@ class OpenSearchEngineButton: BraveButton {
     }
   }
 }
+
