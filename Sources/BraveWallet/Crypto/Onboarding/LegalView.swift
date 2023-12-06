@@ -76,7 +76,7 @@ struct LegalView: View {
     .padding()
     .background(
       NavigationLink(
-        destination: CreateWalletContainerView(
+        destination: CreateWalletView(
           keyringStore: keyringStore,
           setupOption: setupOption,
           dismissAction: dismissAction
@@ -89,7 +89,7 @@ struct LegalView: View {
     )
     .background(
       NavigationLink(
-        destination: RestoreWalletContainerView(
+        destination: RestoreWalletView(
           keyringStore: keyringStore,
           dismissAction: dismissAction
         ),

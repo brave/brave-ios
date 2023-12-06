@@ -10,22 +10,7 @@ import Strings
 import struct Shared.AppConstants
 import Preferences
 
-struct RestoreWalletContainerView: View {
-  @ObservedObject var keyringStore: KeyringStore
-  // Used to dismiss all of Wallet
-  let dismissAction: () -> Void
-
-  var body: some View {
-    ScrollView(.vertical) {
-      RestoreWalletView(keyringStore: keyringStore, dismissAction: dismissAction)
-        .background(Color(.braveBackground))
-    }
-    .background(Color(.braveBackground).edgesIgnoringSafeArea(.all))
-    .transparentUnlessScrolledNavigationAppearance()
-  }
-}
-
-private struct RestoreWalletView: View {
+struct RestoreWalletView: View {
   @ObservedObject var keyringStore: KeyringStore
   // Used to dismiss all of Wallet
   let dismissAction: () -> Void
@@ -195,9 +180,13 @@ private struct RestoreWalletView: View {
       handleRecoveryWordsChanged(oldValue: recoveryWords, newValue: newValue)
     }
     .navigationBarBackButtonHidden(isShowingCreatingWallet)
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
+    .background(Color(.braveBackground).edgesIgnoringSafeArea(.all))
     .overlay {
       if isShowingCreatingWallet {
         CreatingWalletView()
+          .ignoresSafeArea()
+          .frame(maxWidth: .infinity, maxHeight: .infinity)
       }
     }
     .toolbar(content: {
@@ -213,7 +202,7 @@ private struct RestoreWalletView: View {
     })
     .sheet(isPresented: $isShowingCreateNewPassword) {
       NavigationView {
-        CreateWalletContainerView(
+        CreateWalletView(
           keyringStore: keyringStore,
           setupOption: .restore,
           onValidPasswordEntered: restoreWallet,
@@ -228,6 +217,7 @@ private struct RestoreWalletView: View {
         }
       }
     }
+    .transparentUnlessScrolledNavigationAppearance()
   }
   
   private func resignFirstResponder() {
@@ -260,7 +250,7 @@ private struct RestoreWalletView: View {
 struct RestoreWalletView_Previews: PreviewProvider {
   static var previews: some View {
     NavigationView {
-      RestoreWalletContainerView(
+      RestoreWalletView(
         keyringStore: .previewStore,
         dismissAction: {}
       )

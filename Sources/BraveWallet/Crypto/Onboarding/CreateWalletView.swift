@@ -10,40 +10,6 @@ import DesignSystem
 import Strings
 import struct Shared.AppConstants
 
-struct CreateWalletContainerView: View {
-  @ObservedObject var keyringStore: KeyringStore
-  let setupOption: OnboardingSetupOption
-  let onValidPasswordEntered: ((_ validPassword: String) -> Void)?
-  // Used to dismiss all of Wallet
-  let dismissAction: () -> Void
-  
-  init(
-    keyringStore: KeyringStore,
-    setupOption: OnboardingSetupOption,
-    onValidPasswordEntered: ((_ validPassword: String) -> Void)? = nil,
-    dismissAction: @escaping () -> Void
-  ) {
-    self.keyringStore = keyringStore
-    self.setupOption = setupOption
-    self.onValidPasswordEntered = onValidPasswordEntered
-    self.dismissAction = dismissAction
-  }
-  
-  var body: some View {
-    ScrollView(.vertical) {
-      CreateWalletView(
-        keyringStore: keyringStore,
-        setupOption: setupOption,
-        onValidPasswordEntered: onValidPasswordEntered,
-        dismissAction: dismissAction
-      )
-      .background(Color(.braveBackground))
-    }
-    .background(Color(.braveBackground).edgesIgnoringSafeArea(.all))
-    .transparentNavigationBar(backButtonTitle: Strings.Wallet.createWalletBackButtonTitle, backButtonDisplayMode: .generic)
-  }
-}
-
 private enum ValidationError: LocalizedError, Equatable {
   case requirementsNotMet
   case inputsDontMatch
@@ -58,7 +24,7 @@ private enum ValidationError: LocalizedError, Equatable {
   }
 }
 
-private struct CreateWalletView: View {
+struct CreateWalletView: View {
   @ObservedObject var keyringStore: KeyringStore
   let setupOption: OnboardingSetupOption
   let onValidPasswordEntered: ((_ validPassword: String) -> Void)?
@@ -77,6 +43,18 @@ private struct CreateWalletView: View {
   @State private var isShowingCreatingWallet: Bool = false
   
   @FocusState private var isFieldFocused: Bool
+  
+  init(
+    keyringStore: KeyringStore,
+    setupOption: OnboardingSetupOption,
+    onValidPasswordEntered: ((_ validPassword: String) -> Void)? = nil,
+    dismissAction: @escaping () -> Void
+  ) {
+    self.keyringStore = keyringStore
+    self.setupOption = setupOption
+    self.onValidPasswordEntered = onValidPasswordEntered
+    self.dismissAction = dismissAction
+  }
 
   private func createWallet() {
     switch setupOption {
@@ -137,7 +115,7 @@ private struct CreateWalletView: View {
     }
   }
   
-  func errorLabel(_ error: ValidationError?) -> some View {
+  private func errorLabel(_ error: ValidationError?) -> some View {
     HStack(spacing: 12) {
       Image(braveSystemName: "leo.warning.circle-filled")
         .renderingMode(.template)
@@ -161,65 +139,67 @@ private struct CreateWalletView: View {
   }
 
   var body: some View {
-    VStack(spacing: 16) {
-      VStack {
-        Text(Strings.Wallet.createWalletTitle)
-          .font(.title)
-          .padding(.bottom)
-          .multilineTextAlignment(.center)
-          .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
-        Text(Strings.Wallet.createWalletSubTitle)
-          .font(.subheadline)
-          .padding(.bottom)
-          .multilineTextAlignment(.center)
-          .foregroundColor(Color(uiColor: WalletV2Design.textSecondary))
-      }
-      VStack(alignment: .leading, spacing: 20) {
-        VStack(spacing: 30) {
-          VStack(alignment: .leading, spacing: 10) {
-            Text(Strings.Wallet.newPasswordPlaceholder)
-              .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
-            HStack(spacing: 8) {
-              SecureField(Strings.Wallet.newPasswordPlaceholder, text: $password)
-                .textContentType(.newPassword)
-                .focused($isFieldFocused)
-              Spacer()
-              if passwordStatus != .none {
-                passwordStatusView(passwordStatus)
-              }
-            }
-            Divider()
-          }
-          VStack(alignment: .leading, spacing: 12) {
-            Text(Strings.Wallet.repeatedPasswordPlaceholder)
-              .foregroundColor(.primary)
-            HStack(spacing: 8) {
-              SecureField(Strings.Wallet.repeatedPasswordPlaceholder, text: $repeatedPassword, onCommit: createWallet)
-                .textContentType(.newPassword)
-              Spacer()
-              if isInputsMatch {
-                Text("\(Image(braveSystemName: "leo.check.normal")) \(Strings.Wallet.repeatedPasswordMatch)")
-                  .multilineTextAlignment(.trailing)
-                  .font(.footnote)
-                  .foregroundColor(.secondary)
-              }
-            }
-            Divider()
-          }
+    ScrollView(.vertical) {
+      VStack(spacing: 16) {
+        VStack {
+          Text(Strings.Wallet.createWalletTitle)
+            .font(.title)
+            .padding(.bottom)
+            .multilineTextAlignment(.center)
+            .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
+          Text(Strings.Wallet.createWalletSubTitle)
+            .font(.subheadline)
+            .padding(.bottom)
+            .multilineTextAlignment(.center)
+            .foregroundColor(Color(uiColor: WalletV2Design.textSecondary))
         }
-        .font(.subheadline)
-        errorLabel(validationError)
+        VStack(alignment: .leading, spacing: 20) {
+          VStack(spacing: 30) {
+            VStack(alignment: .leading, spacing: 10) {
+              Text(Strings.Wallet.newPasswordPlaceholder)
+                .foregroundColor(Color(uiColor: WalletV2Design.textPrimary))
+              HStack(spacing: 8) {
+                SecureField(Strings.Wallet.newPasswordPlaceholder, text: $password)
+                  .textContentType(.newPassword)
+                  .focused($isFieldFocused)
+                Spacer()
+                if passwordStatus != .none {
+                  passwordStatusView(passwordStatus)
+                }
+              }
+              Divider()
+            }
+            VStack(alignment: .leading, spacing: 12) {
+              Text(Strings.Wallet.repeatedPasswordPlaceholder)
+                .foregroundColor(.primary)
+              HStack(spacing: 8) {
+                SecureField(Strings.Wallet.repeatedPasswordPlaceholder, text: $repeatedPassword, onCommit: createWallet)
+                  .textContentType(.newPassword)
+                Spacer()
+                if isInputsMatch {
+                  Text("\(Image(braveSystemName: "leo.check.normal")) \(Strings.Wallet.repeatedPasswordMatch)")
+                    .multilineTextAlignment(.trailing)
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+                }
+              }
+              Divider()
+            }
+          }
+          .font(.subheadline)
+          errorLabel(validationError)
+        }
+        Button(action: createWallet) {
+          Text(Strings.Wallet.continueButtonTitle)
+            .frame(maxWidth: .infinity)
+        }
+        .buttonStyle(BraveFilledButtonStyle(size: .large))
+        .disabled(isContinueDisabled)
+        .padding(.top, 60)
       }
-      Button(action: createWallet) {
-        Text(Strings.Wallet.continueButtonTitle)
-          .frame(maxWidth: .infinity)
-      }
-      .buttonStyle(BraveFilledButtonStyle(size: .large))
-      .disabled(isContinueDisabled)
-      .padding(.top, 60)
+      .padding(.horizontal, 20)
+      .padding(.bottom, 20)
     }
-    .padding(.horizontal, 20)
-    .padding(.bottom, 20)
     .background(Color(.braveBackground).edgesIgnoringSafeArea(.all))
     .background(
       NavigationLink(
@@ -235,9 +215,12 @@ private struct CreateWalletView: View {
     .onChange(of: password, perform: handleInputChange)
     .onChange(of: repeatedPassword, perform: handleInputChange)
     .navigationBarBackButtonHidden(isShowingCreatingWallet)
+    .frame(maxWidth: .infinity, maxHeight: .infinity)
     .overlay {
       if isShowingCreatingWallet {
         CreatingWalletView()
+          .ignoresSafeArea()
+          .frame(maxWidth: .infinity, maxHeight: .infinity)
       }
     }
     .toolbar(content: {
@@ -254,6 +237,10 @@ private struct CreateWalletView: View {
     .onAppear {
       isFieldFocused = true
     }
+    .transparentNavigationBar(
+      backButtonTitle: Strings.Wallet.createWalletBackButtonTitle,
+      backButtonDisplayMode: .generic
+    )
   }
 }
 
@@ -261,7 +248,7 @@ private struct CreateWalletView: View {
 struct CreateWalletView_Previews: PreviewProvider {
   static var previews: some View {
     NavigationView {
-      CreateWalletContainerView(
+      CreateWalletView(
         keyringStore: .previewStore,
         setupOption: .new,
         dismissAction: {}

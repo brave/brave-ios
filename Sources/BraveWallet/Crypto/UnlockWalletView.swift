@@ -82,7 +82,7 @@ struct UnlockWalletView: View {
             .disabled(!isPasswordValid)
             
             NavigationLink(
-              destination: RestoreWalletContainerView(
+              destination: RestoreWalletView(
                 keyringStore: keyringStore,
                 dismissAction: dismissAction
               )
