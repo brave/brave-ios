@@ -167,8 +167,12 @@ struct PortfolioHeaderView: View {
       timeframeSelector
       let chartData = historicalBalances.isEmpty ? emptyBalanceData : historicalBalances
       LineChartView(data: chartData, numberOfColumns: chartData.count, selectedDataPoint: $selectedBalance) {
-        LinearGradient(braveGradient: .lightGradient02)
-          .shimmer(isLoading)
+        LinearGradient(
+          gradient: Gradient(colors: [Color(.braveBlurpleTint).opacity(0.2), .clear]),
+          startPoint: .top,
+          endPoint: .bottom
+        )
+        .shimmer(isLoading)
       }
       .chartAccessibility(
         title: Strings.Wallet.portfolioPageTitle,

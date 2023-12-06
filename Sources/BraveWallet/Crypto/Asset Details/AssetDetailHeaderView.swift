@@ -228,8 +228,12 @@ struct AssetDetailHeaderView: View {
           .shimmer(assetDetailStore.isLoadingPrice)
           let data = assetDetailStore.priceHistory.isEmpty ? emptyData : assetDetailStore.priceHistory
           LineChartView(data: data, numberOfColumns: data.count, selectedDataPoint: $selectedCandle) {
-            Color(.walletGreen)
-              .shimmer(assetDetailStore.isLoadingChart)
+            LinearGradient(
+              gradient: Gradient(colors: [Color(.braveBlurpleTint).opacity(0.2), .clear]),
+              startPoint: .top,
+              endPoint: .bottom
+            )
+            .shimmer(assetDetailStore.isLoadingChart)
           }
           .chartAccessibility(
             title: String.localizedStringWithFormat(
