@@ -74,6 +74,8 @@ struct SaferSignTransactionContainerView: View {
         network: network,
         fromAddress: fromAddress,
         namedFromAddress: namedFromAddress,
+        receiverAddress: nil,
+        namedReceiverAddress: nil,
         fromToken: fromToken,
         fromAmount: fromAmount,
         toToken: toToken,

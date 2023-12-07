@@ -18,6 +18,11 @@ struct SaferSignTransactionView: View {
   /// The name of the account
   let namedFromAddress: String?
   
+  /// The address of the recipient (applicable to CoW Swap)
+  let receiverAddress: String?
+  /// The named address of the recipient (applicable to CoW Swap)
+  let namedReceiverAddress: String?
+  
   /// The token being swapped from.
   let fromToken: BraveWallet.BlockchainToken?
   /// The amount of the `tokToken` being swapped.
@@ -40,6 +45,8 @@ struct SaferSignTransactionView: View {
     network: BraveWallet.NetworkInfo?,
     fromAddress: String?,
     namedFromAddress: String?,
+    receiverAddress: String?,
+    namedReceiverAddress: String?,
     fromToken: BraveWallet.BlockchainToken?,
     fromAmount: String?,
     toToken: BraveWallet.BlockchainToken?,
@@ -48,6 +55,8 @@ struct SaferSignTransactionView: View {
     self.network = network
     self.fromAddress = fromAddress
     self.namedFromAddress = namedFromAddress
+    self.receiverAddress = receiverAddress
+    self.namedReceiverAddress = namedReceiverAddress
     self.fromToken = fromToken
     self.fromAmount = fromAmount
     self.toToken = toToken
@@ -116,6 +125,22 @@ struct SaferSignTransactionView: View {
           .fontWeight(.medium)
           .foregroundColor(Color(.secondaryBraveLabel))
         Spacer()
+        if let fromAddress, let receiverAddress,
+           receiverAddress.caseInsensitiveCompare(fromAddress) != .orderedSame {
+          AddressView(address: receiverAddress) {
+            HStack(spacing: 2) {
+              Blockie(address: receiverAddress)
+                .frame(width: 15, height: 15)
+              Text(namedReceiverAddress ?? "")
+                .font(.footnote)
+            }
+            .padding(4)
+            .overlay(
+              RoundedRectangle(cornerSize: CGSize(width: 4, height: 4))
+                .stroke(Color(.braveSeparator), lineWidth: pixelLength)
+            )
+          }
+        }
       }
       TokenRow(
         title: "\(minBuyAmount ?? "") \(toToken?.symbol ?? "")",
@@ -235,6 +260,8 @@ struct SaferSignTransactionView_Previews: PreviewProvider {
             network: parsedTransaction.network,
             fromAddress: parsedTransaction.fromAddress,
             namedFromAddress: parsedTransaction.namedFromAddress,
+            receiverAddress: nil,
+            namedReceiverAddress: nil,
             fromToken: .mockUSDCToken,
             fromAmount: "1",
             toToken: .previewDaiToken,

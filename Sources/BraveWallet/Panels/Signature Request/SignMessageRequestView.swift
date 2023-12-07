@@ -342,7 +342,7 @@ private struct MessageWarningView: View {
 }
 
 /// View that displays the current index, total number of items and a `Next` button to move to next index.
-private struct NextIndexButton: View {
+struct NextIndexButton: View {
   
   let currentIndex: Int
   let count: Int
