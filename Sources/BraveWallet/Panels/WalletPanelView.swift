@@ -528,7 +528,7 @@ struct WalletPanelView: View {
     }
     .foregroundColor(.white)
     .background(
-      Color(.braveBackground)
+      Color(.braveGroupedBackground)
       .ignoresSafeArea()
     )
     .onChange(of: cryptoStore.pendingRequest) { newValue in
