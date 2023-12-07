@@ -77,8 +77,10 @@ struct SaferSignTransactionContainerView: View {
         receiverAddress: nil,
         namedReceiverAddress: nil,
         fromToken: fromToken,
+        fromTokenContractAddress: fromToken?.contractAddress,
         fromAmount: fromAmount,
         toToken: toToken,
+        toTokenContractAddress: toToken?.contractAddress,
         minBuyAmount: minBuyAmount
       )
       

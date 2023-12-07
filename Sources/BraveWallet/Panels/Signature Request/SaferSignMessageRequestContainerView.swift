@@ -64,8 +64,10 @@ struct SaferSignMessageRequestContainerView: View {
             receiverAddress: receiverAddress,
             namedReceiverAddress: namedReceiverAddress,
             fromToken: ethSwapDetails?.fromToken,
+            fromTokenContractAddress: cowSwapOrder.sellToken,
             fromAmount: ethSwapDetails?.fromAmount,
             toToken: ethSwapDetails?.toToken,
+            toTokenContractAddress: cowSwapOrder.buyToken,
             minBuyAmount: ethSwapDetails?.minBuyAmount
           )
 

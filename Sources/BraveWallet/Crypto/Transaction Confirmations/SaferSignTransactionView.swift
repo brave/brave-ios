@@ -25,11 +25,15 @@ struct SaferSignTransactionView: View {
   
   /// The token being swapped from.
   let fromToken: BraveWallet.BlockchainToken?
+  /// The contract address of the from token
+  let fromTokenContractAddress: String?
   /// The amount of the `tokToken` being swapped.
   let fromAmount: String?
   
   /// The token being swapped for.
   let toToken: BraveWallet.BlockchainToken?
+  /// The contract address of the to token
+  let toTokenContractAddress: String?
   /// Minimum amount being bought of the `toToken`.
   let minBuyAmount: String?
   
@@ -48,8 +52,10 @@ struct SaferSignTransactionView: View {
     receiverAddress: String?,
     namedReceiverAddress: String?,
     fromToken: BraveWallet.BlockchainToken?,
+    fromTokenContractAddress: String?,
     fromAmount: String?,
     toToken: BraveWallet.BlockchainToken?,
+    toTokenContractAddress: String?,
     minBuyAmount: String?
   ) {
     self.network = network
@@ -58,8 +64,10 @@ struct SaferSignTransactionView: View {
     self.receiverAddress = receiverAddress
     self.namedReceiverAddress = namedReceiverAddress
     self.fromToken = fromToken
+    self.fromTokenContractAddress = fromTokenContractAddress
     self.fromAmount = fromAmount
     self.toToken = toToken
+    self.toTokenContractAddress = toTokenContractAddress
     self.minBuyAmount = minBuyAmount
   }
   
@@ -109,6 +117,7 @@ struct SaferSignTransactionView: View {
         title: "\(fromAmount ?? "") \(fromToken?.symbol ?? "")",
         subTitle: String.localizedStringWithFormat(Strings.Wallet.swapConfirmationNetworkDesc, network?.chainName ?? ""),
         token: fromToken,
+        tokenContractAddress: fromTokenContractAddress,
         network: network,
         assetIconSize: assetIconSize,
         maxAssetIconSize: maxAssetIconSize,
@@ -146,6 +155,7 @@ struct SaferSignTransactionView: View {
         title: "\(minBuyAmount ?? "") \(toToken?.symbol ?? "")",
         subTitle: String.localizedStringWithFormat(Strings.Wallet.swapConfirmationNetworkDesc, network?.chainName ?? ""),
         token: toToken,
+        tokenContractAddress: toTokenContractAddress,
         network: network,
         assetIconSize: assetIconSize,
         maxAssetIconSize: maxAssetIconSize,
@@ -187,11 +197,14 @@ private struct TokenRow: View {
   let title: String
   let subTitle: String
   let token: BraveWallet.BlockchainToken?
+  let tokenContractAddress: String?
   let network: BraveWallet.NetworkInfo?
   let assetIconSize: CGFloat
   let maxAssetIconSize: CGFloat
   let assetNetworkIconSize: CGFloat
   let maxAssetNetworkIconSize: CGFloat
+  
+  @Environment(\.openURL) private var openWalletURL
   
   var body: some View {
     HStack {
@@ -218,6 +231,16 @@ private struct TokenRow: View {
           .font(.footnote)
       }
       Spacer()
+      if let toTokenContractAddress = tokenContractAddress ?? token?.contractAddress,
+         let explorerUrl = network?.tokenBlockExplorerURL(toTokenContractAddress) {
+        Button(action: {
+          openWalletURL(explorerUrl)
+        }) {
+          Label(Strings.Wallet.viewOnBlockExplorer, systemImage: "arrow.up.forward.square")
+            .labelStyle(.iconOnly)
+            .foregroundColor(Color(braveSystemName: .iconInteractive))
+        }
+      }
     }
   }
 }
@@ -263,8 +286,10 @@ struct SaferSignTransactionView_Previews: PreviewProvider {
             receiverAddress: nil,
             namedReceiverAddress: nil,
             fromToken: .mockUSDCToken,
+            fromTokenContractAddress: BraveWallet.BlockchainToken.mockUSDCToken.contractAddress,
             fromAmount: "1",
             toToken: .previewDaiToken,
+            toTokenContractAddress: BraveWallet.BlockchainToken.previewDaiToken.contractAddress,
             minBuyAmount: "0.994798"
           )
         }
