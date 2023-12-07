@@ -27,6 +27,7 @@ struct AssetDetailHeaderView: View {
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   @Environment(\.openURL) private var openWalletURL
+  @Environment(\.colorScheme) private var colourScheme
   @State private var selectedCandle: BraveWallet.AssetTimePrice?
 
   private var deltaText: some View {
@@ -229,7 +230,7 @@ struct AssetDetailHeaderView: View {
           let data = assetDetailStore.priceHistory.isEmpty ? emptyData : assetDetailStore.priceHistory
           LineChartView(data: data, numberOfColumns: data.count, selectedDataPoint: $selectedCandle) {
             LinearGradient(
-              gradient: Gradient(colors: [Color(.braveBlurpleTint).opacity(0.2), .clear]),
+              gradient: Gradient(colors: [Color(.braveBlurpleTint).opacity(colourScheme == .dark ? 0.5 : 0.2), .clear]),
               startPoint: .top,
               endPoint: .bottom
             )
