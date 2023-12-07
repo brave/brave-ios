@@ -21,6 +21,12 @@ struct SaferSignMessageRequestContainerView: View {
   let cowSwapOrder: BraveWallet.CowSwapOrder
   let ethSwapDetails: EthSwapDetails?
 
+  /// A map between request id and a boolean value indicates this request message needs pilcrow formating.
+  @Binding var needPilcrowFormatted: [Int32: Bool]
+  /// A map between request id and a boolean value indicates this request message is displayed as
+  /// its original content.
+  @Binding var showOrignalMessage: [Int32: Bool]
+
   var nextTapped: () -> Void
   var action: (_ approved: Bool) -> Void
 
@@ -39,20 +45,31 @@ struct SaferSignMessageRequestContainerView: View {
         requestsHeader
         
         originAndFavicon
+
+        Spacer(minLength: 20)
         
-        Spacer(minLength: 20) // match spacing in `SaferSignTransactionView`
-        
-        SaferSignTransactionView(
-          network: network,
-          fromAddress: account.address,
-          namedFromAddress: namedFromAddress,
-          receiverAddress: receiverAddress,
-          namedReceiverAddress: namedReceiverAddress,
-          fromToken: ethSwapDetails?.fromToken,
-          fromAmount: ethSwapDetails?.fromAmount,
-          toToken: ethSwapDetails?.toToken,
-          minBuyAmount: ethSwapDetails?.minBuyAmount
-        )
+        if isShowingDetails {
+          SignMessageRequestContentView(
+            request: request,
+            needPilcrowFormatted: $needPilcrowFormatted,
+            showOrignalMessage: $showOrignalMessage
+          )
+          // match spacing from comparison in `SaferSignTransactionView`
+          .padding(.vertical, 20)
+        } else {
+          SaferSignTransactionView(
+            network: network,
+            fromAddress: account.address,
+            namedFromAddress: namedFromAddress,
+            receiverAddress: receiverAddress,
+            namedReceiverAddress: namedReceiverAddress,
+            fromToken: ethSwapDetails?.fromToken,
+            fromAmount: ethSwapDetails?.fromAmount,
+            toToken: ethSwapDetails?.toToken,
+            minBuyAmount: ethSwapDetails?.minBuyAmount
+          )
+
+        }
         
         networkFeeSection
         
@@ -166,7 +183,6 @@ struct SaferSignMessageRequestContainerView: View {
         }
         Spacer()
         Button(action: {
-          // TODO: Show Details view
           isShowingDetails.toggle()
         }) {
           Text(detailsButtonTitle)
