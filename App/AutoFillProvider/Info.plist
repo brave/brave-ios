@@ -26,6 +26,11 @@
 	<string>$(BRAVE_GROUP_ID)</string>
 	<key>NSExtension</key>
 	<dict>
+		<key>NSExtensionAttributes</key>
+		<dict>
+			<key>ASCredentialProviderExtensionShowsConfigurationUI</key>
+			<true/>
+		</dict>
 		<key>NSExtensionMainStoryboard</key>
 		<string>Main</string>
 		<key>NSExtensionPointIdentifier</key>

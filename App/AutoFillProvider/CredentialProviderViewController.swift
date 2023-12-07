@@ -11,25 +11,13 @@ import CredentialProviderUI
 
 class CredentialProviderViewController: ASCredentialProviderViewController {
   let model = CredentialListModel()
-  var identifiers: [ASCredentialServiceIdentifier] = []
+  var identifiers: [ASCredentialServiceIdentifier]?
   lazy var credentialStore = CredentialProviderAPI.credentialStore()
   
   override func viewDidLoad() {
     super.viewDidLoad()
     
     view.backgroundColor = .red
-    
-    let hostingController = UIHostingController(rootView: CredentialListView(model: model))
-    addChild(hostingController)
-    view.addSubview(hostingController.view)
-    hostingController.didMove(toParent: self)
-    hostingController.view.translatesAutoresizingMaskIntoConstraints = false
-    NSLayoutConstraint.activate([
-      hostingController.view.topAnchor.constraint(equalTo: view.topAnchor),
-      hostingController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-      hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-      hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-    ])
     
     model.actionHandler = { [unowned self] action in
       switch action {
@@ -44,7 +32,21 @@ class CredentialProviderViewController: ASCredentialProviderViewController {
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     
-    model.populateFromStore(credentialStore, identifiers: identifiers)
+    if let identifiers {
+      let hostingController = UIHostingController(rootView: CredentialListView(model: model))
+      addChild(hostingController)
+      view.addSubview(hostingController.view)
+      hostingController.didMove(toParent: self)
+      hostingController.view.translatesAutoresizingMaskIntoConstraints = false
+      NSLayoutConstraint.activate([
+        hostingController.view.topAnchor.constraint(equalTo: view.topAnchor),
+        hostingController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+        hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+        hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+      ])
+      
+      model.populateFromStore(credentialStore, identifiers: identifiers)
+    }
   }
   
   func userSelected(item: any Credential) {
@@ -81,6 +83,24 @@ class CredentialProviderViewController: ASCredentialProviderViewController {
       return
     }
     userSelected(item: credential)
+  }
+  
+  override func prepareInterfaceForExtensionConfiguration() {
+    super.prepareInterfaceForExtensionConfiguration()
+    
+    let hostingController = UIHostingController(rootView: CredentialProviderOnboardingView(action: {
+      self.extensionContext.completeExtensionConfigurationRequest()
+    }))
+    addChild(hostingController)
+    view.addSubview(hostingController.view)
+    hostingController.didMove(toParent: self)
+    hostingController.view.translatesAutoresizingMaskIntoConstraints = false
+    NSLayoutConstraint.activate([
+      hostingController.view.topAnchor.constraint(equalTo: view.topAnchor),
+      hostingController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+      hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+      hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+    ])
   }
   
   /*
