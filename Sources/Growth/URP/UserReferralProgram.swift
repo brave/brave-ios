@@ -229,7 +229,8 @@ public class UserReferralProgram {
       UrpLog.log("Enough time has passed, removing referral code data")
       return nil
     } else if let referralCode = Preferences.URP.referralCode.value {
-      // Appending ref code to dau ping if user used installed the app via user referral program.
+      // Appending ref code to dau ping if user used installed the app via
+      // user referral program or apple search ad
       if Preferences.URP.referralCodeDeleteDate.value == nil {
         UrpLog.log("Setting new date for deleting referral code.")
         let timeToDelete = AppConstants.buildChannel.isPublic ? 90.days : 20.minutes

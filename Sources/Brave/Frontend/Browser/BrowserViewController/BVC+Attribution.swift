@@ -26,6 +26,8 @@ extension BrowserViewController {
       // This value should be set before first DAU ping
       Preferences.URP.referralCode.value = refCode
       Preferences.URP.installAttributionLookupOutstanding.value = false
+      
+      self.dau.sendPingToServer()
     }
   }
   
@@ -46,15 +48,12 @@ extension BrowserViewController {
     urp.referralLookup(refCode: refCode) { [weak self] referralCode, offerUrl in
       guard let self = self else { return }
       
-      // Attempting to send ping after first urp lookup.
-      // This way we can grab the referral code if it exists, see issue #2586.
-      if Preferences.URP.installAttributionLookupOutstanding.value == false {
-        self.dau.sendPingToServer()
-      }
+      Preferences.URP.referralLookupOutstanding.value = false
+      
       let retryTime = AppConstants.buildChannel.isPublic ? 1.days : 10.minutes
       let retryDeadline = Date() + retryTime
 
-        Preferences.NewTabPage.superReferrerThemeRetryDeadline.value = retryDeadline
+      Preferences.NewTabPage.superReferrerThemeRetryDeadline.value = retryDeadline
 
       guard let url = offerUrl?.asURL else { return }
       self.openReferralLink(url: url)

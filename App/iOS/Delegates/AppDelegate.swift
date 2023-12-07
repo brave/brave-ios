@@ -213,17 +213,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       }
 
       SceneDelegate.shouldHandleUrpLookup = true
+      
+      if Preferences.URP.installAttributionLookupOutstanding.value == nil {
+        // Similarly to referral lookup, this prefrence should be set if it is a new user
+        // Trigger install attribution fetch only first launch
+        Preferences.URP.installAttributionLookupOutstanding.value = isFirstLaunch
+      }
+      
+      SceneDelegate.shouldHandleInstallAttributionFetch = true
     } else {
       log.error("Failed to initialize user referral program")
       UrpLog.log("Failed to initialize user referral program")
-    }
-
-    if Preferences.URP.installAttributionLookupOutstanding.value == nil {
-      // Similarly to referral lookup, this prefrence should be set if it is a new user
-      // Trigger install attribution fetch only first launch
-      Preferences.URP.installAttributionLookupOutstanding.value = isFirstLaunch
-
-      SceneDelegate.shouldHandleInstallAttributionFetch = true
     }
     
 #if canImport(BraveTalk)

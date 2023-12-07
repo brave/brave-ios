@@ -213,7 +213,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // We try to send DAU ping each time the app goes to foreground to work around network edge cases
     // (offline, bad connection etc.).
     // Also send the ping only after the URP lookup and install attribution has processed.
-    if Preferences.URP.referralLookupOutstanding.value == false, Preferences.URP.installAttributionLookupOutstanding.value == false {
+    if Preferences.URP.referralLookupOutstanding.value == true, Preferences.URP.installAttributionLookupOutstanding.value == true {
       AppState.shared.dau.sendPingToServer()
     }
     
