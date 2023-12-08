@@ -799,7 +799,7 @@ class NewTabPageViewController: UIViewController {
         preferredStyle: .alert)
       
       alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel))
-      alert.addAction(UIAlertAction(title: Strings.OKString, style: .default) { [weak self] _ in
+      alert.addAction(UIAlertAction(title: Strings.PrivacyHub.hidePrivacyHubWidgetActionButtonTitle, style: .default) { [weak self] _ in
         Preferences.NewTabPage.showNewTabPrivacyHub.value = false
         Preferences.NewTabPage.hidePrivacyHubAlertShown.value = true
         self?.collectionView.reloadData()
