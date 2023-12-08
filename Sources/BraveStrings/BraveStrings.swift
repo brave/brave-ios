@@ -552,6 +552,10 @@ extension Strings {
     NSLocalizedString("SearchSettingBrowserSuggestionCellTitle", tableName: "BraveShared", bundle: .module,
       value: "Show Browser Suggestions",
       comment: "Label for showing browser suggestion setting")
+  public static let searchSettingBrowserSuggestionCellDescription =
+    NSLocalizedString("SearchSettingBrowserSuggestionCellDescription", tableName: "BraveShared", bundle: .module,
+      value: "Turn this on to include results from your History and Bookmarks when searching",
+      comment: "Label for showing browser suggestion setting description")
   public static let searchSettingAddCustomEngineCellTitle =
     NSLocalizedString("searchSettingAddCustomEngineCellTitle", tableName: "BraveShared", bundle: .module,
       value: "Add Custom Search Engine",

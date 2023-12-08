@@ -242,8 +242,11 @@ class SearchSettingsTableViewController: UITableViewController {
           $0.isOn = searchEngines.shouldShowBrowserSuggestions
         }
 
-        cell = tableView.dequeueReusableCell(withIdentifier: Constants.showBrowserSuggestionsRowIdentifier, for: indexPath).then {
+        cell = UITableViewCell(style: .subtitle, reuseIdentifier: Constants.showBrowserSuggestionsRowIdentifier).then {
           $0.textLabel?.text = Strings.searchSettingBrowserSuggestionCellTitle
+          $0.detailTextLabel?.numberOfLines = 0
+          $0.detailTextLabel?.textColor = .secondaryBraveLabel
+          $0.detailTextLabel?.text = Strings.searchSettingBrowserSuggestionCellDescription
           $0.accessoryView = toggle
           $0.selectionStyle = .none
         }
