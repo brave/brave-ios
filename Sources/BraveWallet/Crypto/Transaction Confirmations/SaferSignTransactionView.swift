@@ -134,13 +134,12 @@ struct SaferSignTransactionView: View {
           .fontWeight(.medium)
           .foregroundColor(Color(.secondaryBraveLabel))
         Spacer()
-        if let fromAddress, let receiverAddress,
-           receiverAddress.caseInsensitiveCompare(fromAddress) != .orderedSame {
+        if let receiverAddress {
           AddressView(address: receiverAddress) {
             HStack(spacing: 2) {
               Blockie(address: receiverAddress)
                 .frame(width: 15, height: 15)
-              Text(namedReceiverAddress ?? "")
+              Text(namedReceiverAddress ?? receiverAddress.truncatedAddress)
                 .font(.footnote)
             }
             .padding(4)
