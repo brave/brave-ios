@@ -43,11 +43,10 @@ public struct CryptoView: View {
   }
 
   private var visibleScreen: VisibleScreen {
-    let keyring = keyringStore.defaultKeyring
-    if !keyring.isKeyringCreated || keyringStore.isOnboardingVisible {
+    if !keyringStore.isWalletCreated || keyringStore.isOnboardingVisible {
       return .onboarding
     }
-    if keyring.isLocked || keyringStore.isRestoreFromUnlockBiometricsPromptVisible {
+    if keyringStore.isWalletLocked || keyringStore.isRestoreFromUnlockBiometricsPromptVisible {
       return .unlock
     }
     return .crypto
@@ -237,7 +236,7 @@ public struct CryptoView: View {
         }
       case .unlock:
         UIKitNavigationView {
-          UnlockWalletView(keyringStore: keyringStore)
+          UnlockWalletView(keyringStore: keyringStore, dismissAction: dismissAction)
             .toolbar {
               dismissButtonToolbarContents
             }
@@ -253,7 +252,7 @@ public struct CryptoView: View {
           .zIndex(2)  // Needed or the dismiss animation messes up
         } else {
           UIKitNavigationView {
-            SetupCryptoView(keyringStore: keyringStore)
+            SetupCryptoView(keyringStore: keyringStore, dismissAction: dismissAction)
               .toolbar {
                 ToolbarItemGroup(placement: .destructiveAction) {
                   Button(action: {
@@ -312,12 +311,11 @@ private struct CryptoContainerView<DismissContent: ToolbarContent>: View {
   }
 
   var body: some View {
-    UIKitNavigationView {
-      CryptoPagesView(cryptoStore: cryptoStore, keyringStore: keyringStore)
-        .toolbar {
-          toolbarDismissContent
-        }
-    }
+    CryptoTabsView(
+      cryptoStore: cryptoStore,
+      keyringStore: keyringStore,
+      toolbarDismissContent: toolbarDismissContent
+    )
     .background(
       Color.clear
         .sheet(item: $cryptoStore.buySendSwapDestination) { action in
@@ -366,7 +364,7 @@ private struct CryptoContainerView<DismissContent: ToolbarContent>: View {
     )
     .environment(
       \.buySendSwapDestination,
-      Binding(
+       Binding(
         get: { [weak cryptoStore] in cryptoStore?.buySendSwapDestination },
         set: { [weak cryptoStore] destination in
           if cryptoStore?.isPresentingAssetSearch == true {

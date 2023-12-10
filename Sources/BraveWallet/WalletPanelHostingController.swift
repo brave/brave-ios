@@ -9,6 +9,7 @@ import BraveCore
 import SwiftUI
 import Combine
 import BraveUI
+import Shared
 
 /// Displays a summary of the users wallet when they are visiting a webpage that wants to connect with the
 /// users wallet
@@ -61,9 +62,8 @@ public class WalletPanelHostingController: UIHostingController<WalletPanelContai
     }
     
     // Dismiss Buy/Send/Swap Menu when Wallet becomes locked
-    cancellable = walletStore.keyringStore.$defaultKeyring
+    cancellable = walletStore.keyringStore.$isWalletLocked
       .dropFirst() // Drop initial value
-      .map(\.isLocked)
       .removeDuplicates()
       .dropFirst() // Drop first async fetch of keyring
       .sink { [weak self] isLocked in

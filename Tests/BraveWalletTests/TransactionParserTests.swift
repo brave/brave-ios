@@ -124,13 +124,14 @@ class TransactionParserTests: XCTestCase {
       fromAddress: accountInfos[0].address,
       namedToAddress: "Ethereum Account 2",
       toAddress: "0x0987654321098765432109876543210987654321",
-      networkSymbol: "ETH",
+      network: .mockMainnet,
       details: .ethSend(
         .init(
           fromToken: network.nativeToken,
           fromValue: "0x1b667a56d488000",
           fromAmount: "0.1234",
           fromFiat: "$0.12",
+          fromTokenMetadata: nil,
           gasFee: .init(
             fee: "0.000031",
             fiat: "$0.000031"
@@ -146,6 +147,7 @@ class TransactionParserTests: XCTestCase {
       userAssets: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
+      nftMetadata: [:],
       solEstimatedTxFee: nil,
       currencyFormatter: currencyFormatter
     ) else {
@@ -219,13 +221,14 @@ class TransactionParserTests: XCTestCase {
       fromAddress: accountInfos[0].address,
       namedToAddress: "Ethereum Account 2",
       toAddress: "0x0987654321098765432109876543210987654321",
-      networkSymbol: "ETH",
+      network: .mockMainnet,
       details: .erc20Transfer(
         .init(
           fromToken: .previewDaiToken,
           fromValue: "0x5ff20a91f724000",
           fromAmount: "0.4321",
           fromFiat: "$0.86",
+          fromTokenMetadata: nil,
           gasFee: .init(
             fee: "0.000078",
             fiat: "$0.000078"
@@ -241,6 +244,7 @@ class TransactionParserTests: XCTestCase {
       userAssets: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
+      nftMetadata: [:],
       solEstimatedTxFee: nil,
       currencyFormatter: currencyFormatter
     ) else {
@@ -305,7 +309,7 @@ class TransactionParserTests: XCTestCase {
       fromAddress: accountInfos[0].address,
       namedToAddress: "0x Exchange Proxy",
       toAddress: "0xDef1C0ded9bec7F1a1670819833240f027b25EfF",
-      networkSymbol: "ETH",
+      network: .mockMainnet,
       details: .ethSwap(
         .init(
           fromToken: .previewToken,
@@ -331,6 +335,7 @@ class TransactionParserTests: XCTestCase {
       userAssets: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
+      nftMetadata: [:],
       solEstimatedTxFee: nil,
       currencyFormatter: currencyFormatter
     ) else {
@@ -395,7 +400,7 @@ class TransactionParserTests: XCTestCase {
       fromAddress: accountInfos[0].address,
       namedToAddress: "0x Exchange Proxy",
       toAddress: "0xDef1C0ded9bec7F1a1670819833240f027b25EfF",
-      networkSymbol: "ETH",
+      network: .mockMainnet,
       details: .ethSwap(
         .init(
           fromToken: .mockUSDCToken,
@@ -421,6 +426,7 @@ class TransactionParserTests: XCTestCase {
       userAssets: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
+      nftMetadata: [:],
       solEstimatedTxFee: nil,
       currencyFormatter: currencyFormatter
     ) else {
@@ -481,13 +487,14 @@ class TransactionParserTests: XCTestCase {
       fromAddress: accountInfos[0].address,
       namedToAddress: BraveWallet.BlockchainToken.previewDaiToken.contractAddress.truncatedAddress,
       toAddress: BraveWallet.BlockchainToken.previewDaiToken.contractAddress,
-      networkSymbol: "ETH",
+      network: .mockMainnet,
       details: .ethErc20Approve(
         .init(
           token: .previewDaiToken,
           tokenContractAddress: BraveWallet.BlockchainToken.previewDaiToken.contractAddress,
           approvalValue: "0x2386f26fc10000",
           approvalAmount: "0.01",
+          approvalFiat: "$0.02",
           isUnlimited: false,
           spenderAddress: "",
           gasFee: .init(
@@ -505,6 +512,7 @@ class TransactionParserTests: XCTestCase {
       userAssets: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
+      nftMetadata: [:],
       solEstimatedTxFee: nil,
       currencyFormatter: currencyFormatter
     ) else {
@@ -565,13 +573,14 @@ class TransactionParserTests: XCTestCase {
       fromAddress: accountInfos[0].address,
       namedToAddress: BraveWallet.BlockchainToken.previewDaiToken.contractAddress.truncatedAddress,
       toAddress: BraveWallet.BlockchainToken.previewDaiToken.contractAddress,
-      networkSymbol: "ETH",
+      network: .mockMainnet,
       details: .ethErc20Approve(
         .init(
           token: .previewDaiToken,
           tokenContractAddress: BraveWallet.BlockchainToken.previewDaiToken.contractAddress,
           approvalValue: "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
           approvalAmount: "Unlimited",
+          approvalFiat: "Unlimited",
           isUnlimited: true,
           spenderAddress: "",
           gasFee: .init(
@@ -589,6 +598,7 @@ class TransactionParserTests: XCTestCase {
       userAssets: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
+      nftMetadata: [:],
       solEstimatedTxFee: nil,
       currencyFormatter: currencyFormatter
     ) else {
@@ -653,12 +663,13 @@ class TransactionParserTests: XCTestCase {
       fromAddress: accountInfos[0].address,
       namedToAddress: "Ethereum Account 2",
       toAddress: "0x0987654321098765432109876543210987654321",
-      networkSymbol: "ETH",
+      network: .mockMainnet,
       details: .erc721Transfer(
         .init(
           fromToken: .previewDaiToken,
           fromValue: "1",
           fromAmount: "1",
+          nftMetadata: nil,
           owner: "0x1111111111aaaaaaaaaa2222222222bbbbbbbbbb",
           tokenId: "token.id",
           gasFee: .init(
@@ -676,6 +687,7 @@ class TransactionParserTests: XCTestCase {
       userAssets: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
+      nftMetadata: [:],
       solEstimatedTxFee: nil,
       currencyFormatter: currencyFormatter
     ) else {
@@ -737,13 +749,14 @@ class TransactionParserTests: XCTestCase {
       fromAddress: accountInfos[2].accountId.address,
       namedToAddress: accountInfos[3].name,
       toAddress: accountInfos[3].accountId.address,
-      networkSymbol: "SOL",
+      network: .mockSolana,
       details: .solSystemTransfer(
         .init(
           fromToken: .mockSolToken,
           fromValue: "100000000",
           fromAmount: "0.1",
           fromFiat: "$2.00",
+          fromTokenMetadata: nil,
           gasFee: .init(
             fee: "0.00123",
             fiat: "$0.0246"
@@ -759,6 +772,7 @@ class TransactionParserTests: XCTestCase {
       userAssets: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
+      nftMetadata: [:],
       solEstimatedTxFee: 1230000,
       currencyFormatter: currencyFormatter
     ) else {
@@ -834,13 +848,14 @@ class TransactionParserTests: XCTestCase {
       fromAddress: accountInfos[2].accountId.address,
       namedToAddress: accountInfos[3].name,
       toAddress: accountInfos[3].accountId.address,
-      networkSymbol: "SOL",
+      network: .mockSolana,
       details: .solSplTokenTransfer(
         .init(
           fromToken: .mockSpdToken,
           fromValue: "43210000",
           fromAmount: "43.21",
           fromFiat: "$648.15",
+          fromTokenMetadata: nil,
           gasFee: .init(
             fee: "0.0123",
             fiat: "$0.246"
@@ -856,6 +871,7 @@ class TransactionParserTests: XCTestCase {
       userAssets: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
+      nftMetadata: [:],
       solEstimatedTxFee: 12300000,
       currencyFormatter: currencyFormatter
     ) else {
@@ -918,13 +934,14 @@ class TransactionParserTests: XCTestCase {
       fromAddress: accountInfos[2].accountId.address,
       namedToAddress: accountInfos[3].name,
       toAddress: accountInfos[3].accountId.address,
-      networkSymbol: "SOL",
+      network: .mockSolana,
       details: .solSplTokenTransfer(
         .init(
           fromToken: .mockSolanaNFTToken,
           fromValue: "1",
           fromAmount: "1",
           fromFiat: "",
+          fromTokenMetadata: nil,
           gasFee: .init(
             fee: "0.0123",
             fiat: "$0.246"
@@ -940,6 +957,7 @@ class TransactionParserTests: XCTestCase {
       userAssets: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
+      nftMetadata: [:],
       solEstimatedTxFee: 12300000,
       currencyFormatter: currencyFormatter
     ) else {
@@ -1129,7 +1147,7 @@ class TransactionParserTests: XCTestCase {
       fromAddress: accountInfos[4].address,
       namedToAddress: accountInfos[5].name,
       toAddress: accountInfos[5].address,
-      networkSymbol: "FIL",
+      network: .mockFilecoinTestnet,
       details: .filSend(
         .init(
           sendToken: .mockFilToken,
@@ -1154,6 +1172,7 @@ class TransactionParserTests: XCTestCase {
       userAssets: tokens,
       allTokens: tokens,
       assetRatios: assetRatios,
+      nftMetadata: [:],
       solEstimatedTxFee: nil,
       currencyFormatter: currencyFormatter
     ) else {

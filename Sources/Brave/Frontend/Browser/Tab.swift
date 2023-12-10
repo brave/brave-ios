@@ -58,10 +58,21 @@ protocol URLChangeDelegate {
 }
 
 enum TabSecureContentState {
-  case localHost
-  case secure
-  case insecure
   case unknown
+  case localhost
+  case secure
+  case invalidCert
+  case missingSSL
+  case mixedContent
+  
+  var shouldDisplayWarning: Bool {
+    switch self {
+    case .unknown, .invalidCert, .missingSSL, .mixedContent:
+      return true
+    case .localhost, .secure:
+      return false
+    }
+  }
 }
 
 class Tab: NSObject {
@@ -398,7 +409,8 @@ class Tab: NSObject {
         .cookieBlocking: Preferences.Privacy.blockAllCookies.value,
         .mediaBackgroundPlay: Preferences.General.mediaAutoBackgrounding.value,
         .nightMode: Preferences.General.nightModeEnabled.value,
-        .deAmp: Preferences.Shields.autoRedirectAMPPages.value
+        .deAmp: Preferences.Shields.autoRedirectAMPPages.value,
+        .playlistMediaSource: Preferences.Playlist.webMediaSourceCompatibility.value,
       ]
       
       userScripts = Set(scriptPreferences.filter({ $0.value }).map({ $0.key }))
@@ -550,7 +562,6 @@ class Tab: NSObject {
 
     guard let lastTitle = lastTitle, !lastTitle.isEmpty else {
       // FF uses url?.displayURL?.absoluteString ??  ""
-      // but we can grab the title from `TabMO`
       if let title = url?.absoluteString {
         syncTab?.setTitle(title)
         return title
@@ -704,6 +715,13 @@ class Tab: NSObject {
 
   func updateUserAgent(_ webView: WKWebView, newURL: URL) {
     guard let baseDomain = newURL.baseDomain else { return }
+    
+    let screenWidth = webView.currentScene?.screen.bounds.width ?? webView.bounds.size.width
+    if webView.traitCollection.horizontalSizeClass == .compact && (webView.bounds.size.width < screenWidth / 2.0) {
+      let desktopMode = userAgentOverrides[baseDomain] == true
+      webView.customUserAgent = desktopMode ? UserAgent.desktop : UserAgent.mobile
+      return
+    }
 
     let desktopMode = userAgentOverrides[baseDomain] ?? UserAgent.shouldUseDesktopMode
     webView.customUserAgent = desktopMode ? UserAgent.desktop : UserAgent.mobile

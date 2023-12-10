@@ -529,7 +529,8 @@ struct CustomNetworkDetailsView: View {
       supportedKeyrings: [BraveWallet.KeyringId.default.rawValue].map(NSNumber.init(value:)),
       isEip1559: false
     )
-    networkStore.addCustomNetwork(network) { accepted, errMsg in
+    Task { @MainActor in
+      let (accepted, errMsg) = await networkStore.addCustomNetwork(network)
       guard accepted else {
         customNetworkError = .failed(errorMessage: errMsg)
         return
@@ -547,7 +548,7 @@ struct NetworkRadioButton: View {
   var body: some View {
     Image(braveSystemName: checked ? "leo.check.circle-outline" : "leo.radio.unchecked")
       .renderingMode(.template)
-      .foregroundColor(Color(checked ? .braveBlurpleTint : .braveDisabled))
+      .foregroundColor(Color((checked && !isDisabled) ? .braveBlurpleTint : .braveDisabled))
       .font(.title3)
       .onTapGesture {
         if !self.isDisabled && !checked {

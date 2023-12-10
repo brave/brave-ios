@@ -186,8 +186,7 @@ class NewTabPageViewController: UIViewController {
         
         self?.present(host, animated: true)
       }, hidePrivacyHubPressed: { [weak self] in
-        Preferences.NewTabPage.showNewTabPrivacyHub.value = false
-        self?.collectionView.reloadData()
+        self?.hidePrivacyHub()
       }),
       FavoritesSectionProvider(action: { [weak self] bookmark, action in
         self?.handleFavoriteAction(favorite: bookmark, action: action)
@@ -475,12 +474,11 @@ class NewTabPageViewController: UIViewController {
       if let eventType {
         p3aHelper.recordEvent(eventType, on: sponsoredBackground)
       }
-      rewards.ads.reportNewTabPageAdEvent(
+      rewards.ads.triggerNewTabPageAdEvent(
         background.wallpaperId.uuidString,
         creativeInstanceId: sponsoredBackground.creativeInstanceId,
         eventType: event,
-        completion: { _ in }
-      )
+        completion: { _ in })
     }
   }
 
@@ -619,12 +617,10 @@ class NewTabPageViewController: UIViewController {
       let item = context.item
       if !switchingToPrivateMode, item.content.contentType == .partner,
         let creativeInstanceID = item.content.creativeInstanceID {
-        rewards.ads.reportPromotedContentAdEvent(
+        rewards.ads.triggerPromotedContentAdEvent(
           item.content.urlHash,
           creativeInstanceId: creativeInstanceID,
-          eventType: .clicked,
-          completion: { _ in }
-        )
+          eventType: .clicked, completion: { _ in })
       }
       if switchingToPrivateMode, Preferences.Privacy.privateBrowsingLock.value {
         self.askForLocalAuthentication { [weak self] success, error in
@@ -660,12 +656,11 @@ class NewTabPageViewController: UIViewController {
     case .inlineContentAdAction(.opened(let inNewTab, let switchingToPrivateMode), let ad):
       guard let url = ad.targetURL.asURL else { return }
       if !switchingToPrivateMode {
-        rewards.ads.reportInlineContentAdEvent(
+        rewards.ads.triggerInlineContentAdEvent(
           ad.placementID,
           creativeInstanceId: ad.creativeInstanceID,
           eventType: .clicked,
-          completion: { _ in }
-        )
+          completion: { _ in })
       }
       delegate?.navigateToInput(
         url.absoluteString,
@@ -791,6 +786,28 @@ class NewTabPageViewController: UIViewController {
       return
     }
     feedDataSource.load(completion)
+  }
+  
+  private func hidePrivacyHub() {
+    if Preferences.NewTabPage.hidePrivacyHubAlertShown.value {
+      Preferences.NewTabPage.showNewTabPrivacyHub.value = false
+      collectionView.reloadData()
+    } else {
+      let alert = UIAlertController(
+        title: Strings.PrivacyHub.hidePrivacyHubWidgetActionTitle,
+        message: Strings.PrivacyHub.hidePrivacyHubWidgetAlertDescription,
+        preferredStyle: .alert)
+      
+      alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel))
+      alert.addAction(UIAlertAction(title: Strings.PrivacyHub.hidePrivacyHubWidgetActionButtonTitle, style: .default) { [weak self] _ in
+        Preferences.NewTabPage.showNewTabPrivacyHub.value = false
+        Preferences.NewTabPage.hidePrivacyHubAlertShown.value = true
+        self?.collectionView.reloadData()
+      })
+      
+      UIImpactFeedbackGenerator(style: .medium).bzzt()
+      present(alert, animated: true, completion: nil)
+    }
   }
 
   // MARK: - Actions
@@ -1232,13 +1249,21 @@ extension NewTabPageViewController: UICollectionViewDragDelegate, UICollectionVi
 
     if coordinator.proposal.operation == .move {
       guard let item = coordinator.items.first else { return }
+      _ = coordinator.drop(item.dragItem, toItemAt: destinationIndexPath)
 
+      guard let favouritesSection = sections.firstIndex(where: { $0 is FavoritesSectionProvider }) else {
+        return
+      }
+      
       Favorite.reorder(
         sourceIndexPath: sourceIndexPath,
         destinationIndexPath: destinationIndexPath,
         isInteractiveDragReorder: true
       )
-      _ = coordinator.drop(item.dragItem, toItemAt: destinationIndexPath)
+      
+      UIView.performWithoutAnimation {
+        self.collectionView.reloadSections(IndexSet(integer: favouritesSection))
+      }
 
     }
   }

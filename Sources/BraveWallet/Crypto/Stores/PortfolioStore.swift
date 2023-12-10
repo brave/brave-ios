@@ -26,10 +26,14 @@ public enum AssetGroupType: Equatable, Identifiable {
   }
 }
 
-public struct AssetGroupViewModel: Identifiable, Equatable {
-  let groupType: AssetGroupType
-  let assets: [AssetViewModel]
-  
+/// A protocol for both fungible and non-fungible asset group's view model
+protocol WalletAssetGroupViewModel {
+  associatedtype ViewModel
+  var groupType: AssetGroupType { get }
+  var assets: [ViewModel] { get }
+}
+
+extension WalletAssetGroupViewModel {
   var title: String {
     switch groupType {
     case .none:
@@ -40,6 +44,7 @@ public struct AssetGroupViewModel: Identifiable, Equatable {
       return account.name
     }
   }
+  
   var description: String? {
     switch groupType {
     case .none, .network:
@@ -48,6 +53,15 @@ public struct AssetGroupViewModel: Identifiable, Equatable {
       return account.address.truncatedAddress
     }
   }
+}
+
+public struct AssetGroupViewModel: WalletAssetGroupViewModel, Identifiable, Equatable {
+  typealias ViewModel = AssetViewModel
+  
+  public var groupType: AssetGroupType
+  public var assets: [AssetViewModel]
+  public var id: String { "\(groupType.id) \(title)" }
+  
   var totalFiatValue: Double {
     assets.reduce(0) { partialResult, asset in
       let balance: Double
@@ -61,7 +75,6 @@ public struct AssetGroupViewModel: Identifiable, Equatable {
       return partialResult + assetValue
     }
   }
-  public var id: String { "\(groupType.id) \(title)" }
 }
 
 public struct AssetViewModel: Identifiable, Equatable {
@@ -340,6 +353,7 @@ public class PortfolioStore: ObservableObject, WalletObserverStore {
     Preferences.Wallet.isHidingSmallBalancesFilter.observe(from: self)
     Preferences.Wallet.nonSelectedAccountsFilter.observe(from: self)
     Preferences.Wallet.nonSelectedNetworksFilter.observe(from: self)
+    Preferences.Wallet.groupByFilter.observe(from: self)
   }
   
   func tearDown() {
@@ -407,7 +421,16 @@ public class PortfolioStore: ObservableObject, WalletObserverStore {
       let filters = self.filters
       let selectedAccounts = filters.accounts.filter(\.isSelected).map(\.model)
       let selectedNetworks = filters.networks.filter(\.isSelected).map(\.model)
-      let allVisibleUserAssets = assetManager.getAllUserAssetsInNetworkAssetsByVisibility(networks: selectedNetworks, visible: true)
+      let allVisibleUserAssets: [NetworkAssets] = assetManager.getAllUserAssetsInNetworkAssetsByVisibility(
+        networks: selectedNetworks,
+        visible: true
+      ).map { networkAssets in // filter out NFTs from Portfolio
+        NetworkAssets(
+          network: networkAssets.network,
+          tokens: networkAssets.tokens.filter { !($0.isNft || $0.isErc721) },
+          sortOrder: networkAssets.sortOrder
+        )
+      }
       // update assets on display immediately with empty values. Issue #5567
       self.assetGroups = buildAssetGroupViewModels(
         groupBy: filters.groupBy,
@@ -597,7 +620,7 @@ public class PortfolioStore: ObservableObject, WalletObserverStore {
     switch groupType {
     case .none:
       return allVisibleUserAssets.flatMap { networkAssets in
-        networkAssets.tokens.filter { (!$0.isErc721 && !$0.isNft) }.map { token in
+        networkAssets.tokens.map { token in
           AssetViewModel(
             groupType: groupType,
             token: token,
@@ -629,7 +652,6 @@ public class PortfolioStore: ObservableObject, WalletObserverStore {
         return []
       }
       return networkAssets.tokens
-        .filter { (!$0.isErc721 && !$0.isNft) }
         .map { token in
           AssetViewModel(
             groupType: groupType,

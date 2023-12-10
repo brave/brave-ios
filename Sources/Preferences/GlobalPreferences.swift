@@ -56,11 +56,9 @@ extension Preferences {
   }
   
   public final class Rewards {
-    public static let myFirstAdShown = Option<Bool>(key: "rewards.ads.my-first-ad-shown", default: false)
     public static let hideRewardsIcon = Option<Bool>(key: "rewards.new-hide-rewards-icon", default: false)
     public static let rewardsToggledOnce = Option<Bool>(key: "rewards.rewards-toggled-once", default: false)
     public static let isUsingBAP = Option<Bool?>(key: "rewards.is-using-bap", default: nil)
-    public static let seenDataMigrationFailureError = Option<Bool>(key: "rewards.seen-data-migration-failure-error", default: false)
     public static let adaptiveCaptchaFailureCount = Option<Int>(key: "rewards.adaptive-captcha-failure-count", default: 0)
     public static let adsEnabledTimestamp = Option<Date?>(key: "rewards.ads.last-time-enabled", default: nil)
     public static let adsDisabledTimestamp = Option<Date?>(key: "rewards.ads.last-time-disabled", default: nil)
@@ -121,21 +119,30 @@ extension Preferences {
     ///
     /// This is a useful setting because it take too long for filter lists to load during launch
     /// and therefore we can try to load them right away and have them ready on the first tab load
-    @MainActor public static let lastDefaultFilterListFolderPath =
+    @MainActor public static let lastLegacyDefaultFilterListFolderPath =
       Option<String?>(key: "caching.last-default-filter-list-folder-path", default: nil)
+    
+    /// A cached value for the last folder path we got for our ad-block resources
+    ///
+    /// This is a useful setting because it take too long for filter lists to load during launch
+    /// and therefore we can try to load them right away and have them ready on the first tab load
+    @MainActor public static let lastAdBlockResourcesFolderPath =
+      Option<String?>(key: "caching.last-ad-block-resources-folder-path", default: nil)
+    
+    /// A cached value for the last folder path we got our filter lists components
+    ///
+    /// This is a useful setting because it take too long for filter lists to load during launch
+    /// and therefore we can try to load them right away and have them ready on the first tab load
+    @MainActor public static let lastFilterListCatalogueComponentFolderPath =
+      Option<String?>(key: "caching.last-filter-list-catalogue-component-folder-path", default: nil)
+    
+    /// A cached value for indicating if onboarding is actively going on
+    ///
+    /// This is used to determine if a  promoted purchase from store can be triggered and shown user
+    public static let isOnboardingActive = Option<Bool>(key: "appstate.onboarding-active", default: false)
   }
   
   public final class Chromium {
-    /// The boolean determine Bookmark Migration is finished on client side
-    public static let syncV2BookmarksMigrationCompleted = Option<Bool>(key: "chromium.migration.bookmarks", default: false)
-    /// The boolean determine History Migration is finished on client side
-    public static let syncV2HistoryMigrationCompleted = Option<Bool>(key: "chromium.migration.history", default: false)
-    /// The boolean determine Password Migration is finished on client side
-    public static let syncV2PasswordMigrationCompleted = Option<Bool>(key: "chromium.migration.password", default: false)
-    /// The boolean determine Password Migration is started on client side
-    public static let syncV2PasswordMigrationStarted = Option<Bool>(key: "chromium.migration.password.started", default: false)
-    /// The count of how many times migration is performed on client side - the value increases with every fail attempt and after 3 tries migration marked as successful
-    public static let syncV2ObjectMigrationCount = Option<Int>(key: "chromium.migration.attempt.count", default: 0)
     /// Whether the device is in sync chain
     public static let syncEnabled = Option<Bool>(key: "chromium.sync.enabled", default: false)
     /// The sync type bookmarks enabled for the device in sync chain

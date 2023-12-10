@@ -15,11 +15,8 @@ import UniformTypeIdentifiers
 
 class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtocol {
 
-  private var bookmarksFRC: BookmarksV2FetchResultsController?
-  private let bookmarkManager: BookmarkManager
-  /// Called when the bookmarks are updated via some user input (i.e. Delete, edit, etc.)
-  private var bookmarksDidChange: (() -> Void)?
   weak var toolbarUrlActionsDelegate: ToolbarUrlActionsDelegate?
+  private weak var addBookmarksFolderOkAction: UIAlertAction?
 
   private lazy var editBookmarksButton: UIBarButtonItem? = UIBarButtonItem().then {
     $0.image = UIImage(braveSystemNamed: "leo.edit.pencil")
@@ -46,12 +43,6 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     var items: [UIBarButtonItem?] = [.fixedSpace(5)]
     if currentFolder == nil {
       items.append(importExportButton)
-
-      // Unlike Chromium, old CoreData implementation did not have permanent folders
-      if !Preferences.Chromium.syncV2BookmarksMigrationCompleted.value {
-        items.append(.fixedSpace(16))
-        items.append(addFolderButton)
-      }
     } else {
       items.append(addFolderButton)
     }
@@ -59,15 +50,16 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     return items
   }
 
-  private weak var addBookmarksFolderOkAction: UIAlertAction?
-
-  private var isEditingIndividualBookmark = false
-
+  private var bookmarksFRC: BookmarksV2FetchResultsController?
+  private let bookmarkManager: BookmarkManager
+  /// Called when the bookmarks are updated via some user input (i.e. Delete, edit, etc.)
+  private var bookmarksDidChange: (() -> Void)?
+  
   private var currentFolder: Bookmarkv2?
 
   /// Certain bookmark actions are different in private browsing mode.
   private let isPrivateBrowsing: Bool
-
+  private var isEditingIndividualBookmark = false
   private var isAtBookmarkRootLevel: Bool {
     return self.currentFolder == nil
   }
@@ -81,6 +73,8 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
   private var bookmarksSearchQuery = ""
   private lazy var noSearchResultOverlayView = EmptyStateOverlayView(
     overlayDetails: EmptyOverlayStateDetails(title: Strings.noSearchResultsfound))
+  
+  private var bookmarksExportSuccessful = false
 
   // MARK: Lifecycle
 
@@ -487,7 +481,7 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
               ActivityShortcutManager.shared.donateCustomIntent(for: .openBookmarks, with: url.absoluteString)
             }
 
-            self.toolbarUrlActionsDelegate?.select(url: url, visitType: .bookmark)
+            self.toolbarUrlActionsDelegate?.select(url: url, isUserDefinedURLNavigation: true)
           }
 
           if presentingViewController is MenuViewController {
@@ -551,22 +545,15 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
 
     if bookmarkItem.isFolder {
       var actionChildren: [UIAction] = []
-
-      let children = bookmarkManager.getChildren(forFolder: bookmarkItem, includeFolders: false) ?? []
-
-      let urls: [URL] = children.compactMap { bookmark in
-        guard let url = bookmark.url else { return nil }
-        return URL(string: url)
-      }
-
-      let openBatchURLAction = UIAction(
-        title: String(format: Strings.openAllBookmarks, children.count),
-        image: UIImage(systemName: "arrow.up.forward.app"),
-        handler: UIAction.deferredActionHandler { _ in
-          self.toolbarUrlActionsDelegate?.batchOpen(urls)
-        })
-
-      if children.count > 0 {
+      let urls: [URL] = self.getAllURLS(forFolder: bookmarkItem)
+      
+      if urls.count > 0 {
+        let openBatchURLAction = UIAction(
+          title: String(format: Strings.openAllBookmarks, urls.count),
+          image: UIImage(systemName: "arrow.up.forward.app"),
+          handler: UIAction.deferredActionHandler { _ in
+            self.toolbarUrlActionsDelegate?.batchOpen(urls)
+          })
         actionChildren.append(openBatchURLAction)
       }
 
@@ -628,6 +615,23 @@ class BookmarksViewController: SiteTableViewController, ToolbarUrlActionsProtoco
     return UIContextMenuConfiguration(identifier: indexPath as NSCopying, previewProvider: nil) { _ in
       return actionItemsMenu
     }
+  }
+  
+  private func getAllURLS(forFolder rootFolder: Bookmarkv2) -> [URL] {
+    var urls: [URL] = []
+    guard rootFolder.isFolder else { return urls }
+    var children = bookmarkManager.getChildren(forFolder: rootFolder, includeFolders: true) ?? []
+    
+    while !children.isEmpty {
+      let bookmarkItem = children.removeFirst()
+      if bookmarkItem.isFolder {
+        // Follow the order of bookmark manager
+        children.insert(contentsOf: bookmarkManager.getChildren(forFolder: bookmarkItem, includeFolders: true) ?? [], at: 0)
+      } else if let bookmarkItemURL = URL(string: bookmarkItem.url ?? "") {
+        urls.append(bookmarkItemURL)
+      }
+    }
+    return urls
   }
 }
 
@@ -812,6 +816,17 @@ extension BookmarksViewController: UIDocumentPickerDelegate, UIDocumentInteracti
       try? FileManager.default.removeItem(at: url)
     }
     self.documentInteractionController = nil
+    
+    if bookmarksExportSuccessful {
+      bookmarksExportSuccessful = false
+      
+      let alert = UIAlertController(
+        title: Strings.Sync.bookmarksImportExportPopupTitle,
+        message: Strings.Sync.bookmarksExportPopupSuccessMessage,
+        preferredStyle: .alert)
+      alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
+      self.present(alert, animated: true, completion: nil)
+    }
   }
 
   func documentInteractionControllerDidDismissOpenInMenu(_ controller: UIDocumentInteractionController) {
@@ -835,7 +850,7 @@ extension BookmarksViewController {
       self.isLoading = false
 
       let alert = UIAlertController(
-        title: Strings.Sync.bookmarksImportPopupErrorTitle,
+        title: Strings.Sync.bookmarksImportExportPopupTitle,
         message: success ? Strings.Sync.bookmarksImportPopupSuccessMessage : Strings.Sync.bookmarksImportPopupFailureMessage,
         preferredStyle: .alert)
       alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
@@ -850,16 +865,27 @@ extension BookmarksViewController {
       guard let self = self else { return }
 
       self.isLoading = false
-
-      // Controller must be retained otherwise `AirDrop` and other sharing options will fail!
-      self.documentInteractionController = UIDocumentInteractionController(url: url)
-      guard let vc = self.documentInteractionController else { return }
-      vc.uti = UTType.html.identifier
-      vc.name = "Bookmarks.html"
-      vc.delegate = self
-
-      guard let importExportButton = self.importExportButton else { return }
-      vc.presentOptionsMenu(from: importExportButton, animated: true)
+      
+      if success {
+        self.bookmarksExportSuccessful = true
+        
+        // Controller must be retained otherwise `AirDrop` and other sharing options will fail!
+        self.documentInteractionController = UIDocumentInteractionController(url: url)
+        guard let vc = self.documentInteractionController else { return }
+        vc.uti = UTType.html.identifier
+        vc.name = "Bookmarks.html"
+        vc.delegate = self
+        
+        guard let importExportButton = self.importExportButton else { return }
+        vc.presentOptionsMenu(from: importExportButton, animated: true)
+      } else {
+        let alert = UIAlertController(
+          title: Strings.Sync.bookmarksImportExportPopupTitle,
+          message: Strings.Sync.bookmarksExportPopupFailureMessage,
+          preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
+      }
     }
   }
 

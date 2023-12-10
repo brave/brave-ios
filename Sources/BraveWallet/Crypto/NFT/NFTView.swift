@@ -21,6 +21,7 @@ struct NFTView: View {
   @State private var isShowingAddCustomNFT: Bool = false
   @State private var isNFTDiscoveryEnabled: Bool = false
   @State private var nftToBeRemoved: NFTAssetViewModel?
+  @State private var groupToggleState: [NFTGroupViewModel.ID: Bool] = [:]
   
   @Environment(\.buySendSwapDestination)
   private var buySendSwapDestination: Binding<BuySendSwapDestination?>
@@ -74,8 +75,12 @@ struct NFTView: View {
     if let image = nftViewModel.network.nativeTokenLogoImage, nftStore.filters.isShowingNFTNetworkLogo {
       Image(uiImage: image)
         .resizable()
-        .frame(width: 20, height: 20)
-        .padding(4)
+        .overlay {
+          Circle()
+            .stroke(lineWidth: 2)
+            .foregroundColor(Color(braveSystemName: .containerBackground))
+        }
+        .frame(width: 24, height: 24)
     }
   }
   
@@ -83,85 +88,69 @@ struct NFTView: View {
     Group {
       if let urlString = nftViewModel.nftMetadata?.imageURLString {
         NFTImageView(urlString: urlString) {
-          noImageView(nftViewModel)
+          LoadingNFTView(shimmer: false)
         }
       } else {
-        noImageView(nftViewModel)
+        LoadingNFTView(shimmer: false)
       }
     }
-    .overlay(nftLogo(nftViewModel), alignment: .bottomTrailing)
     .cornerRadius(4)
   }
   
-  @ViewBuilder private func noImageView(_ nftViewModel: NFTAssetViewModel) -> some View {
-    Blockie(address: nftViewModel.token.contractAddress, shape: .rectangle)
-      .overlay(
-        Text(nftViewModel.token.symbol.first?.uppercased() ?? "")
-          .font(.system(size: 80, weight: .bold, design: .rounded))
-          .foregroundColor(.white)
-          .shadow(color: .black.opacity(0.3), radius: 2, x: 0, y: 1)
-      )
-      .aspectRatio(1.0, contentMode: .fit)
-  }
-  
   private var filtersButton: some View {
-    AssetButton(braveSystemName: "leo.filter.settings", action: {
+    WalletIconButton(braveSystemName: "leo.filter.settings", action: {
       isPresentingFiltersDisplaySettings = true
     })
-    .sheet(isPresented: $isPresentingFiltersDisplaySettings) {
-      FiltersDisplaySettingsView(
-        filters: nftStore.filters,
-        isNFTFilters: true,
-        networkStore: networkStore,
-        save: { filters in
-          nftStore.saveFilters(filters)
-        }
-      )
-      .osAvailabilityModifiers({ view in
-        if #available(iOS 16, *) {
-          view
-            .presentationDetents([
-              .fraction(0.6),
-              .large
-            ])
-        } else {
-          view
-        }
-      })
-    }
   }
   
   private var nftHeaderView: some View {
     HStack {
-      Text(Strings.Wallet.assetsTitle)
-        .font(.title3.weight(.semibold))
-        .foregroundColor(Color(braveSystemName: .textPrimary))
+      Menu {
+        Picker("", selection: $nftStore.displayType) {
+          ForEach(NFTStore.NFTDisplayType.allCases) { type in
+            Text(type.dropdownTitle)
+              .foregroundColor(Color(.secondaryBraveLabel))
+              .tag(type)
+          }
+        }
+        .pickerStyle(.inline)
+        .disabled(nftStore.isShowingNFTLoadingState)
+      } label: {
+        HStack(spacing: 12) {
+          Text(nftStore.displayType.dropdownTitle)
+            .font(.subheadline.weight(.semibold))
+          if !nftStore.isShowingNFTLoadingState {
+            Text("\(nftStore.totalDisplayedNFTCount)")
+              .padding(.horizontal, 8)
+              .padding(.vertical, 4)
+              .font(.caption2.weight(.semibold))
+              .background(
+                Color(braveSystemName: .primary20)
+                  .cornerRadius(4)
+              )
+          }
+          Image(braveSystemName: "leo.carat.down")
+            .font(.subheadline.weight(.semibold))
+        }
+        .foregroundColor(Color(.braveBlurpleTint))
+      }
       if nftStore.isLoadingDiscoverAssets && isNFTDiscoveryEnabled {
         ProgressView()
           .padding(.leading, 5)
       }
       Spacer()
-      Picker(selection: $nftStore.displayType) {
-        ForEach(NFTStore.NFTDisplayType.allCases) { type in
-          Text(type.dropdownTitle)
-            .foregroundColor(Color(.secondaryBraveLabel))
-            .tag(type)
-        }
-      } label: {
-        Text(nftStore.displayType.dropdownTitle)
-          .font(.footnote)
-          .foregroundColor(Color(.braveLabel))
-      }
-      filtersButton
-        .padding(.trailing, 10)
       addCustomAssetButton
+        .padding(.trailing, 10)
+        .disabled(nftStore.isShowingNFTLoadingState)
+      filtersButton
+        .disabled(nftStore.isShowingNFTLoadingState)
     }
     .padding(.horizontal)
     .frame(maxWidth: .infinity, alignment: .leading)
   }
   
   private var addCustomAssetButton: some View {
-    AssetButton(braveSystemName: "leo.plus.add") {
+    WalletIconButton(braveSystemName: "leo.plus.add") {
       isShowingAddCustomNFT = true
     }
   }
@@ -169,7 +158,7 @@ struct NFTView: View {
   private var nftDiscoveryDescriptionText: NSAttributedString? {
     let attributedString = NSMutableAttributedString(
       string: Strings.Wallet.nftDiscoveryCalloutDescription,
-      attributes: [.foregroundColor: UIColor.braveLabel, .font: UIFont.preferredFont(for: .subheadline, weight: .regular)]
+      attributes: [.foregroundColor: UIColor.secondaryBraveLabel, .font: UIFont.preferredFont(for: .subheadline, weight: .regular)]
     )
     
     attributedString.addAttributes([.underlineStyle: NSUnderlineStyle.single.rawValue], range: (attributedString.string as NSString).range(of: "SimpleHash")) // `SimpleHash` won't get translated
@@ -182,89 +171,126 @@ struct NFTView: View {
     return attributedString
   }
   
-  @ViewBuilder var nftGridsView: some View {
-    if nftStore.displayNFTs.isEmpty {
-      emptyView
-        .listRowBackground(Color(.clear))
-    } else {
-      LazyVGrid(columns: nftGrids) {
-        ForEach(nftStore.displayNFTs) { nft in
-          Button(action: {
-            selectedNFTViewModel = nft
-          }) {
-            VStack(alignment: .leading, spacing: 4) {
-              nftImage(nft)
-                .padding(.bottom, 8)
-              Text(nft.token.nftTokenTitle)
-                .font(.callout.weight(.medium))
-                .foregroundColor(Color(.braveLabel))
+  /// Builds the grids of NFTs without any grouping or expandable / collapse behaviour.
+  @ViewBuilder private func nftGridsPlainView(_ group: NFTGroupViewModel) -> some View {
+    LazyVGrid(columns: nftGrids) {
+      ForEach(group.assets) { nft in
+        Button(action: {
+          selectedNFTViewModel = nft
+        }) {
+          VStack(alignment: .leading, spacing: 4) {
+            nftImage(nft)
+              .overlay(alignment: .bottomTrailing) {
+                nftLogo(nft)
+                  .offset(y: 12)
+              }
+              .padding(.bottom, 8)
+            Text(nft.token.nftTokenTitle)
+              .font(.callout.weight(.medium))
+              .foregroundColor(Color(.braveLabel))
+              .multilineTextAlignment(.leading)
+            if !nft.token.symbol.isEmpty {
+              Text(nft.token.symbol)
+                .font(.caption)
+                .foregroundColor(Color(.secondaryBraveLabel))
                 .multilineTextAlignment(.leading)
-              if !nft.token.symbol.isEmpty {
-                Text(nft.token.symbol)
-                  .font(.caption)
-                  .foregroundColor(Color(.secondaryBraveLabel))
-                  .multilineTextAlignment(.leading)
-              }
-            }
-            .overlay(alignment: .topLeading) {
-              if nft.token.isSpam {
-                HStack(spacing: 4) {
-                  Text(Strings.Wallet.nftSpam)
-                    .padding(.vertical, 4)
-                    .padding(.leading, 6)
-                    .foregroundColor(Color(.braveErrorLabel))
-                  Image(braveSystemName: "leo.warning.triangle-outline")
-                    .padding(.vertical, 4)
-                    .padding(.trailing, 6)
-                    .foregroundColor(Color(.braveErrorBorder))
-                }
-                .font(.system(size: 13).weight(.semibold))
-                .background(
-                  Color(uiColor: WalletV2Design.spamNFTLabelBackground)
-                    .cornerRadius(4)
-                )
-                .padding(12)
-              }
             }
           }
-          .contextMenu {
-            Button(action: {
-              if nft.token.visible { // a collected visible NFT, mark as hidden
-                nftStore.updateNFTStatus(nft.token, visible: false, isSpam: false, isDeletedByUser: false)
-              } else { // either a hidden NFT or a junk NFT, mark as visible
-                nftStore.updateNFTStatus(nft.token, visible: true, isSpam: false, isDeletedByUser: false)
+          .overlay(alignment: .topLeading) {
+            if nft.token.isSpam {
+              HStack(spacing: 4) {
+                Text(Strings.Wallet.nftSpam)
+                  .padding(.vertical, 4)
+                  .padding(.leading, 6)
+                  .foregroundColor(Color(.braveErrorLabel))
+                Image(braveSystemName: "leo.warning.triangle-outline")
+                  .padding(.vertical, 4)
+                  .padding(.trailing, 6)
+                  .foregroundColor(Color(.braveErrorBorder))
               }
-            }) {
-              if nft.token.visible { // a collected visible NFT
-                Label(Strings.recentSearchHide, braveSystemImage: "leo.eye.off")
-              } else if nft.token.isSpam { // a spam NFT
-                Label(Strings.Wallet.nftUnspam, braveSystemImage: "leo.disable.outline")
-              } else { // a hidden but not spam NFT
-                Label(Strings.Wallet.nftUnhide, braveSystemImage: "leo.eye.on")
-              }
-            }
-            Button(action: {
-              nftToBeRemoved = nft
-            }) {
-              Label(Strings.Wallet.nftRemoveFromWallet, braveSystemImage: "leo.trash")
+              .font(.system(size: 13).weight(.semibold))
+              .background(
+                Color(uiColor: WalletV2Design.spamNFTLabelBackground)
+                  .cornerRadius(4)
+              )
+              .padding(12)
             }
           }
         }
+        .contextMenu {
+          Button(action: {
+            if nft.token.visible { // a collected visible NFT, mark as hidden
+              nftStore.updateNFTStatus(nft.token, visible: false, isSpam: false, isDeletedByUser: false)
+            } else { // either a hidden NFT or a junk NFT, mark as visible
+              nftStore.updateNFTStatus(nft.token, visible: true, isSpam: false, isDeletedByUser: false)
+            }
+          }) {
+            if nft.token.visible { // a collected visible NFT
+              Label(Strings.recentSearchHide, braveSystemImage: "leo.eye.off")
+            } else if nft.token.isSpam { // a spam NFT
+              Label(Strings.Wallet.nftUnspam, braveSystemImage: "leo.disable.outline")
+            } else { // a hidden but not spam NFT
+              Label(Strings.Wallet.nftUnhide, braveSystemImage: "leo.eye.on")
+            }
+          }
+          Button(action: {
+            nftToBeRemoved = nft
+          }) {
+            Label(Strings.Wallet.nftRemoveFromWallet, braveSystemImage: "leo.trash")
+          }
+        }
       }
-      .padding(.horizontal)
-      VStack(spacing: 16) {
-        Divider()
-        editUserAssetsButton
-      }
-      .padding(.top, 20)
+    }
+  }
+  
+  /// Builds the expandable /  collapseable section content for a given group.
+  @ViewBuilder private func groupedNFTSection(_ group: NFTGroupViewModel) -> some View {
+    if group.assets.isEmpty {
+      EmptyView()
+    } else {
+      WalletDisclosureGroup(
+        isNFTGroup: true,
+        isExpanded: Binding(
+          get: { groupToggleState[group.id, default: true] },
+          set: { groupToggleState[group.id] = $0 }
+        ),
+        content: {
+          nftGridsPlainView(group)
+            .padding(.top)
+        },
+        label: {
+          if case let .account(account) = group.groupType {
+            AddressView(address: account.address) {
+              PortfolioAssetGroupHeaderView(group: group)
+            }
+          } else {
+            PortfolioAssetGroupHeaderView(group: group)
+          }
+        }
+      )
     }
   }
   
   var body: some View {
-    VStack(spacing: 16) {
+    LazyVStack(spacing: 16) {
       nftHeaderView
-      
-      nftGridsView
+      if nftStore.isShowingNFTLoadingState {
+        SkeletonLoadingNFTView()
+      } else if nftStore.isShowingNFTEmptyState {
+        emptyView
+      } else {
+        ForEach(nftStore.displayNFTGroups) { group in
+          if group.groupType == .none {
+            nftGridsPlainView(group)
+              .padding(.horizontal)
+          } else {
+            groupedNFTSection(group)
+          }
+        }
+      }
+    }
+    .introspectViewController { vc in
+      vc.navigationItem.backButtonDisplayMode = .minimal
     }
     .background(
       NavigationLink(
@@ -275,11 +301,16 @@ struct NFTView: View {
         destination: {
           if let nftViewModel = selectedNFTViewModel {
             NFTDetailView(
-              nftDetailStore: cryptoStore.nftDetailStore(for: nftViewModel.token, nftMetadata: nftViewModel.nftMetadata),
-              buySendSwapDestination: buySendSwapDestination
-            ) { nftMetadata in
-              nftStore.updateNFTMetadataCache(for: nftViewModel.token, metadata: nftMetadata)
-            }
+              keyringStore: keyringStore,
+              nftDetailStore: cryptoStore.nftDetailStore(for: nftViewModel.token, nftMetadata: nftViewModel.nftMetadata, owner: nftStore.owner(for: nftViewModel.token)),
+              buySendSwapDestination: buySendSwapDestination,
+              onNFTMetadataRefreshed: {  nftMetadata in
+                nftStore.updateNFTMetadataCache(for: nftViewModel.token, metadata: nftMetadata)
+              },
+              onNFTStatusUpdated: {
+                nftStore.update()
+              }
+            )
             .onDisappear {
               cryptoStore.closeNFTDetailStore(for: nftViewModel.token)
             }
@@ -314,10 +345,9 @@ struct NFTView: View {
         ),
         showCloseButton: false,
         content: {
-          VStack(spacing: 10) {
+          VStack(alignment: .leading, spacing: 10) {
             Text(Strings.Wallet.nftDiscoveryCalloutTitle)
-              .font(.headline.weight(.bold))
-              .multilineTextAlignment(.center)
+              .font(.body.weight(.medium))
             if let attrString = nftDiscoveryDescriptionText {
               AdjustableHeightAttributedTextView(
                 attributedString: attrString,
@@ -329,6 +359,7 @@ struct NFTView: View {
               )
             }
           }
+          .padding(.bottom, 24)
         }
       )
     )
@@ -362,6 +393,8 @@ struct NFTView: View {
               .font(.footnote)
               .foregroundStyle(Color(.secondaryBraveLabel))
           }
+          .multilineTextAlignment(.center)
+          .padding(.bottom, 24)
         })
     )
     .sheet(isPresented: $isShowingAddCustomNFT) {
@@ -375,12 +408,71 @@ struct NFTView: View {
         cryptoStore.updateAssets()
       }
     }
+    .sheet(isPresented: $isPresentingFiltersDisplaySettings) {
+      FiltersDisplaySettingsView(
+        filters: nftStore.filters,
+        isNFTFilters: true,
+        networkStore: networkStore,
+        save: { filters in
+          nftStore.saveFilters(filters)
+        }
+      )
+      .osAvailabilityModifiers({ view in
+        if #available(iOS 16, *) {
+          view
+            .presentationDetents([
+              .fraction(0.6),
+              .large
+            ])
+        } else {
+          view
+        }
+      })
+    }
+    .onChange(of: keyringStore.isWalletLocked) { isLocked in
+      guard isLocked else { return }
+      if isShowingNFTDiscoveryAlert {
+        isShowingNFTDiscoveryAlert = false
+      }
+      if nftToBeRemoved != nil {
+        nftToBeRemoved = nil
+      }
+    }
     .onAppear {
       Task {
         isNFTDiscoveryEnabled = await nftStore.isNFTDiscoveryEnabled()
         if !isNFTDiscoveryEnabled && Preferences.Wallet.shouldShowNFTDiscoveryPermissionCallout.value {
           self.isShowingNFTDiscoveryAlert = true
         }
+      }
+    }
+  }
+}
+
+struct SkeletonLoadingNFTView: View {
+  
+  private let nftGrids = [GridItem(.adaptive(minimum: 160), spacing: 16, alignment: .top)]
+  
+  var body: some View {
+    LazyVGrid(columns: nftGrids) {
+      ForEach(0..<8) { _ in
+        VStack(alignment: .leading, spacing: 6) {
+          LoadingNFTView()
+            .frame(height: 176)
+          Group {
+            Color(braveSystemName: .containerHighlight)
+              .frame(width: 148, height: 12)
+            Color(braveSystemName: .containerHighlight)
+              .frame(width: 96, height: 12)
+          }
+          .clipShape(Capsule())
+          .redacted(reason: .placeholder)
+          .shimmer(true)
+        }
+        .padding(.horizontal, 8)
+        .padding(.top, 8)
+        .padding(.bottom, 24)
+        .accessibilityHidden(true)
       }
     }
   }

@@ -51,20 +51,6 @@ class TransactionsActivityStoreTests: XCTestCase {
   func testUpdate() {
     let keyringService = BraveWallet.TestKeyringService()
     keyringService._addObserver = { _ in }
-    keyringService._keyringInfo = { keyringId, completion in
-      switch keyringId {
-      case .default:
-        completion(.mockDefaultKeyringInfo)
-      case .solana:
-        completion(.mockSolanaKeyringInfo)
-      case .filecoin:
-        completion(.mockFilecoinKeyringInfo)
-      case .filecoinTestnet:
-        completion(.mockFilecoinTestnetKeyringInfo)
-      default:
-        completion(.mockDefaultKeyringInfo)
-      }
-    }
     keyringService._allAccounts = {
       $0(.mock)
     }
@@ -78,6 +64,16 @@ class TransactionsActivityStoreTests: XCTestCase {
       } else { // .fil
         completion([.mockFilecoinMainnet, .mockFilecoinTestnet])
       }
+    }
+    rpcService._erc721Metadata = { _, _, _, completion in
+      let metadata = """
+      {
+        "image": "mock.image.url",
+        "name": "mock nft name",
+        "description": "mock nft description"
+      }
+      """
+      completion( "", metadata, .success, "")
     }
     
     let walletService = BraveWallet.TestBraveWalletService()
@@ -95,6 +91,7 @@ class TransactionsActivityStoreTests: XCTestCase {
     }
     
     let firstTransactionDate = Date(timeIntervalSince1970: 1636399671) // Monday, November 8, 2021 7:27:51 PM
+    let ethNFTSendTxCopy = BraveWallet.TransactionInfo.previewERC721Send.copy() as! BraveWallet.TransactionInfo // default in mainnet
     let ethSendTxCopy = BraveWallet.TransactionInfo.previewConfirmedSend.copy() as! BraveWallet.TransactionInfo // default in mainnet
     let goerliSwapTxCopy = BraveWallet.TransactionInfo.previewConfirmedSwap.copy() as! BraveWallet.TransactionInfo
     goerliSwapTxCopy.chainId = BraveWallet.GoerliChainId
@@ -104,33 +101,43 @@ class TransactionsActivityStoreTests: XCTestCase {
     let filSendTxCopy = BraveWallet.TransactionInfo.mockFilUnapprovedSend.copy() as! BraveWallet.TransactionInfo
     let filTestnetSendTxCopy = BraveWallet.TransactionInfo.mockFilUnapprovedSend.copy() as! BraveWallet.TransactionInfo
     filTestnetSendTxCopy.chainId = BraveWallet.FilecoinTestnet
-    let mockTxs: [BraveWallet.TransactionInfo] = [ethSendTxCopy, goerliSwapTxCopy, solSendTxCopy, solTestnetSendTxCopy, filSendTxCopy, filTestnetSendTxCopy].enumerated().map { (index, tx) in
+    let txs: [BraveWallet.TransactionInfo] = [
+      ethNFTSendTxCopy, ethSendTxCopy, goerliSwapTxCopy,
+      solSendTxCopy, solTestnetSendTxCopy,
+      filSendTxCopy, filTestnetSendTxCopy
+    ]
+    var timeIntervalIncrement: TimeInterval = 0
+    let mockTxs: [BraveWallet.TransactionInfo] = txs.enumerated().map { (index, tx) in
       tx.txStatus = .unapproved
       // transactions sorted by created time, make sure they are in-order
-      tx.createdTime = firstTransactionDate.addingTimeInterval(TimeInterval(index))
+      timeIntervalIncrement += TimeInterval(index)
+      if index % 2 == 0 { // 2 transactions per day
+        timeIntervalIncrement += 1.days
+      }
+      tx.createdTime = firstTransactionDate.addingTimeInterval(timeIntervalIncrement)
       return tx
     }
     
     let txService = BraveWallet.TestTxService()
     txService._addObserver = { _ in }
     txService._allTransactionInfo = { coin, chainId, address, completion in
-      if coin == .eth {
-        completion([ethSendTxCopy, goerliSwapTxCopy].filter({ $0.chainId == chainId }))
-      } else if coin == .sol {
-        completion([solSendTxCopy, solTestnetSendTxCopy].filter({ $0.chainId == chainId }))
-      } else { // .fil
-        completion([filSendTxCopy, filTestnetSendTxCopy].filter({ $0.chainId == chainId }))
-      }
+      completion(mockTxs.filter({ $0.chainId == chainId && $0.coin == coin }))
     }
     
     let solTxManagerProxy = BraveWallet.TestSolanaTxManagerProxy()
     solTxManagerProxy._estimatedTxFee = { $2(UInt64(1), .success, "") }
     
     let mockUserManager = TestableWalletUserAssetManager()
-    mockUserManager._getAllUserAssetsInNetworkAssetsByVisibility = { [weak self] networks, _ in
+    mockUserManager._getAllUserAssetsInNetworkAssets = { [weak self] networks, _ in
       var networkAssets: [NetworkAssets] = []
       for network in networks {
-        networkAssets.append(NetworkAssets(network: network, tokens: self?.visibleAssetsForCoins[network.coin] ?? [], sortOrder: 0))
+        networkAssets.append(
+          NetworkAssets(
+            network: network,
+            tokens: self?.visibleAssetsForCoins[network.coin] ?? [],
+            sortOrder: 0
+          )
+        )
       }
       return networkAssets
     }
@@ -143,61 +150,148 @@ class TransactionsActivityStoreTests: XCTestCase {
       blockchainRegistry: blockchainRegistry,
       txService: txService,
       solTxManagerProxy: solTxManagerProxy,
+      ipfsApi: TestIpfsAPI(),
       userAssetManager: mockUserManager
     )
    
     let transactionsExpectation = expectation(description: "transactionsExpectation")
-    store.$transactionSummaries
+    store.$transactionSections
       .dropFirst()
-      .collect(2) // without asset prices, with asset prices
-      .sink { transactionSummariesUpdates in
+      .collect(3)
+      .sink { transactionSectionsUpdates in
         defer { transactionsExpectation.fulfill() }
-        guard let transactionSummariesWithoutPrices = transactionSummariesUpdates.first,
-              let transactionSummariesWithPrices = transactionSummariesUpdates[safe: 1] else {
-          XCTFail("Expected 2 updates to transactionSummaries")
+        guard let transactionSectionsWithoutPrices = transactionSectionsUpdates.first,
+              let transactionSectionsWithPrices = transactionSectionsUpdates[safe: 1],
+              let transactionSectionsWithNFTMetadata = transactionSectionsUpdates[safe: 2] else {
+          XCTFail("Expected 3 updates to transactionSummaries")
           return
         }
         let expectedTransactions = mockTxs
         // verify all transactions from supported coin types are shown
-        XCTAssertEqual(transactionSummariesWithoutPrices.count, expectedTransactions.count)
-        XCTAssertEqual(transactionSummariesWithPrices.count, expectedTransactions.count)
-        // verify sorted by `createdTime`
+        XCTAssertEqual(
+          transactionSectionsWithoutPrices.flatMap(\.transactions).count,
+          expectedTransactions.count)
+        XCTAssertEqual(
+          transactionSectionsWithPrices.flatMap(\.transactions).count,
+          expectedTransactions.count)
+        // verify sections sorted by `createdTime`
+        XCTAssertEqual(
+          transactionSectionsWithoutPrices.map(\.date),
+          transactionSectionsWithoutPrices.map(\.date).sorted(by: { $0 > $1}))
+        XCTAssertEqual(
+          transactionSectionsWithPrices.map(\.date),
+          transactionSectionsWithPrices.map(\.date).sorted(by: { $0 > $1}))
+        // verify transactions sorted by `createdTime`
         let expectedSortedOrder = expectedTransactions.sorted(by: { $0.createdTime > $1.createdTime })
+        XCTAssertEqual(
+          transactionSectionsWithoutPrices.flatMap(\.transactions).map(\.transaction.txHash),
+          expectedSortedOrder.map(\.txHash))
+        XCTAssertEqual(
+          transactionSectionsWithPrices.flatMap(\.transactions).map(\.transaction.txHash),
+          expectedSortedOrder.map(\.txHash))
+        
+        // verify transactions are populated with correct ParsedTransaction
+        // Day 1 Transaction 1
+        XCTAssertEqual(
+          transactionSectionsWithoutPrices[safe: 0]?.transactions[safe: 0]?.transaction,
+          filTestnetSendTxCopy)
+        XCTAssertEqual(
+          transactionSectionsWithoutPrices[safe: 0]?.transactions[safe: 0]?.transaction.chainId,
+          filTestnetSendTxCopy.chainId)
+        XCTAssertEqual(
+          transactionSectionsWithPrices[safe: 0]?.transactions[safe: 0]?.transaction,
+          filTestnetSendTxCopy)
+        // Day 2 Transaction 1
+        XCTAssertEqual(
+          transactionSectionsWithoutPrices[safe: 1]?.transactions[safe: 0]?.transaction,
+          filSendTxCopy)
+        XCTAssertEqual(
+          transactionSectionsWithoutPrices[safe: 1]?.transactions[safe: 0]?.transaction.chainId,
+          filSendTxCopy.chainId)
+        XCTAssertEqual(
+          transactionSectionsWithPrices[safe: 1]?.transactions[safe: 0]?.transaction,
+          filSendTxCopy)
+        // Day 2 Transaction 2
+        XCTAssertEqual(
+          transactionSectionsWithoutPrices[safe: 1]?.transactions[safe: 1]?.transaction,
+          solTestnetSendTxCopy)
+        XCTAssertEqual(
+          transactionSectionsWithoutPrices[safe: 1]?.transactions[safe: 1]?.transaction.chainId,
+          solTestnetSendTxCopy.chainId)
+        XCTAssertEqual(
+          transactionSectionsWithPrices[safe: 1]?.transactions[safe: 1]?.transaction,
+          solTestnetSendTxCopy)
+        // Day 3 Transaction 1
+        XCTAssertEqual(
+          transactionSectionsWithoutPrices[safe: 2]?.transactions[safe: 0]?.transaction,
+          solSendTxCopy)
+        XCTAssertEqual(
+          transactionSectionsWithoutPrices[safe: 2]?.transactions[safe: 0]?.transaction.chainId,
+          solSendTxCopy.chainId)
+        XCTAssertEqual(
+          transactionSectionsWithPrices[safe: 2]?.transactions[safe: 0]?.transaction,
+          solSendTxCopy)
+        // Day 3 Transaction 2
+        XCTAssertEqual(
+          transactionSectionsWithoutPrices[safe: 2]?.transactions[safe: 1]?.transaction,
+          goerliSwapTxCopy)
+        XCTAssertEqual(
+          transactionSectionsWithoutPrices[safe: 2]?.transactions[safe: 1]?.transaction.chainId,
+          goerliSwapTxCopy.chainId)
+        XCTAssertEqual(
+          transactionSectionsWithPrices[safe: 2]?.transactions[safe: 1]?.transaction,
+          goerliSwapTxCopy)
+        // Day 4 Transaction 1
+        XCTAssertEqual(
+          transactionSectionsWithoutPrices[safe: 3]?.transactions[safe: 0]?.transaction,
+          ethSendTxCopy)
+        XCTAssertEqual(
+          transactionSectionsWithoutPrices[safe: 3]?.transactions[safe: 0]?.transaction.chainId,
+          ethSendTxCopy.chainId)
+        XCTAssertEqual(
+          transactionSectionsWithPrices[safe: 3]?.transactions[safe: 0]?.transaction,
+          ethSendTxCopy)
+        // Day 4 Transaction 2
+        let parsedNFTTransaction = transactionSectionsWithNFTMetadata[safe: 3]?.transactions[safe: 1]
+        XCTAssertEqual(
+          parsedNFTTransaction?.transaction,
+          ethNFTSendTxCopy)
+        XCTAssertEqual(
+          parsedNFTTransaction?.transaction.chainId,
+          ethNFTSendTxCopy.chainId)
+        XCTAssertEqual(
+          parsedNFTTransaction?.transaction,
+          ethNFTSendTxCopy)
+        if case .erc721Transfer(let details) = parsedNFTTransaction?.details {
+          XCTAssertNotNil(details.nftMetadata)
+        } else {
+          XCTFail("Expected to find nft metadata")
+        }
+        
+        XCTAssertNil(transactionSectionsWithPrices[safe: 4])
 
-        XCTAssertEqual(transactionSummariesWithoutPrices.map(\.txInfo.txHash), expectedSortedOrder.map(\.txHash))
-        XCTAssertEqual(transactionSummariesWithPrices.map(\.txInfo.txHash), expectedSortedOrder.map(\.txHash))
-        // verify they are populated with correct tx (summaries are tested in `TransactionParserTests`)
-        XCTAssertEqual(transactionSummariesWithoutPrices[safe: 0]?.txInfo, filTestnetSendTxCopy)
-        XCTAssertEqual(transactionSummariesWithoutPrices[safe: 0]?.txInfo.chainId, filTestnetSendTxCopy.chainId)
-        XCTAssertEqual(transactionSummariesWithPrices[safe: 0]?.txInfo, filTestnetSendTxCopy)
-
-        XCTAssertEqual(transactionSummariesWithoutPrices[safe: 1]?.txInfo, filSendTxCopy)
-        XCTAssertEqual(transactionSummariesWithoutPrices[safe: 1]?.txInfo.chainId, filSendTxCopy.chainId)
-        XCTAssertEqual(transactionSummariesWithPrices[safe: 1]?.txInfo, filSendTxCopy)
-
-        XCTAssertEqual(transactionSummariesWithoutPrices[safe: 2]?.txInfo, solTestnetSendTxCopy)
-        XCTAssertEqual(transactionSummariesWithoutPrices[safe: 2]?.txInfo.chainId, solTestnetSendTxCopy.chainId)
-        XCTAssertEqual(transactionSummariesWithPrices[safe: 2]?.txInfo, solTestnetSendTxCopy)
-        
-        XCTAssertEqual(transactionSummariesWithoutPrices[safe: 3]?.txInfo, solSendTxCopy)
-        XCTAssertEqual(transactionSummariesWithoutPrices[safe: 3]?.txInfo.chainId, solSendTxCopy.chainId)
-        XCTAssertEqual(transactionSummariesWithPrices[safe: 3]?.txInfo, solSendTxCopy)
-        
-        XCTAssertEqual(transactionSummariesWithoutPrices[safe: 4]?.txInfo, goerliSwapTxCopy)
-        XCTAssertEqual(transactionSummariesWithoutPrices[safe: 4]?.txInfo.chainId, goerliSwapTxCopy.chainId)
-        XCTAssertEqual(transactionSummariesWithPrices[safe: 4]?.txInfo, goerliSwapTxCopy)
-        
-        XCTAssertEqual(transactionSummariesWithoutPrices[safe: 5]?.txInfo, ethSendTxCopy)
-        XCTAssertEqual(transactionSummariesWithoutPrices[safe: 5]?.txInfo.chainId, ethSendTxCopy.chainId)
-        XCTAssertEqual(transactionSummariesWithPrices[safe: 5]?.txInfo, ethSendTxCopy)
-        
         // verify gas fee fiat
-        XCTAssertEqual(transactionSummariesWithPrices[safe: 0]?.gasFee?.fiat, "$0.0000006232")
-        XCTAssertEqual(transactionSummariesWithPrices[safe: 1]?.gasFee?.fiat, "$0.0000006232")
-        XCTAssertEqual(transactionSummariesWithPrices[safe: 2]?.gasFee?.fiat, "$0.000000002")
-        XCTAssertEqual(transactionSummariesWithPrices[safe: 3]?.gasFee?.fiat, "$0.000000002")
-        XCTAssertEqual(transactionSummariesWithPrices[safe: 4]?.gasFee?.fiat, "$255.03792654")
-        XCTAssertEqual(transactionSummariesWithPrices[safe: 5]?.gasFee?.fiat, "$10.41008598" )
+        XCTAssertEqual(
+          transactionSectionsWithPrices[safe: 0]?.transactions[safe: 0]?.gasFee?.fiat,
+          "$0.0000006232")
+        XCTAssertEqual(
+          transactionSectionsWithPrices[safe: 1]?.transactions[safe: 0]?.gasFee?.fiat,
+          "$0.0000006232")
+        XCTAssertEqual(
+          transactionSectionsWithPrices[safe: 1]?.transactions[safe: 1]?.gasFee?.fiat,
+          "$0.000000002")
+        XCTAssertEqual(
+          transactionSectionsWithPrices[safe: 2]?.transactions[safe: 0]?.gasFee?.fiat,
+          "$0.000000002")
+        XCTAssertEqual(
+          transactionSectionsWithPrices[safe: 2]?.transactions[safe: 1]?.gasFee?.fiat,
+          "$255.03792654")
+        XCTAssertEqual(
+          transactionSectionsWithPrices[safe: 3]?.transactions[safe: 0]?.gasFee?.fiat,
+          "$10.41008598")
+        XCTAssertEqual(
+          transactionSectionsWithPrices[safe: 3]?.transactions[safe: 1]?.gasFee?.fiat,
+          "$10.19894667")
       }
       .store(in: &cancellables)
     

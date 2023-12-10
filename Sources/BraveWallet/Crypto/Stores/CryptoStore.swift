@@ -190,6 +190,7 @@ public class CryptoStore: ObservableObject, WalletObserverStore {
       blockchainRegistry: blockchainRegistry,
       txService: txService,
       solTxManagerProxy: solTxManagerProxy,
+      ipfsApi: ipfsApi,
       userAssetManager: userAssetManager
     )
     self.marketStore = .init(
@@ -214,12 +215,12 @@ public class CryptoStore: ObservableObject, WalletObserverStore {
     guard !isObserving else { return }
     self.keyringServiceObserver = KeyringServiceObserver(
       keyringService: keyringService,
-      _keyringReset: { [weak self] in
+      _walletReset: { [weak self] in
         WalletProviderPermissionRequestsManager.shared.cancelAllPendingRequests(for: [.eth, .sol])
         WalletProviderAccountCreationRequestManager.shared.cancelAllPendingRequests(coins: [.eth, .sol])
         self?.rejectAllPendingWebpageRequests()
       },
-      _keyringCreated: { _ in
+      _walletCreated: {
         // 1. We don't need to rely on this observer method to migrate user visible assets
         // when user creates a new wallet, since in this case `CryptoStore` has not yet been initialized
         // 2. We don't need to rely on this observer method to migrate user visible assets
@@ -435,6 +436,7 @@ public class CryptoStore: ObservableObject, WalletObserverStore {
       txService: txService,
       blockchainRegistry: blockchainRegistry,
       solTxManagerProxy: solTxManagerProxy,
+      ipfsApi: ipfsApi,
       swapService: swapService,
       userAssetManager: userAssetManager,
       assetDetailType: assetDetailType
@@ -498,6 +500,7 @@ public class CryptoStore: ObservableObject, WalletObserverStore {
       ethTxManagerProxy: ethTxManagerProxy,
       keyringService: keyringService,
       solTxManagerProxy: solTxManagerProxy,
+      ipfsApi: ipfsApi,
       userAssetManager: userAssetManager
     )
     confirmationStore = store
@@ -510,15 +513,18 @@ public class CryptoStore: ObservableObject, WalletObserverStore {
   }
   
   private var nftDetailStore: NFTDetailStore?
-  func nftDetailStore(for nft: BraveWallet.BlockchainToken, nftMetadata: NFTMetadata?) -> NFTDetailStore {
+  func nftDetailStore(for nft: BraveWallet.BlockchainToken, nftMetadata: NFTMetadata?, owner: BraveWallet.AccountInfo?) -> NFTDetailStore {
     if let store = nftDetailStore, store.nft.id == nft.id {
       return store
     }
     let store = NFTDetailStore(
+      assetManager: userAssetManager,
+      keyringService: keyringService,
       rpcService: rpcService,
       ipfsApi: ipfsApi,
       nft: nft,
-      nftMetadata: nftMetadata
+      nftMetadata: nftMetadata,
+      owner: owner
     )
     nftDetailStore = store
     return store

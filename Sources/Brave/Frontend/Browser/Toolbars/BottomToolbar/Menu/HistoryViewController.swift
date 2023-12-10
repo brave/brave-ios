@@ -28,21 +28,20 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
   
   private let historyAPI: BraveHistoryAPI
   private let tabManager: TabManager
+  private var historyFRC: HistoryV2FetchResultsController?
 
-  var historyFRC: HistoryV2FetchResultsController?
-
-  /// Certain bookmark actions are different in private browsing mode.
-  let isPrivateBrowsing: Bool
-
-  var isHistoryRefreshing = false
+  private let isPrivateBrowsing: Bool  /// Certain bookmark actions are different in private browsing mode.
+  private let isModallyPresented: Bool
+  private var isHistoryRefreshing = false
 
   private var searchHistoryTimer: Timer?
   private var isHistoryBeingSearched = false
   private let searchController = UISearchController(searchResultsController: nil)
   private var searchQuery = ""
 
-  init(isPrivateBrowsing: Bool, historyAPI: BraveHistoryAPI, tabManager: TabManager) {
+  init(isPrivateBrowsing: Bool, isModallyPresented: Bool = false, historyAPI: BraveHistoryAPI, tabManager: TabManager) {
     self.isPrivateBrowsing = isPrivateBrowsing
+    self.isModallyPresented = isModallyPresented
     self.historyAPI = historyAPI
     self.tabManager = tabManager
     super.init(nibName: nil, bundle: nil)
@@ -71,6 +70,10 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
         $0.hidesSearchBarWhenScrolling = false
         $0.rightBarButtonItem =
           UIBarButtonItem(image: UIImage(braveSystemNamed: "leo.trash")!.template, style: .done, target: self, action: #selector(performDeleteAll))
+      }
+      
+      if isModallyPresented {
+        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(performDone))
       }
     }
 
@@ -178,6 +181,8 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
       searchHistoryTimer = nil
     }
   }
+  
+  // MARK: Actions
 
   @objc private func performDeleteAll() {
     let style: UIAlertController.Style = UIDevice.current.userInterfaceIdiom == .pad ? .alert : .actionSheet
@@ -188,8 +193,11 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
       UIAlertAction(
         title: Strings.History.historyClearActionTitle, style: .destructive,
         handler: { [weak self] _ in
-          guard let self = self else { return }
-          
+          guard let self = self, let allHistoryItems = historyFRC?.fetchedObjects  else {
+            return
+          }
+
+          // Deleting Local History
           self.historyAPI.deleteAll {
             // Clearing Tab History with entire history entry
             self.tabManager.clearTabHistory() {
@@ -198,12 +206,28 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
             
             // Clearing History should clear Recently Closed
             RecentlyClosed.removeAll()
+            
+            // Donate Clear Browser History for suggestions
+            let clearBrowserHistoryActivity = ActivityShortcutManager.shared.createShortcutActivity(type: .clearBrowsingHistory)
+            self.userActivity = clearBrowserHistoryActivity
+            clearBrowserHistoryActivity.becomeCurrent()
+          }
+          
+          // Asking Sync Engine To Remove Visits
+          for historyItems in allHistoryItems {
+            self.historyAPI.removeHistory(historyItems)
           }
         }))
     alert.addAction(UIAlertAction(title: Strings.cancelButtonTitle, style: .cancel, handler: nil))
 
     present(alert, animated: true, completion: nil)
   }
+  
+  @objc private func performDone() {
+    dismiss(animated: true)
+  }
+  
+  // MARK: UITableViewDelegate - UITableViewDataSource
 
   override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell = super.tableView(tableView, cellForRowAt: indexPath)
@@ -266,7 +290,7 @@ class HistoryViewController: SiteTableViewController, ToolbarUrlActionsProtocol 
       }
       
       dismiss(animated: true) {
-        self.toolbarUrlActionsDelegate?.select(url: url, visitType: .typed)
+        self.toolbarUrlActionsDelegate?.select(url: url, isUserDefinedURLNavigation: false)
       }
     }
 

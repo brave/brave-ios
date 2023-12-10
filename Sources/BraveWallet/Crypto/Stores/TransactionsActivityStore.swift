@@ -5,9 +5,20 @@
 
 import BraveCore
 import SwiftUI
+import Preferences
 
 class TransactionsActivityStore: ObservableObject, WalletObserverStore {
-  @Published var transactionSummaries: [TransactionSummary] = []
+  /// Sections of transactions for display. Each section represents one date.
+  @Published var transactionSections: [TransactionSection] = []
+  /// Filter query to filter the transactions by.
+  @Published var query: String = ""
+  /// Selected networks to show transactions for.
+  @Published var networkFilters: [Selectable<BraveWallet.NetworkInfo>] = [] {
+    didSet {
+      guard !oldValue.isEmpty else { return } // initial assignment to `networkFilters`
+      update()
+    }
+  }
   
   @Published private(set) var currencyCode: String = CurrencyCode.usd.code {
     didSet {
@@ -16,17 +27,16 @@ class TransactionsActivityStore: ObservableObject, WalletObserverStore {
       update()
     }
   }
-  @Published var networkFilters: [Selectable<BraveWallet.NetworkInfo>] = [] {
-    didSet {
-      guard !oldValue.isEmpty else { return } // initial assignment to `networkFilters`
-      update()
-    }
-  }
   
   let currencyFormatter: NumberFormatter = .usdCurrencyFormatter
   
   private var solEstimatedTxFeesCache: [String: UInt64] = [:]
   private var assetPricesCache: [String: Double] = [:]
+  /// Cache of metadata for NFTs. The key is the token's `id`.
+  private var metadataCache: [String: NFTMetadata] = [:]
+  /// Cache for storing `BlockchainToken`s that are not in user assets or our token registry.
+  /// This could occur with a dapp creating a transaction.
+  private var tokenInfoCache: [BraveWallet.BlockchainToken] = []
   
   private let keyringService: BraveWalletKeyringService
   private let rpcService: BraveWalletJsonRpcService
@@ -35,6 +45,7 @@ class TransactionsActivityStore: ObservableObject, WalletObserverStore {
   private let blockchainRegistry: BraveWalletBlockchainRegistry
   private let txService: BraveWalletTxService
   private let solTxManagerProxy: BraveWalletSolanaTxManagerProxy
+  private let ipfsApi: IpfsAPI
   private let assetManager: WalletUserAssetManagerType
   private var keyringServiceObserver: KeyringServiceObserver?
   private var txServiceObserver: TxServiceObserver?
@@ -52,6 +63,7 @@ class TransactionsActivityStore: ObservableObject, WalletObserverStore {
     blockchainRegistry: BraveWalletBlockchainRegistry,
     txService: BraveWalletTxService,
     solTxManagerProxy: BraveWalletSolanaTxManagerProxy,
+    ipfsApi: IpfsAPI,
     userAssetManager: WalletUserAssetManagerType
   ) {
     self.keyringService = keyringService
@@ -61,10 +73,11 @@ class TransactionsActivityStore: ObservableObject, WalletObserverStore {
     self.blockchainRegistry = blockchainRegistry
     self.txService = txService
     self.solTxManagerProxy = solTxManagerProxy
+    self.ipfsApi = ipfsApi
     self.assetManager = userAssetManager
     
     self.setupObservers()
-
+    Preferences.Wallet.showTestNetworks.observe(from: self)
     Task { @MainActor in
       self.currencyCode = await walletService.defaultBaseCurrency()
     }
@@ -74,6 +87,7 @@ class TransactionsActivityStore: ObservableObject, WalletObserverStore {
     keyringServiceObserver = nil
     txServiceObserver = nil
     walletServiceObserver = nil
+    transactionDetailsStore?.tearDown()
   }
   
   func setupObservers() {
@@ -136,23 +150,34 @@ class TransactionsActivityStore: ObservableObject, WalletObserverStore {
       let allTransactions = await txService.allTransactions(
         networksForCoin: networksForCoin, for: allAccountInfos
       ).filter { $0.txStatus != .rejected }
-      let userAssets = assetManager.getAllUserAssetsInNetworkAssets(networks: allNetworksAllCoins, includingUserDeleted: true).flatMap(\.tokens)
+      let userAssets = assetManager.getAllUserAssetsInNetworkAssets(
+        networks: allNetworksAllCoins,
+        includingUserDeleted: true
+      ).flatMap(\.tokens)
       let allTokens = await blockchainRegistry.allTokens(
         in: allNetworksAllCoins
       ).flatMap(\.tokens)
+      let ethTransactions = allTransactions.filter { $0.coin == .eth }
+      if !ethTransactions.isEmpty { // we can only fetch unknown Ethereum tokens
+        let unknownTokenInfo = ethTransactions.unknownTokenContractAddressChainIdPairs(
+          knownTokens: userAssets + allTokens + tokenInfoCache
+        )
+        updateUnknownTokens(for: unknownTokenInfo)
+      }
       guard !Task.isCancelled else { return }
       // display transactions prior to network request to fetch
       // estimated solana tx fees & asset prices
-      self.transactionSummaries = self.transactionSummaries(
+      self.transactionSections = buildTransactionSections(
         transactions: allTransactions,
         networksForCoin: networksForCoin,
         accountInfos: allAccountInfos,
         userAssets: userAssets,
-        allTokens: allTokens,
+        allTokens: allTokens + tokenInfoCache,
         assetRatios: assetPricesCache,
+        nftMetadata: metadataCache,
         solEstimatedTxFees: solEstimatedTxFeesCache
       )
-      guard !self.transactionSummaries.isEmpty else { return }
+      guard !self.transactionSections.isEmpty else { return }
 
       if allTransactions.contains(where: { $0.coin == .sol }) {
         let solTransactions = allTransactions.filter { $0.coin == .sol }
@@ -163,42 +188,98 @@ class TransactionsActivityStore: ObservableObject, WalletObserverStore {
       await updateAssetPricesCache(assetRatioIds: allUserAssetsAssetRatioIds)
 
       guard !Task.isCancelled else { return }
-      self.transactionSummaries = self.transactionSummaries(
+      self.transactionSections = buildTransactionSections(
         transactions: allTransactions,
         networksForCoin: networksForCoin,
         accountInfos: allAccountInfos,
         userAssets: userAssets,
         allTokens: allTokens,
         assetRatios: assetPricesCache,
+        nftMetadata: metadataCache,
+        solEstimatedTxFees: solEstimatedTxFeesCache
+      )
+      
+      let nftsWithoutMetadata = transactionSections.flatMap(\.transactions)
+        .compactMap { parsedTx in
+          switch parsedTx.details {
+          case .erc721Transfer(let details):
+            return details.fromToken
+          case .solSplTokenTransfer(let details):
+            if let fromToken = details.fromToken, fromToken.isNft {
+              return fromToken
+            }
+            return nil
+          default:
+            return nil
+          }
+        }
+        .filter { token in // filter out already fetched metadata
+          !metadataCache.keys.contains(where: { $0.caseInsensitiveCompare(token.contractAddress) == .orderedSame })
+        }
+      guard !Task.isCancelled, !nftsWithoutMetadata.isEmpty else { return }
+      // fetch nft metadata for all NFTs
+      let allMetadata = await rpcService.fetchNFTMetadata(tokens: nftsWithoutMetadata, ipfsApi: ipfsApi)
+      for (key, value) in allMetadata { // update cached values
+        metadataCache[key] = value
+      }
+      guard !Task.isCancelled else { return }
+      self.transactionSections = buildTransactionSections(
+        transactions: allTransactions,
+        networksForCoin: networksForCoin,
+        accountInfos: allAccountInfos,
+        userAssets: userAssets,
+        allTokens: allTokens,
+        assetRatios: assetPricesCache,
+        nftMetadata: metadataCache,
         solEstimatedTxFees: solEstimatedTxFeesCache
       )
     }
   }
   
-  private func transactionSummaries(
+  private func buildTransactionSections(
     transactions: [BraveWallet.TransactionInfo],
     networksForCoin: [BraveWallet.CoinType: [BraveWallet.NetworkInfo]],
     accountInfos: [BraveWallet.AccountInfo],
     userAssets: [BraveWallet.BlockchainToken],
     allTokens: [BraveWallet.BlockchainToken],
     assetRatios: [String: Double],
+    nftMetadata: [String: NFTMetadata],
     solEstimatedTxFees: [String: UInt64]
-  ) -> [TransactionSummary] {
-    transactions.compactMap { transaction in
-      guard let networks = networksForCoin[transaction.coin], let network = networks.first(where: { $0.chainId == transaction.chainId }) else {
-        return nil
-      }
-      return TransactionParser.transactionSummary(
-        from: transaction,
-        network: network,
-        accountInfos: accountInfos,
-        userAssets: userAssets,
-        allTokens: allTokens,
-        assetRatios: assetRatios,
-        solEstimatedTxFee: solEstimatedTxFees[transaction.id],
-        currencyFormatter: currencyFormatter
+  ) -> [TransactionSection] {
+    // Group transactions by day (only compare day/month/year)
+    let transactionsGroupedByDate = Dictionary(grouping: transactions) { transaction in
+      let dateComponents = Calendar.current.dateComponents([.year, .month, .day], from: transaction.createdTime)
+      return Calendar.current.date(from: dateComponents) ?? transaction.createdTime
+    }
+    // Map to 1 `TransactionSection` per date
+    return transactionsGroupedByDate.keys.sorted(by: { $0 > $1 }).compactMap { date in
+      let transactions = transactionsGroupedByDate[date] ?? []
+      guard !transactions.isEmpty else { return nil }
+      let parsedTransactions: [ParsedTransaction] = transactions
+        .sorted(by: { $0.createdTime > $1.createdTime })
+        .compactMap { transaction in
+          guard let networks = networksForCoin[transaction.coin],
+                let network = networks.first(where: { $0.chainId == transaction.chainId }) else {
+            return nil
+          }
+          return TransactionParser.parseTransaction(
+            transaction: transaction,
+            network: network,
+            accountInfos: accountInfos,
+            userAssets: userAssets,
+            allTokens: allTokens + tokenInfoCache,
+            assetRatios: assetRatios,
+            nftMetadata: nftMetadata,
+            solEstimatedTxFee: solEstimatedTxFees[transaction.id],
+            currencyFormatter: currencyFormatter,
+            decimalFormatStyle: .decimals(precision: 4)
+          )
+        }
+      return TransactionSection(
+        date: date,
+        transactions: parsedTransactions
       )
-    }.sorted(by: { $0.createdTime > $1.createdTime })
+    }
   }
   
   @MainActor private func updateSolEstimatedTxFeesCache(_ solTransactions: [BraveWallet.TransactionInfo]) async {
@@ -219,18 +300,65 @@ class TransactionsActivityStore: ObservableObject, WalletObserverStore {
     }
   }
   
+  private func updateUnknownTokens(
+    for contractAddressesChainIdPairs: [ContractAddressChainIdPair]
+  ) {
+    guard !contractAddressesChainIdPairs.isEmpty else { return }
+    Task { @MainActor in
+      // Gather known information about the transaction(s) tokens
+      let unknownTokens: [BraveWallet.BlockchainToken] = await rpcService.fetchEthTokens(
+        for: contractAddressesChainIdPairs
+      )
+      guard !unknownTokens.isEmpty else { return }
+      tokenInfoCache.append(contentsOf: unknownTokens)
+      update()
+    }
+  }
+  
+  private var transactionDetailsStore: TransactionDetailsStore?
   func transactionDetailsStore(
     for transaction: BraveWallet.TransactionInfo
   ) -> TransactionDetailsStore {
-    TransactionDetailsStore(
+    let parsedTransaction = transactionSections
+      .flatMap(\.transactions)
+      .first(where: { $0.transaction.id == transaction.id })
+    let transactionDetailsStore = TransactionDetailsStore(
       transaction: transaction,
+      parsedTransaction: parsedTransaction,
       keyringService: keyringService,
       walletService: walletService,
       rpcService: rpcService,
       assetRatioService: assetRatioService,
       blockchainRegistry: blockchainRegistry,
+      txService: txService,
       solanaTxManagerProxy: solTxManagerProxy,
+      ipfsApi: ipfsApi,
       userAssetManager: assetManager
     )
+    self.transactionDetailsStore = transactionDetailsStore
+    return transactionDetailsStore
+  }
+  
+  func closeTransactionDetailsStore() {
+    self.transactionDetailsStore?.tearDown()
+    self.transactionDetailsStore = nil
+  }
+}
+
+extension TransactionsActivityStore: PreferencesObserver {
+  public func preferencesDidChange(for key: String) {
+    guard key == Preferences.Wallet.showTestNetworks.key else { return }
+    Task { @MainActor in
+      let allNetworks = await self.rpcService.allNetworksForSupportedCoins()
+      self.networkFilters = allNetworks.map { network in
+        // if user previously de-selected a network, keep it de-selected
+        let isSelected: Bool = self.networkFilters
+          .first(where: { selectedNetworkModel in
+            selectedNetworkModel.model.chainId == network.chainId
+            && selectedNetworkModel.model.coin == network.coin
+          })?.isSelected ?? true
+        return .init(isSelected: isSelected, model: network)
+      }
+    }
   }
 }

@@ -103,11 +103,11 @@ extension Preferences {
     static let shouldShowRecentSearches = Option<Bool>(key: "search.should-show-recent-searches", default: false)
     /// Whether or not to show recent searches opt-in
     static let shouldShowRecentSearchesOptIn = Option<Bool>(key: "search.should-show-recent-searches.opt-in", default: true)
+    /// Whether or not to show suggestions from browser `Open Tabs & Bookmarks & History` while the user types
+    static let showBrowserSuggestions = Option<Bool>(key: "search.show-browser-suggestions", default: true)
     /// How many times Brave Search websites has asked the user to check whether Brave Search can be set as a default
     static let braveSearchDefaultBrowserPromptCount =
       Option<Int>(key: "search.brave-search-default-website-prompt", default: 0)
-    /// Determines Yahoo Search Engine is migration is done
-    public static let yahooEngineMigrationCompleted = Option<Bool>(key: "search-yahoo-engine-migration-completed", default: false)
   }
   
   final public class BraveSearch {
@@ -182,6 +182,11 @@ extension Preferences {
     /// Tells the app whether we should show Privacy Hub in new tab page view controller
     public static let showNewTabPrivacyHub =
       Option<Bool>(key: "newtabpage.show-newtab-privacyhub", default: true)
+    
+    /// First time when privacy hub hide action is tieggered user will be shown alert
+    static let hidePrivacyHubAlertShown = Option<Bool>(
+      key: "newtabpage.hide-privacyhub-alert",
+      default: false)
     
     /// Tells the app whether we should show Favourites in new tab page view controller
     public static let showNewTabFavourites =

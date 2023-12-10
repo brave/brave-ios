@@ -20,6 +20,12 @@ import BraveCore
 import BraveNews
 import Preferences
 
+private extension Logger {
+  static var module: Logger {
+    .init(subsystem: "\(Bundle.main.bundleIdentifier ?? "com.brave.ios")", category: "SceneDelegate")
+  }
+}
+
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
   // This property must be non-null because even though it's optional,
@@ -27,9 +33,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   internal var window: UIWindow?
   private var windowProtection: WindowProtection?
   static var shouldHandleUrpLookup = false
+  static var shouldHandleInstallAttributionFetch = false
 
   private var cancellables: Set<AnyCancellable> = []
-  private let log = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "scene-delegate")
 
   func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
     guard let windowScene = (scene as? UIWindowScene) else { return }
@@ -47,8 +53,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     let conditions = scene.activationConditions
     conditions.canActivateForTargetContentIdentifierPredicate = NSPredicate(value: true)
-    if let windowId = session.userInfo?["WindowID"] as? UUID {
-      let preferPredicate = NSPredicate(format: "self == %@", windowId.uuidString)
+    if let windowId = session.userInfo?["WindowID"] as? String {
+      let preferPredicate = NSPredicate(format: "self == %@", windowId)
         conditions.prefersToActivateForTargetContentIdentifierPredicate = preferPredicate
     }
     
@@ -80,12 +86,21 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       }
       .store(in: &cancellables)
 
+    // Handle URP Lookup at first launch
     if SceneDelegate.shouldHandleUrpLookup {
-      // TODO: Find a better way to do this when multiple windows are involved.
       SceneDelegate.shouldHandleUrpLookup = false
 
       if let urp = UserReferralProgram.shared {
         browserViewController.handleReferralLookup(urp)
+      }
+    }
+    
+    // Handle Install Attribution Fetch at first launch
+    if SceneDelegate.shouldHandleInstallAttributionFetch {
+      SceneDelegate.shouldHandleInstallAttributionFetch = false
+      
+      if let urp = UserReferralProgram.shared {
+        browserViewController.handleSearchAdsInstallAttribution(urp)
       }
     }
 
@@ -146,7 +161,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     if let response = connectionOptions.notificationResponse {
       if response.notification.request.identifier == BrowserViewController.defaultBrowserNotificationId {
         guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
-          log.error("Failed to unwrap iOS settings URL")
+          Logger.module.error("[SCENE] - Failed to unwrap iOS settings URL")
           return
         }
         UIApplication.shared.open(settingsUrl)
@@ -157,7 +172,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   }
 
   func sceneDidDisconnect(_ scene: UIScene) {
-    log.debug("SCENE DISCONNECTED")
+    Logger.module.debug("[SCENE] - Scene Disconnected")
   }
 
   func sceneDidBecomeActive(_ scene: UIScene) {
@@ -196,8 +211,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     // We try to send DAU ping each time the app goes to foreground to work around network edge cases
     // (offline, bad connection etc.).
-    // Also send the ping only after the URP lookup has processed.
-    if Preferences.URP.referralLookupOutstanding.value == false {
+    // Also send the ping only after the URP lookup and install attribution has processed.
+    if Preferences.URP.referralLookupOutstanding.value == false, Preferences.URP.installAttributionLookupOutstanding.value == false {
       AppState.shared.dau.sendPingToServer()
     }
     
@@ -218,17 +233,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   func sceneDidEnterBackground(_ scene: UIScene) {
     AppState.shared.profile.shutdown()
     BraveVPN.sendVPNWorksInBackgroundNotification()
+    Preferences.AppState.isOnboardingActive.value = false
   }
 
   func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
     guard let scene = scene as? UIWindowScene else {
-      log.debug("Invalid Scene - Scene is not a UIWindowScene")
+      Logger.module.error("[SCENE] - Scene is not a UIWindowScene")
       return
     }
 
     URLContexts.forEach({
       guard let routerpath = NavigationPath(url: $0.url, isPrivateBrowsing: scene.browserViewController?.privateBrowsingManager.isPrivateBrowsing == true) else {
-        log.debug("Invalid Navigation Path: \($0.url)")
+        Logger.module.error("[SCENE] - Invalid Navigation Path: \($0.url)")
         return
       }
 
@@ -237,7 +253,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   }
   
   func scene(_ scene: UIScene, didUpdate userActivity: NSUserActivity) {
-    log.debug("Updated User Activity for Scene")
+    Logger.module.debug("[SCENE] - Updated User Activity for Scene")
   }
 
   func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
@@ -282,6 +298,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       }
 
       return
+    case ActivityType.openHistoryList.identifier:
+      if let browserViewController = scene.browserViewController {
+        ActivityShortcutManager.shared.performShortcutActivity(
+          type: .openHistoryList, using: browserViewController)
+      }
+      
+      return
+    case ActivityType.openBookmarks.identifier:
+      if let browserViewController = scene.browserViewController {
+        ActivityShortcutManager.shared.performShortcutActivity(
+          type: .openBookmarks, using: browserViewController)
+      }
+
+      return
     case ActivityType.clearBrowsingHistory.identifier:
       if let browserViewController = scene.browserViewController {
         ActivityShortcutManager.shared.performShortcutActivity(
@@ -309,6 +339,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
           type: .openPlayList, using: browserViewController)
       }
 
+    case ActivityType.openSyncedTabs.identifier:
+      if let browserViewController = scene.browserViewController {
+        ActivityShortcutManager.shared.performShortcutActivity(
+          type: .openSyncedTabs, using: browserViewController)
+      }
       return
     default:
       break
@@ -404,71 +439,42 @@ extension SceneDelegate {
     let isPrivate: Bool
     let urlToOpen: URL?
     
-    if let userActivity = userActivity {
-      // Restore the scene with the WindowID from the User-Activity
-      
-      let windowIdString = userActivity.userInfo?["WindowID"] as? String ?? ""
-      windowId = UUID(uuidString: windowIdString) ?? UUID()
-      isPrivate = userActivity.userInfo?["isPrivate"] as? Bool == true
-      urlToOpen = userActivity.userInfo?["OpenURL"] as? URL
-      privateBrowsingManager.isPrivateBrowsing = isPrivate
-      
-      // Create a new session window
-      SessionWindow.createWindow(isPrivate: false, isSelected: true, uuid: windowId)
-      
-      scene.userActivity = BrowserState.userActivity(for: windowId, isPrivate: isPrivate)
-      scene.session.userInfo?["WindowID"] = windowId
-      scene.session.userInfo?["isPrivate"] = isPrivate
-    } else if let sceneWindowId = scene.session.userInfo?["WindowID"] as? String,
-              let sceneIsPrivate = scene.session.userInfo?["isPrivate"] as? Bool,
-              let windowUUID = UUID(uuidString: sceneWindowId) {
-      
-      // Restore the scene from the Session's User-Info WindowID
-      
-      windowId = windowUUID
-      isPrivate = sceneIsPrivate
-      privateBrowsingManager.isPrivateBrowsing = sceneIsPrivate
-      urlToOpen = scene.session.userInfo?["OpenURL"] as? URL
-      
-      scene.userActivity = BrowserState.userActivity(for: windowId, isPrivate: isPrivate)
-    } else {
-      // Should NOT be possible to get here.
-      // However, if a controller is NOT active, and tapping the app-icon opens a New-Window
-      // Then we need to make sure not to restore that "New" Window
-      // So we iterate all the windows and if there is no active window, then we need to "Restore" one.
-      // If a window is already active, we need to create a new blank window.
-      
-      if let activeWindowId = SessionWindow.getActiveWindow(context: DataController.swiftUIContext)?.windowId {
-        let activeSession = UIApplication.shared.openSessions
-          .compactMap({ $0.userInfo?["WindowID"] as? String })
-          .first(where: { $0 == activeWindowId.uuidString })
-        
-        if activeSession != nil {
-          // An existing window is already active on screen
-          // So create a new window
-          let newWindowId = UUID()
-          SessionWindow.createWindow(isPrivate: false, isSelected: true, uuid: newWindowId)
-          windowId = newWindowId
-        } else {
-          // Restore the active window since none is active on screen
-          windowId = activeWindowId
-        }
+    if UIApplication.shared.supportsMultipleScenes {
+      let windowInfo: BrowserState.SessionState
+      if let userActivity = userActivity {
+        windowInfo = BrowserState.getWindowInfo(from: userActivity)
       } else {
-        // Should be impossible to get here. There must always be an active window.
-        // However, if for some reason there is none, then we should create one.
-        let newWindowId = UUID()
-        SessionWindow.createWindow(isPrivate: false, isSelected: true, uuid: newWindowId)
-        windowId = newWindowId
+        windowInfo = BrowserState.getWindowInfo(from: scene.session)
       }
       
+      if let existingWindowId = windowInfo.windowId,
+         let windowUUID = UUID(uuidString: existingWindowId) {
+        // Restore the scene from the User-Info WindowID
+        windowId = windowUUID
+        isPrivate = windowInfo.isPrivate
+        privateBrowsingManager.isPrivateBrowsing = windowInfo.isPrivate
+        urlToOpen = windowInfo.openURL
+        
+        // Create a new session window if it does not already exist
+        SessionWindow.createWindow(isPrivate: isPrivate, isSelected: true, uuid: windowId)
+        Logger.module.info("[SCENE] - SESSION RESTORED")
+      } else {
+        // Try to restore active window
+        windowId = restoreOrCreateWindow().windowId
+        isPrivate = false
+        privateBrowsingManager.isPrivateBrowsing = false
+        urlToOpen = nil
+      }
+    } else {
+      // iPhones don't care about user-activity or session info since it will always have one window anyway
+      windowId = restoreOrCreateWindow().windowId
       isPrivate = false
       privateBrowsingManager.isPrivateBrowsing = false
       urlToOpen = nil
-      
-      scene.userActivity = BrowserState.userActivity(for: windowId, isPrivate: false)
-      scene.session.userInfo = ["WindowID": windowId.uuidString,
-                                "isPrivate": false]
     }
+    
+    scene.userActivity = BrowserState.userActivity(for: windowId.uuidString, isPrivate: false)
+    BrowserState.setWindowInfo(for: scene.session, windowId: windowId.uuidString, isPrivate: false)
 
     // Create a browser instance
     let browserViewController = BrowserViewController(
@@ -499,7 +505,7 @@ extension SceneDelegate {
        let tabId = UUID(uuidString: tabIdString) {
       
       let currentTabScene = UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene }).filter({
-        guard let sceneWindowId = $0.session.userInfo?["WindowID"] as? String else {
+        guard let sceneWindowId = BrowserState.getWindowInfo(from: $0.session).windowId else {
           return false
         }
         
@@ -521,6 +527,45 @@ extension SceneDelegate {
 
     return browserViewController
   }
+  
+  private func restoreOrCreateWindow() -> (windowId: UUID, isPrivate: Bool, urlToOpen: URL?) {
+    // Find active windows/sessions
+    let activeWindow = SessionWindow.getActiveWindow(context: DataController.swiftUIContext)
+    let activeSession = UIApplication.shared.openSessions
+      .compactMap({ BrowserState.getWindowInfo(from: $0) })
+      .first(where: { $0.windowId != nil && $0.windowId == activeWindow?.windowId.uuidString })
+      
+    if activeSession != nil {
+      if !UIApplication.shared.supportsMultipleScenes {
+        // iPhones should not create new windows
+        if let activeWindow = activeWindow {
+          // If there's no active window, fall through and create one
+          return (activeWindow.windowId, false, nil)
+        }
+      }
+      
+      // An existing window is already active on screen
+      // So create a new window
+      let windowId = UUID()
+      SessionWindow.createWindow(isPrivate: false, isSelected: true, uuid: windowId)
+      Logger.module.info("[SCENE] - CREATED NEW WINDOW")
+      return (windowId, false, nil)
+    }
+    
+    // Restore the active window if possible
+    let windowId: UUID
+    if !UIApplication.shared.supportsMultipleScenes {
+      // iPhones don't have multi-window so we can restore the active window OR first window found
+      windowId = activeWindow?.windowId ?? SessionWindow.all().first?.windowId ?? UUID()
+    } else {
+      windowId = activeWindow?.windowId ?? UUID()
+    }
+    
+    // Create a new session window if it does not already exist
+    SessionWindow.createWindow(isPrivate: false, isSelected: true, uuid: windowId)
+    Logger.module.info("[SCENE] - RESTORING ACTIVE WINDOW OR CREATING A NEW WINDOW")
+    return (windowId, false, nil)
+  }
 }
 
 extension SceneDelegate: UIViewControllerRestoration {
@@ -531,27 +576,52 @@ extension SceneDelegate: UIViewControllerRestoration {
 
 extension BrowserViewController {
   func handleReferralLookup(_ urp: UserReferralProgram) {
-
     if Preferences.URP.referralLookupOutstanding.value == true {
-      urp.referralLookup() { referralCode, offerUrl in
-        // Attempting to send ping after first urp lookup.
-        // This way we can grab the referral code if it exists, see issue #2586.
-        AppState.shared.dau.sendPingToServer()
-        if let code = referralCode {
-          let retryTime = AppConstants.buildChannel.isPublic ? 1.days : 10.minutes
-          let retryDeadline = Date() + retryTime
-
-          Preferences.NewTabPage.superReferrerThemeRetryDeadline.value = retryDeadline
-          
-          // TODO: Set the code in core somehow if we want to support Super Referrals again
-          //       then call updateSponsoredImageComponentIfNeeded
-        }
-
-        guard let url = offerUrl?.asURL else { return }
-        self.openReferralLink(url: url)
-      }
+      performProgramReferralLookup(urp, refCode: UserReferralProgram.getReferralCode())
     } else {
       urp.pingIfEnoughTimePassed()
+    }
+  }
+  
+  func handleSearchAdsInstallAttribution(_ urp: UserReferralProgram) {
+    urp.adCampaignLookup() { [weak self] response, error in
+      guard let self = self else { return }
+      
+      let refCode = self.generateReferralCode(attributionData: response, fetchError: error)
+      // Setting up referral code value
+      // This value should be set before first DAU ping
+      Preferences.URP.referralCode.value = refCode
+      Preferences.URP.installAttributionLookupOutstanding.value = false
+    }
+  }
+  
+  private func generateReferralCode(attributionData: AdAttributionData?, fetchError: Error?) -> String {
+    // Prefix code "001" with BRV for organic iOS installs
+    var referralCode = "BRV001"
+    
+    if fetchError == nil, attributionData?.attribution == true, let campaignId = attributionData?.campaignId {
+      // Adding ASA User refcode prefix to indicate
+      // Apple Ads Attribution is true
+      referralCode = "ASA\(String(campaignId))"
+    }
+    
+    return referralCode
+  }
+  
+  private func performProgramReferralLookup(_ urp: UserReferralProgram, refCode: String?) {
+    urp.referralLookup(refCode: refCode) { referralCode, offerUrl in
+      // Attempting to send ping after first urp lookup.
+      // This way we can grab the referral code if it exists, see issue #2586.
+      if Preferences.URP.installAttributionLookupOutstanding.value == false {
+        AppState.shared.dau.sendPingToServer()
+      }
+      let retryTime = AppConstants.buildChannel.isPublic ? 1.days : 10.minutes
+      let retryDeadline = Date() + retryTime
+
+        Preferences.NewTabPage.superReferrerThemeRetryDeadline.value = retryDeadline
+
+      guard let url = offerUrl?.asURL else { return }
+      self.openReferralLink(url: url)
     }
   }
 }

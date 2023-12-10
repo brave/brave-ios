@@ -8,6 +8,7 @@ import SwiftUI
 import BraveCore
 import Combine
 import BraveUI
+import BraveShared
 
 /// Methods for handling actions that occur while the user is interacting with Brave Wallet that require
 /// some integration with the browser
@@ -79,9 +80,8 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
     rootView.appRatingRequestAction = { [unowned self] in
       self.delegate?.requestAppReview()
     }
-    cancellable = walletStore.keyringStore.$defaultKeyring
+    cancellable = walletStore.keyringStore.$isWalletLocked
       .dropFirst() // Drop initial value
-      .map(\.isLocked)
       .removeDuplicates()
       .dropFirst() // Drop first async fetch of keyring
       .sink { [weak self] isLocked in
@@ -121,7 +121,11 @@ public class WalletHostingViewController: UIHostingController<CryptoView> {
   public override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     view.window?.addGestureRecognizer(gesture)
-    UIDevice.current.forcePortraitIfIphone(for: UIApplication.shared)
+    
+    DeviceOrientation.shared.changeOrientationToPortraitOnPhone()
+    if #available(iOS 16.0, *) {
+      self.setNeedsUpdateOfSupportedInterfaceOrientations()
+    }
   }
   
   public override func viewDidLoad() {

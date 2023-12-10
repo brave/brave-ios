@@ -35,6 +35,7 @@ class SearchSettingsTableViewController: UITableViewController {
     static let searchEngineRowIdentifier = "searchEngineRowIdentifier"
     static let showSearchSuggestionsRowIdentifier = "showSearchSuggestionsRowIdentifier"
     static let showRecentSearchesRowIdentifier = "showRecentSearchRowIdentifier"
+    static let showBrowserSuggestionsRowIdentifier = "showBrowserSuggestionsRowIdentifier"
     static let quickSearchEngineRowIdentifier = "quickSearchEngineRowIdentifier"
     static let customSearchEngineRowIdentifier = "customSearchEngineRowIdentifier"
   }
@@ -52,8 +53,9 @@ class SearchSettingsTableViewController: UITableViewController {
     case standard
     case `private`
     case quick
-    case suggestions
+    case searchSuggestions
     case recentSearches
+    case browserSuggestions
   }
 
   private var searchEngines: SearchEngines
@@ -106,6 +108,7 @@ class SearchSettingsTableViewController: UITableViewController {
       $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.searchEngineRowIdentifier)
       $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.showSearchSuggestionsRowIdentifier)
       $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.showRecentSearchesRowIdentifier)
+      $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.showBrowserSuggestionsRowIdentifier)
       $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.quickSearchEngineRowIdentifier)
       $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.customSearchEngineRowIdentifier)
       $0.sectionHeaderTopPadding = 5
@@ -134,7 +137,6 @@ class SearchSettingsTableViewController: UITableViewController {
     return SearchEnginePicker(type: type, showCancel: false).then {
       // Order alphabetically, so that picker is always consistently ordered.
       // Every engine is a valid choice for the default engine, even the current default engine.
-      // In private mode only custom engines will not be shown excluding migrated Yahoo Search Engine
       $0.engines = searchPickerEngines(type: type)
       $0.delegate = self
       $0.selectedSearchEngineName = searchEngines.defaultEngine(forType: type).shortName
@@ -212,7 +214,7 @@ class SearchSettingsTableViewController: UITableViewController {
           $0.accessoryType = .disclosureIndicator
           $0.editingAccessoryType = .disclosureIndicator
         }
-      case CurrentEngineType.suggestions.rawValue:
+      case CurrentEngineType.searchSuggestions.rawValue:
         let toggle = UISwitch().then {
           $0.addTarget(self, action: #selector(didToggleSearchSuggestions), for: .valueChanged)
           $0.isOn = searchEngines.shouldShowSearchSuggestions
@@ -231,6 +233,20 @@ class SearchSettingsTableViewController: UITableViewController {
 
         cell = tableView.dequeueReusableCell(withIdentifier: Constants.showRecentSearchesRowIdentifier, for: indexPath).then {
           $0.textLabel?.text = Strings.searchSettingRecentSearchesCellTitle
+          $0.accessoryView = toggle
+          $0.selectionStyle = .none
+        }
+      case CurrentEngineType.browserSuggestions.rawValue:
+        let toggle = UISwitch().then {
+          $0.addTarget(self, action: #selector(didToggleBrowserSuggestions), for: .valueChanged)
+          $0.isOn = searchEngines.shouldShowBrowserSuggestions
+        }
+
+        cell = UITableViewCell(style: .subtitle, reuseIdentifier: Constants.showBrowserSuggestionsRowIdentifier).then {
+          $0.textLabel?.text = Strings.searchSettingBrowserSuggestionCellTitle
+          $0.detailTextLabel?.numberOfLines = 0
+          $0.detailTextLabel?.textColor = .secondaryBraveLabel
+          $0.detailTextLabel?.text = Strings.searchSettingBrowserSuggestionCellDescription
           $0.accessoryView = toggle
           $0.selectionStyle = .none
         }
@@ -367,6 +383,11 @@ extension SearchSettingsTableViewController {
     // Setting the value in settings dismisses any opt-in.
     searchEngines.shouldShowRecentSearches = toggle.isOn
     searchEngines.shouldShowRecentSearchesOptIn = false
+  }
+  
+  @objc func didToggleBrowserSuggestions(_ toggle: UISwitch) {
+    // Setting the value effects all the modes private normal pbo
+    searchEngines.shouldShowBrowserSuggestions = toggle.isOn
   }
 
   @objc func dismissAnimated() {

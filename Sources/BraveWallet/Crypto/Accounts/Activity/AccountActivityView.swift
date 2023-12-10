@@ -153,7 +153,12 @@ struct AccountActivityView: View {
         .sheet(
           isPresented: Binding(
             get: { self.transactionDetails != nil },
-            set: { if !$0 { self.transactionDetails = nil } }
+            set: {
+              if !$0 {
+                self.transactionDetails = nil
+                self.activityStore.closeTransactionDetailsStore()
+              }
+            }
           )
         ) {
           if let transactionDetailsStore = transactionDetails {
@@ -185,6 +190,7 @@ private struct AccountActivityHeaderView: View {
     VStack {
       Blockie(address: account.address)
         .frame(width: 64, height: 64)
+        .clipShape(RoundedRectangle(cornerRadius: 4))
         .accessibilityHidden(true)
       VStack(spacing: 4) {
         Text(account.name)

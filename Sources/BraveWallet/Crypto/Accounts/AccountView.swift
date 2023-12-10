@@ -17,8 +17,10 @@ struct AccountView: View {
 
   var body: some View {
     HStack {
-      Blockie(address: address)
-        .frame(width: min(avatarSize, maxAvatarSize), height: min(avatarSize, maxAvatarSize))
+      Group {
+        Blockie(address: address)
+          .frame(width: min(avatarSize, maxAvatarSize), height: min(avatarSize, maxAvatarSize))
+      }
       VStack(alignment: .leading, spacing: 2) {
         Text(name)
           .fontWeight(.semibold)

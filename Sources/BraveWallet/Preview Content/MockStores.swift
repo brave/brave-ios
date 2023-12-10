@@ -56,8 +56,12 @@ extension NetworkStore {
   }
   
   static var previewStoreWithCustomNetworkAdded: NetworkStore {
-    let store = NetworkStore.previewStore
-    store.addCustomNetwork(
+    let keyringService = MockKeyringService()
+    let rpcService = MockJsonRpcService()
+    let walletService = MockBraveWalletService()
+    let swapService = MockSwapService()
+    let userAssetManager = TestableWalletUserAssetManager()
+    rpcService.addChain(
       .init(
         chainId: "0x100",
         chainName: "MockChain",
@@ -72,7 +76,15 @@ extension NetworkStore {
         supportedKeyrings: [BraveWallet.KeyringId.default.rawValue].map(NSNumber.init(value:)),
         isEip1559: false
       )
-    ) { _, _ in }
+    ) { _, _, _ in }
+      
+    let store = NetworkStore(
+      keyringService: keyringService,
+      rpcService: rpcService,
+      walletService: walletService,
+      swapService: swapService,
+      userAssetManager: userAssetManager
+    )
     return store
   }
 }
@@ -132,6 +144,7 @@ extension AssetDetailStore {
       txService: MockTxService(),
       blockchainRegistry: MockBlockchainRegistry(),
       solTxManagerProxy: BraveWallet.TestSolanaTxManagerProxy.previewProxy,
+      ipfsApi: TestIpfsAPI(),
       swapService: MockSwapService(),
       userAssetManager: TestableWalletUserAssetManager(),
       assetDetailType: .blockchainToken(.previewToken)
@@ -203,6 +216,7 @@ extension TransactionConfirmationStore {
         return service
       }(),
       solTxManagerProxy: BraveWallet.TestSolanaTxManagerProxy.previewProxy,
+      ipfsApi: TestIpfsAPI(),
       userAssetManager: TestableWalletUserAssetManager()
     )
   }
@@ -236,6 +250,7 @@ extension TransactionsActivityStore {
     blockchainRegistry: MockBlockchainRegistry(),
     txService: MockTxService(),
     solTxManagerProxy: BraveWallet.TestSolanaTxManagerProxy.previewProxy,
+    ipfsApi: TestIpfsAPI(),
     userAssetManager: TestableWalletUserAssetManager()
   )
 }

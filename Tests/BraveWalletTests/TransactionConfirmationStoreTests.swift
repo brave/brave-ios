@@ -109,15 +109,6 @@ import Preferences
       completion(setDataForUnapprovedTransactionSuccess)
     }
     let keyringService = BraveWallet.TestKeyringService()
-    keyringService._keyringInfo = { id, completion in
-      let keyring: BraveWallet.KeyringInfo = .init(
-        id: id,
-        isKeyringCreated: true,
-        isLocked: false,
-        isBackedUp: true
-      )
-      completion(keyring)
-    }
     keyringService._allAccounts = {
       $0(.init(
         accounts: accountInfos,
@@ -139,6 +130,7 @@ import Preferences
       ethTxManagerProxy: ethTxManagerProxy,
       keyringService: keyringService,
       solTxManagerProxy: solTxManagerProxy,
+      ipfsApi: TestIpfsAPI(),
       userAssetManager: mockAssetManager
     )
   }
@@ -352,11 +344,11 @@ import Preferences
     )
     let networkExpectation = expectation(description: "network-expectation")
     store.$network
-      .dropFirst(7) // `network` is assigned multiple times during setup
-      .collect(5) // collect all transactions
+      .dropFirst(8) // `network` is assigned multiple times during setup
+      .collect(6) // collect all updates (1 extra for final tx network)
       .sink { networks in
         defer { networkExpectation.fulfill() }
-        XCTAssertEqual(networks.count, 5)
+        XCTAssertEqual(networks.count, 6)
         XCTAssertEqual(networks[safe: 0], BraveWallet.NetworkInfo.mockFilecoinMainnet)
         XCTAssertEqual(networks[safe: 1], BraveWallet.NetworkInfo.mockSolanaTestnet)
         XCTAssertEqual(networks[safe: 2], BraveWallet.NetworkInfo.mockSolana)

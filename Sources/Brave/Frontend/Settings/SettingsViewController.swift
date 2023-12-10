@@ -18,6 +18,7 @@ import BraveUI
 import BraveVPN
 import BraveNews
 import Growth
+import NetworkExtension
 
 extension TabBarVisibility: RepresentableOptionType {
   public var displayString: String {
@@ -95,6 +96,8 @@ class SettingsViewController: TableViewController {
   deinit {
     keyringStore?.tearDown()
     cryptoStore?.tearDown()
+    
+    NotificationCenter.default.removeObserver(self)
   }
 
   @available(*, unavailable)
@@ -114,6 +117,11 @@ class SettingsViewController: TableViewController {
     view.backgroundColor = .braveGroupedBackground
     view.tintColor = .braveBlurpleTint
     navigationController?.view.backgroundColor = .braveGroupedBackground
+    
+    NotificationCenter.default.addObserver(
+      self,
+      selector: #selector(vpnConfigChanged(notification:)),
+      name: .NEVPNStatusDidChange, object: nil)
   }
 
   private func displayRewardsDebugMenu() {
@@ -132,6 +140,17 @@ class SettingsViewController: TableViewController {
       UIHostingController(rootView: BraveSearchDebugMenu(logging: BraveSearchLogEntry.shared))
 
     navigationController?.pushViewController(hostingController, animated: true)
+  }
+  
+  /// The function for refreshing VPN status for menu
+  /// - Parameter notification: NEVPNStatusDidChange
+  @objc private func vpnConfigChanged(notification: NSNotification) {
+    guard let connection = notification.object as? NEVPNConnection else { return }
+
+    if connection.status == .connected || connection.status == .disconnected {
+      setUpSections()
+      tableView.reloadData()
+    }
   }
 
   // Do not use `sections` directly to access sections/rows. Use DataSource.sections instead.
@@ -226,7 +245,7 @@ class SettingsViewController: TableViewController {
               feedDataSource: self.feedDataSource,
               historyAPI: self.historyAPI,
               p3aUtilities: self.p3aUtilities,
-              clearDataCallback: { [weak self] isLoading in
+              clearDataCallback: { [weak self] isLoading, isHistoryCleared in
                 guard let view = self?.navigationController?.view, view.window != nil else {
                   assertionFailure()
                   return
@@ -239,6 +258,13 @@ class SettingsViewController: TableViewController {
                 } else {
                   spinner?.dismiss()
                   spinner = nil
+                }
+                
+                if isHistoryCleared {
+                  // Donate Clear Browser History for suggestions
+                  let clearBrowserHistoryActivity = ActivityShortcutManager.shared.createShortcutActivity(type: .clearBrowsingHistory)
+                  self?.userActivity = clearBrowserHistoryActivity
+                  clearBrowserHistoryActivity.becomeCurrent()
                 }
               }
             ))
@@ -336,7 +362,7 @@ class SettingsViewController: TableViewController {
                 syncProfileService:
                   syncProfileServices,
                 tabManager: tabManager,
-                windowProtection: windowProtection)
+                windowProtection: windowProtection)  
 
               self.navigationController?
                 .pushViewController(syncSettingsViewController, animated: true)
@@ -351,7 +377,7 @@ class SettingsViewController: TableViewController {
             }
           }, image: UIImage(braveSystemNamed: "leo.sync"), accessory: .disclosureIndicator,
           cellClass: MultilineValue1Cell.self),
-        .boolRow(title: Strings.bookmarksLastVisitedFolderTitle, option: Preferences.General.showLastVisitedBookmarksFolder, image: UIImage(braveSystemNamed: "leo.folder.open-o")),
+        .boolRow(title: Strings.bookmarksLastVisitedFolderTitle, option: Preferences.General.showLastVisitedBookmarksFolder, image: UIImage(braveSystemNamed: "leo.folder.open")),
         Row(
           text: Strings.Shortcuts.shortcutSettingsTitle,
           selection: { [unowned self] in
@@ -593,7 +619,7 @@ class SettingsViewController: TableViewController {
           case .notPurchased, .expired:
             return BraveVPN.vpnState.enableVPNDestinationVC
           case .purchased:
-            let vc = BraveVPNSettingsViewController()
+            let vc = BraveVPNSettingsViewController(iapObserver: BraveVPN.iapObserver)
             vc.openURL = { [unowned self] url in
               self.settingsDelegate?.settingsOpenURLInNewTab(url)
               self.dismiss(animated: true)
@@ -604,7 +630,18 @@ class SettingsViewController: TableViewController {
         }()
 
         guard let vcToShow = vc else { return }
-        self.navigationController?.pushViewController(vcToShow, animated: true)
+        
+        if VPNProductInfo.isComplete {
+          self.navigationController?.pushViewController(vcToShow, animated: true)
+        } else {
+          let alert = UIAlertController(
+            title: Strings.VPN.errorCantGetPricesTitle,
+            message: Strings.VPN.errorCantGetPricesBody,
+            preferredStyle: .alert)
+
+          alert.addAction(UIAlertAction(title: Strings.OKString, style: .default, handler: nil))
+          self.present(alert, animated: true, completion: nil)
+        }
       },
       image: Preferences.VPN.vpnReceiptStatus.value == BraveVPN.ReceiptResponse.Status.retryPeriod.rawValue
         ? UIImage(braveSystemNamed: "leo.warning.triangle-filled")?
@@ -658,7 +695,7 @@ class SettingsViewController: TableViewController {
             UIApplication.shared.open(writeReviewURL)
             self.dismiss(animated: true)
           },
-          image: UIImage(braveSystemNamed: "leo.comment.smile-square"),
+          image: UIImage(braveSystemNamed: "leo.message.bubble-smile"),
           cellClass: MultilineValue1Cell.self),
       ]
     )

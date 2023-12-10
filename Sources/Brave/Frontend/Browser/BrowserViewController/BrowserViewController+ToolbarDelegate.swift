@@ -23,7 +23,7 @@ import Playlist
 
 extension BrowserViewController: TopToolbarDelegate {
 
-  func showTabTray() {
+  func showTabTray(isExternallyPresented: Bool = false) {
     if tabManager.tabsForCurrentMode.isEmpty {
       return
     }
@@ -42,6 +42,7 @@ extension BrowserViewController: TopToolbarDelegate {
     isTabTrayActive = true
 
     let tabTrayController = TabTrayController(
+      isExternallyPresented: isExternallyPresented,
       tabManager: tabManager,
       braveCore: braveCore,
       windowProtection: windowProtection).then {
@@ -49,81 +50,21 @@ extension BrowserViewController: TopToolbarDelegate {
         $0.toolbarUrlActionsDelegate = self
     }
     let container = UINavigationController(rootViewController: tabTrayController)
+    container.delegate = self
 
     if !UIAccessibility.isReduceMotionEnabled {
-      container.transitioningDelegate = tabTrayController
+      if !isExternallyPresented {
+        container.transitioningDelegate = tabTrayController
+      }
       container.modalPresentationStyle = .fullScreen
     }
-    present(container, animated: true)
-  }
-
-  func topToolbarDidPressLockImageView(_ urlBar: TopToolbarView) {
-    guard let webView = tabManager.selectedTab?.webView else {
-      Logger.module.error("Invalid WebView")
-      return
-    }
-    
-    let getServerTrustForErrorPage = { () -> SecTrust? in
-      do {
-        if let url = webView.url {
-          return try ErrorPageHelper.serverTrust(from: url)
-        }
-      } catch {
-        Logger.module.error("\(error.localizedDescription)")
-      }
-      
-      return nil
-    }
-    
-    guard let trust = webView.serverTrust ?? getServerTrustForErrorPage() else {
-      return
-    }
-    
-    let host = webView.url?.host
-
-    Task.detached {
-      let serverCertificates: [SecCertificate] = SecTrustCopyCertificateChain(trust) as? [SecCertificate] ?? []
-      
-      // TODO: Instead of showing only the first cert in the chain,
-      // have a UI that allows users to select any certificate in the chain (similar to Desktop browsers)
-      if let serverCertificate = serverCertificates.first,
-         let certificate = BraveCertificateModel(certificate: serverCertificate) {
-        
-        var errorDescription: String?
-        
-        do {
-          try await BraveCertificateUtils.evaluateTrust(trust, for: host)
-        } catch {
-          Logger.module.error("\(error.localizedDescription)")
-
-          // Remove the common-name from the first part of the error message
-          // This is because the certificate viewer already displays it.
-          // If it doesn't match, it won't be removed, so this is fine.
-          errorDescription = error.localizedDescription
-          if let range = errorDescription?.range(of: "“\(certificate.subjectName.commonName)” ") ??
-              errorDescription?.range(of: "\"\(certificate.subjectName.commonName)\" ") {
-            errorDescription = errorDescription?.replacingCharacters(in: range, with: "").capitalizeFirstLetter
-          }
-        }
-        
-        await MainActor.run { [errorDescription] in
-          if #available(iOS 16.0, *) {
-            // System components sit on top so we want to dismiss it
-            webView.findInteraction?.dismissFindNavigator()
-          }
-          let certificateViewController = CertificateViewController(certificate: certificate, evaluationError: errorDescription)
-          let popover = PopoverController(contentController: certificateViewController, contentSizeBehavior: .autoLayout(.phoneBounds))
-          popover.addsConvenientDismissalMargins = true
-          popover.present(from: self.topToolbar.locationView.lockImageView.imageView!, on: self)
-        }
-      }
-    }
+    present(container, animated: !isExternallyPresented)
   }
 
   func topToolbarDidPressReload(_ topToolbar: TopToolbarView) {
     if let url = topToolbar.currentURL {
       if url.isIPFSScheme {
-        if !handleIPFSSchemeURL(url, visitType: .unknown) {
+        if !handleIPFSSchemeURL(url) {
           tabManager.selectedTab?.reload()
         }
       } else if let decentralizedDNSHelper = decentralizedDNSHelperFor(url: topToolbar.currentURL) {
@@ -138,7 +79,7 @@ extension BrowserViewController: TopToolbarDelegate {
             showWeb3ServiceInterstitialPage(service: service, originalURL: url)
           case let .load(resolvedURL):
             if resolvedURL.isIPFSScheme {
-              handleIPFSSchemeURL(resolvedURL, visitType: .unknown)
+              handleIPFSSchemeURL(resolvedURL)
             } else {
               tabManager.selectedTab?.loadRequest(URLRequest(url: resolvedURL))
             }
@@ -186,18 +127,7 @@ extension BrowserViewController: TopToolbarDelegate {
   }
 
   func topToolbarDidPressReaderMode(_ topToolbar: TopToolbarView) {
-    if let tab = tabManager.selectedTab {
-      if let readerMode = tab.getContentScript(name: ReaderModeScriptHandler.scriptName) as? ReaderModeScriptHandler {
-        switch readerMode.state {
-        case .available:
-          enableReaderMode()
-        case .active:
-          disableReaderMode()
-        case .unavailable:
-          break
-        }
-      }
-    }
+    toggleReaderMode()
   }
 
   func topToolbarDidPressPlaylistButton(_ urlBar: TopToolbarView) {
@@ -279,16 +209,13 @@ extension BrowserViewController: TopToolbarDelegate {
   }
 
   func topToolbar(_ topToolbar: TopToolbarView, didSubmitText text: String) {
-    // TopToolBar Submit Text is Typed URL Visit Type
-    // This visit type will be used while adding History
-    // And it will determine either to sync the data or not
-    processAddressBar(text: text, visitType: .typed)
+    processAddressBar(text: text)
   }
 
-  func processAddressBar(text: String, visitType: VisitType, isBraveSearchPromotion: Bool = false) {
+  func processAddressBar(text: String, isBraveSearchPromotion: Bool = false, isUserDefinedURLNavigation: Bool = false) {
     processAddressBarTask?.cancel()
     processAddressBarTask = Task { @MainActor in
-      if !isBraveSearchPromotion, await submitValidURL(text, visitType: visitType) {
+      if !isBraveSearchPromotion, await submitValidURL(text, isUserDefinedURLNavigation: isUserDefinedURLNavigation) {
         return
       } else {
         // We couldn't build a URL, so pass it on to the search engine.
@@ -301,43 +228,9 @@ extension BrowserViewController: TopToolbarDelegate {
     }
   }
   
-  @discardableResult
-  func handleIPFSSchemeURL(_ url: URL, visitType: VisitType) -> Bool {
-    guard !privateBrowsingManager.isPrivateBrowsing else {
-      topToolbar.leaveOverlayMode()
-      if let errorPageHelper = tabManager.selectedTab?.getContentScript(name: ErrorPageHelper.scriptName) as? ErrorPageHelper, let webView = tabManager.selectedTab?.webView {
-        errorPageHelper.loadPage(IPFSErrorPageHandler.privateModeError, forUrl: url, inWebView: webView)
-      }
-      return true
-    }
-    
-    guard let ipfsPref = Preferences.Wallet.Web3IPFSOption(rawValue: Preferences.Wallet.resolveIPFSResources.value) else {
-      return false
-    }
-    
-    switch ipfsPref {
-    case .ask:
-      showIPFSInterstitialPage(originalURL: url, visitType: visitType)
-      return true
-    case .enabled:
-      if let resolvedUrl = braveCore.ipfsAPI.resolveGatewayUrl(for: url) {
-        finishEditingAndSubmit(resolvedUrl, visitType: visitType)
-        return true
-      }
-    case .disabled:
-      topToolbar.leaveOverlayMode()
-      if let errorPageHelper = tabManager.selectedTab?.getContentScript(name: ErrorPageHelper.scriptName) as? ErrorPageHelper, let webView = tabManager.selectedTab?.webView {
-        errorPageHelper.loadPage(IPFSErrorPageHandler.privateModeError, forUrl: url, inWebView: webView)
-      }
-      return true
-    }
-    
-    return false
-  }
-  
-  @MainActor func submitValidURL(_ text: String, visitType: VisitType) async -> Bool {
+  @MainActor private func submitValidURL(_ text: String, isUserDefinedURLNavigation: Bool) async -> Bool {
     if let url = URL(string: text), url.isIPFSScheme {
-      return handleIPFSSchemeURL(url, visitType: visitType)
+      return handleIPFSSchemeURL(url)
     } else if let fixupURL = URIFixup.getURL(text) {
       // Do not allow users to enter URLs with the following schemes.
       // Instead, submit them to the search engine like Chrome-iOS does.
@@ -352,13 +245,13 @@ extension BrowserViewController: TopToolbarDelegate {
           guard !Task.isCancelled else { return true } // user pressed stop, or typed new url
           switch result {
           case let .loadInterstitial(service):
-            showWeb3ServiceInterstitialPage(service: service, originalURL: fixupURL, visitType: visitType)
+            showWeb3ServiceInterstitialPage(service: service, originalURL: fixupURL)
             return true
           case let .load(resolvedURL):
             if resolvedURL.isIPFSScheme {
-              return handleIPFSSchemeURL(resolvedURL, visitType: visitType)
+              return handleIPFSSchemeURL(resolvedURL)
             } else {
-              finishEditingAndSubmit(resolvedURL, visitType: visitType)
+              finishEditingAndSubmit(resolvedURL)
               return true
             }
           case .none:
@@ -367,7 +260,9 @@ extension BrowserViewController: TopToolbarDelegate {
         }
         
         // The user entered a URL, so use it.
-        finishEditingAndSubmit(fixupURL, visitType: visitType)
+        // Determine if url navigation is done from favourites or bookmarks
+        // To handle bookmarklets properly
+        finishEditingAndSubmit(fixupURL, isUserDefinedURLNavigation: isUserDefinedURLNavigation)
         return true
       }
     }
@@ -375,6 +270,40 @@ extension BrowserViewController: TopToolbarDelegate {
     return false
   }
 
+  @discardableResult
+  func handleIPFSSchemeURL(_ url: URL) -> Bool {
+    guard !privateBrowsingManager.isPrivateBrowsing else {
+      topToolbar.leaveOverlayMode()
+      if let errorPageHelper = tabManager.selectedTab?.getContentScript(name: ErrorPageHelper.scriptName) as? ErrorPageHelper, let webView = tabManager.selectedTab?.webView {
+        errorPageHelper.loadPage(IPFSErrorPageHandler.privateModeError, forUrl: url, inWebView: webView)
+      }
+      return true
+    }
+    
+    guard let ipfsPref = Preferences.Wallet.Web3IPFSOption(rawValue: Preferences.Wallet.resolveIPFSResources.value) else {
+      return false
+    }
+    
+    switch ipfsPref {
+    case .ask:
+      showIPFSInterstitialPage(originalURL: url)
+      return true
+    case .enabled:
+      if let resolvedUrl = braveCore.ipfsAPI.resolveGatewayUrl(for: url) {
+        finishEditingAndSubmit(resolvedUrl)
+        return true
+      }
+    case .disabled:
+      topToolbar.leaveOverlayMode()
+      if let errorPageHelper = tabManager.selectedTab?.getContentScript(name: ErrorPageHelper.scriptName) as? ErrorPageHelper, let webView = tabManager.selectedTab?.webView {
+        errorPageHelper.loadPage(IPFSErrorPageHandler.privateModeError, forUrl: url, inWebView: webView)
+      }
+      return true
+    }
+    
+    return false
+  }
+  
   func submitSearchText(_ text: String, isBraveSearchPromotion: Bool = false) {
     var engine = profile.searchEngines.defaultEngine(forType: privateBrowsingManager.isPrivateBrowsing ? .privateMode : .standard)
     
@@ -390,7 +319,7 @@ extension BrowserViewController: TopToolbarDelegate {
     
     if let searchURL = engine.searchURLForQuery(text, isBraveSearchPromotion: isBraveSearchPromotion) {
       // We couldn't find a matching search keyword, so do a search query.
-      finishEditingAndSubmit(searchURL, visitType: .typed)
+      finishEditingAndSubmit(searchURL)
     } else {
       // We still don't have a valid URL, so something is broken. Give up.
       print("Error handling URL entry: \"\(text)\".")
@@ -473,7 +402,7 @@ extension BrowserViewController: TopToolbarDelegate {
           feedDataSource: self.feedDataSource,
           historyAPI: self.braveCore.historyAPI,
           p3aUtilities: self.braveCore.p3aUtils,
-          clearDataCallback: { [weak self] isLoading in
+          clearDataCallback: { [weak self] isLoading, isHistoryCleared in
             guard let view = self?.navigationController?.view, view.window != nil else {
               assertionFailure()
               return
@@ -486,6 +415,13 @@ extension BrowserViewController: TopToolbarDelegate {
             } else {
               spinner?.dismiss()
               spinner = nil
+            }
+            
+            if isHistoryCleared {
+              // Donate Clear Browser History for suggestions
+              let clearBrowserHistoryActivity = ActivityShortcutManager.shared.createShortcutActivity(type: .clearBrowsingHistory)
+              self?.userActivity = clearBrowserHistoryActivity
+              clearBrowserHistoryActivity.becomeCurrent()
             }
           }
         ))
@@ -516,7 +452,7 @@ extension BrowserViewController: TopToolbarDelegate {
     
     let container = PopoverNavigationController(rootViewController: shields)
     let popover = PopoverController(contentController: container, contentSizeBehavior: .preferredContentSize)
-    popover.present(from: topToolbar.locationView.shieldsButton, on: self)
+    popover.present(from: topToolbar.shieldsButton, on: self)
   }
   
   func showSubmitReportView(for url: URL) {
@@ -533,8 +469,8 @@ extension BrowserViewController: TopToolbarDelegate {
     viewController.modalPresentationStyle = .popover
 
     if let popover = viewController.popoverPresentationController {
-      popover.sourceView = topToolbar.locationView.shieldsButton
-      popover.sourceRect = topToolbar.locationView.shieldsButton.bounds
+      popover.sourceView = topToolbar.shieldsButton
+      popover.sourceRect = topToolbar.shieldsButton.bounds
       
       let sheet = popover.adaptiveSheetPresentationController
       sheet.largestUndimmedDetentIdentifier = .medium
@@ -723,7 +659,7 @@ extension BrowserViewController: TopToolbarDelegate {
 
           let submitSearch = { [weak self] (text: String) in
             if let fixupURL = URIFixup.getURL(text) {
-              self?.finishEditingAndSubmit(fixupURL, visitType: .unknown)
+              self?.finishEditingAndSubmit(fixupURL)
               return
             }
 
@@ -884,8 +820,15 @@ extension BrowserViewController: ToolbarDelegate {
     let selectedTabURL: URL? = {
       guard let url = tabManager.selectedTab?.url else { return nil }
 
-      if (InternalURL.isValid(url: url) || url.isLocal) && !url.isReaderModeURL { return nil }
-
+      if let internalURL = InternalURL(url) {
+        if internalURL.isErrorPage {
+          return internalURL.originalURLFromErrorPage
+        }
+        if internalURL.isReaderModePage {
+          return internalURL.extractedUrlParam
+        }
+        return nil
+      }
       return url
     }()
     
@@ -933,6 +876,22 @@ extension BrowserViewController: ToolbarDelegate {
 
   func tabToolbarDidPressTabs(_ tabToolbar: ToolbarProtocol, button: UIButton) {
     showTabTray()
+  }
+  
+  func topToolbarDidTapSecureContentState(_ urlBar: TopToolbarView) {
+    guard let tab = tabManager.selectedTab, let url = tab.url, let secureContentStateButton = urlBar.locationView.secureContentStateButton else { return }
+    let hasCertificate = (tab.webView?.serverTrust ?? (try? ErrorPageHelper.serverTrust(from: url))) != nil
+    let pageSecurityView = PageSecurityView(
+      displayURL: urlBar.locationView.urlDisplayLabel.text ?? url.absoluteDisplayString,
+      secureState: tab.secureContentState,
+      hasCertificate: hasCertificate,
+      presentCertificateViewer: { [weak self] in
+        self?.dismiss(animated: true)
+        self?.displayPageCertificateInfo()
+      }
+    )
+    let popoverController = PopoverController(content: pageSecurityView)
+    popoverController.present(from: secureContentStateButton, on: self)
   }
 
   func showBackForwardList() {
@@ -1056,5 +1015,17 @@ extension BrowserViewController: UIContextMenuInteractionDelegate {
     }
     
     return UIMenu(options: .displayInline, children: children)
+  }
+}
+
+// MARK: UINavigationControllerDelegate
+
+extension BrowserViewController: UINavigationControllerDelegate {
+  public func navigationControllerSupportedInterfaceOrientations(_ navigationController: UINavigationController) -> UIInterfaceOrientationMask {
+    return navigationController.visibleViewController?.supportedInterfaceOrientations ?? navigationController.supportedInterfaceOrientations
+  }
+
+  public func navigationControllerPreferredInterfaceOrientationForPresentation(_ navigationController: UINavigationController) -> UIInterfaceOrientation {
+    return navigationController.visibleViewController?.preferredInterfaceOrientationForPresentation ?? navigationController.preferredInterfaceOrientationForPresentation
   }
 }

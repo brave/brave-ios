@@ -76,11 +76,15 @@ class AssetDetailStore: ObservableObject, WalletObserverStore {
   private let txService: BraveWalletTxService
   private let blockchainRegistry: BraveWalletBlockchainRegistry
   private let solTxManagerProxy: BraveWalletSolanaTxManagerProxy
+  private let ipfsApi: IpfsAPI
   private let swapService: BraveWalletSwapService
   private let assetManager: WalletUserAssetManagerType
   /// A list of tokens that are supported with the current selected network for all supported
   /// on-ramp providers.
   private var allBuyTokensAllOptions: [BraveWallet.OnRampProvider: [BraveWallet.BlockchainToken]] = [:]
+  /// Cache for storing `BlockchainToken`s that are not in user assets or our token registry.
+  /// This could occur with a dapp creating a transaction.
+  private var tokenInfoCache: [BraveWallet.BlockchainToken] = []
   private var keyringServiceObserver: KeyringServiceObserver?
   private var txServiceObserver: TxServiceObserver?
   private var walletServiceObserver: WalletServiceObserver?
@@ -119,6 +123,7 @@ class AssetDetailStore: ObservableObject, WalletObserverStore {
     txService: BraveWalletTxService,
     blockchainRegistry: BraveWalletBlockchainRegistry,
     solTxManagerProxy: BraveWalletSolanaTxManagerProxy,
+    ipfsApi: IpfsAPI,
     swapService: BraveWalletSwapService,
     userAssetManager: WalletUserAssetManagerType,
     assetDetailType: AssetDetailType
@@ -130,6 +135,7 @@ class AssetDetailStore: ObservableObject, WalletObserverStore {
     self.txService = txService
     self.blockchainRegistry = blockchainRegistry
     self.solTxManagerProxy = solTxManagerProxy
+    self.ipfsApi = ipfsApi
     self.swapService = swapService
     self.assetManager = userAssetManager
     self.assetDetailType = assetDetailType
@@ -145,6 +151,7 @@ class AssetDetailStore: ObservableObject, WalletObserverStore {
     keyringServiceObserver = nil
     txServiceObserver = nil
     walletServiceObserver = nil
+    transactionDetailsStore?.tearDown()
   }
   
   func setupObservers() {
@@ -336,8 +343,19 @@ class AssetDetailStore: ObservableObject, WalletObserverStore {
       })
     }
     var solEstimatedTxFees: [String: UInt64] = [:]
-    if token.coin == .sol {
+    switch token.coin {
+    case .eth:
+      let ethTransactions = allTransactions.filter { $0.coin == .eth }
+      if !ethTransactions.isEmpty { // we can only fetch unknown Ethereum tokens
+        let unknownTokenInfo = ethTransactions.unknownTokenContractAddressChainIdPairs(
+          knownTokens: userAssets + allTokens + tokenInfoCache
+        )
+        updateUnknownTokens(for: unknownTokenInfo)
+      }
+    case .sol:
       solEstimatedTxFees = await solTxManagerProxy.estimatedTxFees(for: allTransactions)
+    default:
+      break
     }
     return allTransactions
       .filter { tx in
@@ -374,25 +392,37 @@ class AssetDetailStore: ObservableObject, WalletObserverStore {
           network: network,
           accountInfos: accounts,
           userAssets: userAssets,
-          allTokens: allTokens,
+          allTokens: allTokens + tokenInfoCache,
           assetRatios: assetRatios,
+          nftMetadata: [:],
           solEstimatedTxFee: solEstimatedTxFees[transaction.id],
           currencyFormatter: self.currencyFormatter
         )
       }
   }
   
+  private var transactionDetailsStore: TransactionDetailsStore?
   func transactionDetailsStore(for transaction: BraveWallet.TransactionInfo) -> TransactionDetailsStore {
-    TransactionDetailsStore(
+    let transactionDetailsStore = TransactionDetailsStore(
       transaction: transaction,
+      parsedTransaction: nil,
       keyringService: keyringService,
       walletService: walletService,
       rpcService: rpcService,
       assetRatioService: assetRatioService,
       blockchainRegistry: blockchainRegistry,
+      txService: txService,
       solanaTxManagerProxy: solTxManagerProxy,
+      ipfsApi: ipfsApi,
       userAssetManager: assetManager
     )
+    self.transactionDetailsStore = transactionDetailsStore
+    return transactionDetailsStore
+  }
+  
+  func closeTransactionDetailsStore() {
+    self.transactionDetailsStore?.tearDown()
+    self.transactionDetailsStore = nil
   }
   
   /// Should be called after dismissing create account. Returns true if an account was created
@@ -404,17 +434,32 @@ class AssetDetailStore: ObservableObject, WalletObserverStore {
       return false
     }
   }
+  
+  private func updateUnknownTokens(
+    for contractAddressesChainIdPairs: [ContractAddressChainIdPair]
+  ) {
+    guard !contractAddressesChainIdPairs.isEmpty else { return }
+    Task { @MainActor in
+      // Gather known information about the transaction(s) tokens
+      let unknownTokens: [BraveWallet.BlockchainToken] = await rpcService.fetchEthTokens(
+        for: contractAddressesChainIdPairs
+      )
+      guard !unknownTokens.isEmpty else { return }
+      tokenInfoCache.append(contentsOf: unknownTokens)
+      update()
+    }
+  }
 }
 
 extension AssetDetailStore: BraveWalletKeyringServiceObserver {
-  func keyringReset() {
+  func walletReset() {
   }
 
   func accountsChanged() {
     update()
   }
 
-  func keyringCreated(_ keyringId: BraveWallet.KeyringId) {
+  func walletCreated() {
   }
 
   func walletRestored() {
@@ -451,7 +496,7 @@ extension AssetDetailStore: BraveWalletTxServiceObserver {
     update()
   }
   func onTxServiceReset() {
-  }  
+  }
 }
 
 extension AssetDetailStore: BraveWalletBraveWalletServiceObserver {

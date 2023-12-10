@@ -4,6 +4,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
+import Shared
 
 public struct BraveCertificateUtils {
   /// Formats a hex string
@@ -23,10 +24,14 @@ public struct BraveCertificateUtils {
     return result
   }
 
-  public static func formatDate(_ date: Date) -> String {
+  private static let dateFormatter: DateFormatter = {
     let dateFormatter = DateFormatter()
     dateFormatter.dateStyle = .full
     dateFormatter.timeStyle = .full
+    return dateFormatter
+  }()
+
+  public static func formatDate(_ date: Date) -> String {
     return dateFormatter.string(from: date)
   }
 }

@@ -237,7 +237,12 @@ struct AssetDetailView: View {
         .sheet(
           isPresented: Binding(
             get: { self.transactionDetails != nil },
-            set: { if !$0 { self.transactionDetails = nil } }
+            set: { 
+              if !$0 {
+                self.transactionDetails = nil
+                self.assetDetailStore.closeTransactionDetailsStore()
+              }
+            }
           )
         ) {
           if let transactionDetailsStore = transactionDetails {
@@ -309,8 +314,8 @@ struct AssetDetailView: View {
         }
       )
     )
-    .onChange(of: keyringStore.defaultKeyring) { newValue in
-      if newValue.isLocked, isShowingAuroraBridgeAlert {
+    .onChange(of: keyringStore.isWalletLocked) { isLocked in
+      if isLocked, isShowingAuroraBridgeAlert {
         isShowingAuroraBridgeAlert = false
       }
     }

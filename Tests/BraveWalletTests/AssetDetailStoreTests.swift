@@ -24,9 +24,6 @@ class AssetDetailStoreTests: XCTestCase {
     }
     
     let keyringService = BraveWallet.TestKeyringService()
-    keyringService._keyringInfo = {
-      $1(.mockDefaultKeyringInfo)
-    }
     keyringService._allAccounts = { completion in
       completion(.mock)
     }
@@ -94,6 +91,7 @@ class AssetDetailStoreTests: XCTestCase {
       txService: txService,
       blockchainRegistry: blockchainRegistry,
       solTxManagerProxy: solTxManagerProxy,
+      ipfsApi: TestIpfsAPI(),
       swapService: swapService,
       userAssetManager: mockAssetManager,
       assetDetailType: .blockchainToken(.previewToken)
@@ -233,11 +231,7 @@ class AssetDetailStoreTests: XCTestCase {
       completion(true, [.init(date: Date(), price: "0.99")])
     }
     
-    let keyring = BraveWallet.KeyringInfo.mockDefaultKeyringInfo
     let keyringService = BraveWallet.TestKeyringService()
-    keyringService._keyringInfo = {
-      $1(keyring)
-    }
     keyringService._allAccounts = { completion in
       completion(.mock)
     }
@@ -291,6 +285,7 @@ class AssetDetailStoreTests: XCTestCase {
       txService: txService,
       blockchainRegistry: blockchainRegistry,
       solTxManagerProxy: solTxManagerProxy,
+      ipfsApi: TestIpfsAPI(),
       swapService: swapService,
       userAssetManager: mockAssetManager,
       assetDetailType: .coinMarket(.mockCoinMarketBitcoin)
@@ -408,6 +403,7 @@ class AssetDetailStoreTests: XCTestCase {
       txService: txService,
       blockchainRegistry: blockchainRegistry,
       solTxManagerProxy: solTxManagerProxy,
+      ipfsApi: TestIpfsAPI(),
       swapService: swapService,
       userAssetManager: mockAssetManager,
       assetDetailType: .coinMarket(.mockCoinMarketEth)

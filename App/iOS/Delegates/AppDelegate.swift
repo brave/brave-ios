@@ -65,10 +65,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     // Set the Safari UA for browsing.
     setUserAgent()
-    
-    // Moving Brave VPN v1 users to v2 type of credentials.
-    // This is a light operation, can be called at every launch without troubles.
-    BraveVPN.migrateV1Credentials()
 
     // Fetching details of GRDRegion for Automatic Region selection
     BraveVPN.fetchLastUsedRegionDetail()
@@ -120,7 +116,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // IAPs can trigger on the app as soon as it launches,
     // for example when a previous transaction was not finished and is in pending state.
     SKPaymentQueue.default().add(BraveVPN.iapObserver)
-
+    // Editing Product Promotion List
+    Task { @MainActor in
+      await BraveVPN.updateStorePromotionOrder()
+      await BraveVPN.hideActiveStorePromotion()
+    }
+    
     // Override point for customization after application launch.
     var shouldPerformAdditionalDelegateHandling = true
     AdblockEngine.setDomainResolver()
@@ -147,6 +148,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     Preferences.Review.launchCount.value += 1
 
     let isFirstLaunch = Preferences.General.isFirstLaunch.value
+    
+    Preferences.AppState.isOnboardingActive.value = isFirstLaunch
+    
     if Preferences.Onboarding.basicOnboardingCompleted.value == OnboardingState.undetermined.rawValue {
       Preferences.Onboarding.basicOnboardingCompleted.value =
         isFirstLaunch ? OnboardingState.unseen.rawValue : OnboardingState.completed.rawValue
@@ -186,11 +190,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       AppState.shared.profile.searchEngines.searchEngineSetup()
     }
 
-    // Migration of Yahoo Search Engines
-    if !Preferences.Search.yahooEngineMigrationCompleted.value {
-      AppState.shared.profile.searchEngines.migrateDefaultYahooSearchEngines()
-    }
-
     if isFirstLaunch {
       Preferences.DAU.installationDate.value = Date()
 
@@ -219,6 +218,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       UrpLog.log("Failed to initialize user referral program")
     }
 
+    if Preferences.URP.installAttributionLookupOutstanding.value == nil {
+      // Similarly to referral lookup, this prefrence should be set if it is a new user
+      // Trigger install attribution fetch only first launch
+      Preferences.URP.installAttributionLookupOutstanding.value = isFirstLaunch
+
+      SceneDelegate.shouldHandleInstallAttributionFetch = true
+    }
+    
 #if canImport(BraveTalk)
     BraveTalkJitsiCoordinator.sendAppLifetimeEvent(
       .didFinishLaunching(options: launchOptions ?? [:])
@@ -360,7 +367,12 @@ extension AppDelegate {
     // Use this method to release any resources that were specific to the discarded scenes, as they will not return.
     
     sceneSessions.forEach { session in
-      if let windowIdString = session.scene?.userActivity?.userInfo?["WindowID"] as? String, let windowId = UUID(uuidString: windowIdString) {
+      if let windowIdString = BrowserState.getWindowInfo(from: session).windowId,
+         let windowId = UUID(uuidString: windowIdString) {
+        SessionWindow.delete(windowId: windowId)
+      } else if let userActivity = session.scene?.userActivity,
+                let windowIdString = BrowserState.getWindowInfo(from: userActivity).windowId,
+                let windowId = UUID(uuidString: windowIdString) {
         SessionWindow.delete(windowId: windowId)
       }
     }

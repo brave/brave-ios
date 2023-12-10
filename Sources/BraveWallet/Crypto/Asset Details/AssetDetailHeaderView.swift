@@ -27,6 +27,7 @@ struct AssetDetailHeaderView: View {
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
   @Environment(\.openURL) private var openWalletURL
+  @Environment(\.colorScheme) private var colourScheme
   @State private var selectedCandle: BraveWallet.AssetTimePrice?
 
   private var deltaText: some View {
@@ -173,12 +174,20 @@ struct AssetDetailHeaderView: View {
               }
               HStack {
                 tokenImageNameAndNetwork
+                  .transaction { transaction in
+                    transaction.animation = nil
+                    transaction.disablesAnimations = true
+                  }
               }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
           } else {
             HStack {
               tokenImageNameAndNetwork
+                .transaction { transaction in
+                  transaction.animation = nil
+                  transaction.disablesAnimations = true
+                }
               if horizontalSizeClass == .regular {
                 Spacer()
                 DateRangeView(selectedRange: $assetDetailStore.timeframe)
@@ -220,8 +229,12 @@ struct AssetDetailHeaderView: View {
           .shimmer(assetDetailStore.isLoadingPrice)
           let data = assetDetailStore.priceHistory.isEmpty ? emptyData : assetDetailStore.priceHistory
           LineChartView(data: data, numberOfColumns: data.count, selectedDataPoint: $selectedCandle) {
-            Color(.walletGreen)
-              .shimmer(assetDetailStore.isLoadingChart)
+            LinearGradient(
+              gradient: Gradient(colors: [Color(.braveBlurpleTint).opacity(colourScheme == .dark ? 0.5 : 0.2), .clear]),
+              startPoint: .top,
+              endPoint: .bottom
+            )
+            .shimmer(assetDetailStore.isLoadingChart)
           }
           .chartAccessibility(
             title: String.localizedStringWithFormat(
@@ -255,6 +268,10 @@ struct AssetDetailHeaderView: View {
       }
       actionButtonsContainer
         .padding(.horizontal, assetDetailStore.assetDetailToken.isFungibleToken ? 0 : 16)
+        .transaction { transaction in
+          transaction.animation = nil
+          transaction.disablesAnimations = true
+        }
     }
   }
 }

@@ -104,7 +104,8 @@ import Preferences
     let mockNFTMetadata: NFTMetadata = .init(
       imageURLString: "sol.mock.image.url",
       name: "sol mock nft name",
-      description: "sol mock nft description"
+      description: "sol mock nft description",
+      attributes: nil
     )
     let mockFILBalance: Double = 1
     let mockFILPrice: String = "4.06" // FIL value = $4.06
@@ -138,32 +139,6 @@ import Preferences
       price: mockFILPrice, assetTimeframeChange: "-57.23")
     
     let keyringService = BraveWallet.TestKeyringService()
-    keyringService._keyringInfo = { keyringId, completion in
-      switch keyringId {
-      case .default:
-        let keyring: BraveWallet.KeyringInfo = .init(
-          id: BraveWallet.KeyringId.default,
-          isKeyringCreated: true,
-          isLocked: false,
-          isBackedUp: true
-        )
-        completion(keyring)
-      case .solana:
-        let keyring: BraveWallet.KeyringInfo = .init(
-          id: BraveWallet.KeyringId.solana,
-          isKeyringCreated: true,
-          isLocked: false,
-          isBackedUp: true
-        )
-        completion(keyring)
-      case .filecoin:
-        completion(.mockFilecoinKeyringInfo)
-      case .filecoinTestnet:
-        completion(.mockFilecoinTestnetKeyringInfo)
-      default:
-        completion(.mockDefaultKeyringInfo)
-      }
-    }
     keyringService._allAccounts = {
       $0(.init(
         accounts: [

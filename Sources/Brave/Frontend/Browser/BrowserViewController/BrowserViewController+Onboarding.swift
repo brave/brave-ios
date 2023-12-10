@@ -10,6 +10,8 @@ import BraveCore
 import UIKit
 import Onboarding
 import BraveShields
+import BraveVPN
+import StoreKit
 
 // MARK: - Onboarding
 
@@ -18,6 +20,7 @@ extension BrowserViewController {
   func presentOnboardingIntro() {
     if Preferences.DebugFlag.skipOnboardingIntro == true { return }
 
+    Preferences.AppState.isOnboardingActive.value = true
     presentOnboardingWelcomeScreen(on: self)
   }
 
@@ -27,6 +30,7 @@ extension BrowserViewController {
     // 1. Existing user.
     // 2. User already completed onboarding.
     if Preferences.Onboarding.basicOnboardingCompleted.value == OnboardingState.completed.rawValue {
+      Preferences.AppState.isOnboardingActive.value = false
       return
     }
 
@@ -54,6 +58,9 @@ extension BrowserViewController {
   }
 
   func showNTPOnboarding() {
+    Preferences.AppState.isOnboardingActive.value = false
+    iapObserver.savedPayment = nil
+    
     if !topToolbar.inOverlayMode,
        topToolbar.currentURL == nil,
        Preferences.DebugFlag.skipNTPCallouts != true {
@@ -75,10 +82,10 @@ extension BrowserViewController {
     guard presentedViewController == nil else {
       return
     }
-            
+    
     let frame = view.convert(
-      topToolbar.locationView.urlTextField.frame,
-      from: topToolbar.locationView).insetBy(dx: -7.0, dy: -1.0)
+      topToolbar.locationView.frame,
+      from: topToolbar.locationView).insetBy(dx: -1.0, dy: -1.0)
     
     // Present the popover
     let controller = WelcomeOmniBoxOnboardingController()
@@ -88,20 +95,35 @@ extension BrowserViewController {
 
     presentPopoverContent(
       using: controller,
-      with: frame, cornerRadius: 6.0,
-      didDismiss: {
+      with: frame, cornerRadius: topToolbar.locationContainer.layer.cornerRadius,
+      didDismiss: { [weak self] in
+        guard let self = self else { return }
+
         Preferences.FullScreenCallout.omniboxCalloutCompleted.value = true
+        Preferences.AppState.isOnboardingActive.value = false
+        
+        self.triggerPromotedInAppPurchase(savedPayment: self.iapObserver.savedPayment)
       },
       didClickBorderedArea: { [weak self] in
         guard let self = self else { return }
         
         Preferences.FullScreenCallout.omniboxCalloutCompleted.value = true
+        Preferences.AppState.isOnboardingActive.value = false
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
           self.topToolbar.tabLocationViewDidTapLocation(self.topToolbar.locationView)
         }
       }
     )
+  }
+  
+  private func triggerPromotedInAppPurchase(savedPayment: SKPayment?) {
+    guard let productPayment = savedPayment else {
+      return
+    }
+     
+    navigationHelper.openVPNBuyScreen(iapObserver: iapObserver)
+    BraveVPN.activatePaymentTypeForStoredPromotion(savedPayment: productPayment)
   }
 
   private func showPrivacyReportsOnboardingIfNeeded() {
@@ -253,12 +275,12 @@ extension BrowserViewController {
     }
 
     let popover = PopoverController(contentController: controller)
-    popover.previewForOrigin = .init(view: topToolbar.locationView.shieldsButton, action: { [weak self] popover in
+    popover.previewForOrigin = .init(view: topToolbar.shieldsButton, action: { [weak self] popover in
       popover.dismissPopover() {
         self?.presentBraveShieldsViewController()
       }
     })
-    popover.present(from: topToolbar.locationView.shieldsButton, on: self)
+    popover.present(from: topToolbar.shieldsButton, on: self)
 
     popover.popoverDidDismiss = { [weak self] _ in
       DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
@@ -279,6 +301,7 @@ extension BrowserViewController {
 
   func completeOnboarding(_ controller: UIViewController) {
     Preferences.Onboarding.basicOnboardingCompleted.value = OnboardingState.completed.rawValue
+    Preferences.AppState.isOnboardingActive.value = false
     controller.dismiss(animated: true)
   }
 }

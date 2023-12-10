@@ -20,7 +20,7 @@ class ReaderModeButton: UIButton {
   override init(frame: CGRect) {
     super.init(frame: frame)
     adjustsImageWhenHighlighted = false
-    setImage(UIImage(braveSystemNamed: "leo.product.readermode"), for: .normal)
+    setImage(UIImage(braveSystemNamed: "leo.product.speedreader"), for: .normal)
     updateIconSize()
   }
 
@@ -68,6 +68,13 @@ class ReaderModeButton: UIButton {
       .init(pointSize: pointSize, weight: .regular, scale: .medium),
       forImageIn: .normal
     )
+  }
+  
+  override var intrinsicContentSize: CGSize {
+    var size = super.intrinsicContentSize
+    let toolbarTraitCollection = UITraitCollection(preferredContentSizeCategory: traitCollection.toolbarButtonContentSizeCategory)
+    size.width = UIFontMetrics(forTextStyle: .body).scaledValue(for: 44, compatibleWith: toolbarTraitCollection)
+    return size
   }
   
   var readerModeState: ReaderModeState {

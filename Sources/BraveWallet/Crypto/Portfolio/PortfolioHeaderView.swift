@@ -23,9 +23,11 @@ struct PortfolioHeaderView: View {
   @State private var selectedBalance: BalanceTimePrice?
   @ObservedObject private var isShowingGraph = Preferences.Wallet.isShowingGraph
   @ObservedObject private var isShowingBalances = Preferences.Wallet.isShowingBalances
+  
+  @Environment(\.colorScheme) private var colourScheme
 
   private var isShowingBackupBanner: Bool {
-    !keyringStore.defaultKeyring.isBackedUp && !dismissedBackupBannerThisSession
+    !keyringStore.isWalletBackedUp && !dismissedBackupBannerThisSession
   }
   
   private var emptyBalanceData: [BalanceTimePrice] {
@@ -167,8 +169,12 @@ struct PortfolioHeaderView: View {
       timeframeSelector
       let chartData = historicalBalances.isEmpty ? emptyBalanceData : historicalBalances
       LineChartView(data: chartData, numberOfColumns: chartData.count, selectedDataPoint: $selectedBalance) {
-        LinearGradient(braveGradient: .lightGradient02)
-          .shimmer(isLoading)
+        LinearGradient(
+          gradient: Gradient(colors: [Color(.braveBlurpleTint).opacity(colourScheme == .dark ? 0.5 : 0.2), .clear]),
+          startPoint: .top,
+          endPoint: .bottom
+        )
+        .shimmer(isLoading)
       }
       .chartAccessibility(
         title: Strings.Wallet.portfolioPageTitle,

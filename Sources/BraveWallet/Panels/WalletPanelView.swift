@@ -37,13 +37,12 @@ public struct WalletPanelContainerView: View {
   }
 
   private var visibleScreen: VisibleScreen {
-    let keyring = keyringStore.defaultKeyring
-    // check if we are still fetching the `defaultKeyring`
-    if !keyringStore.isDefaultKeyringLoaded {
+    // check if we are still fetching async info from core
+    if !keyringStore.isLoaded {
       return .loading
     }
-    // keyring fetched, check if user has created a wallet
-    if !keyring.isKeyringCreated || keyringStore.isOnboardingVisible {
+    // keyring fetched, check if user has setup a wallet
+    if !keyringStore.isWalletCreated || keyringStore.isOnboardingVisible {
       return .onboarding
     }
     // keyring fetched & wallet setup, but selected account not fetched
@@ -51,7 +50,7 @@ public struct WalletPanelContainerView: View {
       return .loading
     }
     // keyring fetched & wallet setup, wallet is locked
-    if keyring.isLocked || keyringStore.isRestoreFromUnlockBiometricsPromptVisible { // wallet is locked
+    if keyringStore.isWalletLocked || keyringStore.isRestoreFromUnlockBiometricsPromptVisible { // wallet is locked
       return .unlock
     }
     return .panel
@@ -68,7 +67,7 @@ public struct WalletPanelContainerView: View {
       } label: {
         HStack(spacing: 4) {
           Image(braveSystemName: "leo.lock.open")
-          Text(Strings.Wallet.walletPanelUnlockWallet)
+          Text(Strings.Wallet.unlockWallet)
         }
       }
       .buttonStyle(BraveFilledButtonStyle(size: .normal))
@@ -147,9 +146,20 @@ public struct WalletPanelContainerView: View {
       }
     }
     .frame(idealWidth: 320, maxWidth: .infinity)
-    .onChange(of: keyringStore.defaultKeyring) { newValue in
-      if visibleScreen != .panel, !keyringStore.lockedManually {
-        presentWalletWithContext?(.panelUnlockOrSetup)
+    .onChange(of: keyringStore.isWalletLocked) { newValue in
+      guard keyringStore.isLoaded, newValue, !keyringStore.lockedManually else { return }
+      // Wallet was auto-locked with panel open
+      presentWalletWithContext?(.panelUnlockOrSetup)
+    }
+    .onChange(of: keyringStore.isLoaded) { newValue in
+      guard newValue else { return } // KeyringStore loaded
+      handleKeyringStoreLoaded()
+    }
+    .onAppear {
+      if keyringStore.isLoaded {
+        // If KeyringStore is loaded prior to view appearing on
+        // screen onChange won't be executed
+        handleKeyringStoreLoaded()
       }
     }
     .environment(
@@ -158,6 +168,23 @@ public struct WalletPanelContainerView: View {
          openWalletURLAction?(url)
          return .handled
        }))
+  }
+  
+  /// Flag to help prevent race condition between panel appearing on screen and KeyringStore `isLoaded`.
+  @State private var didHandleKeyringLoaded: Bool = false
+  /// Present unlock if displayed locked state (unless manually locked), or onboarding if displaying
+  /// onboarding state
+  private func handleKeyringStoreLoaded() {
+    guard !didHandleKeyringLoaded else { return }
+    didHandleKeyringLoaded = true
+    if visibleScreen == .onboarding {
+      // automatically open full wallet when displaying onboarding
+      presentWalletWithContext?(.panelUnlockOrSetup)
+    } else if visibleScreen == .unlock, !keyringStore.lockedManually {
+      // automatically open full unlock wallet view when displaying
+      // locked panel unless user locked manually
+      presentWalletWithContext?(.panelUnlockOrSetup)
+    }
   }
 }
 
@@ -280,11 +307,11 @@ struct WalletPanelView: View {
             .lineLimit(1)
         }
       }
-      .foregroundColor(.white)
+      .foregroundColor(Color(.braveLabel))
       .font(.caption.weight(.semibold))
       .padding(.init(top: 6, leading: 12, bottom: 6, trailing: 12))
       .background(
-        Color.white.opacity(0.5)
+        Color(.secondaryButtonTint)
           .clipShape(Capsule().inset(by: 0.5).stroke())
       )
       .clipShape(Capsule())
@@ -294,7 +321,7 @@ struct WalletPanelView: View {
   
   private var networkPickerButton: some View {
     NetworkPicker(
-      style: .init(textColor: .white, borderColor: .white),
+      style: .init(textColor: .braveLabel, borderColor: .secondaryButtonTint),
       isForOrigin: true,
       keyringStore: keyringStore,
       networkStore: networkStore
@@ -304,7 +331,7 @@ struct WalletPanelView: View {
   private var pendingRequestsButton: some View {
     Button(action: { presentWalletWithContext(.pendingRequests) }) {
       Image(braveSystemName: "leo.notification.dot")
-        .foregroundColor(.white)
+        .foregroundColor(Color(.braveLabel))
         .frame(minWidth: 30, minHeight: 44)
         .contentShape(Rectangle())
     }
@@ -315,6 +342,7 @@ struct WalletPanelView: View {
       presentWalletWithContext(.default)
     } label: {
       Image(systemName: "arrow.up.left.and.arrow.down.right")
+        .foregroundColor(Color(.braveLabel))
         .rotationEffect(.init(degrees: 90))
         .frame(minWidth: 30, minHeight: 44)
         .contentShape(Rectangle())
@@ -336,6 +364,7 @@ struct WalletPanelView: View {
       }
     } label: {
       Image(braveSystemName: "leo.more.horizontal")
+        .foregroundColor(Color(.braveLabel))
         .frame(minWidth: 30, minHeight: 44)
         .contentShape(Rectangle())
     }
@@ -365,6 +394,7 @@ struct WalletPanelView: View {
         if sizeCategory.isAccessibilityCategory {
           VStack {
             Text(Strings.Wallet.braveWallet)
+              .foregroundColor(Color(.braveLabel))
               .font(.headline)
               .background(
                 Color.clear
@@ -382,7 +412,7 @@ struct WalletPanelView: View {
           .padding(.horizontal, 16)
           .padding(.vertical, 4)
           .overlay(
-            Color.white.opacity(0.3) // Divider
+            Color(.braveLabel).opacity(0.3) // Divider
               .frame(height: pixelLength),
             alignment: .bottom
           )
@@ -396,6 +426,7 @@ struct WalletPanelView: View {
             }
             Spacer()
             Text(Strings.Wallet.braveWallet)
+              .foregroundColor(Color(.braveLabel))
               .font(.headline)
               .background(
                 Color.clear
@@ -409,7 +440,7 @@ struct WalletPanelView: View {
           .padding(.horizontal, 16)
           .padding(.vertical, 4)
           .overlay(
-            Color.white.opacity(0.3) // Divider
+            Color(.braveLabel).opacity(0.3) // Divider
               .frame(height: pixelLength),
             alignment: .bottom
           )
@@ -424,6 +455,7 @@ struct WalletPanelView: View {
             }
             Spacer()
           }
+          .padding(.bottom, 12)
           VStack(spacing: 12) {
             Button {
               presentWalletWithContext(.accountSelection)
@@ -431,20 +463,24 @@ struct WalletPanelView: View {
               Blockie(address: keyringStore.selectedAccount.address)
                 .frame(width: blockieSize, height: blockieSize)
                 .overlay(
-                  Circle().strokeBorder(lineWidth: 2, antialiased: true)
+                  RoundedRectangle(cornerRadius: 4)
+                  .strokeBorder(Color(.braveLabel).opacity(0.6), style: .init(lineWidth: 1))
                 )
                 .overlay(
                   Image(systemName: "chevron.down.circle.fill")
                     .font(.footnote)
-                    .background(Color(.braveLabel).clipShape(Circle())),
+                    .background(Color(.braveLabel).clipShape(Circle()))
+                    .offset(x: -4, y: 4),
                   alignment: .bottomLeading
                 )
             }
             VStack(spacing: 4) {
               Text(keyringStore.selectedAccount.name)
+                .foregroundColor(Color(.braveLabel))
                 .font(.headline)
               AddressView(address: keyringStore.selectedAccount.address) {
                 Text(keyringStore.selectedAccount.address.truncatedAddress)
+                  .foregroundColor(Color(.braveLabel))
                   .font(.callout)
                   .multilineTextAlignment(.center)
               }
@@ -460,36 +496,39 @@ struct WalletPanelView: View {
             Text(currencyFormatter.string(from: NSNumber(value: (Double(nativeAsset?.price ?? "") ?? 0) * (nativeAsset?.totalBalance ?? 0.0))) ?? "")
               .font(.callout)
           }
+          .foregroundColor(Color(.braveLabel))
           .padding(.vertical)
           HStack(spacing: 0) {
             Button {
               presentBuySendSwap()
             } label: {
               Image(braveSystemName: "leo.swap.horizontal")
+                .foregroundColor(Color(.braveLabel))
                 .imageScale(.large)
                 .padding(.horizontal, 44)
                 .padding(.vertical, 8)
             }
             .background(buySendSwapBackground)
-            Color.white.opacity(0.6)
+            Color(.braveLabel).opacity(0.6)
               .frame(width: pixelLength)
             Button {
               presentWalletWithContext(.transactionHistory)
             } label: {
               Image(braveSystemName: "leo.history")
+                .foregroundColor(Color(.braveLabel))
                 .imageScale(.large)
                 .padding(.horizontal, 44)
                 .padding(.vertical, 8)
             }
           }
-          .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).strokeBorder(Color.white.opacity(0.6), style: .init(lineWidth: pixelLength)))
+          .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).strokeBorder(Color(.braveLabel).opacity(0.6), style: .init(lineWidth: pixelLength)))
         }
         .padding(EdgeInsets(top: 12, leading: 12, bottom: 24, trailing: 12))
       }
     }
     .foregroundColor(.white)
     .background(
-      BlockieMaterial(address: keyringStore.selectedAccount.address)
+      Color(.braveGroupedBackground)
       .ignoresSafeArea()
     )
     .onChange(of: cryptoStore.pendingRequest) { newValue in
