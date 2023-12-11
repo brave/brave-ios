@@ -7,6 +7,7 @@ import Foundation
 import Combine
 import Shared
 import BraveShared
+import Preferences
 import WebKit
 import os.log
 import UserAgent
@@ -110,13 +111,18 @@ class BraveSearchManager: NSObject {
       url: url,
       cachePolicy: .reloadIgnoringLocalAndRemoteCacheData,
       timeoutInterval: 5)
-
-    let cookieStorage = HTTPCookieStorage()
-    domainCookies.forEach { cookieStorage.setCookie($0) }
-
-    let headers = HTTPCookie.requestHeaderFields(with: domainCookies)
-    headers.forEach {
-      request.setValue($0.value, forHTTPHeaderField: $0.key)
+    
+    // If the value was set by the user
+    if Preferences.defaultContainer.object(forKey: Preferences.Search.allowGoogleFallback.key) != nil {
+      request.setValue(Preferences.Search.allowGoogleFallback.value ? "1" : "0", forHTTPHeaderField: "Sec-Brave-Settings")
+    } else {
+      let cookieStorage = HTTPCookieStorage()
+      domainCookies.forEach { cookieStorage.setCookie($0) }
+      
+      let headers = HTTPCookie.requestHeaderFields(with: domainCookies)
+      headers.forEach {
+        request.setValue($0.value, forHTTPHeaderField: $0.key)
+      }
     }
 
     request.setValue(UserAgent.userAgentForDesktopMode, forHTTPHeaderField: "User-Agent")

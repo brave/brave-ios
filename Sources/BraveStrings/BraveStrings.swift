@@ -556,6 +556,14 @@ extension Strings {
     NSLocalizedString("SearchSettingBrowserSuggestionCellDescription", tableName: "BraveShared", bundle: .module,
       value: "Turn this on to include results from your History and Bookmarks when searching",
       comment: "Label for showing browser suggestion setting description")
+  public static let searchSettingGoogleFallbackCellTitle =
+    NSLocalizedString("SearchSettingGoogleFallbackCellTitle", tableName: "BraveShared", bundle: .module,
+      value: "Google fallback mixing on Brave Search",
+      comment: "Label for showing google fallback search setting")
+  public static let searchSettingGoogleFallbackCellDescription =
+    NSLocalizedString("SearchSettingGoogleFallbackCellDescription", tableName: "BraveShared", bundle: .module,
+      value: "For queries where Brave Search is not yet refined, your browser will anonymously check Google for the same query, mix the results for you and send the query data back to us so we can improve Brave Search results for everyone. Learn More.",
+      comment: "Label for showing google fallback search setting description")
   public static let searchSettingAddCustomEngineCellTitle =
     NSLocalizedString("searchSettingAddCustomEngineCellTitle", tableName: "BraveShared", bundle: .module,
       value: "Add Custom Search Engine",

@@ -186,6 +186,11 @@ public class SearchEngines {
     get { return Preferences.Search.showBrowserSuggestions.value }
     set { Preferences.Search.showBrowserSuggestions.value = newValue }
   }
+  
+  var allowGoogleFallback: Bool {
+    get { return Preferences.Search.allowGoogleFallback.value }
+    set { Preferences.Search.allowGoogleFallback.value = newValue }
+  }
 
   func isEngineEnabled(_ engine: OpenSearchEngine) -> Bool {
     return disabledEngineNames.index(forKey: engine.shortName) == nil

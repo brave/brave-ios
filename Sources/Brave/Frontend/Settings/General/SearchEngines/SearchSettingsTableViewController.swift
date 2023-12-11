@@ -36,6 +36,7 @@ class SearchSettingsTableViewController: UITableViewController {
     static let showSearchSuggestionsRowIdentifier = "showSearchSuggestionsRowIdentifier"
     static let showRecentSearchesRowIdentifier = "showRecentSearchRowIdentifier"
     static let showBrowserSuggestionsRowIdentifier = "showBrowserSuggestionsRowIdentifier"
+    static let showGoogleFallbackRowIdentifier = "showGoogleFallbackRowIdentifier"
     static let quickSearchEngineRowIdentifier = "quickSearchEngineRowIdentifier"
     static let customSearchEngineRowIdentifier = "customSearchEngineRowIdentifier"
   }
@@ -56,6 +57,7 @@ class SearchSettingsTableViewController: UITableViewController {
     case searchSuggestions
     case recentSearches
     case browserSuggestions
+    case googleSearchFallback
   }
 
   private var searchEngines: SearchEngines
@@ -109,6 +111,7 @@ class SearchSettingsTableViewController: UITableViewController {
       $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.showSearchSuggestionsRowIdentifier)
       $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.showRecentSearchesRowIdentifier)
       $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.showBrowserSuggestionsRowIdentifier)
+      $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.showGoogleFallbackRowIdentifier)
       $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.quickSearchEngineRowIdentifier)
       $0.register(UITableViewCell.self, forCellReuseIdentifier: Constants.customSearchEngineRowIdentifier)
       $0.sectionHeaderTopPadding = 5
@@ -250,6 +253,20 @@ class SearchSettingsTableViewController: UITableViewController {
           $0.accessoryView = toggle
           $0.selectionStyle = .none
         }
+      case CurrentEngineType.googleSearchFallback.rawValue:
+        let toggle = UISwitch().then {
+          $0.addTarget(self, action: #selector(didToggleGoogleFallback), for: .valueChanged)
+          $0.isOn = searchEngines.allowGoogleFallback
+        }
+
+        cell = UITableViewCell(style: .subtitle, reuseIdentifier: Constants.showGoogleFallbackRowIdentifier).then {
+          $0.textLabel?.text = Strings.searchSettingGoogleFallbackCellTitle
+          $0.detailTextLabel?.numberOfLines = 0
+          $0.detailTextLabel?.textColor = .secondaryBraveLabel
+          $0.detailTextLabel?.text = Strings.searchSettingGoogleFallbackCellDescription
+          $0.accessoryView = toggle
+          $0.selectionStyle = .none
+        }
       default:
         // Should not happen.
         break
@@ -383,6 +400,10 @@ extension SearchSettingsTableViewController {
     // Setting the value in settings dismisses any opt-in.
     searchEngines.shouldShowRecentSearches = toggle.isOn
     searchEngines.shouldShowRecentSearchesOptIn = false
+  }
+  
+  @objc func didToggleGoogleFallback(_ toggle: UISwitch) {
+    searchEngines.allowGoogleFallback = toggle.isOn
   }
   
   @objc func didToggleBrowserSuggestions(_ toggle: UISwitch) {

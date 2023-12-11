@@ -305,16 +305,26 @@ extension BrowserViewController: WKNavigationDelegate {
     }
 
     // Brave Search logic.
-
+    
     if navigationAction.targetFrame?.isMainFrame == true,
       BraveSearchManager.isValidURL(requestURL) {
 
       // Add Brave Search headers if Rewards is enabled
-      if !isPrivateBrowsing && rewards.isEnabled && navigationAction.request.allHTTPHeaderFields?["X-Brave-Ads-Enabled"] == nil {
+      if !isPrivateBrowsing && rewards.isEnabled && navigationAction.request.value(forHTTPHeaderField: "X-Brave-Ads-Enabled") == nil {
         var modifiedRequest = URLRequest(url: requestURL)
         modifiedRequest.setValue("1", forHTTPHeaderField: "X-Brave-Ads-Enabled")
         tab?.loadRequest(modifiedRequest)
         return (.cancel, preferences)
+      }
+      
+      // If the user has set the preference at least once
+      if Preferences.defaultContainer.object(forKey: Preferences.Search.allowGoogleFallback.key) != nil {
+        if navigationAction.request.value(forHTTPHeaderField: "Sec-Brave-Settings") == nil {
+          var modifiedRequest = URLRequest(url: requestURL)
+          modifiedRequest.setValue(Preferences.Search.allowGoogleFallback.value ? "1" : "0", forHTTPHeaderField: "Sec-Brave-Settings")
+          tab?.loadRequest(modifiedRequest)
+          return (.cancel, preferences)
+        }
       }
 
       // We fetch cookies to determine if backup search was enabled on the website.

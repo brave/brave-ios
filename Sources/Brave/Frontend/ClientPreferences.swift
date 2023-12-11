@@ -105,6 +105,8 @@ extension Preferences {
     static let shouldShowRecentSearchesOptIn = Option<Bool>(key: "search.should-show-recent-searches.opt-in", default: true)
     /// Whether or not to show suggestions from browser `Open Tabs & Bookmarks & History` while the user types
     static let showBrowserSuggestions = Option<Bool>(key: "search.show-browser-suggestions", default: true)
+    /// Whether or not to allow Google Fallback when using Brave Search
+    static let allowGoogleFallback = Option<Bool>(key: "search.allow-google-fallback", default: false)
     /// How many times Brave Search websites has asked the user to check whether Brave Search can be set as a default
     static let braveSearchDefaultBrowserPromptCount =
       Option<Int>(key: "search.brave-search-default-website-prompt", default: 0)
