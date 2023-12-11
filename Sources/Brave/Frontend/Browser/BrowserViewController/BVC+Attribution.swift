@@ -22,18 +22,13 @@ extension BrowserViewController {
       guard let self = self else { return }
       
       let refCode = self.generateReferralCode(attributionData: response, fetchError: error)
-      // Setting up referral code value
-      // This value should be set before first DAU ping
-      Preferences.URP.referralCode.value = refCode
-      Preferences.URP.installAttributionLookupOutstanding.value = false
-      
-      self.dau.sendPingToServer()
+      self.setupReferralCodeAndPingServer(refCode: refCode)
     }
   }
   
   private func generateReferralCode(attributionData: AdAttributionData?, fetchError: Error?) -> String {
     // Prefix code "001" with BRV for organic iOS installs
-    var referralCode = "BRV001"
+    var referralCode = DAU.organicInstallReferralCode
     
     if fetchError == nil, attributionData?.attribution == true, let campaignId = attributionData?.campaignId {
       // Adding ASA User refcode prefix to indicate
@@ -44,17 +39,21 @@ extension BrowserViewController {
     return referralCode
   }
   
+  public func setupReferralCodeAndPingServer(refCode: String) {
+    // Setting up referral code value
+    // This value should be set before first DAU ping
+    Preferences.URP.referralCode.value = refCode
+    Preferences.URP.installAttributionLookupOutstanding.value = false
+    
+    dau.sendPingToServer()
+  }
+  
   private func performProgramReferralLookup(_ urp: UserReferralProgram, refCode: String?) {
     urp.referralLookup(refCode: refCode) { [weak self] referralCode, offerUrl in
       guard let self = self else { return }
       
       Preferences.URP.referralLookupOutstanding.value = false
       
-      let retryTime = AppConstants.buildChannel.isPublic ? 1.days : 10.minutes
-      let retryDeadline = Date() + retryTime
-
-      Preferences.NewTabPage.superReferrerThemeRetryDeadline.value = retryDeadline
-
       guard let url = offerUrl?.asURL else { return }
       self.openReferralLink(url: url)
     }
