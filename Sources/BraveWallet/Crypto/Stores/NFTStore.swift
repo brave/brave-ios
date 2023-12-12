@@ -133,8 +133,8 @@ public class NFTStore: ObservableObject, WalletObserverStore {
   @Published var displayType: NFTDisplayType = .visible
   /// View model for all NFT include visible, hidden and spams
   @Published private(set) var userNFTGroups: [NFTGroupViewModel] = []
-  /// showing shimmering loading state when the view finishes loading NFT information
-  @Published var isShowingNFTLoadingState: Bool = false
+  /// showing shimmering loading state when the view is fetching non-fungible tokens without fetching its metadata or balance
+  @Published var isLoadingJunkNFTs: Bool = false
   
   private let keyringService: BraveWalletKeyringService
   private let rpcService: BraveWalletJsonRpcService
@@ -152,7 +152,11 @@ public class NFTStore: ObservableObject, WalletObserverStore {
   /// Cache of metadata for NFTs. The key is the token's `id`.
   private var metadataCache: [String: NFTMetadata] = [:]
   /// Spam from SimpleHash in form of `NetworkAssets`
-  private var simpleHashSpamNFTs: [NetworkAssets] = []
+  private var simpleHashSpamNFTs: [NetworkAssets] = [] {
+    didSet {
+      update()
+    }
+  }
   
   var isObserving: Bool {
     rpcServiceObserver != nil && keyringServiceObserver != nil && walletServiveObserber != nil
@@ -187,6 +191,12 @@ public class NFTStore: ObservableObject, WalletObserverStore {
     self.assetManager = userAssetManager
     
     self.setupObservers()
+    
+    walletService.nftDiscoveryEnabled { [self] enabled in
+      if enabled {
+        fetchJunkNFTs()
+      }
+    }
     
     keyringService.isLocked { [self] isLocked in
       if !isLocked {
@@ -249,7 +259,6 @@ public class NFTStore: ObservableObject, WalletObserverStore {
   private var nftBalancesCache: [String: [String: Int]] = [:]
   
   func update() {
-    self.isShowingNFTLoadingState = true
     self.updateTask?.cancel()
     self.updateTask = Task { @MainActor in
       self.allAccounts = await keyringService.allAccounts().accounts
@@ -261,14 +270,13 @@ public class NFTStore: ObservableObject, WalletObserverStore {
       let selectedAccounts = filters.accounts.filter(\.isSelected).map(\.model)
       let selectedNetworks = filters.networks.filter(\.isSelected).map(\.model)
       
-      // all spam NFTs marked by SimpleHash
-      simpleHashSpamNFTs = await walletService.simpleHashSpamNFTs(for: selectedAccounts, on: selectedNetworks)
+      // First display grids with placeholder since we haven't fetched balance
+      // or metadata
       let unionedSpamNFTs = computeSpamNFTs(
         selectedNetworks: selectedNetworks,
         selectedAccounts: selectedAccounts,
         simpleHashSpamNFTs: simpleHashSpamNFTs
       )
-      
       let (userNFTGroups, allUserNFTs) = buildNFTGroupModels(
         groupBy: filters.groupBy,
         spams: unionedSpamNFTs,
@@ -277,13 +285,14 @@ public class NFTStore: ObservableObject, WalletObserverStore {
       )
       self.userNFTGroups = userNFTGroups
       
+      // Then, we fetch balance and update the UI
       // if we're not hiding unowned or grouping by account, balance isn't needed
       if filters.isHidingUnownedNFTs || filters.groupBy == .accounts {
         let allAccounts = filters.accounts.map(\.model)
         nftBalancesCache = await withTaskGroup(
           of: [String: [String: Int]].self,
           body: { @MainActor [nftBalancesCache, rpcService] group in
-            for nft in allUserNFTs { // for each NFT
+            for nft in allUserNFTs { // for all NFTs that have not yet been fetched its balance
               guard let networkForNFT = allNetworks.first(where: { $0.chainId == nft.chainId }) else {
                 continue
               }
@@ -292,13 +301,17 @@ public class NFTStore: ObservableObject, WalletObserverStore {
                   of: [String: Int].self,
                   body: { @MainActor group in
                     for account in allAccounts where account.coin == nft.coin {
-                      group.addTask { @MainActor in
-                        let balanceForToken = await rpcService.balance(
-                          for: nft,
-                          in: account,
-                          network: networkForNFT
-                        )
-                        return [account.address: Int(balanceForToken ?? 0)]
+                      if let cachedBalance = nftBalancesCache[nft.id]?[account.address] { // cached balance
+                        return [account.address: cachedBalance]
+                      } else { // no balance for this account
+                        group.addTask { @MainActor in
+                          let balanceForToken = await rpcService.balance(
+                            for: nft,
+                            in: account,
+                            network: networkForNFT
+                          )
+                          return [account.address: Int(balanceForToken ?? 0)]
+                        }
                       }
                     }
                     return await group.reduce(into: [String: Int](), { partialResult, new in
@@ -315,7 +328,6 @@ public class NFTStore: ObservableObject, WalletObserverStore {
             })
           })
       }
-      
       guard !Task.isCancelled else { return }
       let (userNFTGroupsWithBalance, _) = buildNFTGroupModels(
         groupBy: filters.groupBy,
@@ -325,11 +337,12 @@ public class NFTStore: ObservableObject, WalletObserverStore {
       )
       self.userNFTGroups = userNFTGroupsWithBalance
       
-      // fetch nft metadata for all NFTs
-      let allMetadata = await rpcService.fetchNFTMetadata(tokens: allUserNFTs, ipfsApi: ipfsApi)
-      for (key, value) in allMetadata { // update cached values
-        metadataCache[key] = value
-      }
+      // Last, we fet fetch nft metadata for NFTs that do not have metadata loaded
+      // and update the UI
+      let nftsMissingMetadata = allUserNFTs.filter { metadataCache[$0.id] == nil }
+      let fetchedMetadata = await rpcService.fetchNFTMetadata(tokens: nftsMissingMetadata, ipfsApi: ipfsApi)
+      metadataCache.merge(with: fetchedMetadata)
+      
       guard !Task.isCancelled else { return }
       let (userNFTGroupsWithMetadata, _) = buildNFTGroupModels(
         groupBy: filters.groupBy,
@@ -338,8 +351,6 @@ public class NFTStore: ObservableObject, WalletObserverStore {
         selectedNetworks: selectedNetworks
       )
       self.userNFTGroups = userNFTGroupsWithMetadata
-      
-      isShowingNFTLoadingState = false
     }
   }
   
@@ -569,12 +580,27 @@ public class NFTStore: ObservableObject, WalletObserverStore {
     return (groups, allUserNFTs)
   }
   
+  private func fetchJunkNFTs() {
+    Task { @MainActor in
+      // all spam NFTs marked by SimpleHash (for all accounts on all networks)
+      self.isLoadingJunkNFTs = true
+      let allAccounts = await keyringService.allAccounts().accounts
+        .filter { account in
+          WalletConstants.supportedCoinTypes().contains(account.coin)
+        }
+      let allNetworks = await rpcService.allNetworksForSupportedCoins()
+      self.simpleHashSpamNFTs = await walletService.simpleHashSpamNFTs(for: allAccounts, on: allNetworks)
+      self.isLoadingJunkNFTs = false
+    }
+  }
+  
   @MainActor func isNFTDiscoveryEnabled() async -> Bool {
     await walletService.nftDiscoveryEnabled()
   }
   
   func enableNFTDiscovery() {
     walletService.setNftDiscoveryEnabled(true)
+    fetchJunkNFTs() // junk NFTs is only returned when auto-discovery is enabled
   }
   
   func updateNFTStatus(
@@ -583,7 +609,6 @@ public class NFTStore: ObservableObject, WalletObserverStore {
     isSpam: Bool,
     isDeletedByUser: Bool
   ) {
-    isShowingNFTLoadingState = true
     assetManager.updateUserAsset(
       for: token,
       visible: visible,
@@ -606,8 +631,6 @@ public class NFTStore: ObservableObject, WalletObserverStore {
         selectedAccounts: selectedAccounts,
         selectedNetworks: selectedNetworks
       )
-      
-      isShowingNFTLoadingState = false
     }
   }
   

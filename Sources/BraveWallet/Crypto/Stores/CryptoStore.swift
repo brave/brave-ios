@@ -259,11 +259,17 @@ public class CryptoStore: ObservableObject, WalletObserverStore {
         // CoreData are added after.
         guard let self else { return }
         if !self.isUpdatingUserAssets {
+          let dispatchGroup = DispatchGroup()
           for asset in discoveredAssets {
-            self.userAssetManager.addUserAsset(asset, completion: nil)
+            dispatchGroup.enter()
+            self.userAssetManager.addUserAsset(asset) {
+              dispatchGroup.leave()
+            }
           }
-          if !discoveredAssets.isEmpty {
-            self.updateAssets()
+          dispatchGroup.notify(queue: .main) {
+            if !discoveredAssets.isEmpty {
+              self.updateAssets()
+            }
           }
         } else {
           self.autoDiscoveredAssets.append(contentsOf: discoveredAssets)

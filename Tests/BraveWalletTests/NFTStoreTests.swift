@@ -121,13 +121,14 @@ class NFTStoreTests: XCTestCase {
     }
     let walletService = BraveWallet.TestBraveWalletService()
     walletService._addObserver = { _ in }
-    walletService._simpleHashSpamNfTs = {walletAddress, chainIds, coin, _, completion in
+    walletService._simpleHashSpamNfTs = { walletAddress, chainIds, coin, _, completion in
       if walletAddress == self.ethAccount1.address, chainIds.contains(BraveWallet.MainnetChainId), coin == .eth {
         completion([self.spamEthNFT], nil)
       } else {
         completion([], nil)
       }
     }
+    walletService._nftDiscoveryEnabled = { $0(true) }
     let assetRatioService = BraveWallet.TestAssetRatioService()
     
     let mockAssetManager = TestableWalletUserAssetManager()
