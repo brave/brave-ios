@@ -192,12 +192,6 @@ public class NFTStore: ObservableObject, WalletObserverStore {
     
     self.setupObservers()
     
-    walletService.nftDiscoveryEnabled { [self] enabled in
-      if enabled {
-        fetchJunkNFTs()
-      }
-    }
-    
     keyringService.isLocked { [self] isLocked in
       if !isLocked {
         update()
@@ -580,7 +574,7 @@ public class NFTStore: ObservableObject, WalletObserverStore {
     return (groups, allUserNFTs)
   }
   
-  private func fetchJunkNFTs() {
+  func fetchJunkNFTs() {
     Task { @MainActor in
       // all spam NFTs marked by SimpleHash (for all accounts on all networks)
       self.isLoadingJunkNFTs = true
@@ -600,7 +594,6 @@ public class NFTStore: ObservableObject, WalletObserverStore {
   
   func enableNFTDiscovery() {
     walletService.setNftDiscoveryEnabled(true)
-    fetchJunkNFTs() // junk NFTs is only returned when auto-discovery is enabled
   }
   
   func updateNFTStatus(

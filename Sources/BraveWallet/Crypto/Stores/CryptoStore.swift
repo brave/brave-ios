@@ -268,7 +268,7 @@ public class CryptoStore: ObservableObject, WalletObserverStore {
           }
           dispatchGroup.notify(queue: .main) {
             if !discoveredAssets.isEmpty {
-              self.updateAssets()
+              self.updateAutoDiscoveredAssets()
             }
           }
         } else {
@@ -556,6 +556,14 @@ public class CryptoStore: ObservableObject, WalletObserverStore {
   func updateAssets() {
     portfolioStore.update()
     nftStore.update()
+  }
+  
+  func updateAutoDiscoveredAssets() {
+    // at this point, all auto-discovered assets have been added to CD
+    // update `Portfolio/Assets`
+    portfolioStore.update()
+    // fetch junk NFTs from SimpleHash which will also update `Portfolio/NFTs`
+    nftStore.fetchJunkNFTs()
   }
   
   func prepare(isInitialOpen: Bool = false) {

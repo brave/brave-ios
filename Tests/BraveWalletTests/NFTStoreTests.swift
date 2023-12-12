@@ -128,7 +128,6 @@ class NFTStoreTests: XCTestCase {
         completion([], nil)
       }
     }
-    walletService._nftDiscoveryEnabled = { $0(true) }
     let assetRatioService = BraveWallet.TestAssetRatioService()
     
     let mockAssetManager = TestableWalletUserAssetManager()
@@ -477,7 +476,7 @@ class NFTStoreTests: XCTestCase {
         XCTAssertEqual(spamNFTs[safe: 0]?.nftMetadata?.name, self.mockERC721Metadata.name)
       }.store(in: &cancellables)
 
-    store.update()
+    store.fetchJunkNFTs()
     await fulfillment(of: [userSpamNFTsException], timeout: 1)
     cancellables.removeAll()
   }
@@ -547,7 +546,7 @@ class NFTStoreTests: XCTestCase {
         XCTAssertEqual(spamNFTs[safe: 1]?.nftMetadata?.name, self.mockERC721Metadata.name)
       }.store(in: &cancellables)
     
-    store.update()
+    store.fetchJunkNFTs()
     await fulfillment(of: [userSpamNFTsException], timeout: 1)
     cancellables.removeAll()
   }
@@ -615,7 +614,7 @@ class NFTStoreTests: XCTestCase {
         XCTAssertEqual(spamNFTs[safe: 0]?.nftMetadata?.name, self.mockERC721Metadata.name)
       }.store(in: &cancellables)
     
-    store.update()
+    store.fetchJunkNFTs()
     await fulfillment(of: [userSpamNFTsException], timeout: 1)
     cancellables.removeAll()
   }
@@ -689,6 +688,7 @@ class NFTStoreTests: XCTestCase {
     await fulfillment(of: [groupByAccountVisibleExpectation], timeout: 1)
     cancellables.removeAll()
   }
+  
   // MARK: Group by `Accounts` with `displayType`: `hidden`
   func testUpdateGroupByAccountsHiddenNFTs() async {
     let mockEthUserAssets: [BraveWallet.BlockchainToken] = [
