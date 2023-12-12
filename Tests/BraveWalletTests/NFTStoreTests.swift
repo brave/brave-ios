@@ -414,7 +414,7 @@ class NFTStoreTests: XCTestCase {
   }
   
   // MARK: Group By `None`
-  func testUpdateSpamGroupOnlyFromSimpleHash() async {
+  func testSpamOnlyFromSimpleHash() async {
     let mockEthUserAssets: [BraveWallet.BlockchainToken] = [
       .previewToken.copy(asVisibleAsset: true),
       .mockUSDCToken.copy(asVisibleAsset: false), // Verify non-visible assets not displayed #6386
@@ -482,7 +482,7 @@ class NFTStoreTests: XCTestCase {
   }
   
   // MARK: Group By `None`
-  func testUpdateSpamGroupFromSimpleHashAndUserMarked() async {
+  func testSpamFromSimpleHashAndUserMarked() async {
     let mockEthUserAssets: [BraveWallet.BlockchainToken] = [
       .previewToken.copy(asVisibleAsset: true),
       .mockUSDCToken.copy(asVisibleAsset: false), // Verify non-visible assets not displayed #6386
@@ -552,7 +552,7 @@ class NFTStoreTests: XCTestCase {
   }
   
   // MARK: Group By `None`
-  func testUpdateSpamGroupDuplicationFromSimpleHashAndUserMarked() async {
+  func testSpamDuplicationFromSimpleHashAndUserMarked() async {
     let mockEthUserAssets: [BraveWallet.BlockchainToken] = [
       .previewToken.copy(asVisibleAsset: true),
       .mockUSDCToken.copy(asVisibleAsset: false), // Verify non-visible assets not displayed #6386
