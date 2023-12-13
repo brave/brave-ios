@@ -31,7 +31,7 @@ public struct WalletConstants {
   
   // TODO: update wiki link
   /// Brave Wiki page for Solana Name Service (SNS)
-  public static let snsBraveWikiURL: URL = URL(string: "https://brave.com")!
+  public static let snsBraveWikiURL: URL = URL(string: "https://github.com/brave/brave-browser/wiki/Resolve-Methods-for-Solana-Name-Service")!
   
   /// Terms of Use for Ethereum Name Service (ENS)
   public static let ensTermsOfUseURL: URL = URL(string: "https://consensys.net/terms-of-use/")!
