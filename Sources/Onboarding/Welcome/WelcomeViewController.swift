@@ -375,8 +375,17 @@ public class WelcomeViewController: UIViewController {
           nextController.present(p3aLearnMoreController, animated: true)
         },
         
-        primaryButtonAction: { [weak self] in
-          self?.close()
+        primaryButtonAction: { [weak nextController, weak self] in
+          guard nextController?.calloutView.isLoading == false else {
+            return
+          }
+          
+          nextController?.calloutView.isLoading = true
+          
+          DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(5)) {
+            nextController?.calloutView.isLoading = false
+            self?.close()
+          }
         }
       )
     )

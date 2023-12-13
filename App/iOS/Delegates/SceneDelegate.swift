@@ -103,18 +103,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       // First time user should send dau ping after onboarding last stage _ p3a consent screen
       // The reason p3a user consent is necesserray to call search ad install attribution API methods
       if Preferences.AppState.dailyUserPingAwaitingUserConsent.value {
-        return
-      }
-      
-      // If P3A is not enabled, send the organic install code at daily pings which is BRV001
-      // User has not opted in to share completely private and anonymous product insights
-      guard AppState.shared.braveCore.p3aUtils.isP3AEnabled else {
-        browserViewController.setupReferralCodeAndPingServer(refCode: DAU.organicInstallReferralCode)
-        return
-      }
-      
-      if let urp = UserReferralProgram.shared {
-        browserViewController.handleSearchAdsInstallAttribution(urp)
+        // If P3A is not enabled, send the organic install code at daily pings which is BRV001
+        // User has not opted in to share completely private and anonymous product insights
+        if AppState.shared.braveCore.p3aUtils.isP3AEnabled {
+          if let urp = UserReferralProgram.shared {
+            browserViewController.handleSearchAdsInstallAttribution(urp)
+          }
+        } else {
+          browserViewController.setupReferralCodeAndPingServer(refCode: DAU.organicInstallReferralCode)
+        }
       }
     }
 
