@@ -1868,7 +1868,7 @@
 "wallet.transactionSummaryFee" = "Ücret: %1$@ %2$@ (%3$@)";
 
 /* The label used to describe a transaction type. Used like 'Send from' or 'Approved from'. */
-"wallet.transactionSummaryIntentLabel" = "Tarafından %@";
+"wallet.transactionSummaryIntentLabel" = "%@ Tarafından";
 
 /* The label to describe an Solana Swap transaction. */
 "wallet.transactionSummarySolanaSwap" = "Solana Swap";
