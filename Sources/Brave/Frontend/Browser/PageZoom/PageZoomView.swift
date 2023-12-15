@@ -126,6 +126,7 @@ struct PageZoomView: View {
       HStack(spacing: 0.0) {
         Text(Strings.PageZoom.zoomViewText)
           .font(.system(.subheadline))
+          .fixedSize(horizontal: false, vertical: true)
           .frame(maxWidth: .infinity, alignment: .leading)
         
         ZoomView(
@@ -151,6 +152,7 @@ struct PageZoomView: View {
       .padding(.vertical, 6.0)
     }
     .background(Color(UIColor.braveBackground))
+    .ignoresSafeArea()
   }
   
   private func storeChanges() {
