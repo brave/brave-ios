@@ -187,6 +187,7 @@ extension BrowserViewController {
           rewards: self.rewards,
           windowProtection: self.windowProtection,
           braveCore: self.braveCore,
+          dau: dau,
           keyringStore: keyringStore,
           cryptoStore: cryptoStore
         )

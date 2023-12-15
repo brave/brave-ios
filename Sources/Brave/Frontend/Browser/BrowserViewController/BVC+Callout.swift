@@ -155,7 +155,9 @@ extension BrowserViewController {
             self?.dismiss(animated: false)
           }
         )
-      ), p3aUtilities: braveCore.p3aUtils
+      ), 
+      p3aUtilities: braveCore.p3aUtils,
+      dau: dau
     )
 
     present(onboardingController, animated: true)
