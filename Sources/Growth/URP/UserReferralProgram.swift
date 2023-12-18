@@ -120,25 +120,35 @@ public class UserReferralProgram {
     service.referralCodeLookup(refCode: refCode, completion: referralBlock)
   }
   
-  public func adCampaignLookup(completion: @escaping ((AdAttributionData)?, Error?) -> Void) {
+  @MainActor public func adCampaignLookup() async throws -> AdAttributionData? {
     // Fetching ad attibution token
     do {
       let adAttributionToken = try AAAttribution.attributionToken()
       
-      Task { @MainActor in
-        do {
-          let result = try await service.adCampaignTokenLookupQueue(adAttributionToken: adAttributionToken)
-          completion(result, nil)
-        } catch {
-          Logger.module.info("Could not retrieve ad campaign attibution from ad services")
-          completion(nil, error)
-        }
+      do {
+        return try await service.adCampaignTokenLookupQueue(adAttributionToken: adAttributionToken)
+        
+      } catch {
+        Logger.module.info("Could not retrieve ad campaign attibution from ad services")
+        throw error
       }
     } catch {
       Logger.module.info("Couldnt fetch attribute tokens with error: \(error)")
-      completion(nil, error)
-      return
+      throw error
     }
+  }
+  
+  public func generateReferralCode(attributionData: AdAttributionData?) -> String {
+    // Prefix code "001" with BRV for organic iOS installs
+    var referralCode = DAU.organicInstallReferralCode
+    
+    if attributionData?.attribution == true, let campaignId = attributionData?.campaignId {
+      // Adding ASA User refcode prefix to indicate
+      // Apple Ads Attribution is true
+      referralCode = "ASA\(String(campaignId))"
+    }
+    
+    return referralCode
   }
 
   private func initRetryPingConnection(numberOfTimes: Int32) {

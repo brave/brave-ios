@@ -107,7 +107,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // User has not opted in to share completely private and anonymous product insights
         if AppState.shared.braveCore.p3aUtils.isP3AEnabled {
           if let urp = UserReferralProgram.shared {
-            browserViewController.handleSearchAdsInstallAttribution(urp)
+            Task { @MainActor in
+              do {
+                try await browserViewController.handleSearchAdsInstallAttribution(urp)
+              } catch {
+                Logger.module.debug("Error fetching ads attribution \(error)")
+              }
+            }
           }
         } else {
           browserViewController.setupReferralCodeAndPingServer(refCode: DAU.organicInstallReferralCode)

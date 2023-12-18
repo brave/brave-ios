@@ -17,26 +17,14 @@ extension BrowserViewController {
     }
   }
   
-  public func handleSearchAdsInstallAttribution(_ urp: UserReferralProgram) {
-    urp.adCampaignLookup() { [weak self] response, error in
-      guard let self = self else { return }
-      
-      let refCode = self.generateReferralCode(attributionData: response, fetchError: error)
-      self.setupReferralCodeAndPingServer(refCode: refCode)
+  @MainActor public func handleSearchAdsInstallAttribution(_ urp: UserReferralProgram) async throws {
+    do {
+      let attributionData = try await urp.adCampaignLookup()
+      let refCode = urp.generateReferralCode(attributionData: attributionData)
+      setupReferralCodeAndPingServer(refCode: refCode)
+    } catch {
+      throw error
     }
-  }
-  
-  private func generateReferralCode(attributionData: AdAttributionData?, fetchError: Error?) -> String {
-    // Prefix code "001" with BRV for organic iOS installs
-    var referralCode = DAU.organicInstallReferralCode
-    
-    if fetchError == nil, attributionData?.attribution == true, let campaignId = attributionData?.campaignId {
-      // Adding ASA User refcode prefix to indicate
-      // Apple Ads Attribution is true
-      referralCode = "ASA\(String(campaignId))"
-    }
-    
-    return referralCode
   }
   
   public func setupReferralCodeAndPingServer(refCode: String) {
