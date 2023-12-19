@@ -131,19 +131,6 @@ public class UserReferralProgram {
       throw error
     }
   }
-  
-  public func generateReferralCode(attributionData: AdAttributionData?) -> String {
-    // Prefix code "001" with BRV for organic iOS installs
-    var referralCode = DAU.organicInstallReferralCode
-    
-    if attributionData?.attribution == true, let campaignId = attributionData?.campaignId {
-      // Adding ASA User refcode prefix to indicate
-      // Apple Ads Attribution is true
-      referralCode = "ASA\(String(campaignId))"
-    }
-    
-    return referralCode
-  }
 
   private func initRetryPingConnection(numberOfTimes: Int32) {
     if AppConstants.buildChannel.isPublic {

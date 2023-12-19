@@ -11,6 +11,9 @@ public class AttributionManager {
   private let dau: DAU
   private let urp: UserReferralProgram
   
+  ///  The default Install Referral Code
+  public let organicInstallReferralCode = "BRV001"
+  
   public init(dau: DAU, urp: UserReferralProgram) {
     self.dau = dau
     self.urp = urp
@@ -30,7 +33,7 @@ public class AttributionManager {
   @MainActor public func handleSearchAdsInstallAttribution() async throws {
     do {
       let attributionData = try await urp.adCampaignLookup()
-      let refCode = urp.generateReferralCode(attributionData: attributionData)
+      let refCode = generateReferralCode(attributionData: attributionData)
       setupReferralCodeAndPingServer(refCode: refCode)
     } catch {
       throw error
@@ -52,5 +55,18 @@ public class AttributionManager {
       
       completion(offerUrl?.asURL)
     }
+  }
+  
+  private func generateReferralCode(attributionData: AdAttributionData?) -> String {
+    // Prefix code "001" with BRV for organic iOS installs
+    var referralCode = organicInstallReferralCode
+    
+    if attributionData?.attribution == true, let campaignId = attributionData?.campaignId {
+      // Adding ASA User refcode prefix to indicate
+      // Apple Ads Attribution is true
+      referralCode = "ASA\(String(campaignId))"
+    }
+    
+    return referralCode
   }
 }

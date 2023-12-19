@@ -24,9 +24,6 @@ public class DAU {
   }
   /// Number of seconds that determins when a user is "active"
   private let pingRefreshDuration = 5.minutes
-
-  ///  The default DAU referral code
-  public static let organicInstallReferralCode = "BRV001"
   
   /// We always use gregorian calendar for DAU pings. This also adds more anonymity to the server call.
   fileprivate static var calendar: Calendar {

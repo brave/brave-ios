@@ -203,30 +203,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       Preferences.General.keepYouTubeInBrave.value = true
     }
 
-    if UserReferralProgram.shared != nil {
-      if Preferences.URP.referralLookupOutstanding.value == nil {
-        // This preference has never been set, and this means it is a new or upgraded user.
-        // That distinction must be made to know if a network request for ref-code look up should be made.
+    if Preferences.URP.referralLookupOutstanding.value == nil {
+      // This preference has never been set, and this means it is a new or upgraded user.
+      // That distinction must be made to know if a network request for ref-code look up should be made.
 
-        // Setting this to an explicit value so it will never get overwritten on subsequent launches.
-        // Upgrade users should not have ref code ping happening.
-        Preferences.URP.referralLookupOutstanding.value = isFirstLaunch
-      }
+      // Setting this to an explicit value so it will never get overwritten on subsequent launches.
+      // Upgrade users should not have ref code ping happening.
+      Preferences.URP.referralLookupOutstanding.value = isFirstLaunch
+    }
 
-      SceneDelegate.shouldHandleUrpLookup = true
-      
-      if Preferences.URP.installAttributionLookupOutstanding.value == nil {
-        // Similarly to referral lookup, this prefrence should be set if it is a new user
-        // Trigger install attribution fetch only first launch
-        Preferences.URP.installAttributionLookupOutstanding.value = isFirstLaunch
-      }
-      
-      SceneDelegate.shouldHandleInstallAttributionFetch = true
-    } else {
-      log.error("Failed to initialize user referral program")
-      UrpLog.log("Failed to initialize user referral program")
+    SceneDelegate.shouldHandleUrpLookup = true
+    
+    if Preferences.URP.installAttributionLookupOutstanding.value == nil {
+      // Similarly to referral lookup, this prefrence should be set if it is a new user
+      // Trigger install attribution fetch only first launch
+      Preferences.URP.installAttributionLookupOutstanding.value = isFirstLaunch
     }
     
+    SceneDelegate.shouldHandleInstallAttributionFetch = true
+
 #if canImport(BraveTalk)
     BraveTalkJitsiCoordinator.sendAppLifetimeEvent(
       .didFinishLaunching(options: launchOptions ?? [:])
