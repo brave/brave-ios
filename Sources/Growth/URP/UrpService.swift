@@ -29,7 +29,7 @@ struct UrpService {
   private let sessionManager: URLSession
   private let certificateEvaluator: URPCertificatePinningService
 
-  init?(host: String, apiKey: String, adServicesURL: String) {
+  init(host: String, apiKey: String, adServicesURL: String) {
     self.host = host
     self.apiKey = apiKey
     self.adServicesURL = adServicesURL

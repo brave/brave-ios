@@ -5,19 +5,29 @@
 
 import Foundation
 import Preferences
-import Growth
 import Shared
 
-extension BrowserViewController {
-  public func handleReferralLookup(_ urp: UserReferralProgram) {
+public class AttributionManager { 
+  private let dau: DAU
+  private let urp: UserReferralProgram
+  
+  public init(dau: DAU, urp: UserReferralProgram) {
+    self.dau = dau
+    self.urp = urp
+  }
+  
+  public func handleReferralLookup(completion: @escaping (URL) -> Void) {
     if Preferences.URP.referralLookupOutstanding.value == true {
-      performProgramReferralLookup(urp, refCode: UserReferralProgram.getReferralCode())
+      performProgramReferralLookup(refCode: UserReferralProgram.getReferralCode()) { offerUrl in
+        guard let url = offerUrl else { return }
+        completion(url)
+      }
     } else {
       urp.pingIfEnoughTimePassed()
     }
   }
   
-  @MainActor public func handleSearchAdsInstallAttribution(_ urp: UserReferralProgram) async throws {
+  @MainActor public func handleSearchAdsInstallAttribution() async throws {
     do {
       let attributionData = try await urp.adCampaignLookup()
       let refCode = urp.generateReferralCode(attributionData: attributionData)
@@ -36,14 +46,11 @@ extension BrowserViewController {
     dau.sendPingToServer()
   }
   
-  private func performProgramReferralLookup(_ urp: UserReferralProgram, refCode: String?) {
-    urp.referralLookup(refCode: refCode) { [weak self] referralCode, offerUrl in
-      guard let self = self else { return }
-      
+  private func performProgramReferralLookup(refCode: String?, completion: @escaping (URL?) -> Void) {
+    urp.referralLookup(refCode: refCode) { referralCode, offerUrl in
       Preferences.URP.referralLookupOutstanding.value = false
       
-      guard let url = offerUrl?.asURL else { return }
-      self.openReferralLink(url: url)
+      completion(offerUrl?.asURL)
     }
   }
 }

@@ -162,7 +162,7 @@ public class BrowserViewController: UIViewController {
 
   public let windowId: UUID
   let profile: Profile
-  let dau: DAU
+  let attributionManager: AttributionManager
   let braveCore: BraveCoreMain
   let tabManager: TabManager
   let migration: Migration?
@@ -273,7 +273,7 @@ public class BrowserViewController: UIViewController {
   public init(
     windowId: UUID,
     profile: Profile,
-    dau: DAU,
+    attributionManager: AttributionManager,
     diskImageStore: DiskImageStore?,
     braveCore: BraveCoreMain,
     rewards: BraveRewards,
@@ -284,7 +284,7 @@ public class BrowserViewController: UIViewController {
   ) {
     self.windowId = windowId
     self.profile = profile
-    self.dau = dau
+    self.attributionManager = attributionManager
     self.braveCore = braveCore
     self.bookmarkManager = BookmarkManager(bookmarksAPI: braveCore.bookmarksAPI)
     self.rewards = rewards

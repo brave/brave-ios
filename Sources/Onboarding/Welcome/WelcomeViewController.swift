@@ -29,18 +29,16 @@ private enum WelcomeViewID: Int {
 public class WelcomeViewController: UIViewController {
   private var state: WelcomeViewCalloutState?
   private let p3aUtilities: BraveP3AUtils // Privacy Analytics
-  private let dau: DAU  // Daily Active User
-  private let urp: UserReferralProgram? // User Referral which in sync with dau
+  private let attributionManager: AttributionManager // Manager to handle daily active user and user referral
 
-  public convenience init(p3aUtilities: BraveP3AUtils, dau: DAU) {
-    self.init(state: .loading, p3aUtilities: p3aUtilities, dau: dau)
+  public convenience init(p3aUtilities: BraveP3AUtils, attributionManager: AttributionManager) {
+    self.init(state: .loading, p3aUtilities: p3aUtilities, attributionManager: attributionManager)
   }
 
-  public init(state: WelcomeViewCalloutState?, p3aUtilities: BraveP3AUtils, dau: DAU) {
+  public init(state: WelcomeViewCalloutState?, p3aUtilities: BraveP3AUtils, attributionManager: AttributionManager) {
     self.state = state
     self.p3aUtilities = p3aUtilities
-    self.dau = dau
-    self.urp = UserReferralProgram.shared
+    self.attributionManager = attributionManager
     super.init(nibName: nil, bundle: nil)
     
     self.transitioningDelegate = self
@@ -321,14 +319,14 @@ public class WelcomeViewController: UIViewController {
   }
 
   private func animateToWelcomeState() {
-    let nextController = WelcomeViewController(state: nil, p3aUtilities: self.p3aUtilities, dau: self.dau).then {
+    let nextController = WelcomeViewController(state: nil, p3aUtilities: self.p3aUtilities, attributionManager: self.attributionManager).then {
         $0.setLayoutState(state: WelcomeViewCalloutState.welcome(title: Strings.Onboarding.welcomeScreenTitle))
       }
     present(nextController, animated: true)
   }
 
   private func animateToDefaultBrowserState() {
-    let nextController = WelcomeViewController(state: nil, p3aUtilities: self.p3aUtilities, dau: self.dau)
+    let nextController = WelcomeViewController(state: nil, p3aUtilities: self.p3aUtilities, attributionManager: self.attributionManager)
     let state = WelcomeViewCalloutState.defaultBrowser(
       info: WelcomeViewCalloutState.WelcomeViewDefaultBrowserDetails(
         title: Strings.Callout.defaultBrowserCalloutTitle,
@@ -349,7 +347,7 @@ public class WelcomeViewController: UIViewController {
   }
   
   private func animateToDefaultSettingsState() {
-    let nextController = WelcomeViewController(state: nil, p3aUtilities: self.p3aUtilities, dau: self.dau).then {
+    let nextController = WelcomeViewController(state: nil, p3aUtilities: self.p3aUtilities, attributionManager: self.attributionManager).then {
         $0.setLayoutState(
           state: WelcomeViewCalloutState.settings(
             title: Strings.Onboarding.navigateSettingsOnboardingScreenTitle,
@@ -362,7 +360,7 @@ public class WelcomeViewController: UIViewController {
   }
   
   private func animateToP3aState() {
-    let nextController = WelcomeViewController(state: nil, p3aUtilities: self.p3aUtilities, dau: dau)
+    let nextController = WelcomeViewController(state: nil, p3aUtilities: self.p3aUtilities, attributionManager: attributionManager)
     let state = WelcomeViewCalloutState.p3a(
       info: WelcomeViewCalloutState.WelcomeViewDefaultBrowserDetails(
         title: Strings.Callout.p3aCalloutTitle,

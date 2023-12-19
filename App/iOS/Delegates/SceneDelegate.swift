@@ -40,11 +40,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
     guard let windowScene = (scene as? UIWindowScene) else { return }
 
+    let attributionManager = AttributionManager(dau: AppState.shared.dau, urp: UserReferralProgram.shared)
+
     let browserViewController = createBrowserWindow(
       scene: windowScene,
       braveCore: AppState.shared.braveCore,
       profile: AppState.shared.profile,
-      dau: AppState.shared.dau,
+      attributionManager: attributionManager,
       diskImageStore: AppState.shared.diskImageStore,
       migration: AppState.shared.migration,
       rewards: AppState.shared.rewards,
@@ -90,9 +92,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // Handle URP Lookup at first launch
     if SceneDelegate.shouldHandleUrpLookup {
       SceneDelegate.shouldHandleUrpLookup = false
-
-      if let urp = UserReferralProgram.shared {
-        browserViewController.handleReferralLookup(urp)
+      
+      attributionManager.handleReferralLookup { [weak browserViewController] url in
+        browserViewController?.openReferralLink(url: url)
       }
     }
     
@@ -106,17 +108,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // If P3A is not enabled, send the organic install code at daily pings which is BRV001
         // User has not opted in to share completely private and anonymous product insights
         if AppState.shared.braveCore.p3aUtils.isP3AEnabled {
-          if let urp = UserReferralProgram.shared {
-            Task { @MainActor in
-              do {
-                try await browserViewController.handleSearchAdsInstallAttribution(urp)
-              } catch {
-                Logger.module.debug("Error fetching ads attribution \(error)")
-              }
+          Task { @MainActor in
+            do {
+              try await attributionManager.handleSearchAdsInstallAttribution()
+            } catch {
+              Logger.module.debug("Error fetching ads attribution default code is sent \(error)")
+              attributionManager.setupReferralCodeAndPingServer(refCode: DAU.organicInstallReferralCode)
             }
           }
         } else {
-          browserViewController.setupReferralCodeAndPingServer(refCode: DAU.organicInstallReferralCode)
+          attributionManager.setupReferralCodeAndPingServer(refCode: DAU.organicInstallReferralCode)
         }
       }
     }
@@ -439,7 +440,7 @@ extension SceneDelegate {
   private func createBrowserWindow(scene: UIWindowScene,
                                    braveCore: BraveCoreMain,
                                    profile: Profile,
-                                   dau: DAU,
+                                   attributionManager: AttributionManager,
                                    diskImageStore: DiskImageStore?,
                                    migration: Migration?,
                                    rewards: Brave.BraveRewards,
@@ -498,7 +499,7 @@ extension SceneDelegate {
     let browserViewController = BrowserViewController(
       windowId: windowId,
       profile: profile,
-      dau: dau,
+      attributionManager: attributionManager,
       diskImageStore: diskImageStore,
       braveCore: braveCore,
       rewards: rewards,

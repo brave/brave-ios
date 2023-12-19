@@ -58,7 +58,7 @@ class SettingsViewController: TableViewController {
   private let syncAPI: BraveSyncAPI
   private let syncProfileServices: BraveSyncProfileServiceIOS
   private let p3aUtilities: BraveP3AUtils
-  private let dau: DAU
+  private let attributionManager: AttributionManager
   private let keyringStore: KeyringStore?
   private let cryptoStore: CryptoStore?
   private let windowProtection: WindowProtection?
@@ -74,7 +74,7 @@ class SettingsViewController: TableViewController {
     rewards: BraveRewards? = nil,
     windowProtection: WindowProtection?,
     braveCore: BraveCoreMain,
-    dau: DAU,
+    attributionManager: AttributionManager,
     keyringStore: KeyringStore? = nil,
     cryptoStore: CryptoStore? = nil
   ) {
@@ -88,7 +88,7 @@ class SettingsViewController: TableViewController {
     self.syncAPI = braveCore.syncAPI
     self.syncProfileServices = braveCore.syncProfileService
     self.p3aUtilities = braveCore.p3aUtils
-    self.dau = dau
+    self.attributionManager = attributionManager
     self.keyringStore = keyringStore
     self.cryptoStore = cryptoStore
     self.ipfsAPI = braveCore.ipfsAPI
@@ -864,7 +864,7 @@ class SettingsViewController: TableViewController {
         Row(
           text: "Retention Preferences Debug Menu",
           selection: { [unowned self] in
-            self.navigationController?.pushViewController(RetentionPreferencesDebugMenuViewController(p3aUtilities: p3aUtilities, dau: dau), animated: true)
+            self.navigationController?.pushViewController(RetentionPreferencesDebugMenuViewController(p3aUtilities: p3aUtilities, attributionManager: attributionManager), animated: true)
           }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self),
         Row(
           text: "Load all QA Links",
