@@ -285,7 +285,9 @@ extension BrowserViewController {
             browserViewController.dismiss(animated: true)
             browserViewController.tabToolbarDidPressShare()
           }
-          NightModeMenuButton()
+          NightModeMenuButton(dismiss: {
+            browserViewController.dismiss(animated: true)
+          })
           MenuItemButton(icon: Image(braveSystemName: "leo.browser.bookmark-add"), title: Strings.addToMenuItem) {
             browserViewController.dismiss(animated: true) {
               browserViewController.openAddBookmark()
