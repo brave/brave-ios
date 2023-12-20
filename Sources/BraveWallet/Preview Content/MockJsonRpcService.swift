@@ -236,7 +236,7 @@ class MockJsonRpcService: BraveWalletJsonRpcService {
       completion(BraveWallet.FilecoinMainnet)
     case .btc:
       fallthrough
-    @unknown default:
+    default:
       completion("")
     }
   }
