@@ -387,6 +387,8 @@ public class WelcomeViewController: UIViewController {
           
           DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(5)) {
             nextController?.calloutView.isLoading = false
+            
+            nextController?.attributionManager.adFeatureLinkage = .vpn
             self?.close()
           }
         }

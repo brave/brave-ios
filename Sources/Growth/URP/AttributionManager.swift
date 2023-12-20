@@ -5,15 +5,22 @@
 
 import Foundation
 import Preferences
+import Combine
 import Shared
 
 public class AttributionManager { 
+  public enum FeatureLinkageType {
+    case undefined, vpn, playlist
+  }
+  
   private let dau: DAU
   private let urp: UserReferralProgram
   
   ///  The default Install Referral Code
   public let organicInstallReferralCode = "BRV001"
   
+  @Published public var adFeatureLinkage: FeatureLinkageType = .undefined
+
   public init(dau: DAU, urp: UserReferralProgram) {
     self.dau = dau
     self.urp = urp

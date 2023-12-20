@@ -137,6 +137,7 @@ public class BrowserViewController: UIViewController {
 
   private var privateModeCancellable: AnyCancellable?
   private var appReviewCancelable: AnyCancellable?
+  private var adFeatureLinkageCancelable: AnyCancellable?
   var onPendingRequestUpdatedCancellable: AnyCancellable?
   
   /// Voice Search
@@ -949,6 +950,15 @@ public class BrowserViewController: UIViewController {
           // User made changes to the Brave News sources (tapped close)
           AppReviewManager.shared.handleAppReview(for: .revised, using: self)
         }
+      })
+    
+    adFeatureLinkageCancelable = attributionManager
+      .$adFeatureLinkage
+      .removeDuplicates()
+      .sink(receiveValue: { [weak self] featureLinkageType in
+        guard let self = self else { return }
+        
+        print("Feature is linked \(featureLinkageType)")
       })
     
     Preferences.General.isUsingBottomBar.objectWillChange
