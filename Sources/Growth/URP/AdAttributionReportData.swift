@@ -4,6 +4,12 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os.log
+import Foundation
+
+public enum SerializationError: Error {
+  case missing(String)
+  case invalid(String, Any)
+}
 
 public struct AdAttributionData {
   // A value of true returns if a user clicks an Apple Search Ads impression up to 30 days before your app download.
@@ -38,14 +44,7 @@ public struct AdAttributionData {
     self.adGroupId = adGroupId
     self.keywordId = keywordId
   }
-}
 
-enum SerializationError: Error {
-  case missing(String)
-  case invalid(String, Any)
-}
-
-extension AdAttributionData {
   init(json: [String: Any]?) throws {
     guard let json = json else {
       throw SerializationError.invalid("Invalid json Dictionary", "")
@@ -80,5 +79,37 @@ extension AdAttributionData {
     self.countryOrRegion = json["countryOrRegion"] as? String
     self.adGroupId = json["adGroupId"] as? Int
     self.keywordId = json["keywordId"] as? Int
+  }
+}
+
+public struct AdGroupReportData {
+  public struct KeywordReportResponse: Codable {
+    let row: [KeywordRow]
+  }
+
+  public struct KeywordRow: Codable {
+    let metadata: KeywordMetadata
+  }
+
+  public struct KeywordMetadata: Codable {
+    let keyword: String
+    let keywordId: Int
+  }
+  
+  public let productKeyword: String
+  
+  init(data: Data, keywordId: Int) throws {
+    do {
+      let decoder = JSONDecoder()
+      let keywordResponse = try decoder.decode(KeywordReportResponse.self, from: data)
+
+      if let keywordRow = keywordResponse.row.first(where: { $0.metadata.keywordId == keywordId }) {
+        productKeyword = keywordRow.metadata.keyword
+      } else {
+        throw SerializationError.invalid("Keyword with ID \(keywordId) not found", "")
+      }
+    } catch {
+      throw SerializationError.invalid("Invalid json Dictionary", "")
+    }
   }
 }

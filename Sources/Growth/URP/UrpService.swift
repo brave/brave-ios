@@ -25,14 +25,16 @@ struct UrpService {
 
   private let host: String
   private let adServicesURL: String
+  private let adReportsURL: String
   private let apiKey: String
   private let sessionManager: URLSession
   private let certificateEvaluator: URPCertificatePinningService
 
-  init(host: String, apiKey: String, adServicesURL: String) {
+  init(host: String, apiKey: String, adServicesURL: String, adReportsURL: String) {
     self.host = host
     self.apiKey = apiKey
     self.adServicesURL = adServicesURL
+    self.adReportsURL = adReportsURL
 
     // Certificate pinning
     certificateEvaluator = URPCertificatePinningService()
@@ -78,7 +80,7 @@ struct UrpService {
     }
   }
   
-  @MainActor func adCampaignTokenLookupQueue(adAttributionToken: String, isRetryEnabled: Bool = true) async throws -> (AdAttributionData?) {
+  @MainActor func adCampaignTokenLookupQueue(adAttributionToken: String, isRetryEnabled: Bool = true) async throws -> AdAttributionData {
     guard let endPoint = URL(string: adServicesURL) else {
       Logger.module.error("AdServicesURLString can not be resolved: \(adServicesURL)")
       throw URLError(.badURL)
@@ -96,11 +98,35 @@ struct UrpService {
         
         return adAttributionData
       }
+      
+      throw SerializationError.invalid("Invalid Data type from response", "")
     } catch {
       throw error
     }
-
-    return (nil)
+  }
+  
+  @MainActor func adGroupReportsKeywordLookup(adGroupId: Int, campaignId: Int, keywordId: Int) async throws -> String {
+    let reportsURL = adReportsURL + "campaigns/\(campaignId)/adgroups/\(adGroupId)/keywords"
+    
+    guard let endPoint = URL(string: reportsURL) else {
+      Logger.module.error("AdServicesURLString can not be resolved: \(reportsURL)")
+      throw URLError(.badURL)
+    }
+    
+    do {
+      let (result, _) = try await sessionManager.adGroupsReportApiRequest(endPoint: endPoint)
+      UrpLog.log("Ad Groups Report response: \(result)")
+      
+      if let resultData = result as? Data {
+        let adGroupsReportData = try AdGroupReportData(data: resultData, keywordId: keywordId)
+        
+        return adGroupsReportData.productKeyword
+      }
+      
+      throw SerializationError.invalid("Invalid Data type from response", "")
+    } catch {
+      throw error
+    }
   }
 
   func checkIfAuthorizedForGrant(with downloadId: String, completion: @escaping (Bool?, UrpError?) -> Void) {
@@ -153,6 +179,10 @@ extension URLSession {
     } else {
       return try await self.request(endPoint, method: .post, rawData: rawData, encoding: .textPlain)
     }
+  }
+  
+  func adGroupsReportApiRequest(endPoint: URL) async throws -> (Any, URLResponse) {
+    return try await self.request(endPoint, method: .post, encoding: .json)
   }
 }
 

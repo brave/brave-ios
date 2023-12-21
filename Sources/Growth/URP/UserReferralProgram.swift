@@ -23,6 +23,7 @@ public class UserReferralProgram {
   }
   
   let adServicesURLString = "https://api-adservices.apple.com/api/v1/"
+  let adReportsURLString = "https://api.searchads.apple.com/api/v4/reports/"
 
   // In case of network problems when looking for referrral code
   // we retry the call few times while the app is still alive.
@@ -44,7 +45,7 @@ public class UserReferralProgram {
     let apiKey = Bundle.main.getPlistString(for: UserReferralProgram.apiKeyPlistKey)?
       .trimmingCharacters(in: .whitespacesAndNewlines) ?? "apikey"
 
-    let urpService = UrpService(host: host, apiKey: apiKey, adServicesURL: adServicesURLString)
+    let urpService = UrpService(host: host, apiKey: apiKey, adServicesURL: adServicesURLString, adReportsURL: adReportsURLString)
 
     UrpLog.log("URP init, host: \(host)")
 
@@ -114,7 +115,7 @@ public class UserReferralProgram {
     service.referralCodeLookup(refCode: refCode, completion: referralBlock)
   }
   
-  @MainActor public func adCampaignLookup(isRetryEnabled: Bool = true) async throws -> AdAttributionData? {
+  @MainActor public func adCampaignLookup(isRetryEnabled: Bool = true) async throws -> AdAttributionData {
     // Fetching ad attibution token
     do {
       let adAttributionToken = try AAAttribution.attributionToken()
@@ -132,6 +133,23 @@ public class UserReferralProgram {
     }
   }
 
+  @MainActor func adReportsKeywordLookup(attributionData: AdAttributionData) async throws -> String {
+    guard let adGroupId = attributionData.adGroupId, let keywordId = attributionData.keywordId else {
+      throw SerializationError.invalid("adGroupId or keywordId is nil", "")
+    }
+      
+    do {
+      return try await service.adGroupReportsKeywordLookup(
+        adGroupId: adGroupId,
+        campaignId: attributionData.campaignId,
+        keywordId: keywordId)
+      
+    } catch {
+      Logger.module.info("Could not retrieve ad groups reports using ad services")
+      throw error
+    }
+  }
+  
   private func initRetryPingConnection(numberOfTimes: Int32) {
     if AppConstants.buildChannel.isPublic {
       // Adding some time offset to be extra safe.

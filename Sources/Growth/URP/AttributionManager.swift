@@ -13,6 +13,10 @@ public class AttributionManager {
     case undefined, vpn, playlist
   }
   
+  public enum FeatureLinkageError: Error {
+    case executionTimeout
+  }
+  
   private let dau: DAU
   private let urp: UserReferralProgram
   
@@ -47,12 +51,43 @@ public class AttributionManager {
     }
   }
   
-  @MainActor public func handleAdsReportingFeatureLinkage() async throws -> FeatureLinkageType {
+  @MainActor public func handleAdsReportingFeatureLinkage() async throws -> String {
+    // This function should run multiple tasks first adCampaignLookup
+    // and adReportsKeywordLookup depending on adCampaignLookup result.
+    // There is maximum threshold of 5 sec for all the tasks to be completed
+    // or an error will be thrown
+    // This is done in order not to delay onboading more than certain periods
+
+    let start = DispatchTime.now() // Start time for time tracking
+
     do {
-      // TODO: Test call result
-      let attributionData = try await urp.adCampaignLookup(isRetryEnabled: false)
-      return .vpn
+      let attributionData = try await urp.adCampaignLookup()
+
+      let elapsedTime = Double(DispatchTime.now().uptimeNanoseconds - start.uptimeNanoseconds) / 1_000_000_000
+      let remainingTime = 5.0 - elapsedTime
+
+      guard remainingTime > 0 else {
+        throw FeatureLinkageError.executionTimeout
+      }
+
+      let task2Timeout = DispatchTime.now() + .seconds(Int(remainingTime))
       
+      let keywordResult = try await withCheckedThrowingContinuation { continuation in
+        Task.detached {
+          do {
+            let keyword = try await self.urp.adReportsKeywordLookup(attributionData: attributionData)
+            continuation.resume(returning: keyword)
+          } catch {
+            continuation.resume(throwing: error)
+          }
+        }
+
+        DispatchQueue.global().asyncAfter(deadline: task2Timeout) {
+          continuation.resume(throwing: FeatureLinkageError.executionTimeout)
+        }
+      }
+
+      return keywordResult
     } catch {
       throw error
     }

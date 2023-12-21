@@ -389,8 +389,8 @@ public class WelcomeViewController: UIViewController {
           Task { @MainActor in
             do {
               // Handle API calls and send linkage type
-              let featureType = try await controller.attributionManager.handleAdsReportingFeatureLinkage()
-              controller.attributionManager.adFeatureLinkage = featureType
+//              let featureType = try await controller.attributionManager.handleAdsReportingFeatureLinkage()
+//              controller.attributionManager.adFeatureLinkage = featureType!
               
               controller.calloutView.isLoading = false
               self?.close()
