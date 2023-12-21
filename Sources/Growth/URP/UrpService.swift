@@ -78,7 +78,7 @@ struct UrpService {
     }
   }
   
-  @MainActor func adCampaignTokenLookupQueue(adAttributionToken: String) async throws -> (AdAttributionData?) {
+  @MainActor func adCampaignTokenLookupQueue(adAttributionToken: String, isRetryEnabled: Bool = true) async throws -> (AdAttributionData?) {
     guard let endPoint = URL(string: adServicesURL) else {
       Logger.module.error("AdServicesURLString can not be resolved: \(adServicesURL)")
       throw URLError(.badURL)
@@ -87,7 +87,7 @@ struct UrpService {
     let attributionDataToken = adAttributionToken.data(using: .utf8)
     
     do {
-      let (result, _) = try await sessionManager.adServicesAttributionApiRequest(endPoint: endPoint, rawData: attributionDataToken)
+      let (result, _) = try await sessionManager.adServicesAttributionApiRequest(endPoint: endPoint, rawData: attributionDataToken, isRetryEnabled: isRetryEnabled)
       UrpLog.log("Ad Attribution response: \(result)")
       
       if let resultData = result as? Data {
@@ -141,13 +141,18 @@ extension URLSession {
   }
   
   // Apple ad service attricution request requires plain text encoding with post method and passing token as rawdata
-  func adServicesAttributionApiRequest(endPoint: URL, rawData: Data?) async throws -> (Any, URLResponse) {
-    // According to attributiontoken API docs
-    // An error reponse can occur API call is done too quickly after receiving a valid token.
-    // A best practice is to initiate retries at intervals of 5 seconds, with a maximum of three attempts.
-    return try await Task.retry(retryCount: 3, retryDelay: 5) {
+  func adServicesAttributionApiRequest(endPoint: URL, rawData: Data?, isRetryEnabled: Bool) async throws -> (Any, URLResponse) {
+    // Re-try logic will not be enabled while onboarding happening on first launch
+    if isRetryEnabled {
+      // According to attributiontoken API docs
+      // An error reponse can occur API call is done too quickly after receiving a valid token.
+      // A best practice is to initiate retries at intervals of 5 seconds, with a maximum of three attempts.
+      return try await Task.retry(retryCount: 3, retryDelay: 5) {
+        return try await self.request(endPoint, method: .post, rawData: rawData, encoding: .textPlain)
+      }.value
+    } else {
       return try await self.request(endPoint, method: .post, rawData: rawData, encoding: .textPlain)
-    }.value
+    }
   }
 }
 

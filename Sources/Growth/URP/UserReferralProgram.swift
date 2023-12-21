@@ -114,7 +114,7 @@ public class UserReferralProgram {
     service.referralCodeLookup(refCode: refCode, completion: referralBlock)
   }
   
-  @MainActor public func adCampaignLookup() async throws -> AdAttributionData? {
+  @MainActor public func adCampaignLookup(isRetryEnabled: Bool = true) async throws -> AdAttributionData? {
     // Fetching ad attibution token
     do {
       let adAttributionToken = try AAAttribution.attributionToken()

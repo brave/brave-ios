@@ -17,7 +17,7 @@ public class AttributionManager {
   private let urp: UserReferralProgram
   
   ///  The default Install Referral Code
-  public let organicInstallReferralCode = "BRV001"
+  private let organicInstallReferralCode = "BRV001"
   
   @Published public var adFeatureLinkage: FeatureLinkageType = .undefined
 
@@ -47,7 +47,20 @@ public class AttributionManager {
     }
   }
   
-  public func setupReferralCodeAndPingServer(refCode: String) {
+  @MainActor public func handleAdsReportingFeatureLinkage() async throws -> FeatureLinkageType {
+    do {
+      // TODO: Test call result
+      let attributionData = try await urp.adCampaignLookup(isRetryEnabled: false)
+      return .vpn
+      
+    } catch {
+      throw error
+    }
+  }
+  
+  public func setupReferralCodeAndPingServer(refCode: String? = nil) {
+    let refCode = refCode ?? organicInstallReferralCode
+    
     // Setting up referral code value
     // This value should be set before first DAU ping
     Preferences.URP.referralCode.value = refCode

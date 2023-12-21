@@ -379,17 +379,28 @@ public class WelcomeViewController: UIViewController {
         },
         
         primaryButtonAction: { [weak nextController, weak self] in
-          guard nextController?.calloutView.isLoading == false else {
+          // Check controller is not in loading state
+          guard let controller = nextController, !controller.calloutView.isLoading else {
             return
           }
-          
-          nextController?.calloutView.isLoading = true
-          
-          DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(5)) {
-            nextController?.calloutView.isLoading = false
-            
-            nextController?.attributionManager.adFeatureLinkage = .vpn
-            self?.close()
+          // The loading state should start before calling API
+          controller.calloutView.isLoading = true
+              
+          Task { @MainActor in
+            do {
+              // Handle API calls and send linkage type
+              let featureType = try await controller.attributionManager.handleAdsReportingFeatureLinkage()
+              controller.attributionManager.adFeatureLinkage = featureType
+              
+              controller.calloutView.isLoading = false
+              self?.close()
+            } catch {
+              // Sending default organic install code for dau
+              controller.attributionManager.setupReferralCodeAndPingServer()
+              
+              controller.calloutView.isLoading = false
+              self?.close()
+            }
           }
         }
       )

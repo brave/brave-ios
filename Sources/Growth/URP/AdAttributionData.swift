@@ -18,13 +18,25 @@ public struct AdAttributionData {
   public let campaignId: Int
   // The country or region for the campaign.
   public let countryOrRegion: String?
-  
-  init(attribution: Bool, organizationId: Int? = nil, conversionType: String? = nil, campaignId: Int, countryOrRegion: String? = nil) {
+  // The ad group if for the campaign which will be used for feature link
+  public let adGroupId: Int?
+  // The keyword id for the campaign which will be used for feature link
+  public let keywordId: Int?
+
+  init(attribution: Bool,
+       organizationId: Int? = nil,
+       conversionType: String? = nil,
+       campaignId: Int,
+       countryOrRegion: String? = nil,
+       adGroupId: Int? = nil,
+       keywordId: Int? = nil ) {
     self.attribution = attribution
     self.organizationId = organizationId
     self.conversionType = conversionType
     self.campaignId = campaignId
     self.countryOrRegion = countryOrRegion
+    self.adGroupId = adGroupId
+    self.keywordId = keywordId
   }
 }
 
@@ -66,5 +78,7 @@ extension AdAttributionData {
     self.conversionType = json["conversionType"] as? String
     self.campaignId = campaignId
     self.countryOrRegion = json["countryOrRegion"] as? String
+    self.adGroupId = json["adGroupId"] as? Int
+    self.keywordId = json["keywordId"] as? Int
   }
 }

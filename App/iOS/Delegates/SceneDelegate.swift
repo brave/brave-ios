@@ -113,13 +113,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
               try await attributionManager.handleSearchAdsInstallAttribution()
             } catch {
               Logger.module.debug("Error fetching ads attribution default code is sent \(error)")
-              attributionManager.setupReferralCodeAndPingServer(
-                refCode: attributionManager.organicInstallReferralCode)
+              // Sending default organic install code for dau
+              attributionManager.setupReferralCodeAndPingServer()
             }
           }
         } else {
-          attributionManager.setupReferralCodeAndPingServer(
-            refCode: attributionManager.organicInstallReferralCode)
+          // Sending default organic install code for dau
+          attributionManager.setupReferralCodeAndPingServer()
         }
       }
     }
