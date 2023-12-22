@@ -957,6 +957,14 @@ public class BrowserViewController: UIViewController {
       .removeDuplicates()
       .sink(receiveValue: { [weak self] featureLinkageType in
         guard let self = self else { return }
+        switch featureLinkageType {
+        case .playlist:
+          self.presentPlaylistController()
+        case .vpn:
+          self.navigationHelper.openVPNBuyScreen(iapObserver: self.iapObserver)
+        default:
+          return
+        }
         
         print("Feature is linked \(featureLinkageType)")
       })

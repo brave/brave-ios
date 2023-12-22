@@ -8,14 +8,26 @@ import Preferences
 import Combine
 import Shared
 
-public class AttributionManager { 
-  public enum FeatureLinkageType {
-    case undefined, vpn, playlist
-  }
+public enum FeatureLinkageType: CaseIterable {
+  case notdefined, vpn, playlist, leoAI
   
-  public enum FeatureLinkageError: Error {
-    case executionTimeout
+  var adKeywords: [String] {
+    switch self {
+    case .vpn:
+      return ["vpn, 1.1.1.1"]
+    case .playlist:
+      return ["youtube", "video player", "playlist"]
+    default:
+      return [] // Return nil for any other case
+    }
   }
+}
+
+public enum FeatureLinkageError: Error {
+  case executionTimeout(AdAttributionData)
+}
+
+public class AttributionManager {
   
   private let dau: DAU
   private let urp: UserReferralProgram
@@ -23,7 +35,7 @@ public class AttributionManager {
   ///  The default Install Referral Code
   private let organicInstallReferralCode = "BRV001"
   
-  @Published public var adFeatureLinkage: FeatureLinkageType = .undefined
+  @Published public var adFeatureLinkage: FeatureLinkageType = .notdefined
 
   public init(dau: DAU, urp: UserReferralProgram) {
     self.dau = dau
@@ -51,7 +63,7 @@ public class AttributionManager {
     }
   }
   
-  @MainActor public func handleAdsReportingFeatureLinkage() async throws -> String {
+  @MainActor public func handleAdsReportingFeatureLinkage() async throws -> (featureType: FeatureLinkageType, attributionData: AdAttributionData) {
     // This function should run multiple tasks first adCampaignLookup
     // and adReportsKeywordLookup depending on adCampaignLookup result.
     // There is maximum threshold of 5 sec for all the tasks to be completed
@@ -72,11 +84,13 @@ public class AttributionManager {
 
       let task2Timeout = DispatchTime.now() + .seconds(Int(remainingTime))
       
-      let keywordResult = try await withCheckedThrowingContinuation { continuation in
+      let featureTypeResult = try await withCheckedThrowingContinuation { continuation in
         Task.detached {
           do {
+            self.generateReferralCodeAndPingServer(with: attributionData)
             let keyword = try await self.urp.adReportsKeywordLookup(attributionData: attributionData)
-            continuation.resume(returning: keyword)
+            let featureLinkageType = self.fetchFeatureTypes(for: keyword)
+            continuation.resume(returning: featureLinkageType)
           } catch {
             continuation.resume(throwing: error)
           }
@@ -87,10 +101,17 @@ public class AttributionManager {
         }
       }
 
-      return keywordResult
+      return (featureTypeResult, attributionData)
     } catch {
       throw error
     }
+  }
+  
+  private func fetchFeatureTypes(for keyword: String) -> FeatureLinkageType {
+    for linkageType in FeatureLinkageType.allCases where linkageType.adKeywords.contains(keyword) {
+      return linkageType
+    }
+    return .notdefined
   }
   
   public func setupReferralCodeAndPingServer(refCode: String? = nil) {
