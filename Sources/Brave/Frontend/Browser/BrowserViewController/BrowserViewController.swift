@@ -2530,6 +2530,7 @@ extension BrowserViewController: TabDelegate {
       Web3NameServiceScriptHandler(tab: tab),
       Web3IPFSScriptHandler(tab: tab),
       YoutubeQualityScriptHandler(tab: tab),
+      BraveLeoScriptHandler(tab: tab),
       
       tab.contentBlocker,
       tab.requestBlockingContentHelper,
@@ -3354,5 +3355,13 @@ extension BrowserViewController {
         }
       }
     }
+  }
+}
+
+extension BrowserViewController {
+  func openBraveLeo() {
+    let chat = UIHostingController(rootView: AIChatView(model: .init(braveCore: self.braveCore,
+                                                                     webView: self.tabManager.selectedTab!.webView!)))
+    self.present(chat, animated: true)
   }
 }

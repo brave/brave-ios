@@ -179,7 +179,12 @@ public class AppState {
       }
     }
     switches.append(.init(key: .rewardsFlags, value: BraveRewards.Configuration.current().flags))
+//    switches.append(.init(key: .init(rawValue: "variations-server-url"), value: "https://variations.brave.com/seed"))
+//    switches.append(.init(key: .init(rawValue: "variations-insecure-server-url"), value: "https://variations.brave.com/seed"))
     
+    switches.append(.init(key: .init(rawValue: "force-fieldtrials"), value: "*BraveDebounceStudy/Enabled/"))
+    switches.append(.init(key: .init(rawValue: "enable-features"), value: "BraveDebounce<BraveDebounceStudy"))
+                          
     // Initialize BraveCore
     return BraveCoreMain(userAgent: UserAgent.mobile, additionalSwitches: switches)
   }
