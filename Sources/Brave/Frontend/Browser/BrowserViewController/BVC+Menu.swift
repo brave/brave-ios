@@ -282,6 +282,10 @@ extension BrowserViewController {
             }
             .animation(.default, value: playlistItemAdded)
           }
+          MenuItemButton(icon: Image(braveSystemName: "leo.product.brave-leo"), title: Strings.leoMenuItem) {
+            browserViewController.dismiss(animated: true)
+            browserViewController.openBraveLeo()
+          }
           MenuItemButton(icon: Image(braveSystemName: "leo.share.macos"), title: Strings.shareWithMenuItem) {
             browserViewController.dismiss(animated: true)
             browserViewController.tabToolbarDidPressShare()
