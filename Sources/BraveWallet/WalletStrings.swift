@@ -505,6 +505,13 @@ extension Strings {
       value: "Swap tokens and assets.",
       comment: "The description of a swap button on the buy/send/swap modal"
     )
+    public static let more = NSLocalizedString(
+      "wallet.more",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "More",
+      comment: "A button title for user to open more option in asset details screen other than buy/send/swap."
+    )
     public static let infoTitle = NSLocalizedString(
       "wallet.infoTitle",
       tableName: "BraveWallet",
