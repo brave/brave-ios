@@ -388,9 +388,14 @@ public class WelcomeViewController: UIViewController {
               
           Task { @MainActor in
             do {
-              // Handle API calls and send linkage type
-              let reportLink = try await controller.attributionManager.handleAdsReportingFeatureLinkage()
-              controller.attributionManager.adFeatureLinkage = reportLink.featureType
+              if controller.p3aUtilities.isP3AEnabled {
+                // Handle API calls and send linkage type
+                let reportLink = try await controller.attributionManager.handleAdsReportingFeatureLinkage()
+                controller.attributionManager.adFeatureLinkage = reportLink.featureType
+              } else {
+                // p3a consent is not given
+                controller.attributionManager.setupReferralCodeAndPingServer()
+              }
               
               controller.calloutView.isLoading = false
               self?.close()

@@ -97,6 +97,21 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         browserViewController?.openReferralLink(url: url)
       }
     }
+
+    // Setup Playlist Car-Play
+    // TODO: Decide what to do if we have multiple windows
+    // as it is only possible to have a single car-play instance.
+    // Once we move to iOS 14+, this is easy to fix as we just pass car-play a `MediaStreamer`
+    // instance instead of a `BrowserViewController`.
+    PlaylistCarplayManager.shared.do {
+      $0.browserController = browserViewController
+    }
+    
+    self.present(
+      browserViewController: browserViewController,
+      windowScene: windowScene,
+      connectionOptions: connectionOptions
+    )
     
     // Handle Install Attribution Fetch at first launch
     if SceneDelegate.shouldHandleInstallAttributionFetch {
@@ -104,7 +119,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
       // First time user should send dau ping after onboarding last stage _ p3a consent screen
       // The reason p3a user consent is necesserray to call search ad install attribution API methods
-      if Preferences.AppState.dailyUserPingAwaitingUserConsent.value {
+      if !Preferences.AppState.dailyUserPingAwaitingUserConsent.value {
         // If P3A is not enabled, send the organic install code at daily pings which is BRV001
         // User has not opted in to share completely private and anonymous product insights
         if AppState.shared.braveCore.p3aUtils.isP3AEnabled {
@@ -123,21 +138,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         }
       }
     }
-
-    // Setup Playlist Car-Play
-    // TODO: Decide what to do if we have multiple windows
-    // as it is only possible to have a single car-play instance.
-    // Once we move to iOS 14+, this is easy to fix as we just pass car-play a `MediaStreamer`
-    // instance instead of a `BrowserViewController`.
-    PlaylistCarplayManager.shared.do {
-      $0.browserController = browserViewController
-    }
     
-    self.present(
-      browserViewController: browserViewController,
-      windowScene: windowScene,
-      connectionOptions: connectionOptions
-    )
+    if Preferences.URP.installAttributionLookupOutstanding.value == nil {
+      // Similarly to referral lookup, this prefrence should be set if it is a new user
+      // Trigger install attribution fetch only first launch
+      Preferences.URP.installAttributionLookupOutstanding.value = Preferences.General.isFirstLaunch.value
+    }
         
     PrivacyReportsManager.scheduleNotification(debugMode: !AppConstants.buildChannel.isPublic)
     PrivacyReportsManager.consolidateData()

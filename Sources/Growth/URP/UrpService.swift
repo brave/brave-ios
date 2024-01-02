@@ -182,7 +182,8 @@ extension URLSession {
   }
   
   func adGroupsReportApiRequest(endPoint: URL) async throws -> (Any, URLResponse) {
-    return try await self.request(endPoint, method: .post, encoding: .json)
+    // Having Reports Keywrod Lookup Endpoint 30 sec timeout
+    return try await self.request(endPoint, method: .post, encoding: .json, timeout: 30)
   }
 }
 

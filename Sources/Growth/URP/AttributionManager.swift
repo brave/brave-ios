@@ -66,42 +66,31 @@ public class AttributionManager {
   @MainActor public func handleAdsReportingFeatureLinkage() async throws -> (featureType: FeatureLinkageType, attributionData: AdAttributionData) {
     // This function should run multiple tasks first adCampaignLookup
     // and adReportsKeywordLookup depending on adCampaignLookup result.
-    // There is maximum threshold of 5 sec for all the tasks to be completed
-    // or an error will be thrown
-    // This is done in order not to delay onboading more than certain periods
-
-    let start = DispatchTime.now() // Start time for time tracking
-
+    // There is a 60 sec timeout added for adCampaignLookup and will be run with no retry and
+    // additionally adGroupReportsKeywordLookup API call will be cancelled after 30 sec
+    
     do {
-      let attributionData = try await urp.adCampaignLookup()
+      let start = DispatchTime.now() // Start time for time tracking
+      
+      // Ad campaign Lookup should be performed with no retry as first step
+      let attributionData = try await urp.adCampaignLookup(isRetryEnabled: false)
 
       let elapsedTime = Double(DispatchTime.now().uptimeNanoseconds - start.uptimeNanoseconds) / 1_000_000_000
-      let remainingTime = 5.0 - elapsedTime
+      let remainingTime = 1.0 - elapsedTime
 
       guard remainingTime > 0 else {
         throw FeatureLinkageError.executionTimeout
       }
-
-      let task2Timeout = DispatchTime.now() + .seconds(Int(remainingTime))
       
-      let featureTypeResult = try await withCheckedThrowingContinuation { continuation in
-        Task.detached {
-          do {
-            self.generateReferralCodeAndPingServer(with: attributionData)
-            let keyword = try await self.urp.adReportsKeywordLookup(attributionData: attributionData)
-            let featureLinkageType = self.fetchFeatureTypes(for: keyword)
-            continuation.resume(returning: featureLinkageType)
-          } catch {
-            continuation.resume(throwing: error)
-          }
-        }
-
-        DispatchQueue.global().asyncAfter(deadline: task2Timeout) {
-          continuation.resume(throwing: FeatureLinkageError.executionTimeout)
-        }
+      do {
+        generateReferralCodeAndPingServer(with: attributionData)
+        
+        let keyword = try await urp.adReportsKeywordLookup(attributionData: attributionData)
+        let featureLinkageType = fetchFeatureTypes(for: keyword)
+        return (featureLinkageType, attributionData)
+      } catch {
+        throw(SearchAdError.successfulCampaignFailedKeywordLookup(attributionData))
       }
-
-      return (featureTypeResult, attributionData)
     } catch {
       throw error
     }
