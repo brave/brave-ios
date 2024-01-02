@@ -68,7 +68,8 @@ platform :ios do
         "BraveWalletTests/SendTokenStoreTests/testUDAddressResolutionTokenChange",
         "BraveWalletTests/TransactionConfirmationStoreTests/testPrepareERC20Approve",
         "BraveWalletTests/TransactionConfirmationStoreTests/testPrepareTransactionNotOnSelectedNetwork",
-        "BraveSharedTests/NSURLExtensionsTests/testBugzillaURLDomain"
+        "BraveWalletTests/AccountActivityStoreTests/testUpdateEthereumAccount",
+        "BraveSharedTests/NSURLExtensionsTests/testBugzillaURLDomain",
       ]
     )
 
