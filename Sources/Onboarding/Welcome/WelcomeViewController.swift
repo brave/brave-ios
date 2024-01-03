@@ -379,34 +379,11 @@ public class WelcomeViewController: UIViewController {
         },
         
         primaryButtonAction: { [weak nextController, weak self] in
-          // Check controller is not in loading state
-          guard let controller = nextController, !controller.calloutView.isLoading else {
+          guard let controller = nextController, let self = self else {
             return
           }
-          // The loading state should start before calling API
-          controller.calloutView.isLoading = true
-              
-          Task { @MainActor in
-            do {
-              if controller.p3aUtilities.isP3AEnabled {
-                // Handle API calls and send linkage type
-                let reportLink = try await controller.attributionManager.handleAdsReportingFeatureLinkage()
-                controller.attributionManager.adFeatureLinkage = reportLink.featureType
-              } else {
-                // p3a consent is not given
-                controller.attributionManager.setupReferralCodeAndPingServer()
-              }
-              
-              controller.calloutView.isLoading = false
-              self?.close()
-            } catch {
-              // Sending default organic install code for dau
-              controller.attributionManager.setupReferralCodeAndPingServer()
-              
-              controller.calloutView.isLoading = false
-              self?.close()
-            }
-          }
+
+          self.handleAdReportingFeatureLinkage(with: controller)
         }
       )
     )
@@ -417,6 +394,73 @@ public class WelcomeViewController: UIViewController {
       self.p3aUtilities.isNoticeAcknowledged = true
       Preferences.Onboarding.p3aOnboardingShown.value = true
     }
+  }
+
+  
+  private func handleAdReportingFeatureLinkage(with controller: WelcomeViewController) {
+    // Check controller is not in loading state
+    guard !controller.calloutView.isLoading else {
+      return
+    }
+    // The loading state should start before calling API
+    controller.calloutView.isLoading = true
+    
+    let attributionManager = controller.attributionManager
+    
+    Task { @MainActor in
+      do {
+        if controller.p3aUtilities.isP3AEnabled {
+          switch attributionManager.activeFetureLinkageLogic {
+          case .campaingId:
+            let featureType = try await attributionManager.handleSearchAdsFeatureLinkage()
+            attributionManager.adFeatureLinkage = featureType
+          case .reporting:
+            // Handle API calls and send linkage type
+            let featureType = try await controller.attributionManager.handleAdsReportingFeatureLinkage()
+            attributionManager.adFeatureLinkage = featureType
+          }
+        } else {
+          // p3a consent is not given
+          attributionManager.setupReferralCodeAndPingServer()
+        }
+        
+        controller.calloutView.isLoading = false
+        close()
+      } catch FeatureLinkageError.executionTimeout(let attributionData) {
+        // Time out occurred while executing ad reports lookup
+        // Ad Campaign Lookup is successful so dau server should be pinged
+        // attribution data referral code
+        await pingServerWithGeneratedReferralCode(
+          using: attributionData, controller: controller)
+      } catch SearchAdError.successfulCampaignFailedKeywordLookup(let attributionData) {
+        // Error occurred while executing ad reports lookup
+        // Ad Campaign Lookup is successful so dau server should be pinged
+        // attribution data referral code
+        await pingServerWithGeneratedReferralCode(
+          using: attributionData, controller: controller)
+      } catch {
+        // Error occurred before getting successful
+        // attributuion data, generic code should be pinged
+        attributionManager.setupReferralCodeAndPingServer()
+        
+        controller.calloutView.isLoading = false
+        close()
+      }
+    }
+  }
+  
+  private func pingServerWithGeneratedReferralCode(using attributionData: AdAttributionData, controller: WelcomeViewController) async {
+    Task {
+      await withCheckedContinuation { continuation in
+        DispatchQueue.global().async {
+          controller.attributionManager.generateReferralCodeAndPingServer(with: attributionData)
+          continuation.resume()
+        }
+      }
+    }
+    
+    controller.calloutView.isLoading = false
+    close()
   }
 
   private func onSetDefaultBrowser() {

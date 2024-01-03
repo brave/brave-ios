@@ -18,13 +18,28 @@ public enum FeatureLinkageType: CaseIterable {
     case .playlist:
       return ["youtube", "video player", "playlist"]
     default:
-      return [] // Return nil for any other case
+      return []
+    }
+  }
+  
+  var campaignIds: [Int] {
+    switch self {
+    case .vpn:
+      return [1475635127]
+    case .playlist:
+      return [1475635128]
+    default:
+      return []
     }
   }
 }
 
 public enum FeatureLinkageError: Error {
   case executionTimeout(AdAttributionData)
+}
+
+public enum FeatureLinkageLogicType {
+  case reporting, campaingId
 }
 
 public class AttributionManager {
@@ -34,6 +49,8 @@ public class AttributionManager {
   
   ///  The default Install Referral Code
   private let organicInstallReferralCode = "BRV001"
+  
+  public let activeFetureLinkageLogic: FeatureLinkageLogicType = .campaingId
   
   @Published public var adFeatureLinkage: FeatureLinkageType = .notdefined
 
@@ -53,17 +70,29 @@ public class AttributionManager {
     }
   }
   
-  @MainActor public func handleSearchAdsInstallAttribution() async throws {
+  @discardableResult
+  @MainActor public func handleSearchAdsInstallAttribution() async throws -> AdAttributionData {
     do {
       let attributionData = try await urp.adCampaignLookup()
-      let refCode = generateReferralCode(attributionData: attributionData)
-      setupReferralCodeAndPingServer(refCode: refCode)
+      generateReferralCodeAndPingServer(with: attributionData)
+      
+      return attributionData
     } catch {
       throw error
     }
   }
   
-  @MainActor public func handleAdsReportingFeatureLinkage() async throws -> (featureType: FeatureLinkageType, attributionData: AdAttributionData) {
+  @MainActor public func handleSearchAdsFeatureLinkage() async throws -> FeatureLinkageType {
+    do {
+      let attributionData = try await handleSearchAdsInstallAttribution()
+     
+      return fetchFeatureTypes(for: attributionData.campaignId)
+    } catch {
+      throw error
+    }
+  }
+  
+  @MainActor public func handleAdsReportingFeatureLinkage() async throws -> FeatureLinkageType {
     // This function should run multiple tasks first adCampaignLookup
     // and adReportsKeywordLookup depending on adCampaignLookup result.
     // There is a 60 sec timeout added for adCampaignLookup and will be run with no retry and
@@ -86,8 +115,7 @@ public class AttributionManager {
         generateReferralCodeAndPingServer(with: attributionData)
         
         let keyword = try await urp.adReportsKeywordLookup(attributionData: attributionData)
-        let featureLinkageType = fetchFeatureTypes(for: keyword)
-        return (featureLinkageType, attributionData)
+        return fetchFeatureTypes(for: keyword)
       } catch {
         throw(SearchAdError.successfulCampaignFailedKeywordLookup(attributionData))
       }
@@ -98,6 +126,13 @@ public class AttributionManager {
   
   private func fetchFeatureTypes(for keyword: String) -> FeatureLinkageType {
     for linkageType in FeatureLinkageType.allCases where linkageType.adKeywords.contains(keyword) {
+      return linkageType
+    }
+    return .notdefined
+  }
+  
+  private func fetchFeatureTypes(for campaignId: Int) -> FeatureLinkageType {
+    for linkageType in FeatureLinkageType.allCases where linkageType.campaignIds.contains(campaignId) {
       return linkageType
     }
     return .notdefined
