@@ -115,14 +115,16 @@ public class UserReferralProgram {
     service.referralCodeLookup(refCode: refCode, completion: referralBlock)
   }
   
-  @MainActor public func adCampaignLookup(isRetryEnabled: Bool = true) async throws -> AdAttributionData {
+  @MainActor public func adCampaignLookup(isRetryEnabled: Bool = true, timeout: TimeInterval = 60) async throws -> AdAttributionData {
     // Fetching ad attibution token
     do {
       let adAttributionToken = try AAAttribution.attributionToken()
       
       do {
-        return try await service.adCampaignTokenLookupQueue(adAttributionToken: adAttributionToken)
-        
+        return try await service.adCampaignTokenLookupQueue(
+          adAttributionToken: adAttributionToken,
+          isRetryEnabled: isRetryEnabled,
+          timeout: timeout)
       } catch {
         Logger.module.info("Could not retrieve ad campaign attibution from ad services")
         throw error

@@ -80,7 +80,7 @@ struct UrpService {
     }
   }
   
-  @MainActor func adCampaignTokenLookupQueue(adAttributionToken: String, isRetryEnabled: Bool = true) async throws -> AdAttributionData {
+  @MainActor func adCampaignTokenLookupQueue(adAttributionToken: String, isRetryEnabled: Bool = true, timeout: TimeInterval) async throws -> AdAttributionData {
     guard let endPoint = URL(string: adServicesURL) else {
       Logger.module.error("AdServicesURLString can not be resolved: \(adServicesURL)")
       throw URLError(.badURL)
@@ -89,7 +89,11 @@ struct UrpService {
     let attributionDataToken = adAttributionToken.data(using: .utf8)
     
     do {
-      let (result, _) = try await sessionManager.adServicesAttributionApiRequest(endPoint: endPoint, rawData: attributionDataToken, isRetryEnabled: isRetryEnabled)
+      let (result, _) = try await sessionManager.adServicesAttributionApiRequest(
+        endPoint: endPoint,
+        rawData: attributionDataToken,
+        isRetryEnabled: isRetryEnabled,
+        timeout: timeout)
       UrpLog.log("Ad Attribution response: \(result)")
       
       if let resultData = result as? Data {
@@ -167,7 +171,7 @@ extension URLSession {
   }
   
   // Apple ad service attricution request requires plain text encoding with post method and passing token as rawdata
-  func adServicesAttributionApiRequest(endPoint: URL, rawData: Data?, isRetryEnabled: Bool) async throws -> (Any, URLResponse) {
+  func adServicesAttributionApiRequest(endPoint: URL, rawData: Data?, isRetryEnabled: Bool, timeout: TimeInterval) async throws -> (Any, URLResponse) {
     // Re-try logic will not be enabled while onboarding happening on first launch
     if isRetryEnabled {
       // According to attributiontoken API docs
@@ -177,7 +181,7 @@ extension URLSession {
         return try await self.request(endPoint, method: .post, rawData: rawData, encoding: .textPlain)
       }.value
     } else {
-      return try await self.request(endPoint, method: .post, rawData: rawData, encoding: .textPlain)
+      return try await self.request(endPoint, method: .post, rawData: rawData, encoding: .textPlain, timeout: timeout)
     }
   }
   

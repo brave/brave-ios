@@ -84,8 +84,9 @@ public class AttributionManager {
   
   @MainActor public func handleSearchAdsFeatureLinkage() async throws -> FeatureLinkageType {
     do {
-      let attributionData = try await handleSearchAdsInstallAttribution()
-     
+      let attributionData = try await urp.adCampaignLookup(isRetryEnabled: false, timeout: 30)
+      generateReferralCodeAndPingServer(with: attributionData)
+
       return fetchFeatureTypes(for: attributionData.campaignId)
     } catch {
       throw error
