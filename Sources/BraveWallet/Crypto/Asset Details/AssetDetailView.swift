@@ -285,6 +285,12 @@ struct AssetDetailView: View {
       case .coinMarket(let coinMarket):
         coinMarketInfoView(coinMarket)
           .padding(.bottom, 20)
+        Text(Strings.Wallet.coinGeckoDisclaimer)
+          .multilineTextAlignment(.center)
+          .font(.footnote)
+          .foregroundColor(Color(.secondaryBraveLabel))
+          .frame(maxWidth: .infinity)
+          .padding(.bottom, 12)
       }
     }
     .padding(.vertical)
