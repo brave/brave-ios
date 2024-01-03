@@ -753,7 +753,7 @@ public class SwapTokenStore: ObservableObject, WalletObserverStore {
     let network = await rpcService.network(.sol, origin: nil)
     
     let jupiterSwapParams: BraveWallet.JupiterTransactionParams = .init(
-      chainId: network.id,
+      chainId: network.chainId,
       route: route,
       userPublicKey: accountInfo.address,
       inputMint: selectedFromToken.contractAddress(in: network),
