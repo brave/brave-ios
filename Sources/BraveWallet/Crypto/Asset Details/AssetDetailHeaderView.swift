@@ -20,9 +20,6 @@ struct AssetDetailHeaderView: View {
   @ObservedObject var assetDetailStore: AssetDetailStore
   @ObservedObject var keyringStore: KeyringStore
   @ObservedObject var networkStore: NetworkStore
-  @Binding var buySendSwapDestination: BuySendSwapDestination?
-  @Binding var isShowingMoreActionSheet: Bool
-  var onAccountCreationNeeded: (_ savedDestination: BuySendSwapDestination) -> Void
 
   @Environment(\.sizeCategory) private var sizeCategory
   @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -44,60 +41,6 @@ struct AssetDetailHeaderView: View {
   private var emptyData: [BraveWallet.AssetTimePrice] {
     // About 300 points added so it doesn't animate funny
     (0..<300).map { _ in .init(date: Date(), price: "0.0") }
-  }
-  
-  @ViewBuilder var actionButtonsContainer: some View {
-    HStack(alignment: .top, spacing: 40) {
-      if assetDetailStore.isBuySupported {
-        PortfolioHeaderButton(style: .buy) {
-          let destination = BuySendSwapDestination(
-            kind: .buy,
-            initialToken: assetDetailStore.assetDetailToken
-          )
-          if assetDetailStore.accounts.isEmpty {
-            onAccountCreationNeeded(destination)
-          } else {
-            buySendSwapDestination = destination
-          }
-        }
-      }
-      if assetDetailStore.isSendSupported {
-        PortfolioHeaderButton(style: .send) {
-          let destination = BuySendSwapDestination(
-            kind: .send,
-            initialToken: assetDetailStore.assetDetailToken
-          )
-          if assetDetailStore.accounts.isEmpty {
-            onAccountCreationNeeded(destination)
-          } else {
-            buySendSwapDestination = destination
-          }
-        }
-      }
-      if assetDetailStore.isSwapSupported && assetDetailStore.assetDetailToken.isFungibleToken {
-        PortfolioHeaderButton(style: .swap) {
-          let destination = BuySendSwapDestination(
-            kind: .swap,
-            initialToken: assetDetailStore.assetDetailToken
-          )
-          if assetDetailStore.accounts.isEmpty {
-            onAccountCreationNeeded(destination)
-          } else {
-            buySendSwapDestination = destination
-          }
-        }
-      }
-      if case let .blockchainToken(token) = assetDetailStore.assetDetailType, token.isAuroraSupportedToken {
-        PortfolioHeaderButton(style: .more) {
-          isShowingMoreActionSheet = true
-        }
-      }
-    }
-    .padding(.horizontal, 16)
-    .transaction { transaction in
-      transaction.animation = nil
-      transaction.disablesAnimations = true
-    }
   }
   
   @ViewBuilder private var tokenInfoView: some View {
@@ -207,9 +150,6 @@ struct AssetDetailHeaderView: View {
         .padding(.bottom, 8)
       
       lineChart
-      
-      actionButtonsContainer
-        .padding(.top, 8)
     }
     .padding()
     .frame(maxWidth: .infinity)
@@ -223,10 +163,7 @@ struct CurrencyDetailHeaderView_Previews: PreviewProvider {
     AssetDetailHeaderView(
       assetDetailStore: .previewStore,
       keyringStore: .previewStore,
-      networkStore: .previewStore,
-      buySendSwapDestination: .constant(nil),
-      isShowingMoreActionSheet: .constant(false),
-      onAccountCreationNeeded: { _ in }
+      networkStore: .previewStore
     )
     .padding(.vertical)
     .previewLayout(.sizeThatFits)
@@ -235,9 +172,3 @@ struct CurrencyDetailHeaderView_Previews: PreviewProvider {
   }
 }
 #endif
-
-private extension BraveWallet.BlockchainToken {
-  var isFungibleToken: Bool {
-    return !isErc721 && !isNft
-  }
-}

@@ -32,7 +32,7 @@ struct AssetDetailView: View {
   @State private var collectionViewRef: WeakRef<UICollectionView>?
 
   @Environment(\.buySendSwapDestination)
-  private var buySendSwapDestination: Binding<BuySendSwapDestination?>
+  @Binding private var buySendSwapDestination: BuySendSwapDestination?
 
   @Environment(\.openURL) private var openWalletURL
   @ObservedObject private var isShowingBalances = Preferences.Wallet.isShowingBalances
@@ -52,8 +52,8 @@ struct AssetDetailView: View {
         
         Spacer()
         
-        if assetDetailStore.accounts.isEmpty {
-          Text(Strings.RewardsInternals.totalBalance)
+        if assetDetailStore.isLoadingAccountBalances {
+          Text(Strings.Wallet.totalBalance)
             .redacted(reason: assetDetailStore.isLoadingAccountBalances ? .placeholder : [])
             .shimmer(assetDetailStore.isLoadingAccountBalances)
         } else {
@@ -98,15 +98,11 @@ struct AssetDetailView: View {
 
   @ViewBuilder private var accountsBalanceView: some View {
     VStack {
-      accountsBalanceHeader
-      
       if assetDetailStore.accounts.isEmpty {
-        Text(Strings.Wallet.noAccounts)
-        .redacted(reason: assetDetailStore.isLoadingAccountBalances ? .placeholder : [])
-        .shimmer(assetDetailStore.isLoadingAccountBalances)
-        .font(.footnote)
-        .padding()
+        emptyAccountState
       } else {
+        accountsBalanceHeader
+        
         ForEach(assetDetailStore.accounts) { viewModel in
           accontBalanceRow(viewModel)
         }
@@ -173,8 +169,80 @@ struct AssetDetailView: View {
     .padding(.vertical)
   }
   
+  private var emptyAccountState: some View {
+    VStack(spacing: 10) {
+      Image("account-empty", bundle: .module)
+        .aspectRatio(contentMode: .fit)
+      Text(Strings.Wallet.noAccounts)
+        .font(.headline)
+        .foregroundColor(Color(WalletV2Design.textPrimary))
+      Text(Strings.Wallet.noAccountDescription)
+        .font(.footnote)
+        .foregroundColor(Color(WalletV2Design.textSecondary))
+    }
+    .multilineTextAlignment(.center)
+    .padding(.vertical)
+  }
+  
+  @ViewBuilder var actionButtonsContainer: some View {
+    HStack(alignment: .top, spacing: 40) {
+      if assetDetailStore.isBuySupported {
+        PortfolioHeaderButton(style: .buy) {
+          let destination = BuySendSwapDestination(
+            kind: .buy,
+            initialToken: assetDetailStore.assetDetailToken
+          )
+          if assetDetailStore.accounts.isEmpty {
+            onAccountCreationNeeded(destination)
+          } else {
+            buySendSwapDestination = destination
+          }
+        }
+      }
+      if assetDetailStore.isSendSupported {
+        PortfolioHeaderButton(style: .send) {
+          let destination = BuySendSwapDestination(
+            kind: .send,
+            initialToken: assetDetailStore.assetDetailToken
+          )
+          if assetDetailStore.accounts.isEmpty {
+            onAccountCreationNeeded(destination)
+          } else {
+            buySendSwapDestination = destination
+          }
+        }
+      }
+      if assetDetailStore.isSwapSupported {
+        PortfolioHeaderButton(style: .swap) {
+          let destination = BuySendSwapDestination(
+            kind: .swap,
+            initialToken: assetDetailStore.assetDetailToken
+          )
+          if assetDetailStore.accounts.isEmpty {
+            onAccountCreationNeeded(destination)
+          } else {
+            buySendSwapDestination = destination
+          }
+        }
+      }
+      if case let .blockchainToken(token) = assetDetailStore.assetDetailType, token.isAuroraSupportedToken {
+        PortfolioHeaderButton(style: .more) {
+          isShowingMoreActionSheet = true
+        }
+      }
+    }
+    .padding(.horizontal, 16)
+    .transaction { transaction in
+      transaction.animation = nil
+      transaction.disablesAnimations = true
+    }
+  }
+  
   @ViewBuilder private var tokenContentDrawer: some View {
     VStack(spacing: 0) {
+      actionButtonsContainer
+        .padding(.bottom, 40)
+      
       AssetDetailSegmentedControl(selected: $selectedContent)
         .padding(.horizontal)
       if selectedContent == .accounts {
@@ -206,7 +274,7 @@ struct AssetDetailView: View {
         tokenContentDrawer
           .padding(.bottom, 12)
         
-        if selectedContent != .transactions || !assetDetailStore.transactionSections.isEmpty {
+        if (selectedContent == .accounts && !assetDetailStore.accounts.isEmpty) || (selectedContent == .transactions && !assetDetailStore.transactionSections.isEmpty) {
           Text(Strings.Wallet.coinGeckoDisclaimer)
             .multilineTextAlignment(.center)
             .font(.footnote)
@@ -220,16 +288,7 @@ struct AssetDetailView: View {
       }
     }
     .padding(.vertical)
-    .background(
-      ZStack {
-        Color(braveSystemName: .pageBackground) // bg behind rounded corners
-          .zIndex(0)
-        Color(braveSystemName: .containerBackground)
-          .roundedCorner(16, corners: [.topLeft, .topRight])
-          .shadow(color: .black.opacity(0.04), radius: 8, x: 0, y: -8)
-          .zIndex(1)
-      }
-    )
+    .background(Color(braveSystemName: .containerBackground))
   }
   
   var body: some View {
@@ -238,23 +297,14 @@ struct AssetDetailView: View {
         AssetDetailHeaderView(
           assetDetailStore: assetDetailStore,
           keyringStore: keyringStore,
-          networkStore: networkStore,
-          buySendSwapDestination: buySendSwapDestination,
-          isShowingMoreActionSheet: $isShowingMoreActionSheet,
-          onAccountCreationNeeded: { savedDestination in
-            isPresentingAddAccountConfirmation = true
-            savedBSSDestination = savedDestination
-          }
+          networkStore: networkStore
         )
         
         assetDetailContentView
       }
     }
     .background(
-      VStack(spacing: 0) {
-        Color(braveSystemName: .pageBackground) // top scroll rubberband area
-        Color(braveSystemName: .containerBackground) // bottom drawer scroll rubberband area
-      }.edgesIgnoringSafeArea(.all)
+      Color(braveSystemName: .containerBackground).edgesIgnoringSafeArea(.all)
     )
     .navigationTitle(assetDetailStore.assetDetailToken.name)
     .navigationBarTitleDisplayMode(.inline)
@@ -390,6 +440,11 @@ struct AssetDetailView: View {
         isShowingAuroraBridgeAlert = false
       }
     }
+  }
+  
+  private func onAccountCreationNeeded(_ destination: BuySendSwapDestination) {
+    isPresentingAddAccountConfirmation = true
+    savedBSSDestination = destination
   }
 }
 

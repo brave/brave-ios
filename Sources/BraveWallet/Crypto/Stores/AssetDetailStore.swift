@@ -373,7 +373,7 @@ class AssetDetailStore: ObservableObject, WalletObserverStore {
       }
     }
     self.isLoadingAccountBalances = false
-    return accountAssetViewModels
+    return accountAssetViewModels.filter { $0.decimalBalance > 0 }
   }
   
   private func buildTransactionSections(
