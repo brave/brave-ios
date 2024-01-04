@@ -353,13 +353,13 @@ public class SwapTokenStore: ObservableObject, WalletObserverStore {
   }
   
   @MainActor private func createEthSwapTransaction() async -> Bool {
-    self.isMakingTx = true
-    defer { self.isMakingTx = false }
     guard let accountInfo = self.accountInfo else {
       self.state = .error(Strings.Wallet.unknownError)
       self.clearAllAmount()
       return false
     }
+    self.isMakingTx = true
+    defer { self.isMakingTx = false }
     let coin = accountInfo.coin
     let network = await rpcService.network(coin, origin: nil)
     guard let swapParams = self.swapParameters(for: .perSellAsset, in: network) else {
@@ -748,6 +748,8 @@ public class SwapTokenStore: ObservableObject, WalletObserverStore {
           let selectedFromToken else {
       return false
     }
+    self.isMakingTx = true
+    defer { self.isMakingTx = false }
     let network = await rpcService.network(.sol, origin: nil)
     let jupiterSwapParams: BraveWallet.JupiterSwapParams = .init(
       chainId: network.chainId,
