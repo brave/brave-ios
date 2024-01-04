@@ -95,9 +95,6 @@ struct AddCustomAssetView: View {
                 if !token.isErc721, !token.isNft, decimalsInput.isEmpty {
                   decimalsInput = "\(token.decimals)"
                 }
-                if let network = networkStore.allChains.first(where: { $0.chainId == token.chainId }) {
-                  networkSelectionStore.networkSelectionInForm = network
-                }
               }
             }
             .autocapitalization(.none)
