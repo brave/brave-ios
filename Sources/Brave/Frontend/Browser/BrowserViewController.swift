@@ -2120,6 +2120,19 @@ public class BrowserViewController: UIViewController {
 
   func makeShareActivities(for url: URL, tab: Tab?, sourceView: UIView?, sourceRect: CGRect, arrowDirection: UIPopoverArrowDirection) -> [UIActivity] {
     var activities = [UIActivity]()
+    
+    if !url.isLocal, !InternalURL.isValid(url: url), !url.isReaderModeURL {
+      let copyCleanURLActivity = CopyCleanURLActivity() { [weak self] in
+        guard let self = self else { return }
+        
+        let service = URLSanitizerServiceFactory.get(privateMode: tab?.isPrivate ?? true)
+        let cleanedURL = service?.sanitizeURL(url) ?? url
+        UIPasteboard.general.url = cleanedURL
+      }
+
+      activities.append(copyCleanURLActivity)
+      
+    }
 
     // Adding SendTabToSelfActivity conditionally to show device selection screen
     if !privateBrowsingManager.isPrivateBrowsing, !url.isLocal, !InternalURL.isValid(url: url), !url.isReaderModeURL,
