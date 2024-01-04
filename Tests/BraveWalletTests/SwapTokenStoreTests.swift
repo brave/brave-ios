@@ -253,7 +253,7 @@ class SwapStoreTests: XCTestCase {
       } else if coin == .sol {
         completion(.init(jupiterQuote: .init()), nil, "")
       } else {
-        completion(nil, nil, "Test Internal Error")
+        XCTFail("Coin type is not supported for swap")
       }
     }
     swapService._transaction = { _, completion in
@@ -262,7 +262,7 @@ class SwapStoreTests: XCTestCase {
       } else if coin == .sol {
         completion(.init(jupiterTransaction: .init()), nil, "")
       } else {
-        completion(nil, nil, "Test Internal Error")
+        XCTFail("Coin type is not supported for swap")
       }
     }
     swapService._braveFee = { params, completion in
