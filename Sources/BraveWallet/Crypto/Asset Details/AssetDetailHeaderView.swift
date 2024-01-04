@@ -153,7 +153,7 @@ struct AssetDetailHeaderView: View {
     }
     .padding()
     .frame(maxWidth: .infinity)
-    .background(Color(braveSystemName: .pageBackground))
+    .background(Color(braveSystemName: .containerBackground))
   }
 }
 

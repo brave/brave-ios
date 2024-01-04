@@ -238,7 +238,7 @@ struct AssetDetailView: View {
     }
   }
   
-  @ViewBuilder private var tokenContentDrawer: some View {
+  @ViewBuilder private var tokenContentContainer: some View {
     VStack(spacing: 0) {
       actionButtonsContainer
         .padding(.bottom, 40)
@@ -271,7 +271,7 @@ struct AssetDetailView: View {
     LazyVStack {
       switch assetDetailStore.assetDetailType {
       case .blockchainToken(_):
-        tokenContentDrawer
+        tokenContentContainer
           .padding(.bottom, 12)
         
         if (selectedContent == .accounts && !assetDetailStore.accounts.isEmpty) || (selectedContent == .transactions && !assetDetailStore.transactionSections.isEmpty) {
