@@ -212,7 +212,7 @@ public class UserAssetsStore: ObservableObject, WalletObserverStore {
     else if let token = allTokens.first(where: { $0.contractAddress.caseInsensitiveCompare(address) == .orderedSame }) {
       completion(token)
     } // else use network request to get token info
-    else if address.isETHAddress { // only Eth Mainnet supported, require ethereum address
+    else if address.isETHAddress { // only Eth networks supported, require ethereum address
       timer?.invalidate()
       timer = Timer.scheduledTimer(
         withTimeInterval: 0.25, repeats: false,
