@@ -494,7 +494,7 @@ extension BrowserViewController: WKNavigationDelegate {
        mimeTypesThatRequireSFSafariViewControllerHandling.contains(mimeType) {
       
       let isAboutHome = InternalURL(url)?.isAboutHomeURL == true
-      let isNonActiveTab = isAboutHome ? false : url.host != topToolbar.currentURL?.host
+      let isNonActiveTab = isAboutHome ? false : url.host != tabManager.selectedTab?.url?.host
       
       // Check website is trying to open Safari Controller in non-active tab
       if !isNonActiveTab {
