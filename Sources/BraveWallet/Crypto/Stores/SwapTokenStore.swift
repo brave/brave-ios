@@ -61,6 +61,8 @@ public class SwapTokenStore: ObservableObject, WalletObserverStore {
         swapResponse = nil
         jupiterQuote = nil
         braveFee = nil
+        // price quote requested for a different amount
+        priceQuoteTask?.cancel()
       }
       guard !sellAmount.isEmpty, BDouble(sellAmount.normalizedDecimals) != nil else {
         state = .idle
@@ -661,6 +663,7 @@ public class SwapTokenStore: ObservableObject, WalletObserverStore {
     self.isUpdatingPriceQuote = true
     let (jupiterQuote, swapErrorResponse, _) = await swapService.jupiterQuote(jupiterQuoteParams)
     defer { self.isUpdatingPriceQuote = false }
+    guard !Task.isCancelled else { return }
     if let jupiterQuote {
       await self.handleSolPriceQuoteResponse(jupiterQuote, swapParams: swapParams)
     } else if let swapErrorResponse {
@@ -833,8 +836,10 @@ public class SwapTokenStore: ObservableObject, WalletObserverStore {
     }
   }
 
+  private var priceQuoteTask: Task<(), Never>?
   func fetchPriceQuote(base: SwapParamsBase) {
-    Task { @MainActor in
+    priceQuoteTask?.cancel()
+    priceQuoteTask = Task { @MainActor in
       // reset quotes before fetching new quote
       swapResponse = nil
       jupiterQuote = nil
@@ -844,6 +849,7 @@ public class SwapTokenStore: ObservableObject, WalletObserverStore {
         return
       }
       let network = await rpcService.network(accountInfo.coin, origin: nil)
+      guard !Task.isCancelled else { return }
       // Entering a buy amount is disabled for Solana swaps, always use
       // `SwapParamsBase.perSellAsset` to fetch quote based on the sell amount.
       // `SwapParamsBase.perBuyAsset` is sent when `selectedToToken` is changed.
@@ -873,6 +879,7 @@ public class SwapTokenStore: ObservableObject, WalletObserverStore {
     self.isUpdatingPriceQuote = true
     defer { self.isUpdatingPriceQuote = false }
     let (swapResponse, swapErrorResponse, _) = await swapService.priceQuote(swapParams)
+    guard !Task.isCancelled else { return }
     if let swapResponse = swapResponse {
       await self.handleEthPriceQuoteResponse(swapResponse, base: base, swapParams: swapParams)
     } else if let swapErrorResponse = swapErrorResponse {
