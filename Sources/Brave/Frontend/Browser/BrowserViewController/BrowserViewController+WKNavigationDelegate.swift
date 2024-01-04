@@ -492,7 +492,15 @@ extension BrowserViewController: WKNavigationDelegate {
     if navigationResponse.isForMainFrame, let url = responseURL, url.isWebPage(includeDataURIs: false),
        let mimeType = response.mimeType.flatMap({ UTType(mimeType: $0) }),
        mimeTypesThatRequireSFSafariViewControllerHandling.contains(mimeType) {
-      handleLinkWithSafariViewController(url, tab: tab)
+      
+      let isAboutHome = InternalURL(url)?.isAboutHomeURL == true
+      let isNonActiveTab = isAboutHome ? false : url.host != topToolbar.currentURL?.host
+      
+      // Check website is trying to open Safari Controller in non-active tab
+      if !isNonActiveTab {
+        handleLinkWithSafariViewController(url, tab: tab)
+      }
+      
       return .cancel
     }
 
