@@ -2122,9 +2122,7 @@ public class BrowserViewController: UIViewController {
     var activities = [UIActivity]()
     
     if !url.isLocal, !InternalURL.isValid(url: url), !url.isReaderModeURL {
-      let copyCleanURLActivity = CopyCleanURLActivity() { [weak self] in
-        guard let self = self else { return }
-        
+      let copyCleanURLActivity = CopyCleanURLActivity() { 
         let service = URLSanitizerServiceFactory.get(privateMode: tab?.isPrivate ?? true)
         let cleanedURL = service?.sanitizeURL(url) ?? url
         UIPasteboard.general.url = cleanedURL
