@@ -110,12 +110,15 @@ struct UrpService {
   }
   
   @MainActor func adGroupReportsKeywordLookup(adGroupId: Int, campaignId: Int, keywordId: Int) async throws -> String {
-    let reportsURL = adReportsURL + "campaigns/\(campaignId)/adgroups/\(adGroupId)/keywords"
-    
-    guard let endPoint = URL(string: reportsURL) else {
-      Logger.module.error("AdServicesURLString can not be resolved: \(reportsURL)")
+    guard let reportsURL = URL(string: adReportsURL) else {
+      Logger.module.error("AdServicesURLString can not be resolved: \(adReportsURL)")
       throw URLError(.badURL)
     }
+    
+    var endPoint = reportsURL
+    endPoint.append(pathComponents: "campaigns", "\(campaignId)")
+    endPoint.append(pathComponents: "adgroups", "\(adGroupId)")
+    endPoint.append(pathComponents: "keywords", "")
     
     do {
       let (result, _) = try await sessionManager.adGroupsReportApiRequest(endPoint: endPoint)
