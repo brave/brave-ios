@@ -29,6 +29,10 @@ public class BlockedDomainHandler: InternalSchemeResponse {
         .replacingOccurrences(of: "%blocked_subtitle%", with: Strings.Shields.domainBlockedPageMessage)
         .replacingOccurrences(of: "%blocked_domain%", with: originalURL.domainURL.absoluteDisplayString)
         .replacingOccurrences(of: "%blocked_description%", with: Strings.Shields.domainBlockedPageDescription)
+        .replacingOccurrences(of: "%proceed_action%", with: Strings.Shields.domainBlockedProceedAction)
+        .replacingOccurrences(of: "%go_back_action%", with: Strings.Shields.domainBlockedGoBackAction)
+        .replacingOccurrences(of: "%message_handler%", with: BlockedDomainScriptHandler.messageHandlerName)
+        .replacingOccurrences(of: "%security_token%", with: UserScriptManager.securityToken)
       
       if #available(iOS 16.0, *) {
         html = html?.replacingOccurrences(of: "<html lang=\"en\">", with: "<html lang=\"\(Locale.current.language.minimalIdentifier)\">")
