@@ -965,8 +965,6 @@ public class BrowserViewController: UIViewController {
         default:
           return
         }
-        
-        print("Feature is linked \(featureLinkageType)")
       })
     
     Preferences.General.isUsingBottomBar.objectWillChange

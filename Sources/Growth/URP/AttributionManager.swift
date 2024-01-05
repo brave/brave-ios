@@ -9,7 +9,7 @@ import Combine
 import Shared
 
 public enum FeatureLinkageType: CaseIterable {
-  case notdefined, vpn, playlist, leoAI
+  case vpn, playlist, leoAI
   
   var adKeywords: [String] {
     switch self {
@@ -77,7 +77,7 @@ public class AttributionManager {
   
   public let activeFetureLinkageLogic: FeatureLinkageLogicType = .campaingId
   
-  @Published public var adFeatureLinkage: FeatureLinkageType = .notdefined
+  @Published public var adFeatureLinkage: FeatureLinkageType?
 
   public init(dau: DAU, urp: UserReferralProgram) {
     self.dau = dau
@@ -107,7 +107,7 @@ public class AttributionManager {
     }
   }
   
-  @MainActor public func handleSearchAdsFeatureLinkage() async throws -> FeatureLinkageType {
+  @MainActor public func handleSearchAdsFeatureLinkage() async throws -> FeatureLinkageType? {
     do {
       let attributionData = try await urp.adCampaignLookup(isRetryEnabled: false, timeout: 30)
       generateReferralCodeAndPingServer(with: attributionData)
@@ -118,7 +118,7 @@ public class AttributionManager {
     }
   }
   
-  @MainActor public func handleAdsReportingFeatureLinkage() async throws -> FeatureLinkageType {
+  @MainActor public func handleAdsReportingFeatureLinkage() async throws -> FeatureLinkageType? {
     // This function should run multiple tasks first adCampaignLookup
     // and adReportsKeywordLookup depending on adCampaignLookup result.
     // There is a 60 sec timeout added for adCampaignLookup and will be run with no retry and
@@ -150,18 +150,18 @@ public class AttributionManager {
     }
   }
   
-  private func fetchFeatureTypes(for keyword: String) -> FeatureLinkageType {
+  private func fetchFeatureTypes(for keyword: String) -> FeatureLinkageType? {
     for linkageType in FeatureLinkageType.allCases where linkageType.adKeywords.contains(keyword) {
       return linkageType
     }
-    return .notdefined
+    return nil
   }
   
-  private func fetchFeatureTypes(for campaignId: Int) -> FeatureLinkageType {
+  private func fetchFeatureTypes(for campaignId: Int) -> FeatureLinkageType? {
     for linkageType in FeatureLinkageType.allCases where linkageType.campaignIds.contains(campaignId) {
       return linkageType
     }
-    return .notdefined
+    return nil
   }
   
   public func setupReferralCodeAndPingServer(refCode: String? = nil) {
