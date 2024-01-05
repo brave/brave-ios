@@ -319,14 +319,14 @@ public class WelcomeViewController: UIViewController {
   }
 
   private func animateToWelcomeState() {
-    let nextController = WelcomeViewController(state: nil, p3aUtilities: self.p3aUtilities, attributionManager: self.attributionManager).then {
+    let nextController = WelcomeViewController(state: nil, p3aUtilities: p3aUtilities, attributionManager: attributionManager).then {
         $0.setLayoutState(state: WelcomeViewCalloutState.welcome(title: Strings.Onboarding.welcomeScreenTitle))
       }
     present(nextController, animated: true)
   }
 
   private func animateToDefaultBrowserState() {
-    let nextController = WelcomeViewController(state: nil, p3aUtilities: self.p3aUtilities, attributionManager: self.attributionManager)
+    let nextController = WelcomeViewController(state: nil, p3aUtilities: p3aUtilities, attributionManager: attributionManager)
     let state = WelcomeViewCalloutState.defaultBrowser(
       info: WelcomeViewCalloutState.WelcomeViewDefaultBrowserDetails(
         title: Strings.Callout.defaultBrowserCalloutTitle,
@@ -347,7 +347,7 @@ public class WelcomeViewController: UIViewController {
   }
   
   private func animateToDefaultSettingsState() {
-    let nextController = WelcomeViewController(state: nil, p3aUtilities: self.p3aUtilities, attributionManager: self.attributionManager).then {
+    let nextController = WelcomeViewController(state: nil, p3aUtilities: p3aUtilities, attributionManager: attributionManager).then {
         $0.setLayoutState(
           state: WelcomeViewCalloutState.settings(
             title: Strings.Onboarding.navigateSettingsOnboardingScreenTitle,
@@ -360,7 +360,7 @@ public class WelcomeViewController: UIViewController {
   }
   
   private func animateToP3aState() {
-    let nextController = WelcomeViewController(state: nil, p3aUtilities: self.p3aUtilities, attributionManager: attributionManager)
+    let nextController = WelcomeViewController(state: nil, p3aUtilities: p3aUtilities, attributionManager: attributionManager)
     let state = WelcomeViewCalloutState.p3a(
       info: WelcomeViewCalloutState.WelcomeViewDefaultBrowserDetails(
         title: Strings.Callout.p3aCalloutTitle,
@@ -396,7 +396,6 @@ public class WelcomeViewController: UIViewController {
     }
   }
 
-  
   private func handleAdReportingFeatureLinkage(with controller: WelcomeViewController) {
     // Check controller is not in loading state
     guard !controller.calloutView.isLoading else {

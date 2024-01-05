@@ -127,28 +127,29 @@ public class UserReferralProgram {
           timeout: timeout)
       } catch {
         Logger.module.info("Could not retrieve ad campaign attibution from ad services")
-        throw error
+        throw SearchAdError.invalidCampaignTokenData
       }
     } catch {
       Logger.module.info("Couldnt fetch attribute tokens with error: \(error)")
-      throw error
+      throw SearchAdError.failedCampaignTokenFetch
     }
   }
 
   @MainActor func adReportsKeywordLookup(attributionData: AdAttributionData) async throws -> String {
     guard let adGroupId = attributionData.adGroupId, let keywordId = attributionData.keywordId else {
-      throw SerializationError.invalid("adGroupId or keywordId is nil", "")
+      Logger.module.info("Could not retrieve ad campaign attibution from ad services")
+      throw SearchAdError.missingReportsKeywordParameter
     }
-      
+
     do {
       return try await service.adGroupReportsKeywordLookup(
         adGroupId: adGroupId,
         campaignId: attributionData.campaignId,
         keywordId: keywordId)
-      
+
     } catch {
       Logger.module.info("Could not retrieve ad groups reports using ad services")
-      throw error
+      throw SearchAdError.failedReportsKeywordLookup
     }
   }
   

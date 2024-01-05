@@ -134,7 +134,7 @@ public class AttributionManager {
       let remainingTime = 1.0 - elapsedTime
 
       guard remainingTime > 0 else {
-        throw FeatureLinkageError.executionTimeout
+        throw FeatureLinkageError.executionTimeout(attributionData)
       }
       
       do {
@@ -173,6 +173,11 @@ public class AttributionManager {
     Preferences.URP.installAttributionLookupOutstanding.value = false
     
     dau.sendPingToServer()
+  }
+  
+  public func generateReferralCodeAndPingServer(with attributionData: AdAttributionData) {
+    let refCode = generateReferralCode(attributionData: attributionData)
+    setupReferralCodeAndPingServer(refCode: refCode)
   }
   
   private func performProgramReferralLookup(refCode: String?, completion: @escaping (URL?) -> Void) {
