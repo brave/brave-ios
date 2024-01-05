@@ -21,7 +21,7 @@
 
 ### General 
 
-- Added support for all datatypes when "History" sync is enabled. ([#8305](https://github.com/brave/brave-ios/issues/8305))
+- Added support for all history data to be synced when "History" sync is enabled. ([#8305](https://github.com/brave/brave-ios/issues/8305))
 - Added setting to ensure YouTube links always load in brave. ([#8272](https://github.com/brave/brave-ios/issues/8272))
 - Added confirmation message for successfully exporting bookmarks. ([#8236](https://github.com/brave/brave-ios/issues/8236))
 - Added confirmation message for resetting configuration in VPN settings. ([#8087](https://github.com/brave/brave-ios/issues/8087))
@@ -47,7 +47,7 @@
 - Fixed context menu item when using long press action on Favorites. ([#8286](https://github.com/brave/brave-ios/issues/8286))
 - Fixed duplicated items showing when reordering Favorites. ([#8255](https://github.com/brave/brave-ios/issues/8255))
 - Fixed Favorites from showing in Private Mode on New Tab Page when using app switcher. ([#8109](https://github.com/brave/brave-ios/issues/8095))
-- Fixed favicons being rendered incorrectly for navigation arrow lists. ([#8206](https://github.com/brave/brave-ios/issues/8206))
+- Fixed favicons being rendered incorrectly for back-forward lists. ([#8206](https://github.com/brave/brave-ios/issues/8206))
 - Fixed “Learn more” link from overlapping other text in Brave Rewards panel. ([#8243](https://github.com/brave/brave-ios/issues/8243))
 - Fixed Brave News opt-in card to show after upgrading Brave. ([#8167](https://github.com/brave/brave-ios/issues/8167))
 - Fixed crash when opening Brave Rewards panel for the first time. ([#8109](https://github.com/brave/brave-ios/issues/8109))
