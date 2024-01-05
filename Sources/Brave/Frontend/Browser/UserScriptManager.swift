@@ -12,6 +12,7 @@ import os.log
 
 private class ScriptLoader: TabContentScriptLoader { }
 
+@MainActor
 class UserScriptManager {
   static let shared = UserScriptManager()
   

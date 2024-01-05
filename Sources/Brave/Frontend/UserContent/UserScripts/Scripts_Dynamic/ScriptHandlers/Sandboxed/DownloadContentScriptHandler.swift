@@ -33,6 +33,7 @@ class DownloadContentScriptHandler: TabContentScript {
   static let scriptSandbox: WKContentWorld = .defaultClient
   static let userScript: WKUserScript? = nil
   
+  @MainActor
   static func downloadBlob(url: URL, tab: Tab) -> Bool {
     let safeUrl = url.absoluteString.replacingOccurrences(of: "'", with: "%27")
     guard url.scheme == "blob" else {
@@ -45,37 +46,37 @@ class DownloadContentScriptHandler: TabContentScript {
     return true
   }
   
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
-    defer { replyHandler(nil, nil) }
-    
+  func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) async -> (Any?, String?) {
     if !verifyMessage(message: message, securityToken: UserScriptManager.securityToken) {
       assertionFailure("Missing required security token.")
-      return
+      return (nil, nil)
     }
     
     do {
       guard let body = message.body as? [String: Any?] else {
-        return
+        return (nil, nil)
       }
       
       let info = try JSONDecoder().decode(BlobDownloadInfo.self, from: JSONSerialization.data(withJSONObject: body))
       guard let _ = Bytes.decodeBase64(info.base64String) else {
-        return
+        return (nil, nil)
       }
       
       defer {
-        browserViewController?.pendingDownloadWebView = nil
-        Self.blobUrlForDownload = nil
+        Task { @MainActor in
+          browserViewController?.pendingDownloadWebView = nil
+          Self.blobUrlForDownload = nil
+        }
       }
       
       guard let requestedUrl = Self.blobUrlForDownload else {
         Logger.module.error("\(Self.scriptName): no url was requested")
-        return
+        return (nil, nil)
       }
       
       guard requestedUrl == info.url else {
         Logger.module.error("\(Self.scriptName): URL mismatch")
-        return
+        return (nil, nil)
       }
       
       var filename = info.url.absoluteString.components(separatedBy: "/").last ?? "data"
@@ -97,5 +98,7 @@ class DownloadContentScriptHandler: TabContentScript {
     } catch {
       Logger.module.error("\(error.localizedDescription)")
     }
+    
+    return (nil, nil)
   }
 }

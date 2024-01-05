@@ -61,7 +61,9 @@ class LinkPreviewViewController: UIViewController {
   }
   
   deinit {
-    self.currentTab?.navigationDelegate = nil
-    self.currentTab = nil
+    Task { @MainActor in
+      self.currentTab?.navigationDelegate = nil
+      self.currentTab = nil
+    }
   }
 }

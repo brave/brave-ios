@@ -27,6 +27,7 @@ enum PlaylistCarplayError: Error {
   case itemExpired(id: String)
 }
 
+@MainActor
 class PlaylistCarplayController: NSObject {
   private let player: MediaPlayer
   private let mediaStreamer: PlaylistMediaStreamer

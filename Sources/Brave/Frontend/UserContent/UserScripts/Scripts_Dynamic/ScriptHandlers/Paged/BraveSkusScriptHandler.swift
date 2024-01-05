@@ -16,6 +16,7 @@ class BraveSkusScriptHandler: TabContentScript {
   
   private let braveSkusManager: BraveSkusManager
   
+  @MainActor
   required init?(tab: Tab) {
     guard let manager = BraveSkusManager(isPrivateMode: tab.isPrivate) else {
       return nil
@@ -47,12 +48,10 @@ class BraveSkusScriptHandler: TabContentScript {
     case credentialsSummary = 4
   }
   
-  func userContentController(_ userContentController: WKUserContentController,
-                             didReceiveScriptMessage message: WKScriptMessage,
-                             replyHandler: @escaping (Any?, String?) -> Void) {
+  func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) async -> (Any?, String?) {
     if !verifyMessage(message: message) {
       assertionFailure("Missing required security token.")
-      return
+      return (nil, nil)
     }
     
     let allowedHosts = DomainUserScript.braveSkus.associatedDomains
@@ -61,40 +60,38 @@ class BraveSkusScriptHandler: TabContentScript {
           allowedHosts.contains(requestHost),
           message.frameInfo.isMainFrame else {
       Logger.module.error("Brave skus request called from disallowed host")
-      return
+      return (nil, nil)
     }
     
     guard let response = message.body as? [String: Any],
           let methodId = response["method_id"] as? Int,
           let data = response["data"] as? [String: Any] else {
       Logger.module.error("Failed to retrieve method id")
-      return
+      return (nil, nil)
     }
     
     switch methodId {
     case Method.refreshOrder.rawValue:
       if let orderId = data["orderId"] as? String {
         
-        braveSkusManager.refreshOrder(for: orderId, domain: requestHost) { result in
-          replyHandler(result, nil)
-        }
+        let result = await braveSkusManager.refreshOrder(for: orderId, domain: requestHost)
+        return (result, nil)
       }
     case Method.fetchOrderCredentials.rawValue:
       if let orderId = data["orderId"] as? String {
-        braveSkusManager.fetchOrderCredentials(for: orderId, domain: requestHost) { result in
-          replyHandler(result, nil)
-        }
+        let result = await braveSkusManager.fetchOrderCredentials(for: orderId, domain: requestHost)
+        return (result, nil)
       }
     case Method.prepareCredentialsPresentation.rawValue:
       assertionFailure("The website should never call the credentialsPresentation.")
     case Method.credentialsSummary.rawValue:
       if let domain = data["domain"] as? String {
-        braveSkusManager.credentialSummary(for: domain) { result in
-          replyHandler(result, nil)
-        }
+        let result = await braveSkusManager.credentialSummary(for: domain)
+        return (result, nil)
       }
     default:
       assertionFailure("Failure, the website called unhandled method with id: \(methodId)")
     }
+    return (nil, nil)
   }
 }

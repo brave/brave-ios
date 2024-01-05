@@ -46,16 +46,16 @@ class RequestBlockingContentScriptHandler: TabContentScript {
     self.tab = tab
   }
   
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
+  @MainActor
+  func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) async -> (Any?, String?) {
     guard let tab = tab, let currentTabURL = tab.webView?.url else {
       assertionFailure("Should have a tab set")
-      return
+      return (nil, nil)
     }
     
     if !verifyMessage(message: message) {
       assertionFailure("Invalid security token. Fix the `RequestBlocking.js` script")
-      replyHandler(false, nil)
-      return
+      return (false, nil)
     }
 
     do {
@@ -64,13 +64,13 @@ class RequestBlockingContentScriptHandler: TabContentScript {
       
       // Because javascript urls allow some characters that `URL` does not,
       // we use `NSURL(idnString: String)` to parse them
-      guard let requestURL = NSURL(idnString: dto.data.resourceURL) as URL? else { return }
-      guard let sourceURL = NSURL(idnString: dto.data.sourceURL) as URL? else { return }
+      guard let requestURL = NSURL(idnString: dto.data.resourceURL) as URL? else { return (nil, nil) }
+      guard let sourceURL = NSURL(idnString: dto.data.sourceURL) as URL? else { return (nil, nil) }
       let isPrivateBrowsing = tab.isPrivate
       
-      Task { @MainActor in
+      return await Task { @MainActor in
         let domain = Domain.getOrCreate(forUrl: currentTabURL, persistent: !isPrivateBrowsing)
-        guard let domainURLString = domain.url else { return }
+        guard let domainURLString = domain.url else { return (nil, nil) }
         let shouldBlock = await AdBlockStats.shared.shouldBlock(
           requestURL: requestURL, sourceURL: sourceURL, resourceType: dto.data.resourceType,
           isAggressiveMode: domain.blockAdsAndTrackingLevel.isAggressive
@@ -82,9 +82,8 @@ class RequestBlockingContentScriptHandler: TabContentScript {
         // For subframes which may use different etld+1 than the main frame (example `reddit.com` and `redditmedia.com`)
         // We simply check the known subframeURLs on this page.
         guard tab.url?.baseDomain == sourceURL.baseDomain ||
-              self.tab?.currentPageData?.allSubframeURLs.contains(sourceURL) == true else {
-          replyHandler(shouldBlock, nil)
-          return
+                self.tab?.currentPageData?.allSubframeURLs.contains(sourceURL) == true else {
+          return (shouldBlock, nil)
         }
         
         if shouldBlock, Preferences.PrivacyReports.captureShieldsData.value,
@@ -93,7 +92,7 @@ class RequestBlockingContentScriptHandler: TabContentScript {
            !isPrivateBrowsing {
           PrivacyReportsManager.pendingBlockedRequests.append((blockedResourceHost, domainURL, Date()))
         }
-
+        
         if shouldBlock && !tab.contentBlocker.blockedRequests.contains(requestURL) {
           BraveGlobalShieldStats.shared.adblock += 1
           let stats = tab.contentBlocker.stats
@@ -101,11 +100,11 @@ class RequestBlockingContentScriptHandler: TabContentScript {
           tab.contentBlocker.blockedRequests.insert(requestURL)
         }
         
-        replyHandler(shouldBlock, nil)
-      }
+        return (shouldBlock, nil)
+      }.value
     } catch {
       assertionFailure("Invalid type of message. Fix the `RequestBlocking.js` script")
-      replyHandler(false, nil)
+      return (false, nil)
     }
   }
 }

@@ -73,7 +73,9 @@ extension BrowserViewController {
             title: Strings.toggleReaderMode,
             braveSystemImage: "leo.product.speedreader",
             callback: { [weak self] in
-              self?.toggleReaderMode()
+              Task { @MainActor in
+                await self?.toggleReaderMode()
+              }
             }
           )
         )

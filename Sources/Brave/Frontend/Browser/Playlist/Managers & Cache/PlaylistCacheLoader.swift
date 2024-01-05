@@ -17,11 +17,13 @@ import os.log
 import Playlist
 
 class LivePlaylistWebLoaderFactory: PlaylistWebLoaderFactory {
+  @MainActor
   func makeWebLoader() -> PlaylistWebLoader {
     LivePlaylistWebLoader()
   }
 }
 
+@MainActor
 class LivePlaylistWebLoader: UIView, PlaylistWebLoader {
   fileprivate static var pageLoadTimeout = 300.0
   private var pendingRequests = [String: URLRequest]()
@@ -60,11 +62,6 @@ class LivePlaylistWebLoader: UIView, PlaylistWebLoader {
     fatalError("init(coder:) has not been implemented")
   }
 
-  deinit {
-    self.removeFromSuperview()
-  }
-
-  @MainActor
   func load(url: URL) async -> PlaylistInfo? {
     return await withCheckedContinuation { continuation in
       self.handler = { [weak self] in
@@ -110,24 +107,26 @@ class LivePlaylistWebLoader: UIView, PlaylistWebLoader {
     webView.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
   }
 
+  @MainActor
   private class PlaylistWebLoaderContentHelper: TabContentScript {
     private weak var webLoader: LivePlaylistWebLoader?
     private var playlistItems = Set<String>()
     private var isPageLoaded = false
-    private var timeout: DispatchWorkItem?
+    private var timeout: Task<Void, Error>?
 
     init(_ webLoader: LivePlaylistWebLoader) {
       self.webLoader = webLoader
       
-      timeout = DispatchWorkItem(block: { [weak self] in
-        guard let self = self else { return }
+      timeout = Task.delayed(bySeconds: LivePlaylistWebLoader.pageLoadTimeout) { @MainActor in
         self.webLoader?.handler?(nil)
         self.webLoader?.tab.webView?.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
         self.webLoader = nil
-      })
-
+      }
+      
       if let timeout = timeout {
-        DispatchQueue.main.asyncAfter(deadline: .now() + LivePlaylistWebLoader.pageLoadTimeout, execute: timeout)
+        Task {
+          _ = try? await timeout.value
+        }
       }
     }
 
@@ -138,13 +137,12 @@ class LivePlaylistWebLoader: UIView, PlaylistWebLoader {
     static let userScript: WKUserScript? = nil
     static let playlistProcessDocumentLoad = PlaylistScriptHandler.playlistProcessDocumentLoad
 
-    func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
+    @MainActor
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) async -> (Any?, String?) {
       if !verifyMessage(message: message) {
         assertionFailure("Missing required security token.")
-        return
+        return (nil, nil)
       }
-      
-      replyHandler(nil, nil)
       
       let cancelRequest = {
         self.timeout?.cancel()
@@ -159,54 +157,56 @@ class LivePlaylistWebLoader: UIView, PlaylistWebLoader {
         
         if readyState.state == "cancel" {
           cancelRequest()
-          return
+          return (nil, nil)
         }
           
         if isPageLoaded {
           timeout?.cancel()
-          timeout = DispatchWorkItem(block: { [weak self] in
-            guard let self = self else { return }
+          timeout = Task.delayed(bySeconds: LivePlaylistWebLoader.pageLoadTimeout) { @MainActor in
             self.webLoader?.handler?(nil)
             self.webLoader?.tab.webView?.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
             self.webLoader = nil
-          })
-            
+          }
+          
           if let timeout = timeout {
-            DispatchQueue.main.asyncAfter(deadline: .now() + LivePlaylistWebLoader.pageLoadTimeout, execute: timeout)
+            Task {
+              _ = try? await timeout.value
+            }
           }
         }
-        return
+        return (nil, nil)
       }
       
       guard let item = PlaylistInfo.from(message: message),
         item.detected
       else {
         cancelRequest()
-        return
+        return (nil, nil)
       }
       
       if item.isInvisible {
         timeout?.cancel()
-        timeout = DispatchWorkItem(block: { [weak self] in
-          guard let self = self else { return }
+        timeout = Task.delayed(bySeconds: LivePlaylistWebLoader.pageLoadTimeout) { @MainActor in
           self.webLoader?.handler?(nil)
           self.webLoader?.tab.webView?.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
           self.webLoader = nil
-        })
+        }
           
         if let timeout = timeout {
-          DispatchQueue.main.asyncAfter(deadline: .now() + LivePlaylistWebLoader.pageLoadTimeout, execute: timeout)
+          Task {
+            _ = try? await timeout.value
+          }
         }
-        return
+        return (nil, nil)
       }
 
       // For now, we ignore base64 video mime-types loaded via the `data:` scheme.
       if item.duration <= 0.0 && !item.detected || item.src.isEmpty || item.src.hasPrefix("data:") || item.src.hasPrefix("blob:") {
         cancelRequest()
-        return
+        return (nil, nil)
       }
         
-      DispatchQueue.main.async {
+      await MainActor.run {
         if !self.playlistItems.contains(item.src) {
           self.playlistItems.insert(item.src)
           
@@ -224,6 +224,8 @@ class LivePlaylistWebLoader: UIView, PlaylistWebLoader {
         self.webLoader?.tab.webView?.loadHTMLString("<html><body>PlayList</body></html>", baseURL: nil)
         self.webLoader = nil
       }
+      
+      return (nil, nil)
     }
   }
 }

@@ -36,11 +36,10 @@ class CosmeticFiltersScriptHandler: TabContentScript {
     self.tab = tab
   }
   
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
+  func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) async -> (Any?, String?) {
     if !verifyMessage(message: message) {
       assertionFailure("Invalid security token. Fix the `RequestBlocking.js` script")
-      replyHandler(nil, nil)
-      return
+      return (nil, nil)
     }
 
     do {
@@ -48,11 +47,10 @@ class CosmeticFiltersScriptHandler: TabContentScript {
       let dto = try JSONDecoder().decode(CosmeticFiltersDTO.self, from: data)
       
       guard let frameURL = URL(string: dto.data.sourceURL) else {
-        replyHandler(nil, nil)
-        return
+        return (nil, nil)
       }
       
-      Task { @MainActor in
+      return await Task { @MainActor in
         let domain = Domain.getOrCreate(forUrl: frameURL, persistent: self.tab?.isPrivate == true ? false : true)
         let cachedEngines = await AdBlockStats.shared.cachedEngines(for: domain)
         
@@ -83,14 +81,14 @@ class CosmeticFiltersScriptHandler: TabContentScript {
           }
         }
         
-        replyHandler([
+        return ([
           "aggressiveSelectors": Array(aggressiveSelectors),
           "standardSelectors": Array(standardSelectors)
         ], nil)
-      }
+      }.value
     } catch {
       assertionFailure("Invalid type of message. Fix the `RequestBlocking.js` script")
-      replyHandler(nil, nil)
+      return (nil, nil)
     }
   }
 }

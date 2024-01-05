@@ -110,6 +110,7 @@ public class PlaylistMediaStreamer {
       }
       
       let newItem = await webLoader.load(url: url)
+      webLoader.stop()
       webLoader.removeFromSuperview()
       self.webLoader = nil
       

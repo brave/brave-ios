@@ -36,8 +36,8 @@ enum TabType: Int, CustomDebugStringConvertible {
   ///
   /// - parameter tab: An object representing a Tab.
   /// - returns: A Tab type.
+  @MainActor
   static func of(_ tab: Tab?) -> TabType {
     return tab?.type ?? .regular
   }
-
 }

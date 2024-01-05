@@ -44,6 +44,7 @@ public class FaviconFetcher {
   /// 4. Fetch Monogram Icons
   /// Notes: Does NOT make a request to fetch icons from the page.
   ///      Requests are only made in FaviconScriptHandler, when the user visits the page.
+  nonisolated
   public static func loadIcon(url: URL, kind: FaviconFetcher.Kind = .smallIcon, persistent: Bool) async throws -> Favicon {
     try Task.checkCancellation()
     
@@ -80,7 +81,7 @@ public class FaviconFetcher {
   /// Creates a monogram Favicon with the following conditions
   /// 1. If `monogramString` is not null, it is used to render the Favicon image.
   /// 2. If `monogramString` is null, the first character of the URL's domain is used to render the Favicon image.
-  public static func monogramIcon(url: URL, monogramString: Character? = nil, persistent: Bool) async throws -> Favicon {
+  nonisolated public static func monogramIcon(url: URL, monogramString: Character? = nil, persistent: Bool) async throws -> Favicon {
     try Task.checkCancellation()
     
     if let favicon = getFromCache(for: url) {

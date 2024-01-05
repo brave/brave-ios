@@ -32,10 +32,12 @@ class NightModeScriptHandler: TabContentScript {
                         in: scriptSandbox)
   }()
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
+  func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) async -> (Any?, String?) {
     // Do nothing.
+    return (nil, nil)
   }
 
+  @MainActor
   static func setNightMode(tabManager: TabManager, enabled: Bool) {
     Preferences.General.nightModeEnabled.value = enabled
 

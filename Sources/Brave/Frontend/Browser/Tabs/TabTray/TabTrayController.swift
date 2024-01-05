@@ -222,12 +222,12 @@ class TabTrayController: AuthenticationController {
   required init?(coder: NSCoder) { fatalError() }
 
   deinit {
-    tabManager.removeDelegate(self)
-    
-    // Remove the open tabs service observer
-    if let observer = openTabsSessionServiceListener {
-      braveCore.openTabsAPI.removeObserver(observer)
-    }
+//    tabManager.removeDelegate(self)
+//
+//    // Remove the open tabs service observer
+//    if let observer = openTabsSessionServiceListener {
+//      braveCore.openTabsAPI.removeObserver(observer)
+//    }
   }
 
   override func viewDidLoad() {
@@ -329,6 +329,17 @@ class TabTrayController: AuthenticationController {
     if isExternallyPresented {
       tabTypeSelector.selectedSegmentIndex = 1
       tabTypeSelector.sendActions(for: UIControl.Event.valueChanged)
+    }
+  }
+  
+  override func viewDidDisappear(_ animated: Bool) {
+    super.viewDidDisappear(animated)
+
+    tabManager.removeDelegate(self)
+    
+    // Remove the open tabs service observer
+    if let observer = openTabsSessionServiceListener {
+      braveCore.openTabsAPI.removeObserver(observer)
     }
   }
   

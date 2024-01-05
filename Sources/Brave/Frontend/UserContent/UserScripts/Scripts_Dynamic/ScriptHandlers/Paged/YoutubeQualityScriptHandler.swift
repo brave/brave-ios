@@ -14,6 +14,7 @@ class YoutubeQualityScriptHandler: NSObject, TabContentScript {
   private var url: URL?
   private var urlObserver: NSObjectProtocol?
   
+  @MainActor
   init(tab: Tab) {
     self.tab = tab
     self.url = tab.url
@@ -21,12 +22,12 @@ class YoutubeQualityScriptHandler: NSObject, TabContentScript {
     
     urlObserver = tab.webView?.observe(
       \.url, options: [.new],
-       changeHandler: { [weak self] object, change in
+       changeHandler: { [weak self] webView, change in
          guard let self = self, let url = change.newValue else { return }
          if self.url?.withoutFragment != url?.withoutFragment {
            self.url = url
            
-           object.evaluateSafeJavaScript(functionName: "window.__firefox__.\(Self.refreshQuality)",
+           webView.evaluateSafeJavaScript(functionName: "window.__firefox__.\(Self.refreshQuality)",
                                          contentWorld: Self.scriptSandbox,
                                          asFunction: true)
          }
@@ -56,19 +57,20 @@ class YoutubeQualityScriptHandler: NSObject, TabContentScript {
                         in: scriptSandbox)
   }()
   
+  @MainActor
   static func setEnabled(option: Preferences.Option<String>, for tab: Tab) {
     let enabled = canEnableHighQuality(option: option)
     
     tab.webView?.evaluateSafeJavaScript(functionName: "window.__firefox__.\(Self.setQuality)", args: [enabled ? Self.highestQuality: "''"], contentWorld: Self.scriptSandbox, escapeArgs: false, asFunction: true)
   }
   
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
+  func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) async -> (Any?, String?) {
     if !verifyMessage(message: message) {
       assertionFailure("Missing required security token.")
-      return
+      return (nil, nil)
     }
     
-    replyHandler(Self.canEnableHighQuality(option: Preferences.General.youtubeHighQuality) ?
+    return (Self.canEnableHighQuality(option: Preferences.General.youtubeHighQuality) ?
                  Self.highestQuality : "", nil)
   }
   

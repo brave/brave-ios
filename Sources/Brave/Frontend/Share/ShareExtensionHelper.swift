@@ -7,6 +7,7 @@ import Shared
 import UIKit
 
 /// A helper class that aids in the creation of share sheets
+@MainActor
 class ShareExtensionHelper {
   /// Create a activity view controller with the given elements.
   /// - Parameters:

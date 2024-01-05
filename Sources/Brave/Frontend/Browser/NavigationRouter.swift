@@ -15,6 +15,7 @@ public enum DeepLink: String {
 }
 
 // The root navigation for the Router. Look at the tests to see a complete URL
+@MainActor
 public enum NavigationPath: Equatable {
   case url(webURL: URL?, isPrivate: Bool)
   case deepLink(DeepLink)

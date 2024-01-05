@@ -41,17 +41,15 @@ class SiteStateListenerScriptHandler: TabContentScript {
                         in: scriptSandbox)
   }()
   
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
-    defer { replyHandler(nil, nil) }
-    
+  func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) async -> (Any?, String?) {
     if !verifyMessage(message: message) {
       assertionFailure("Missing required security token.")
-      return
+      return (nil, nil)
     }
     
-    guard let tab = tab, let webView = tab.webView else {
+    guard let tab = tab, let webView = await tab.webView else {
       assertionFailure("Should have a tab set")
-      return
+      return (nil, nil)
     }
     
     do {
@@ -59,10 +57,10 @@ class SiteStateListenerScriptHandler: TabContentScript {
       let dto = try JSONDecoder().decode(MessageDTO.self, from: data)
       
       guard let frameURL = URL(string: dto.data.windowURL) else {
-        return
+        return (nil, nil)
       }
       
-      if let pageData = tab.currentPageData {
+      if let pageData = await tab.currentPageData {
         Task { @MainActor in
           let domain = pageData.domain(persistent: !tab.isPrivate)
           guard domain.isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true) else { return }
@@ -83,6 +81,8 @@ class SiteStateListenerScriptHandler: TabContentScript {
       assertionFailure("Invalid type of message. Fix the `SiteStateListenerScript.js` script")
       Logger.module.error("\(error.localizedDescription)")
     }
+    
+    return (nil, nil)
   }
   
   @MainActor private func makeSetup(from modelTuples: [AdBlockStats.CosmeticFilterModelTuple], isAggressive: Bool) throws -> UserScriptType.SelectorsPollerSetup {

@@ -57,12 +57,11 @@ class ResourceDownloadScriptHandler: TabContentScript {
                         in: scriptSandbox)
   }()
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
-    defer { replyHandler(nil, nil) }
-    
+  @MainActor
+  func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) async -> (Any?, String?) {
     if !verifyMessage(message: message) {
       assertionFailure("Missing required security token.")
-      return
+      return (nil, nil)
     }
 
     do {
@@ -71,8 +70,10 @@ class ResourceDownloadScriptHandler: TabContentScript {
     } catch {
       tab?.temporaryDocument?.onDocumentDownloaded(document: nil, error: error)
     }
+    return (nil, nil)
   }
 
+  @MainActor
   static func downloadResource(for tab: Tab, url: URL) {
     tab.webView?.evaluateSafeJavaScript(functionName: "window.__firefox__.downloadManager.download", args: [url.absoluteString], contentWorld: self.scriptSandbox) { _, error in
       if let error = error {

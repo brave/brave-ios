@@ -30,8 +30,9 @@ class BraveGetUA: TabContentScript {
                                in: scriptSandbox)
   }()
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
+  func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) async -> (Any?, String?) {
     // 🙀 😭 🏃‍♀️💨
+    return (nil, nil)
   }
 
   static var isActivated: Bool {

@@ -20,6 +20,7 @@ class ScreenshotHelper {
     self.tabManager = tabManager
   }
 
+  @MainActor
   func takeScreenshot(_ tab: Tab) {
     guard let webView = tab.webView, let url = tab.url else {
       Logger.module.error("Tab webView or url is nil")
@@ -70,6 +71,7 @@ class ScreenshotHelper {
     }
   }
 
+  @MainActor
   func takePendingScreenshots(_ tabs: [Tab]) {
     for tab in tabs where tab.pendingScreenshot {
       tab.pendingScreenshot = false

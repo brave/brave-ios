@@ -35,11 +35,10 @@ public class DeAmpScriptHandler: TabContentScript {
                         in: scriptSandbox)
   }()
   
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
+  func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) async -> (Any?, String?) {
     if !verifyMessage(message: message) {
       assertionFailure("Missing required security token.")
-      replyHandler(false, nil)
-      return
+      return (nil, nil)
     }
     
     do {
@@ -50,11 +49,13 @@ public class DeAmpScriptHandler: TabContentScript {
       // or that previousURL is nil which indicates circular loop cause by a client side redirect
       // Also check that our window url does not match the previously committed url
       // or that previousURL is nil which indicates as circular loop caused by a server side redirect
-      let shouldRedirect = dto.destURL != tab?.previousComittedURL && tab?.committedURL != tab?.previousComittedURL
-      replyHandler(shouldRedirect, nil)
+      return await MainActor.run {
+        let shouldRedirect = dto.destURL != tab?.previousComittedURL && tab?.committedURL != tab?.previousComittedURL
+        return (shouldRedirect, nil)
+      }
     } catch {
       assertionFailure("Invalid type of message. Fix the `RequestBlocking.js` script")
-      replyHandler(false, nil)
+      return (false, nil)
     }
   }
 }
