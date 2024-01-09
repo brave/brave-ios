@@ -14,8 +14,6 @@ struct AccountsView: View {
   var cryptoStore: CryptoStore
   @ObservedObject var keyringStore: KeyringStore
   @State private var selectedAccount: BraveWallet.AccountInfo?
-  @State private var isPresentingBackup: Bool = false
-  @State private var isPresentingAddAccount: Bool = false
 
   private var primaryAccounts: [BraveWallet.AccountInfo] {
     keyringStore.allAccounts.filter(\.isPrimary)
@@ -27,17 +25,6 @@ struct AccountsView: View {
 
   var body: some View {
     List {
-      Section(
-        header: AccountsHeaderView(
-          keyringStore: keyringStore,
-          settingsStore: cryptoStore.settingsStore,
-          networkStore: cryptoStore.networkStore,
-          isPresentingBackup: $isPresentingBackup,
-          isPresentingAddAccount: $isPresentingAddAccount
-        )
-        .resetListHeaderStyle()
-      ) {
-      }
       Section(
         header: WalletListHeaderView(
           title: Text(Strings.Wallet.primaryCryptoAccountsTitle)
@@ -110,32 +97,6 @@ struct AccountsView: View {
     )
     .listStyle(InsetGroupedListStyle())
     .listBackgroundColor(Color(UIColor.braveGroupedBackground))
-    .background(
-      Color.clear
-        .sheet(isPresented: $isPresentingBackup) {
-          NavigationView {
-            BackupWalletView(
-              password: nil,
-              keyringStore: keyringStore
-            )
-          }
-          .navigationViewStyle(StackNavigationViewStyle())
-          .environment(\.modalPresentationMode, $isPresentingBackup)
-          .accentColor(Color(.braveBlurpleTint))
-        }
-    )
-    .background(
-      Color.clear
-        .sheet(isPresented: $isPresentingAddAccount) {
-          NavigationView {
-            AddAccountView(
-              keyringStore: keyringStore,
-              networkStore: cryptoStore.networkStore
-            )
-          }
-          .navigationViewStyle(StackNavigationViewStyle())
-        }
-    )
   }
 }
 
