@@ -1750,16 +1750,6 @@ public class BrowserViewController: UIViewController {
         // Catch history pushState navigation, but ONLY for same origin navigation,
         // for reasons above about URL spoofing risk.
         navigateInTab(tab: tab)
-      } else {
-        updateURLBar()
-        // If navigation will start from NTP, tab display url will be nil until
-        // didCommit is called and it will cause url bar be empty in that period
-        // To fix this when tab display url is empty, webview url is used
-        if tab.url?.displayURL == nil {
-          if let url = webView.url, !url.isLocal, !InternalURL.isValid(url: url) {
-            updateToolbarCurrentURL(url.displayURL)
-          }
-        }
       }
 
       // Rewards reporting
@@ -1887,11 +1877,10 @@ public class BrowserViewController: UIViewController {
         port = 80
       }
       
-      Task.detached {
+      Task { @MainActor in
         do {
-          let result = BraveCertificateUtility.verifyTrust(serverTrust,
-                                                           host: host,
-                                                           port: port)
+          let result = await BraveCertificateUtils.verifyTrust(serverTrust, host: host, port: port)
+          
           // Cert is valid!
           if result == 0 {
             tab.secureContentState = .secure
@@ -1907,9 +1896,7 @@ public class BrowserViewController: UIViewController {
           tab.secureContentState = .invalidCert
         }
         
-        Task { @MainActor in
-          self.updateURLBar()
-        }
+        self.updateURLBar()
       }
     case ._sampledPageTopColor:
       updateStatusBarOverlayColor()
@@ -3045,15 +3032,6 @@ extension BrowserViewController: ToolbarUrlActionsDelegate {
     let tabIsPrivate = TabType.of(tabManager.selectedTab).isPrivate
     self.tabManager.addTabsForURLs(urls, zombie: false, isPrivate: tabIsPrivate)
   }
-
-#if DEBUG
-  public override func select(_ sender: Any?) {
-    if sender is URL {
-      assertionFailure("Wrong method called, use `select(url:)` or `select(_:action:)`")
-    }
-    super.select(sender)
-  }
-#endif
   
   func select(url: URL, isUserDefinedURLNavigation: Bool) {
     select(url, action: .openInCurrentTab, isUserDefinedURLNavigation: isUserDefinedURLNavigation)
