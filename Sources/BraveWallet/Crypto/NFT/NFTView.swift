@@ -16,7 +16,7 @@ struct NFTView: View {
   
   @State private var isPresentingFiltersDisplaySettings: Bool = false
   @State private var isPresentingEditUserAssets: Bool = false
-  @State private var selectedNFTViewModel: NFTAssetViewModel?
+  @State private var nftDetailStore: NFTDetailStore?
   @State private var isShowingNFTDiscoveryAlert: Bool = false
   @State private var isShowingAddCustomNFT: Bool = false
   @State private var isNFTDiscoveryEnabled: Bool = false
@@ -147,6 +147,10 @@ struct NFTView: View {
     }
     .padding(.horizontal)
     .frame(maxWidth: .infinity, alignment: .leading)
+    .transaction { transaction in
+      transaction.animation = nil
+      transaction.disablesAnimations = true
+    }
   }
   
   private var addCustomAssetButton: some View {
@@ -176,7 +180,11 @@ struct NFTView: View {
     LazyVGrid(columns: nftGrids) {
       ForEach(group.assets) { nft in
         Button(action: {
-          selectedNFTViewModel = nft
+          nftDetailStore = cryptoStore.nftDetailStore(
+            for: nft.token,
+            nftMetadata: nft.nftMetadata,
+            owner: nftStore.owner(for: nft.token)
+          )
         }) {
           VStack(alignment: .leading, spacing: 4) {
             nftImage(nft)
@@ -295,25 +303,29 @@ struct NFTView: View {
     .background(
       NavigationLink(
         isActive: Binding(
-          get: { selectedNFTViewModel != nil },
-          set: { if !$0 { selectedNFTViewModel = nil } }
+          get: { nftDetailStore != nil },
+          set: {
+            if !$0 {
+              if let nftDetailStore {
+                cryptoStore.closeNFTDetailStore(for: nftDetailStore.nft)
+                self.nftDetailStore = nil
+              }
+            }
+          }
         ),
         destination: {
-          if let nftViewModel = selectedNFTViewModel {
+          if let nftDetailStore {
             NFTDetailView(
               keyringStore: keyringStore,
-              nftDetailStore: cryptoStore.nftDetailStore(for: nftViewModel.token, nftMetadata: nftViewModel.nftMetadata, owner: nftStore.owner(for: nftViewModel.token)),
+              nftDetailStore: nftDetailStore,
               buySendSwapDestination: buySendSwapDestination,
-              onNFTMetadataRefreshed: {  nftMetadata in
-                nftStore.updateNFTMetadataCache(for: nftViewModel.token, metadata: nftMetadata)
+              onNFTMetadataRefreshed: { nftMetadata in
+                nftStore.updateNFTMetadataCache(for: nftDetailStore.nft, metadata: nftMetadata)
               },
               onNFTStatusUpdated: {
                 nftStore.update()
               }
             )
-            .onDisappear {
-              cryptoStore.closeNFTDetailStore(for: nftViewModel.token)
-            }
           }
         },
         label: {
