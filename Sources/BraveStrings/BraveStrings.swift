@@ -4483,8 +4483,8 @@ extension Strings {
 extension Strings {
   public struct PrivacyHub {
     public static let privacyReportsTitle = NSLocalizedString("privacyHub.privacyReportsTitle", tableName: "BraveShared", bundle: .module,
-      value: "Privacy Hub",
-      comment: "Title of main privacy hub screen. This screen shows various stats caught by Brave's ad blockers."
+      value: "Privacy Report",
+      comment: "Title of main privacy report screen. This screen shows various stats caught by Brave's ad blockers."
     )
     
     public static let notificationCalloutBody = NSLocalizedString("privacyHub.notificationCalloutBody", tableName: "BraveShared", bundle: .module,
@@ -4498,7 +4498,7 @@ extension Strings {
     )
     
     public static let noDataCalloutBody = NSLocalizedString("privacyHub.noDataCalloutBody", tableName: "BraveShared", bundle: .module,
-      value: "Visit some websites to see data here.",
+      value: "Start browsing and we'll display your stats here.",
       comment: "Text of a callout that tell user they need to browser some websites first in order to see privacy stats data"
     )
     

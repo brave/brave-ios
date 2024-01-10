@@ -27,14 +27,20 @@ extension PrivacyReportsView {
     }
     
     private func emptyCalloutView(text: String) -> some View {
-      HStack {
-        Image(systemName: "info.circle.fill")
-        Text(text)
+      HStack(alignment: .top) {
+        HStack(alignment: .top) {
+          Image(braveSystemName: "leo.info.filled")
+          Text(text)
+            .font(.subheadline)
+          Spacer()
+        }
+        Spacer()
+        closeButton
       }
-      .foregroundColor(Color.white)
+      .foregroundColor(Color(braveSystemName: .systemfeedbackInfoIcon))
       .frame(maxWidth: .infinity)
       .padding()
-      .background(Color(.braveInfoLabel))
+      .background(Color(braveSystemName: .blue20))
       .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
     
@@ -106,7 +112,7 @@ extension PrivacyReportsView {
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .background(Color(.braveBackground))
+        .background(Color(braveSystemName: .pageBackground))
         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .redacted(reason: riskiestWebsiteLoading ? .placeholder: [])
       }
@@ -122,6 +128,15 @@ extension PrivacyReportsView {
           riskiestWebsiteLoading = false
         }
       }
+    }
+    
+    var closeButton: some View {
+      Button(
+        action: { },
+        label: {
+          Image(braveSystemName: "leo.close")
+        })
+        .accessibilityLabel(Text(Strings.close))
     }
   }
 }
