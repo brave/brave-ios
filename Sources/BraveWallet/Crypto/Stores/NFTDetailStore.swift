@@ -76,15 +76,7 @@ class NFTDetailStore: ObservableObject, WalletObserverStore {
   @Published var nft: BraveWallet.BlockchainToken
   @Published var isLoading: Bool = false
   @Published var nftMetadata: NFTMetadata?
-  @Published var networkInfo: BraveWallet.NetworkInfo? {
-    didSet {
-      if networkInfo != nil {
-        print("new network assignment")
-      } else {
-        print("nil")
-      }
-    }
-  }
+  @Published var networkInfo: BraveWallet.NetworkInfo?
   
   var isObserving: Bool {
     txServiceObserver != nil

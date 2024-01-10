@@ -253,7 +253,7 @@ public class NFTStore: ObservableObject, WalletObserverStore {
     self.txServiceObserver = TxServiceObserver(
       txService: txService, _onTransactionStatusChanged: { [weak self] txInfo in
         if txInfo.txStatus == .confirmed, txInfo.isSend, (txInfo.coin == .eth || txInfo.coin == .sol) {
-          self?.update(force: true)
+          self?.update(forceUpdateNFTBalances: true)
         }
       }
     )
@@ -264,7 +264,7 @@ public class NFTStore: ObservableObject, WalletObserverStore {
   /// Cache of NFT balances for each account tokenBalances: [token.contractAddress]
   private var nftBalancesCache: [String: [String: Int]] = [:]
   
-  func update(force: Bool = false) {
+  func update(forceUpdateNFTBalances: Bool = false) {
     self.updateTask?.cancel()
     self.updateTask = Task { @MainActor in
       self.allAccounts = await keyringService.allAccounts().accounts
@@ -307,7 +307,7 @@ public class NFTStore: ObservableObject, WalletObserverStore {
                   of: [String: Int].self,
                   body: { @MainActor group in
                     for account in allAccounts where account.coin == nft.coin {
-                      if !force, let cachedBalance = nftBalancesCache[nft.id]?[account.address] { // cached balance
+                      if !forceUpdateNFTBalances, let cachedBalance = nftBalancesCache[nft.id]?[account.address] { // cached balance
                         return [account.address: cachedBalance]
                       } else { // no balance for this account
                         group.addTask { @MainActor in

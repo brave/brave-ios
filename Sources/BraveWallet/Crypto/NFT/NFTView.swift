@@ -16,7 +16,7 @@ struct NFTView: View {
   
   @State private var isPresentingFiltersDisplaySettings: Bool = false
   @State private var isPresentingEditUserAssets: Bool = false
-  @State private var nftDetailStore: NFTDetailStore?
+  @State private var selectedNFTViewModel: NFTAssetViewModel?
   @State private var isShowingNFTDiscoveryAlert: Bool = false
   @State private var isShowingAddCustomNFT: Bool = false
   @State private var isNFTDiscoveryEnabled: Bool = false
@@ -180,11 +180,7 @@ struct NFTView: View {
     LazyVGrid(columns: nftGrids) {
       ForEach(group.assets) { nft in
         Button(action: {
-          nftDetailStore = cryptoStore.nftDetailStore(
-            for: nft.token,
-            nftMetadata: nft.nftMetadata,
-            owner: nftStore.owner(for: nft.token)
-          )
+          selectedNFTViewModel = nft
         }) {
           VStack(alignment: .leading, spacing: 4) {
             nftImage(nft)
@@ -303,24 +299,24 @@ struct NFTView: View {
     .background(
       NavigationLink(
         isActive: Binding(
-          get: { nftDetailStore != nil },
+          get: { selectedNFTViewModel != nil },
           set: {
             if !$0 {
-              if let nftDetailStore {
-                cryptoStore.closeNFTDetailStore(for: nftDetailStore.nft)
-                self.nftDetailStore = nil
+              if let viewModel = selectedNFTViewModel {
+                cryptoStore.closeNFTDetailStore(for: viewModel.token)
               }
+              selectedNFTViewModel = nil
             }
           }
         ),
         destination: {
-          if let nftDetailStore {
+          if let selectedNFTViewModel {
             NFTDetailView(
               keyringStore: keyringStore,
-              nftDetailStore: nftDetailStore,
+              nftDetailStore: cryptoStore.nftDetailStore(for: selectedNFTViewModel.token, nftMetadata: selectedNFTViewModel.nftMetadata, owner: nftStore.owner(for: selectedNFTViewModel.token)),
               buySendSwapDestination: buySendSwapDestination,
               onNFTMetadataRefreshed: { nftMetadata in
-                nftStore.updateNFTMetadataCache(for: nftDetailStore.nft, metadata: nftMetadata)
+                nftStore.updateNFTMetadataCache(for: selectedNFTViewModel.token, metadata: nftMetadata)
               },
               onNFTStatusUpdated: {
                 nftStore.update()
