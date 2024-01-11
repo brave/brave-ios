@@ -19,7 +19,6 @@ import BraveVPN
 import BraveNews
 import Growth
 import NetworkExtension
-import BraveTalk
 
 extension TabBarVisibility: RepresentableOptionType {
   public var displayString: String {
