@@ -19,6 +19,7 @@ import BraveVPN
 import BraveNews
 import Growth
 import NetworkExtension
+import BraveTalk
 
 extension TabBarVisibility: RepresentableOptionType {
   public var displayString: String {
@@ -860,6 +861,11 @@ class SettingsViewController: TableViewController {
           text: "VPN Logs",
           selection: { [unowned self] in
             self.navigationController?.pushViewController(VPNLogsViewController(), animated: true)
+          }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self),
+        Row(
+          text: "Brave Talk Logs",
+          selection: { [unowned self] in
+            self.navigationController?.pushViewController(BraveTalkLogsViewController(), animated: true)
           }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self),
         Row(
           text: "Retention Preferences Debug Menu",
