@@ -10,12 +10,12 @@ import SnapKit
 
 public class BraveTalkLogsViewController: UIViewController {
   
+  private var logsTextView = UITextView()
+  
   public override func viewDidLoad() {
     super.viewDidLoad()
     
-    let logsTextView = UITextView()
     logsTextView.isEditable = false
-    
     view.addSubview(logsTextView)
     logsTextView.snp.makeConstraints {
       $0.edges.equalToSuperview()
@@ -26,6 +26,28 @@ public class BraveTalkLogsViewController: UIViewController {
     formatter.timeStyle = .long
     
     logsTextView.text = getLogs()
+    
+    let shareButton = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(shareLogs))
+    navigationItem.rightBarButtonItem = shareButton
+  }
+  
+  @objc private func shareLogs() {
+    do {
+      let fileURL = try createTemporaryLogFile()
+      let activityViewController = UIActivityViewController(activityItems: [fileURL], applicationActivities: nil)
+      present(activityViewController, animated: true)
+    } catch {
+      Logger.module.error("Error while creating the log file: \(error.localizedDescription, privacy: .public)")
+    }
+  }
+  
+  private func createTemporaryLogFile() throws -> URL {
+    let logsString = getLogs()
+    let temporaryDirectoryURL = FileManager.default.temporaryDirectory
+    let logFileURL = temporaryDirectoryURL.appendingPathComponent("Logs.txt")
+    
+    try logsString.write(to: logFileURL, atomically: true, encoding: .utf8)
+    return logFileURL
   }
   
   private func getLogs() -> String {
