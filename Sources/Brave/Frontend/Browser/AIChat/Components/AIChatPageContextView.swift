@@ -3,8 +3,9 @@ import SwiftUI
 import DesignSystem
 
 struct AIChatPageContextView: View {
-  @Binding
-  var isToggleOn: Bool
+  @Binding var isToggleOn: Bool
+  
+  @State var isToggleEnabled: Bool
   
   var body: some View {
     Toggle(isOn: $isToggleOn) {
@@ -12,6 +13,7 @@ struct AIChatPageContextView: View {
         .font(.footnote)
         .foregroundStyle(Color(braveSystemName: .textTertiary))
     }
+    .disabled(!isToggleEnabled)
     .tint(Color(braveSystemName: .primary60))
     .padding(8.0)
     .background(
@@ -24,6 +26,6 @@ struct AIChatPageContextView: View {
 
 @available(iOS 17.0, *)
 #Preview(traits: .sizeThatFitsLayout) {
-  AIChatPageContextView(isToggleOn: .constant(true))
+  AIChatPageContextView(isToggleOn: .constant(true), isToggleEnabled: true)
     .previewLayout(.sizeThatFits)
 }
