@@ -238,11 +238,25 @@ class SelectAccountTokenStore: ObservableObject, WalletObserverStore {
           })
         }
       )
-      self.balancesForAccountsCache.merge(with: balancesForAccounts)
+      for account in allAccounts {
+        if let updatedBalancesForAccount = balancesForAccounts[account.address] {
+          // if balance fetch failed that we already have cached, don't overwrite existing
+          if var existing = self.balancesForAccountsCache[account.address] {
+            existing.merge(with: updatedBalancesForAccount)
+            self.balancesForAccountsCache[account.address] = existing
+          } else {
+            self.balancesForAccountsCache[account.address] = updatedBalancesForAccount
+          }
+        }
+      }
       self.balancesFetched = true
       self.updateAccountSections()
       // fetch prices for tokens with balance
-      let tokensIdsWithBalance = Array(Set(balancesForAccountsCache.flatMap(\.value.keys)))
+      var tokensIdsWithBalance: Set<String> = .init()
+      for accountBalance in balancesForAccountsCache.values {
+        let tokenIdsWithAccountBalance = accountBalance.filter { $1 > 0 }.map(\.key)
+        tokenIdsWithAccountBalance.forEach { tokensIdsWithBalance.insert($0) }
+      }
       let assetRatioIdsForTokensWithBalance = tokensIdsWithBalance
         .compactMap { tokenId in
           userVisibleAssets[tokenId]?.assetRatioId

@@ -294,6 +294,7 @@ extension BraveWalletJsonRpcService {
     return balancesForAsset.reduce(0, +)
   }
   
+  /// Returns the total balance for a given account for all of the given network assets
   func fetchBalancesForTokens(
     account: BraveWallet.AccountInfo,
     networkAssets: [NetworkAssets]
@@ -309,7 +310,7 @@ extension BraveWalletJsonRpcService {
                 in: account,
                 network: networkAsset.network
               )
-              if let balance, balance > 0 {
+              if let balance {
                 return [token.id: balance]
               } else {
                 return [:]
