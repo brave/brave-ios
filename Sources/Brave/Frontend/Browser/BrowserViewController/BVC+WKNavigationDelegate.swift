@@ -1409,10 +1409,11 @@ extension BrowserViewController: WKUIDelegate {
     // Lets get the redirect chain.
     // Then we simply get all elements up until the user allows us to redirect
     // (i.e. appropriate settings are enabled for that redirect rule)
-    if Preferences.Shields.autoRedirectTrackingURLs.value,
+    if let debounceService = DebounceServiceFactory.get(privateMode: tab.isPrivate), 
+       debounceService.isEnabled,
        let currentURL = tab.webView?.url,
        currentURL.baseDomain != requestURL.baseDomain {
-      if let redirectURL = DebounceServiceFactory.get(privateMode: tab.isPrivate)?.debounce(requestURL) {
+      if let redirectURL = debounceService.debounce(requestURL) {
         // For now we only allow the `Referer`. The browser will add other headers during navigation.
         var modifiedRequest = URLRequest(url: redirectURL)
         
