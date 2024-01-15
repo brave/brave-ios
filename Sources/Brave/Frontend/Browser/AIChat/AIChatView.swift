@@ -27,6 +27,10 @@ class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
     }
   }
   
+  var shouldShowPremiumPrompt: Bool {
+    return true // premiumStatus == .inactive && api?.canShowPremiumPrompt ?? false
+  }
+  
   static func modelForPreviews() -> AIChatViewModel {
     return AIChatViewModel()
   }
@@ -173,42 +177,47 @@ struct AIChatView: View {
         ScrollViewReader { scrollViewReader in
           ScrollView {
             VStack(spacing: 0.0) {
-              ForEach(Array(model.conversationHistory.enumerated()), id: \.offset) { index, turn in
-                if turn.characterType == .human {
-                  AIChatUserMessageView(prompt: turn.text)
-                    .padding()
-                    .background(Color(braveSystemName: .pageBackground))
-                  
-                  if index == 0 && model.isPageConnected {
-                    AIChatPageInfoBanner(url: model.getLastCommittedURL(), pageTitle: model.getPageTitle() ?? "")
-                      .padding([.horizontal, .bottom])
-                      .background(Color(braveSystemName: .pageBackground))
-                  }
-                } else {
-                  AIChatResponseMessageView(prompt: turn.text)
-                    .padding()
-                    .background(Color(braveSystemName: .containerBackground))
-                    .contextMenu {
-                      responseContextMenuItems(for: index, turn: turn)
-                    }
-                  
-                  if let customFeedbackIndex = customFeedbackIndex,
-                     customFeedbackIndex == index {
-                    AIChatFeedbackView()
+              
+              if model.shouldShowPremiumPrompt {
+                
+              } else {
+                ForEach(Array(model.conversationHistory.enumerated()), id: \.offset) { index, turn in
+                  if turn.characterType == .human {
+                    AIChatUserMessageView(prompt: turn.text)
                       .padding()
+                      .background(Color(braveSystemName: .pageBackground))
+                    
+                    if index == 0 && model.isPageConnected {
+                      AIChatPageInfoBanner(url: model.getLastCommittedURL(), pageTitle: model.getPageTitle() ?? "")
+                        .padding([.horizontal, .bottom])
+                        .background(Color(braveSystemName: .pageBackground))
+                    }
+                  } else {
+                    AIChatResponseMessageView(prompt: turn.text)
+                      .padding()
+                      .background(Color(braveSystemName: .containerBackground))
+                      .contextMenu {
+                        responseContextMenuItems(for: index, turn: turn)
+                      }
+                    
+                    if let customFeedbackIndex = customFeedbackIndex,
+                       customFeedbackIndex == index {
+                      AIChatFeedbackView()
+                        .padding()
+                    }
                   }
                 }
-              }
-              
-              Color.clear.id(lastMessageId)
-              
-              if !model.requestInProgress && !model.suggestedQuestions.isEmpty {
-                AIChatSuggestionsView(geometry: geometry, suggestions: model.suggestedQuestions) { suggestion in
-                  model.submitSuggestion(suggestion)
+                
+                Color.clear.id(lastMessageId)
+                
+                if !model.requestInProgress && !model.suggestedQuestions.isEmpty {
+                  AIChatSuggestionsView(geometry: geometry, suggestions: model.suggestedQuestions) { suggestion in
+                    model.submitSuggestion(suggestion)
+                  }
+                  .padding()
                 }
-                .padding()
               }
-            }
+            } 
             .onChange(of: model.conversationHistory) { _ in
               scrollViewReader.scrollTo(lastMessageId, anchor: .bottom)
             }
@@ -226,12 +235,15 @@ struct AIChatView: View {
       
       Spacer()
       
-      AIChatPageContextView(isToggleOn: $model.isPageConnected)
-          .padding()
+      AIChatPageContextView(
+        isToggleOn: model.shouldShowPremiumPrompt ? .constant(false) : $model.isPageConnected,
+        isToggleEnabled: !model.shouldShowPremiumPrompt)
+        .padding()
       
       AIChatPromptInputView() { prompt in
         model.submitQuery(prompt)
       }
+        .disabled(model.shouldShowPremiumPrompt)
     }
     .background(Color(braveSystemName: .containerBackground))
   }
@@ -300,7 +312,7 @@ struct AIChatView: View {
     
     Spacer()
     
-    AIChatPageContextView(isToggleOn: .constant(true))
+    AIChatPageContextView(isToggleOn: .constant(true), isToggleEnabled: true)
       .padding()
     
     AIChatPromptInputView() { prompt in
