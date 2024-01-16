@@ -32,10 +32,15 @@ private struct TopView<L, C, R>: View where L: View, C: View, R: View {
   }
 }
 
-struct AIChatNavigationView: View {
+struct AIChatNavigationView<Content>: View where Content: View {
   let onClose: (() -> Void)
   let onErase: (() -> Void)
-  let onMenu: (() -> Void)
+  
+  @ViewBuilder
+  let menuContent: (() -> Content)
+  
+  @State
+  private var showSettingsMenu = false
   
   var body: some View {
     TopView {
@@ -44,33 +49,47 @@ struct AIChatNavigationView: View {
       } label: {
         Text("Close")
           .font(.body)
-          .foregroundStyle(Color(braveSystemName: .textTertiary))
+          .foregroundStyle(Color(braveSystemName: .textInteractive))
       }
       .padding()
     } center: {
-      Text("Leo")
-        .font(.body)
-        .fontWeight(.bold)
-        .foregroundStyle(Color(braveSystemName: .textPrimary))
-        .padding()
-        .frame(maxWidth: .infinity, alignment: .center)
+      HStack(spacing: 0.0) {
+        Text("Leo")
+          .font(.body)
+          .fontWeight(.bold)
+          .foregroundStyle(Color(braveSystemName: .textPrimary))
+          .padding(.horizontal, 8.0)
+          .padding(.vertical)
+       
+        Text("PREMIUM")
+          .font(.caption2)
+          .fontWeight(.bold)
+          .foregroundStyle(Color(braveSystemName: .blue50))
+          .padding(.horizontal, 6.0)
+          .padding(.vertical, 4.0)
+          .background(RoundedRectangle(cornerRadius: 4.0, style: .continuous)
+            .fill(Color(braveSystemName: .blue20)))
+      }
     } right: {
-      HStack {
+      HStack(spacing: 0.0) {
         Button {
           onErase()
         } label: {
           Image(braveSystemName: "leo.erase")
-            .tint(Color(braveSystemName: .textTertiary))
+            .tint(Color(braveSystemName: .textInteractive))
         }
-        .padding()
         
         Button {
-          onMenu()
+          showSettingsMenu = true
         } label: {
-          Image(braveSystemName: "leo.more.horizontal")
-            .tint(Color(braveSystemName: .textTertiary))
+          Image(braveSystemName: "leo.settings")
+            .tint(Color(braveSystemName: .textInteractive))
         }
         .padding()
+        .popover(isPresented: $showSettingsMenu,
+                 content: {
+          menuContent()
+        })
       }
     }
     .background(Color(braveSystemName: .pageBackground))
@@ -83,8 +102,8 @@ struct AIChatNavigationView: View {
     print("Closed Chat")
   }, onErase: {
     print("Erased Chat History")
-  }, onMenu: {
-    print("Opened Chat Menu")
+  }, menuContent: {
+    AIChatMenuView()
   })
     .previewLayout(.sizeThatFits)
 }
