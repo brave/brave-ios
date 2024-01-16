@@ -28,7 +28,7 @@ class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   }
   
   var shouldShowPremiumPrompt: Bool {
-    return true // premiumStatus == .inactive && api?.canShowPremiumPrompt ?? false
+    return premiumStatus == .inactive && api?.canShowPremiumPrompt ?? false
   }
   
   static func modelForPreviews() -> AIChatViewModel {
@@ -179,7 +179,8 @@ struct AIChatView: View {
             VStack(spacing: 0.0) {
               
               if model.shouldShowPremiumPrompt {
-                
+                AIChatPremiumUpsellView(upsellType: .rateLimit)
+                  .padding(8)
               } else {
                 ForEach(Array(model.conversationHistory.enumerated()), id: \.offset) { index, turn in
                   if turn.characterType == .human {
