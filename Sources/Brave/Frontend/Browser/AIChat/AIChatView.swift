@@ -166,8 +166,19 @@ struct AIChatView: View {
         presentationMode.wrappedValue.dismiss()
       }, onErase: {
         model.clearConversationHistory()
-      }, onMenu: {
-        
+      }, menuContent: {
+        ScrollView {
+          AIChatMenuView()
+            .frame(minWidth: 300)
+            .osAvailabilityModifiers({ view in
+              if #available(iOS 16.4, *) {
+                view
+                  .presentationCompactAdaptation(.popover)
+              } else {
+                view
+              }
+            })
+        }
       })
       
       Color(braveSystemName: .dividerSubtle)
@@ -280,8 +291,8 @@ struct AIChatView: View {
       print("Closed Chat")
     }, onErase: {
       print("Erased Chat History")
-    }, onMenu: {
-      print("Opened Chat Menu")
+    }, menuContent: {
+      AIChatMenuView()
     })
     
     Divider()

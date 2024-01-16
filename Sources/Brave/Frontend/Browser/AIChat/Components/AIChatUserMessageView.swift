@@ -9,7 +9,7 @@ struct AIChatUserMessageView: View {
     VStack {
       HStack {
         ZStack {
-          Color.white
+          Color(braveSystemName: .containerHighlight)
           Image(braveSystemName: "leo.user.circle")
             .padding(8.0)
         }
