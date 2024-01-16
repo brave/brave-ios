@@ -21,10 +21,6 @@ public class BraveTalkLogsViewController: UIViewController {
       $0.edges.equalToSuperview()
     }
     
-    let formatter = DateFormatter()
-    formatter.dateStyle = .short
-    formatter.timeStyle = .long
-    
     logsTextView.text = getLogs()
     
     let shareButton = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(shareLogs))
@@ -59,7 +55,7 @@ public class BraveTalkLogsViewController: UIViewController {
         .compactMap { $0 as? OSLogEntryLog }
         .filter { $0.category == "BraveTalk" && $0.subsystem == Bundle.main.bundleIdentifier }
         .map { "[\($0.date.formatted())] \($0.composedMessage)" }
-        .joined()
+        .joined(separator: "\n")
     } catch {
       Logger.module.error("\(error.localizedDescription, privacy: .public)")
     }
