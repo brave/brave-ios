@@ -11,16 +11,6 @@ import os.log
 /// This object holds on to our adblock engines and returns information needed for stats tracking as well as some conveniences
 /// for injected scripts needed during web navigation and cosmetic filters models needed by the `SelectorsPollerScript.js` script.
 public actor AdBlockStats {
-  /// The max number of enabled filter lists depending on the amount memory available to the device
-  static var maxNumberOfAllowedFilterLists: Int = {
-    // Get the number of gigs (memory in bytes divided by the size of a gig in bytes)
-    let numberOfGigs = Int(ProcessInfo.processInfo.physicalMemory / 1073741824)
-    ContentBlockerManager.log.debug("Number of gigs (rounded down): \(numberOfGigs)")
-    // Take a value between 20 and 40,
-    // with the real value somewhere in the middle depending on the device's memory
-    return max(min(5 * numberOfGigs, 40), 20)
-  }()
-  
   typealias CosmeticFilterModelTuple = (isAlwaysAggressive: Bool, model: CosmeticFilterModel)
   public static let shared = AdBlockStats()
   
@@ -44,31 +34,31 @@ public actor AdBlockStats {
   /// Critical sources are those that are enabled and are "on" by default. Giving us the most important sources.
   /// Used for memory managment so we know which filter lists to disable upon a memory warning
   @MainActor var criticalSources: [CachedAdBlockEngine.Source] {
-    var enabledSources: [CachedAdBlockEngine.Source] = [.adBlock]
-    enabledSources.append(contentsOf: FilterListStorage.shared.ciriticalSources)
+    var enabledSources: [CachedAdBlockEngine.Source] = [.adBlock, .firstParty]
+    enabledSources.append(contentsOf: FilterListStorage.shared.criticalSources)
     return enabledSources
   }
   
+  /// Return an array of all sources that are enabled according to user's settings
+  /// - Note: This does not take into account the domain or global adblock toggle
   @MainActor var enabledSources: [CachedAdBlockEngine.Source] {
-    var enabledSources: [CachedAdBlockEngine.Source] = [.adBlock]
+    var enabledSources: [CachedAdBlockEngine.Source] = [.adBlock, .firstParty]
     enabledSources.append(contentsOf: FilterListStorage.shared.enabledSources)
     enabledSources.append(contentsOf: CustomFilterListStorage.shared.enabledSources)
     return enabledSources
   }
   
+  /// Return an array of all sources that are enabled according to user's settings.
+  /// They are prioritized in case we need to disable trailing filter lists
+  /// - Note: This does not take into account the domain or global adblock toggle
   @MainActor var enabledPrioritizedSources: [CachedAdBlockEngine.Source] {
     let criticalSources = Set(self.criticalSources)
-    var enabledSources: [CachedAdBlockEngine.Source] = [.adBlock]
+    var enabledSources: [CachedAdBlockEngine.Source] = [.adBlock, .firstParty]
     enabledSources.append(contentsOf: FilterListStorage.shared.enabledSources.sorted { left, right in
       return criticalSources.contains(left) && !criticalSources.contains(right)
     })
     enabledSources.append(contentsOf: CustomFilterListStorage.shared.enabledSources)
     return enabledSources
-  }
-  
-  /// Tells us if we reached the max limit of already compiled filter lists
-  var reachedMaxLimit: Bool {
-    return cachedEngines.count >= Self.maxNumberOfAllowedFilterLists
   }
 
   init() {
@@ -88,16 +78,11 @@ public actor AdBlockStats {
   /// - Note: This method will ensure syncronous compilation
   public func compile(
     lazyInfo: LazyFilterListInfo, resourcesInfo: CachedAdBlockEngine.ResourcesInfo,
-    ignoreMaximum: Bool = false, compileContentBlockers: Bool
+    compileContentBlockers: Bool
   ) async {
     await currentCompileTask?.value
     
     currentCompileTask = Task {
-      if !ignoreMaximum && reachedMaxLimit && cachedEngines[lazyInfo.filterListInfo.source] == nil {
-        ContentBlockerManager.log.error("Failed to compile engine for \(lazyInfo.filterListInfo.source.debugDescription): Reached maximum!")
-        return
-      }
-      
       // Compile engine
       if needsCompilation(for: lazyInfo.filterListInfo, resourcesInfo: resourcesInfo) {
         do {
@@ -210,8 +195,8 @@ public actor AdBlockStats {
   /// Eagerness is determined by several factors:
   /// * If the source represents a fitler list or a custom filter list, it is eager if it is enabled
   /// * If the source represents the `adblock` default filter list, it is always eager regardless of shield settings
-  func isEagerlyLoaded(source: CachedAdBlockEngine.Source) async -> Bool {
-    return await enabledSources.contains(source)
+  @MainActor func isEagerlyLoaded(source: CachedAdBlockEngine.Source) -> Bool {
+    return enabledSources.contains(source)
   }
   
   /// Tells us if an engine needs compilation if it's missing or if its resources are outdated
@@ -307,7 +292,7 @@ private extension FilterListStorage {
   ///
   /// Critical filter lists are those that are enabled and are "on" by default. Giving us the most important filter lists.
   /// Used for memory managment so we know which filter lists to disable upon a memory warning
-  @MainActor var ciriticalSources: [CachedAdBlockEngine.Source] {
+  @MainActor var criticalSources: [CachedAdBlockEngine.Source] {
     return enabledSources.filter { source in
       switch source {
       case .filterList(let componentId):
@@ -357,7 +342,7 @@ private extension CachedAdBlockEngine.Source {
   /// This is determined by checking the source of the engine and checking the appropriate shields.
   @MainActor func isEnabled(for domain: Domain) -> Bool {
     switch self {
-    case .adBlock, .filterList, .filterListURL:
+    case .adBlock, .firstParty, .filterList, .filterListURL:
       // This engine source type is enabled only if shields are enabled
       // for the given domain
       return domain.isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true)
@@ -372,6 +357,8 @@ extension AdBlockStats.LazyFilterListInfo {
       // Normally this should be .generic(.blockAds)
       // but this content blocker is coming from slim-list
       return nil
+    case .firstParty:
+      return .firstParty
     case .filterList(let componentId):
       return .filterList(componentId: componentId, isAlwaysAggressive: isAlwaysAggressive)
     case .filterListURL(let uuid):

@@ -29,7 +29,7 @@ public final class FilterListSetting: NSManagedObject, CRUD {
     }
     set {
       // We need to extract the path. We don't want to store the full URL
-      self.folderPath = Self.extractFolderPath(fromFilterListFolderURL: newValue)
+      self.folderPath = Self.extractFolderPath(fromComponentFolderURL: newValue)
     }
   }
   
@@ -104,7 +104,7 @@ public final class FilterListSetting: NSManagedObject, CRUD {
     return filterListBaseFolderURL?.appendingPathComponent(folderPath)
   }
   
-  public static func extractFolderPath(fromFilterListFolderURL folderURL: URL?) -> String? {
+  public static func extractFolderPath(fromComponentFolderURL folderURL: URL?) -> String? {
     guard let baseURL = filterListBaseFolderURL, let folderURL = folderURL else {
       return nil
     }

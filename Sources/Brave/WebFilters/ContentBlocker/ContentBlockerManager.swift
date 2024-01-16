@@ -80,7 +80,16 @@ actor ContentBlockerManager {
     fileprivate static let filterListPrefix = "filter-list"
     fileprivate static let filterListURLPrefix = "filter-list-url"
     
+    /// These are all types that are non-configurable by the user 
+    /// and don't need additional stored or fetched catalogues to get a complete list.
+    static var allStaticTypes: Set<BlocklistType> {
+      return Set([.firstParty]).union(
+        ContentBlockerManager.GenericBlocklistType.allCases.map { .generic($0) }
+      )
+    }
+    
     case generic(GenericBlocklistType)
+    case firstParty
     case filterList(componentId: String, isAlwaysAggressive: Bool)
     case customFilterList(uuid: String)
     
@@ -88,6 +97,8 @@ actor ContentBlockerManager {
       switch self {
       case .generic(let type):
         return [Self.genericPrifix, type.bundledFileName].joined(separator: "-")
+      case .firstParty:
+        return "first-party"
       case .filterList(let componentId, _):
         return [Self.filterListPrefix, componentId].joined(separator: "-")
       case .customFilterList(let uuid):
@@ -99,6 +110,8 @@ actor ContentBlockerManager {
       switch self {
       case .customFilterList:
         return .general
+      case .firstParty:
+        return .aggressive
       case .filterList(_, let isAlwaysAggressive):
         if isAlwaysAggressive || isAggressiveMode {
           return .aggressive

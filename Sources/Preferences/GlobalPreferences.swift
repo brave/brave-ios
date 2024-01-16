@@ -115,13 +115,6 @@ extension Preferences {
     /// Value should only be checked on launch
     public static let backgroundedCleanly = Option<Bool>(key: "appstate.backgrounded-cleanly", default: true)
     
-    /// A cached value for the last folder path we got for filter lists
-    ///
-    /// This is a useful setting because it take too long for filter lists to load during launch
-    /// and therefore we can try to load them right away and have them ready on the first tab load
-    @MainActor public static let lastLegacyDefaultFilterListFolderPath =
-      Option<String?>(key: "caching.last-default-filter-list-folder-path", default: nil)
-    
     /// A cached value for the last folder path we got for our ad-block resources
     ///
     /// This is a useful setting because it take too long for filter lists to load during launch
@@ -135,6 +128,13 @@ extension Preferences {
     /// and therefore we can try to load them right away and have them ready on the first tab load
     @MainActor public static let lastFilterListCatalogueComponentFolderPath =
       Option<String?>(key: "caching.last-filter-list-catalogue-component-folder-path", default: nil)
+    
+    /// A cached value for the last folder path we got our first party filter list component
+    ///
+    /// This is a useful setting because it take too long for filter lists to load during launch
+    /// and therefore we can try to load them right away and have them ready on the first tab load
+    @MainActor public static let lastFirstPartyComponentFolderPath =
+      Option<String?>(key: "caching.last-first-party-component-folder-path", default: nil)
     
     /// A cached value for indicating if onboarding is actively going on
     ///
