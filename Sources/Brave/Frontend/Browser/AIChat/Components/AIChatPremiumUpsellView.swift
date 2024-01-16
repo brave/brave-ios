@@ -56,7 +56,7 @@ struct AIChatPremiumUpsellView: View {
       PremiumUpsellDetailView()
         .padding(8)
       PremiumUpsellActionView(
-        upsellType: .premium,
+        upsellType: upsellType,
         upgradeAction: {
           upgradeAction?()
         },

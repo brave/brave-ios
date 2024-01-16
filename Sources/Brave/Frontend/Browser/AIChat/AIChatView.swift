@@ -4,60 +4,47 @@ import DesignSystem
 import BraveCore
 
 class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
-  private var api: AIChat?
+  private var api: AIChat!
   private let webView: WKWebView?
   
   @Published var siteInfo: AiChat.SiteInfo?
   @Published var premiumStatus: AiChat.PremiumStatus = .inactive
   @Published var suggestedQuestions: [String] = []
   @Published var conversationHistory: [AiChat.ConversationTurn] = []
+  @Published var models: [AiChat.Model] = []
+  @Published var currentModel: AiChat.Model!
   
   @Published var requestInProgress: Bool = false
   @Published var apiError: AiChat.APIError = .none
   
   var isPageConnected: Bool {
     get {
-      return api?.shouldSendPageContents == true
+      return api.shouldSendPageContents == true
     }
     
     set {
-      if api?.shouldSendPageContents != newValue {
-        api?.shouldSendPageContents = newValue
+      if api.shouldSendPageContents != newValue {
+        api.shouldSendPageContents = newValue
       }
     }
   }
   
   var shouldShowPremiumPrompt: Bool {
-    return premiumStatus == .inactive && api?.canShowPremiumPrompt ?? false
-  }
-  
-  static func modelForPreviews() -> AIChatViewModel {
-    return AIChatViewModel()
-  }
-  
-  private override init() {
-    api = nil
-    webView = nil
-    
-    super.init()
-    
-    siteInfo = .init(title: "Preview", isContentTruncated: false, isContentAssociationPossible: true)
-    premiumStatus = .inactive
-    suggestedQuestions = ["Summarize this page"]
-    conversationHistory = [.init(characterType: .human, visibility: .visible, text: "Summarize this page")]
-    isPageConnected = false
+    return premiumStatus == .inactive && api.canShowPremiumPrompt
   }
   
   init(braveCore: BraveCoreMain, webView: WKWebView) {
-    api = nil
     self.webView = webView
     
     super.init()
-    
+
     api = braveCore.aiChatAPI(with: self)
-    api?.setConversationActive(true)
-    api?.isAgreementAccepted = true
     isPageConnected = webView.url != nil
+    currentModel = api.currentModel
+    models = api.models
+    
+    api.setConversationActive(true)
+    api.isAgreementAccepted = true
   }
   
   func getPageTitle() -> String? {
@@ -98,7 +85,6 @@ class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   }
   
   func onHistoryUpdate() {
-    guard let api = api else { return }
     conversationHistory = api.conversationHistory
   }
   
@@ -129,7 +115,7 @@ class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   // MARK: - API
   
   func clearConversationHistory() {
-    api?.clearConversationHistory()
+    api.clearConversationHistory()
   }
   
   func submitSuggestion(_ suggestion: String) {
@@ -137,11 +123,11 @@ class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   }
   
   func submitQuery(_ text: String) {
-    api?.submitHumanConversationEntry(text)
+    api.submitHumanConversationEntry(text)
   }
   
   func rateConversation(isLiked: Bool, turnId: UInt) {
-    api?.rateMessage(isLiked, turnId: turnId, completion: { identifier in
+    api.rateMessage(isLiked, turnId: turnId, completion: { identifier in
       
     })
   }
@@ -188,9 +174,14 @@ struct AIChatView: View {
         ScrollViewReader { scrollViewReader in
           ScrollView {
             VStack(spacing: 0.0) {
-              
               if model.shouldShowPremiumPrompt {
-                AIChatPremiumUpsellView(upsellType: .rateLimit)
+                AIChatPremiumUpsellView(upsellType: model.apiError == .rateLimitReached ? .rateLimit : .premium, 
+                  upgradeAction: {
+                    
+                  }, dismissAction: {
+                    
+                  }
+                )
                   .padding(8)
               } else {
                 ForEach(Array(model.conversationHistory.enumerated()), id: \.offset) { index, turn in
@@ -218,6 +209,24 @@ struct AIChatView: View {
                         .padding()
                     }
                   }
+                }
+                
+                if model.apiError == .connectionIssue {
+                  // TODO: Connection Issue View
+                  EmptyView()
+                } else if model.apiError == .rateLimitReached {
+                  // TODO: If the user is already premium, are they also rate-limited?
+                  AIChatPremiumUpsellView(upsellType: .rateLimit,
+                    upgradeAction: {
+                      
+                    }, dismissAction: {
+                      
+                    }
+                  )
+                    .padding(8)
+                } else if model.apiError == .contextLimitReached {
+                  // TODO: Conversation Length Limit View
+                  EmptyView()
                 }
                 
                 Color.clear.id(lastMessageId)
