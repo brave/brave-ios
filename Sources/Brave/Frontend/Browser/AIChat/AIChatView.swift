@@ -45,6 +45,10 @@ class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
     
     api.setConversationActive(true)
     api.isAgreementAccepted = true
+    
+    Task {
+      self.premiumStatus = await getPremiumStatus()
+    }
   }
   
   func getPageTitle() -> String? {
@@ -114,6 +118,10 @@ class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   
   // MARK: - API
   
+  func changeModel(modelKey: String) {
+    api.changeModel(modelKey)
+  }
+  
   func clearConversationHistory() {
     api.clearConversationHistory()
   }
@@ -126,10 +134,27 @@ class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
     api.submitHumanConversationEntry(text)
   }
   
-  func rateConversation(isLiked: Bool, turnId: UInt) {
-    api.rateMessage(isLiked, turnId: turnId, completion: { identifier in
-      
-    })
+  @MainActor
+  func getPremiumStatus() async -> AiChat.PremiumStatus {
+    return await withCheckedContinuation { continuation in
+      api.getPremiumStatus { status in
+        DispatchQueue.main.async {
+          self.premiumStatus = status
+          continuation.resume(returning: status)
+        }
+      }
+    }
+  }
+  
+  @MainActor
+  func rateConversation(isLiked: Bool, turnId: UInt) async -> String? {
+    return await withCheckedContinuation { continuation in
+      api.rateMessage(isLiked, turnId: turnId, completion: { identifier in
+        DispatchQueue.main.async {
+          continuation.resume(returning: identifier)
+        }
+      })
+    }
   }
 }
 
@@ -148,13 +173,20 @@ struct AIChatView: View {
   
   var body: some View {
     VStack(spacing: 0.0) {
-      AIChatNavigationView(onClose: {
+      AIChatNavigationView(premiumStatus: model.premiumStatus,
+      onClose: {
         presentationMode.wrappedValue.dismiss()
       }, onErase: {
         model.clearConversationHistory()
       }, menuContent: {
         ScrollView {
-          AIChatMenuView()
+          AIChatMenuView(
+            currentModel: model.currentModel,
+            modelOptions: model.models,
+            onModelChanged: { modelKey in
+              model.changeModel(modelKey: modelKey)
+            }
+          )
             .frame(minWidth: 300)
             .osAvailabilityModifiers({ view in
               if #available(iOS 16.4, *) {
@@ -284,11 +316,15 @@ struct AIChatView: View {
     })
     
     AIChatResponseMessageViewContextMenuButton(title: "Like Answer", icon: Image(braveSystemName: "leo.thumb.up"), onSelected: {
-      model.rateConversation(isLiked: true, turnId: UInt(turnIndex))
+      Task {
+        await model.rateConversation(isLiked: true, turnId: UInt(turnIndex))
+      }
     })
     
     AIChatResponseMessageViewContextMenuButton(title: "Dislike Answer", icon: Image(braveSystemName: "leo.thumb.down"), onSelected: {
-      model.rateConversation(isLiked: false, turnId: UInt(turnIndex))
+      Task {
+        await model.rateConversation(isLiked: false, turnId: UInt(turnIndex))
+      }
     })
   }
 }
@@ -296,12 +332,14 @@ struct AIChatView: View {
 @available(iOS 17.0, *)
 #Preview(traits: .sizeThatFitsLayout) {
   return VStack(spacing: 0.0) {
-    AIChatNavigationView(onClose: {
+    AIChatNavigationView(premiumStatus: .active,
+    onClose: {
       print("Closed Chat")
     }, onErase: {
       print("Erased Chat History")
     }, menuContent: {
-      AIChatMenuView()
+      EmptyView()
+      //AIChatMenuView()
     })
     
     Divider()

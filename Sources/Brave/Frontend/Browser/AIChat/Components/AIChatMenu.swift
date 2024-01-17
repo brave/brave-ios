@@ -4,6 +4,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import SwiftUI
+import BraveCore
 
 private struct AIChatMenuHeaderView: View {
   
@@ -61,6 +62,9 @@ private struct AIChatMenuItemView: View {
 }
 
 struct AIChatMenuView: View {
+  let currentModel: AiChat.Model
+  let modelOptions: [AiChat.Model]
+  let onModelChanged: (String) -> Void
   
   var body: some View {
     LazyVStack(spacing: 0.0) {
@@ -150,5 +154,38 @@ struct AIChatMenuView: View {
 }
 
 #Preview {
-  AIChatMenuView()
+  AIChatMenuView(currentModel:
+      .init(key: "mixtral_8x7b", name: "Mixtral 8x7b", displayName: "Mixtral 8x7b",
+            displayMaker: "", engineType: .llamaRemote,
+            category: .chat, isPremium: false,
+            maxPageContentLength: 9000, longConversationWarningCharacterLimit: 20000),
+                 modelOptions: [
+                  .init(key: "mx_8x7b", name: "Mixtral 8x7b", displayName: "Mixtral 8x7b",
+                        displayMaker: "", engineType: .llamaRemote,
+                        category: .chat, isPremium: false,
+                        maxPageContentLength: 9000, longConversationWarningCharacterLimit: 20000),
+                  .init(key: "mixtral_8x7b", name: "Mixtral 8x7b", displayName: "Mixtral 8x7b",
+                        displayMaker: "", engineType: .llamaRemote,
+                        category: .chat, isPremium: false,
+                        maxPageContentLength: 9000, longConversationWarningCharacterLimit: 20000),
+                  .init(key: "mixtral_8x7b", name: "Mixtral 8x7b", displayName: "Mixtral 8x7b",
+                        displayMaker: "", engineType: .llamaRemote,
+                        category: .chat, isPremium: false,
+                        maxPageContentLength: 9000, longConversationWarningCharacterLimit: 20000),
+                  .init(key: "mixtral_8x7b", name: "Mixtral 8x7b", displayName: "Mixtral 8x7b",
+                        displayMaker: "", engineType: .llamaRemote,
+                        category: .chat, isPremium: false,
+                        maxPageContentLength: 9000, longConversationWarningCharacterLimit: 20000),
+                  .init(key: "mixtral_8x7b", name: "Mixtral 8x7b", displayName: "Mixtral 8x7b",
+                        displayMaker: "", engineType: .llamaRemote,
+                        category: .chat, isPremium: false,
+                        maxPageContentLength: 9000, longConversationWarningCharacterLimit: 20000),
+                  .init(key: "mixtral_8x7b", name: "Mixtral 8x7b", displayName: "Mixtral 8x7b",
+                        displayMaker: "", engineType: .llamaRemote,
+                        category: .chat, isPremium: false,
+                        maxPageContentLength: 9000, longConversationWarningCharacterLimit: 20000)
+                 ],
+                 onModelChanged: {
+    print("Model Changed To: \($0)")
+  })
 }

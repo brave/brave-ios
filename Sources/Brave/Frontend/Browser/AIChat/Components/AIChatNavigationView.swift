@@ -5,6 +5,7 @@
 
 import SwiftUI
 import DesignSystem
+import BraveCore
 
 private struct TopView<L, C, R>: View where L: View, C: View, R: View {
   private let left: () -> L
@@ -37,6 +38,7 @@ private struct TopView<L, C, R>: View where L: View, C: View, R: View {
 }
 
 struct AIChatNavigationView<Content>: View where Content: View {
+  let premiumStatus: AiChat.PremiumStatus
   let onClose: (() -> Void)
   let onErase: (() -> Void)
   
@@ -65,14 +67,16 @@ struct AIChatNavigationView<Content>: View where Content: View {
           .padding(.horizontal, 8.0)
           .padding(.vertical)
        
-        Text("PREMIUM")
-          .font(.caption2)
-          .fontWeight(.bold)
-          .foregroundStyle(Color(braveSystemName: .blue50))
-          .padding(.horizontal, 6.0)
-          .padding(.vertical, 4.0)
-          .background(RoundedRectangle(cornerRadius: 4.0, style: .continuous)
-            .fill(Color(braveSystemName: .blue20)))
+        if premiumStatus == .active {
+          Text("PREMIUM")
+            .font(.caption2)
+            .fontWeight(.bold)
+            .foregroundStyle(Color(braveSystemName: .blue50))
+            .padding(.horizontal, 6.0)
+            .padding(.vertical, 4.0)
+            .background(RoundedRectangle(cornerRadius: 4.0, style: .continuous)
+              .fill(Color(braveSystemName: .blue20)))
+        }
       }
     } right: {
       HStack(spacing: 0.0) {
@@ -102,12 +106,13 @@ struct AIChatNavigationView<Content>: View where Content: View {
 
 @available(iOS 17.0, *)
 #Preview(traits: .sizeThatFitsLayout) {
-  AIChatNavigationView(onClose: {
+  AIChatNavigationView(premiumStatus: .active,
+  onClose: {
     print("Closed Chat")
   }, onErase: {
     print("Erased Chat History")
   }, menuContent: {
-    AIChatMenuView()
+    EmptyView()
   })
     .previewLayout(.sizeThatFits)
 }
