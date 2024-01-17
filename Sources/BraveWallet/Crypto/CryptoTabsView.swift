@@ -89,6 +89,7 @@ struct CryptoTabsView<DismissContent: ToolbarContent>: View {
       
       NavigationView {
         AccountsView(
+          store: cryptoStore.accountsStore,
           cryptoStore: cryptoStore,
           keyringStore: keyringStore
         )
