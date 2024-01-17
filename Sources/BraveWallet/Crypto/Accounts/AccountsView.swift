@@ -182,6 +182,7 @@ private struct AccountCardView: View {
   let isLoading: Bool
   let action: (Action) -> Void
   
+  @Environment(\.colorScheme) private var colorScheme: ColorScheme
   @ScaledMetric private var avatarSize = 40.0
   private let maxAvatarSize: CGFloat = 80.0
   private let contentPadding: CGFloat = 16
@@ -195,11 +196,14 @@ private struct AccountCardView: View {
           .frame(width: min(avatarSize, maxAvatarSize), height: min(avatarSize, maxAvatarSize))
         VStack(alignment: .leading) {
           AddressView(address: account.address) {
-            Text(account.name)
-              .font(.headline.weight(.semibold))
-              .foregroundColor(Color(braveSystemName: .textPrimary))
-            Text(account.address.truncatedAddress)
-              .font(.footnote)
+            // VStack keeps views together when showing context menu w/ address
+            VStack(alignment: .leading) {
+              Text(account.name)
+                .font(.headline.weight(.semibold))
+                .foregroundColor(Color(braveSystemName: .textPrimary))
+              Text(account.address.truncatedAddress)
+                .font(.footnote)
+            }
           }
           Text(account.accountSupportDisplayString)
             .font(.footnote)
@@ -314,14 +318,17 @@ private struct AccountCardView: View {
     }) {
       VStack(spacing: 0) {
         topSectionContent()
-          .background(Color.white.opacity(0.5))
+          .background(colorScheme == .dark ? Color.black.opacity(0.5) : Color.white.opacity(0.5))
         
         bottomSectionContent
+          .background(
+            colorScheme == .dark ? Color.black.opacity(0.4) : Color.clear
+          )
       }
       .background(
         RoundedRectangle(cornerRadius: 8)
           .stroke(Color(braveSystemName: .dividerInteractive), lineWidth: 1)
-          .background(RoundedRectangle(cornerRadius: 8).fill(Color(white: 0.95)))
+          .background(cardBackground)
       )
       .clipShape(RoundedRectangle(cornerRadius: 8))
       .frame(maxWidth: .infinity)
@@ -330,6 +337,13 @@ private struct AccountCardView: View {
     .overlay(alignment: .top) {
       topSectionContent(hidingButtons: false)
     }
+  }
+  
+  private var cardBackground: some View {
+    BlockieMaterial(address: account.address)
+      .blur(radius: 25, opaque: true)
+      .opacity(0.3)
+      .clipShape(RoundedRectangle(cornerRadius: 8))
   }
 }
 

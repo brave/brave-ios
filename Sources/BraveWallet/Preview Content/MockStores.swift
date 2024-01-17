@@ -260,6 +260,7 @@ extension AccountsStore {
     .init(
       keyringService: MockKeyringService(),
       rpcService: MockJsonRpcService(),
+      walletService: MockBraveWalletService(),
       assetRatioService: MockAssetRatioService(),
       userAssetManager: TestableWalletUserAssetManager()
     )

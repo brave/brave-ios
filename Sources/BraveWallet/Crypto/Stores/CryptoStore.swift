@@ -198,6 +198,7 @@ public class CryptoStore: ObservableObject, WalletObserverStore {
     self.accountsStore = .init(
       keyringService: keyringService,
       rpcService: rpcService,
+      walletService: walletService,
       assetRatioService: assetRatioService,
       userAssetManager: userAssetManager
     )

@@ -155,6 +155,9 @@ import Preferences
       }
     }
     
+    let walletService = BraveWallet.TestBraveWalletService()
+    walletService._addObserver = { _ in }
+    
     let assetRatioService = BraveWallet.TestAssetRatioService()
     assetRatioService._price = { priceIds, _, _, completion in
       completion(true, [self.mockETHAssetPrice,
@@ -190,6 +193,7 @@ import Preferences
     let store = AccountsStore(
       keyringService: keyringService,
       rpcService: rpcService,
+      walletService: walletService,
       assetRatioService: assetRatioService,
       userAssetManager: userAssetManager
     )

@@ -5,6 +5,7 @@
 
 import BraveCore
 import SwiftUI
+import Preferences
 
 struct AccountDetails: Equatable, Identifiable {
   var id: String { account.id }
@@ -39,10 +40,12 @@ class AccountsStore: ObservableObject, WalletObserverStore {
   
   private let keyringService: BraveWalletKeyringService
   private let rpcService: BraveWalletJsonRpcService
+  private let walletService: BraveWalletBraveWalletService
   private let assetRatioService: BraveWalletAssetRatioService
   private let userAssetManager: WalletUserAssetManagerType
   
   private var keyringServiceObserver: KeyringServiceObserver?
+  private var walletServiceObserver: WalletServiceObserver?
 
   var isObserving: Bool {
     keyringServiceObserver != nil
@@ -51,11 +54,13 @@ class AccountsStore: ObservableObject, WalletObserverStore {
   init(
     keyringService: BraveWalletKeyringService,
     rpcService: BraveWalletJsonRpcService,
+    walletService: BraveWalletBraveWalletService,
     assetRatioService: BraveWalletAssetRatioService,
     userAssetManager: WalletUserAssetManagerType
   ) {
     self.keyringService = keyringService
     self.rpcService = rpcService
+    self.walletService = walletService
     self.assetRatioService = assetRatioService
     self.userAssetManager = userAssetManager
     self.setupObservers()
@@ -69,6 +74,13 @@ class AccountsStore: ObservableObject, WalletObserverStore {
         self?.update()
       }
     )
+    self.walletServiceObserver = WalletServiceObserver(
+      walletService: walletService,
+      _onNetworkListChanged: { [weak self] in
+        self?.update()
+      }
+    )
+    Preferences.Wallet.showTestNetworks.observe(from: self)
   }
   
   func tearDown() {
@@ -238,5 +250,12 @@ class AccountsStore: ObservableObject, WalletObserverStore {
     account: BraveWallet.AccountInfo
   ) -> Double? {
     tokenBalancesCache[account.address]?[tokenId]
+  }
+}
+
+extension AccountsStore: PreferencesObserver {
+  public func preferencesDidChange(for key: String) {
+    guard key == Preferences.Wallet.showTestNetworks.key else { return }
+    update()
   }
 }
