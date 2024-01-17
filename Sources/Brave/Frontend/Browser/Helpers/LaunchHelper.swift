@@ -21,46 +21,12 @@ public actor LaunchHelper {
   )
   
   private var loadTask: Task<(), Never>?
-  private var areAdBlockServicesReady = false
+  private var areAdBlockServicesReady = true
   
   /// This method prepares the ad-block services one time so that multiple scenes can benefit from its results
   /// This is particularly important since we use a shared instance for most of our ad-block services.
   public func prepareAdBlockServices(adBlockService: AdblockService) async {
-    // Check if ad-block services are already ready.
-    // If so, we don't have to do anything
-    guard !areAdBlockServicesReady else { return }
     
-    // Check if we're still preparing the ad-block services
-    // If so we await that task
-    if let task = loadTask {
-      return await task.value
-    }
-    
-    // Otherwise prepare the services and await the task
-    let task = Task {
-      let signpostID = Self.signpost.makeSignpostID()
-      let state = Self.signpost.beginInterval("blockingLaunchTask", id: signpostID)
-      // We only want to compile the necessary content blockers during launch
-      // We will compile other ones after launch
-      let launchBlockModes = self.getFirstLaunchBlocklistModes()
-      
-      // Load cached data
-      // This is done first because compileResources need their results
-      async let filterListCache: Void = FilterListResourceDownloader.shared.loadFilterListSettingsAndCachedData()
-      async let adblockResourceCache: Void = AdblockResourceDownloader.shared.loadCachedAndBundledDataIfNeeded(allowedModes: launchBlockModes)
-      _ = await (filterListCache, adblockResourceCache)
-      Self.signpost.emitEvent("loadedCachedData", id: signpostID, "Loaded cached data")
-      
-      // This one is non-blocking
-      performPostLoadTasks(adBlockService: adBlockService, loadedBlockModes: launchBlockModes)
-      areAdBlockServicesReady = true
-      Self.signpost.endInterval("blockingLaunchTask", state)
-    }
-    
-    // Await the task and wait for the results
-    self.loadTask = task
-    await task.value
-    self.loadTask = nil
   }
   
   /// Return the blocking modes we need to pre-compile on first launch.
@@ -83,48 +49,7 @@ public actor LaunchHelper {
   
   /// Perform tasks that don't need to block the initial load (things that can happen happily in the background after the first page loads
   private func performPostLoadTasks(adBlockService: AdblockService, loadedBlockModes: Set<ContentBlockerManager.BlockingMode>) {
-    // Here we need to load the remaining modes so they are ready should the user change their settings
-    let remainingModes = ContentBlockerManager.BlockingMode.allCases.filter({ !loadedBlockModes.contains($0) })
     
-    Task.detached(priority: .low) {
-      // Let's disable filter lists if we have reached a maxumum amount
-      let enabledSources = await AdBlockStats.shared.enabledPrioritizedSources
-      
-      if enabledSources.count > AdBlockStats.maxNumberOfAllowedFilterLists {
-        let toDisableSources = enabledSources[AdBlockStats.maxNumberOfAllowedFilterLists...]
-        
-        for source in toDisableSources {
-          switch source {
-          case .adBlock:
-            // This should never be in the list because the order of enabledSources places this as the first item
-            continue
-          case .filterList(let componentId):
-            ContentBlockerManager.log.debug("Disabling filter list \(source.debugDescription)")
-            await FilterListStorage.shared.ensureFilterList(for: componentId, isEnabled: false)
-          case .filterListURL(let uuid):
-            ContentBlockerManager.log.debug("Disabling custom filter list \(source.debugDescription)")
-            await CustomFilterListStorage.shared.ensureFilterList(for: uuid, isEnabled: false)
-          }
-        }
-      }
-      
-      let signpostID = Self.signpost.makeSignpostID()
-      let state = Self.signpost.beginInterval("nonBlockingLaunchTask", id: signpostID)
-      await FilterListResourceDownloader.shared.start(with: adBlockService)
-      Self.signpost.emitEvent("FilterListResourceDownloader.shared.start", id: signpostID, "Started filter list downloader")
-      await AdblockResourceDownloader.shared.loadCachedAndBundledDataIfNeeded(allowedModes: Set(remainingModes))
-      Self.signpost.emitEvent("loadCachedAndBundledDataIfNeeded", id: signpostID, "Reloaded data for remaining modes")
-      await AdblockResourceDownloader.shared.startFetching()
-      Self.signpost.emitEvent("startFetching", id: signpostID, "Started fetching ad-block data")
-      
-      /// Cleanup rule lists so we don't have dead rule lists
-      let validBlocklistTypes = await self.getAllValidBlocklistTypes()
-      await ContentBlockerManager.shared.cleaupInvalidRuleLists(validTypes: validBlocklistTypes)
-      Self.signpost.endInterval("nonBlockingLaunchTask", state)
-      
-      // Update the setting
-      await self.lastBlocklistVersion.value = self.currentBlocklistVersion
-    }
   }
   
   /// Get all possible types of blocklist types available in this app, this includes actual and potential types
