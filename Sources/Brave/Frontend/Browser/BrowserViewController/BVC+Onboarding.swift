@@ -239,6 +239,7 @@ extension BrowserViewController {
     popover.popoverDidDismiss = { _ in
       maskShape.removeFromSuperlayer()
       borderView.removeFromSuperview()
+      placeholderView.removeFromSuperview()
 
       didDismiss()
     }
@@ -246,6 +247,7 @@ extension BrowserViewController {
     borderView.didClickBorderedArea = { [weak popover] in
       maskShape.removeFromSuperlayer()
       borderView.removeFromSuperview()
+      placeholderView.removeFromSuperview()
         
       popover?.dismissPopover() {
         didClickBorderedArea()
@@ -256,6 +258,8 @@ extension BrowserViewController {
       controller.buttonTapped = {
         maskShape.removeFromSuperlayer()
         borderView.removeFromSuperview()
+        placeholderView.removeFromSuperview()
+
         didButtonClick?()
       }
     }
