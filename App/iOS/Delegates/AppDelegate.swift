@@ -113,6 +113,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
     AppState.shared.state = .launching(options: launchOptions ?? [:], active: true)
     
+    log.error("AppDelegate did Finish")
+    
     // IAPs can trigger on the app as soon as it launches,
     // for example when a previous transaction was not finished and is in pending state.
     SKPaymentQueue.default().add(BraveVPN.iapObserver)

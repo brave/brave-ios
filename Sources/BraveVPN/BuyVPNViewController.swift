@@ -116,6 +116,8 @@ class BuyVPNViewController: VPNSetupLoadingController {
     iapObserver.delegate = self
 
     Preferences.VPN.popupShowed.value = true
+    
+    Logger.module.error("Failed to retrieve subcription product")
   }
 
   override func viewWillAppear(_ animated: Bool) {
