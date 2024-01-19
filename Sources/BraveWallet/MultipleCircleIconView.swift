@@ -42,10 +42,15 @@ struct MultipleCircleIconView<IconView: View, Model>: View {
     HStack(spacing: -(min(iconSize, maxIconSize) / 2)) {
       let numberOfIcons = min(maxIcons, models.count)
       ForEach(0..<numberOfIcons, id: \.self) { index in
-        iconView(models[index])
+        Color(.secondaryBraveGroupedBackground)
           .frame(width: min(iconSize, maxIconSize), height: min(iconSize, maxIconSize))
           .clipShape(ContainerRelativeShape())
-          .overlay(ContainerRelativeShape().stroke(Color(.secondaryBraveGroupedBackground), lineWidth: 1))
+          .overlay {
+            iconView(models[index])
+               // frame also applied on `iconView` externally
+              .frame(width: min(iconSize, maxIconSize) - 2, height: min(iconSize, maxIconSize) - 2)
+              .clipShape(ContainerRelativeShape())
+          }
           .containerShape(ContainerShape(shape: shape))
           .zIndex(Double(numberOfIcons - index))
       }
@@ -69,6 +74,7 @@ struct MultipleCircleIconView<IconView: View, Model>: View {
               .frame(width: iconDotSize, height: iconDotSize)
           }
             .foregroundColor(.white)
+            .containerShape(ContainerShape(shape: shape))
         )
       }
     }

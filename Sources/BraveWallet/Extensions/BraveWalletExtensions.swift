@@ -392,8 +392,9 @@ extension BraveWallet.BlockchainToken {
   }
   
   /// Returns the local image asset for the `BlockchainToken`.
-  func localImage(network: BraveWallet.NetworkInfo) -> UIImage? {
-    if network.isNativeAsset(self), let uiImage = network.nativeTokenLogoImage {
+  func localImage(network: BraveWallet.NetworkInfo?) -> UIImage? {
+    if let network,
+       network.isNativeAsset(self), let uiImage = network.nativeTokenLogoImage {
       return uiImage
     }
     

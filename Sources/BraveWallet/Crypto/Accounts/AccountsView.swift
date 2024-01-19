@@ -289,20 +289,11 @@ private struct AccountCardView: View {
           .redacted(reason: .placeholder)
           .shimmer(true)
       } else {
-        MultipleCircleIconView(
-          models: tokensWithBalances,
-          shape: .circle,
+        MultipleAssetIconsView(
+          tokens: tokensWithBalances,
           iconSize: 24,
           maxIconSize: 32
-        ) { token in
-          AssetIconView(
-            token: token,
-            network: .init(), // not shown
-            shouldShowNetworkIcon: false,
-            length: 24,
-            maxLength: 32
-          )
-        }
+        )
         Spacer()
         Text(balance)
           .font(.title3.weight(.medium))
