@@ -141,6 +141,24 @@ extension BraveWallet.AccountId {
   }
 }
 
+extension BraveWallet.AccountInfo {
+  /// String to display what this account supports, ex. `"Ethereum + EVM Chains"`.
+  var accountSupportDisplayString: String {
+    switch coin {
+    case .eth:
+      return Strings.Wallet.ethAccountDescription
+    case .sol:
+      return Strings.Wallet.solAccountDescription
+    case .fil:
+      return Strings.Wallet.filAccountDescription
+    case .btc, .zec:
+      return ""
+    @unknown default:
+      return ""
+    }
+  }
+}
+
 extension BraveWallet.CoinType {
   public var keyringIds: [BraveWallet.KeyringId] {
     switch self {

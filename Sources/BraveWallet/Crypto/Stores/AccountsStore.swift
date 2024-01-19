@@ -48,7 +48,7 @@ class AccountsStore: ObservableObject, WalletObserverStore {
   private var walletServiceObserver: WalletServiceObserver?
 
   var isObserving: Bool {
-    keyringServiceObserver != nil
+    keyringServiceObserver != nil && walletServiceObserver != nil
   }
   
   init(
@@ -85,6 +85,7 @@ class AccountsStore: ObservableObject, WalletObserverStore {
   
   func tearDown() {
     keyringServiceObserver = nil
+    walletServiceObserver = nil
   }
   
   func update() {
