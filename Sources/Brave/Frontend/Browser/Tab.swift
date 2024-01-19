@@ -58,12 +58,12 @@ protocol URLChangeDelegate {
 }
 
 enum TabSecureContentState {
-  case unknown
+  case unknown(info: String)
   case localhost
   case secure
-  case invalidCert
-  case missingSSL
-  case mixedContent
+  case invalidCert(info: String)
+  case missingSSL(info: String)
+  case mixedContent(info: String)
   
   var shouldDisplayWarning: Bool {
     switch self {
@@ -93,7 +93,7 @@ class Tab: NSObject {
     return type.isPrivate
   }
 
-  var secureContentState: TabSecureContentState = .unknown
+  var secureContentState: TabSecureContentState = .unknown(info: "Default")
   var sslPinningError: Error?
 
   private let _syncTab: BraveSyncTab?

@@ -1823,13 +1823,13 @@ public class BrowserViewController: UIViewController {
         break
       }
 
-      if tab.secureContentState == .secure, !webView.hasOnlySecureContent,
+      if case .secure = tab.secureContentState, !webView.hasOnlySecureContent,
          tab.url?.origin == tab.webView?.url?.origin {
         if let url = tab.webView?.url, url.isReaderModeURL {
           break
         }
         
-        tab.secureContentState = .mixedContent
+        tab.secureContentState = .mixedContent(info: "Page")
       }
       
       if let url = tab.webView?.url,
@@ -1839,7 +1839,7 @@ public class BrowserViewController: UIViewController {
         if internalUrl.isErrorPage {
           if ErrorPageHelper.certificateError(for: url) != 0 {
             // Cert validation takes precedence over all other errors
-            tab.secureContentState = .invalidCert
+            tab.secureContentState = .invalidCert(info: "Page")
           } else if NetworkErrorPageHandler.isNetworkError(errorCode: ErrorPageHelper.errorCode(for: url)) {
             // Network error takes precedence over missing cert
             // Because we cannot determine if a cert is missing yet, if we cannot connect to the server
@@ -1848,7 +1848,7 @@ public class BrowserViewController: UIViewController {
           } else {
             // Since it's not a cert error explicitly, and it's not a network error, and the cert is missing (no serverTrust),
             // then we display .missingSSL
-            tab.secureContentState = .missingSSL
+            tab.secureContentState = .missingSSL(info: "Page")
           }
         } else if url.isReaderModeURL || InternalURL.isValid(url: url) {
           tab.secureContentState = .localhost
@@ -1863,7 +1863,7 @@ public class BrowserViewController: UIViewController {
         break
       }
 
-      tab.secureContentState = .unknown
+      tab.secureContentState = .unknown(info: "Trust")
 
       guard let serverTrust = tab.webView?.serverTrust else {
         if let url = tab.webView?.url ?? tab.url {
@@ -1884,7 +1884,7 @@ public class BrowserViewController: UIViewController {
 
             if ErrorPageHelper.certificateError(for: url) != 0 {
               // Cert validation takes precedence over all other errors
-              tab.secureContentState = .invalidCert
+              tab.secureContentState = .invalidCert(info: "None")
             } else if NetworkErrorPageHandler.isNetworkError(errorCode: ErrorPageHelper.errorCode(for: url)) {
               // Network error takes precedence over missing cert
               // Because we cannot determine if a cert is missing yet, if we cannot connect to the server
@@ -1893,7 +1893,7 @@ public class BrowserViewController: UIViewController {
             } else {
               // Since it's not a cert error explicitly, and it's not a network error, and the cert is missing (no serverTrust),
               // then we display .missingSSL
-              tab.secureContentState = .missingSSL
+              tab.secureContentState = .missingSSL(info: "None")
             }
             
             if tabManager.selectedTab === tab {
@@ -1911,7 +1911,7 @@ public class BrowserViewController: UIViewController {
           }
 
           // All our checks failed, we show the page as insecure
-          tab.secureContentState = .missingSSL
+          tab.secureContentState = .missingSSL(info: "Failed")
         } else {
           // When there is no URL, it's likely a new tab.
           tab.secureContentState = .localhost
@@ -1925,7 +1925,7 @@ public class BrowserViewController: UIViewController {
       
       guard let scheme = tab.webView?.url?.scheme,
             let host = tab.webView?.url?.host else {
-        tab.secureContentState = .unknown
+        tab.secureContentState = .unknown(info: "Host")
         self.updateURLBar()
         return
       }
@@ -1952,10 +1952,10 @@ public class BrowserViewController: UIViewController {
             try await BraveCertificateUtils.evaluateTrust(serverTrust, for: host)
             tab.secureContentState = .secure
           } else {
-            tab.secureContentState = .invalidCert
+            tab.secureContentState = .invalidCert(info: "Core")
           }
         } catch {
-          tab.secureContentState = .invalidCert
+          tab.secureContentState = .invalidCert(info: "Apple")
         }
         
         self.updateURLBar()

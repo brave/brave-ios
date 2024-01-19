@@ -92,7 +92,7 @@ extension PageSecurityView: PopoverContentComponent {
 #Preview {
   PageSecurityView(
     displayURL: "http.badssl.com",
-    secureState: .missingSSL,
+    secureState: .missingSSL(info: "Preview"),
     hasCertificate: false,
     presentCertificateViewer: { }
   )

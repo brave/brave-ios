@@ -49,7 +49,7 @@ class TabLocationView: UIView {
     }
   }
 
-  var secureContentState: TabSecureContentState = .unknown {
+  var secureContentState: TabSecureContentState = .unknown(info: "Default") {
     didSet {
       updateLeadingItem()
     }
@@ -77,6 +77,21 @@ class TabLocationView: UIView {
     configuration.contentInsets = .init(top: 0, leading: 12, bottom: 0, trailing: 8)
     
     var title = AttributedString(Strings.tabToolbarNotSecureTitle)
+    switch secureContentState {
+    case .unknown:
+      title = AttributedString("Unknown")
+    case .localhost:
+      title = AttributedString("Local")
+    case .secure:
+      title = AttributedString("Secure")
+    case .invalidCert(let info):
+      title = AttributedString("Invalid-\(info)")
+    case .missingSSL(let info):
+      title = AttributedString("Missing-\(info)")
+    case .mixedContent(let info):
+      title = AttributedString("Mixed-\(info)")
+    }
+    
     title.font = .preferredFont(forTextStyle: .subheadline, compatibleWith: clampedTraitCollection)
     
     let isTitleVisible = !traitCollection.preferredContentSizeCategory.isAccessibilityCategory && bounds.width > 200

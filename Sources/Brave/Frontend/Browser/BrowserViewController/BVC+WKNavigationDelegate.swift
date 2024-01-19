@@ -70,8 +70,8 @@ extension BrowserViewController: WKNavigationDelegate {
       if let url = webView.url {
         if !InternalURL.isValid(url: url) {
           // reset secure content state to unknown until page can be evaluated
-          selectedTab.secureContentState = .unknown
-          updateToolbarSecureContentState(.unknown)
+          selectedTab.secureContentState = .unknown(info: "Prov")
+          updateToolbarSecureContentState(.unknown(info: "Prov"))
         }
       }
       

@@ -89,7 +89,7 @@ class CollapsedURLBarView: UIView {
     return configuration
   }
   
-  var secureContentState: TabSecureContentState = .unknown {
+  var secureContentState: TabSecureContentState = .unknown(info: "Default") {
     didSet {
       updateLockImageView()
     }
