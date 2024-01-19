@@ -4,7 +4,6 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
-
 import SwiftUI
 import os.log
 import OSLog
@@ -26,11 +25,7 @@ struct BraveTalkLogsView: View {
         }
       }
     }
-    .toolbar(content: {
-      ToolbarItem(placement: .topBarTrailing) {
-        ShareButton()
-      }
-    })
+    .navigationBarItems(trailing: ShareButton())
     .task {
       logs = await getLogs()
       fileURL = createTemporaryLogFile()
