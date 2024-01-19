@@ -22,47 +22,62 @@ class ActionToBraveViewController: UIViewController {
         
         // Opening browser with search url
         if provider.hasItemConformingToTypeIdentifier(UTType.text.identifier) {
-          provider.loadItem(forTypeIdentifier: UTType.text.identifier) { item, error in
-            DispatchQueue.main.async {
-              guard let item = item as? String,
-                    let schemeUrl = self.createURL(for: .query, with: item) else {
-                self.done()
-                return
-              }
-              
-              self.openBrowser(with: schemeUrl)
-            }
-          }
+          loadAttachmentFor(type: .query, using: provider)
+          break
         }
     
         // Opening browser with site
         if provider.hasItemConformingToTypeIdentifier(UTType.url.identifier) {
-          provider.loadItem(forTypeIdentifier: UTType.url.identifier) { item, error in
-            DispatchQueue.main.async {
-              // The first URL found within item url absolute string
-              guard let item = (item as? URL)?.absoluteString,
-                    let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue),
-                    let match = detector.firstMatch(in: item, options: [], range: NSRange(location: 0, length: item.count)),
-                    let range = Range(match.range, in: item),
-                    let queryURL = URL(string: String(item[range]))?.absoluteString,
-                    let schemeUrl = self.createURL(for: .url, with: queryURL) else {
-                self.done()
-                return
-              }
-              
-              self.openBrowser(with: schemeUrl)
-            }
-          }
+          loadAttachmentFor(type: .url, using: provider)
+          break
         }
-        
-        break
       }
     }
   }
-
+  
   func done() {
     // Return any edited content to the host app, in this case empty
     extensionContext!.completeRequest(returningItems: [], completionHandler: nil)
+  }
+  
+  private func loadAttachmentFor(type: SchemeType, using provider: NSItemProvider) {
+    let typeIdentifier: String = type == .query ? UTType.text.identifier : UTType.url.identifier
+    
+    provider.loadItem(forTypeIdentifier: typeIdentifier) { item, error in
+      DispatchQueue.main.async {
+        
+        guard let schemeUrl = self.constructSchemeURL(for: type, with: item) else {
+          self.done()
+          return
+        }
+        
+        self.openBrowser(with: schemeUrl)
+      }
+    }
+  }
+  
+  private func constructSchemeURL(for schemeType: SchemeType, with item: NSSecureCoding?) -> URL? {
+    switch schemeType {
+    case .query:
+      guard let item = item as? String else {
+        return nil
+      }
+      
+      return createURL(for: .query, with: item)
+      
+      case .url:
+      // The first URL found within item url absolute string
+      guard let item = (item as? URL)?.absoluteString,
+            let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue),
+            let match = detector.firstMatch(in: item, options: [], range: NSRange(location: 0, length: item.count)),
+            let range = Range(match.range, in: item),
+            let queryURL = URL(string: String(item[range]))?.absoluteString else {
+        return nil
+      }
+      
+      return createURL(for: .url, with: queryURL)
+    }
+    
   }
   
   private func createURL(for schemeType: SchemeType, with value: String) -> URL? {
