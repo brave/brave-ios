@@ -44,12 +44,8 @@ class ActionToBraveViewController: UIViewController {
                     let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue),
                     let match = detector.firstMatch(in: item, options: [], range: NSRange(location: 0, length: item.count)),
                     let range = Range(match.range, in: item),
-                    let queryURL = URL(string: String(item[range]))?.absoluteString else {
-                self.done()
-                return
-              }
-
-              guard let schemeUrl = self.createURL(for: .url, with: queryURL) else {
+                    let queryURL = URL(string: String(item[range]))?.absoluteString,
+                    let schemeUrl = self.createURL(for: .url, with: queryURL) else {
                 self.done()
                 return
               }
