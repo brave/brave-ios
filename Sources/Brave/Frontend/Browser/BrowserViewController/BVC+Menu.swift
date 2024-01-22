@@ -115,6 +115,14 @@ extension BrowserViewController {
       MenuItemFactory.button(for: .wallet(subtitle: Strings.OptionsMenu.braveWalletItemDescription)) { [unowned self] in
         self.presentWallet()
       }
+      
+      // Add Brave-Leo options only in normal browsing
+      if !privateBrowsingManager.isPrivateBrowsing {
+        MenuItemButton(icon: Image(braveSystemName: "leo.product.brave-leo"), title: Strings.leoMenuItem) { [unowned self] in
+          self.popToBVC()
+          self.openBraveLeo()
+        }
+      }
     }
     .fixedSize(horizontal: false, vertical: true)
     .padding(.top, 10)

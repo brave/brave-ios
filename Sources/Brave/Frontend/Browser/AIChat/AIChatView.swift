@@ -2,6 +2,7 @@
 import SwiftUI
 import DesignSystem
 import BraveCore
+import Shared
 
 class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   private var api: AIChat!
@@ -33,13 +34,20 @@ class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
     return premiumStatus == .inactive && api.canShowPremiumPrompt
   }
   
-  init(braveCore: BraveCoreMain, webView: WKWebView) {
+  var hasValidWebPage: Bool {
+    if let url = webView?.url {
+      return url.isWebPage() && !InternalURL.isValid(url: url)
+    }
+    return false
+  }
+  
+  init(braveCore: BraveCoreMain, webView: WKWebView?) {
     self.webView = webView
     
     super.init()
 
     api = braveCore.aiChatAPI(with: self)
-    isPageConnected = webView.url != nil
+    isPageConnected = hasValidWebPage
     currentModel = api.currentModel
     models = api.models
     
@@ -292,7 +300,7 @@ struct AIChatView: View {
       
       AIChatPageContextView(
         isToggleOn: model.shouldShowPremiumPrompt ? .constant(false) : $model.isPageConnected,
-        isToggleEnabled: !model.shouldShowPremiumPrompt)
+        isToggleEnabled: !model.shouldShowPremiumPrompt && model.hasValidWebPage)
         .padding()
       
       AIChatPromptInputView() { prompt in
