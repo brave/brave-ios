@@ -141,7 +141,7 @@ struct PremiumUpsellTitleView: View {
   }
 }
 
-private struct PremiumUpsellDetailView: View {
+struct PremiumUpsellDetailView: View {
   
   var body: some View {
     VStack(spacing: 0) {
@@ -255,14 +255,6 @@ private struct PremiumUpsellTopicView: View {
   
 }
 
-@available(iOS 17.0, *)
-#Preview(traits: .sizeThatFitsLayout) {
+#Preview {
   AIChatPremiumUpsellView(upsellType: .premium)
-    .previewLayout(.sizeThatFits)
-}
-
-@available(iOS 17.0, *)
-#Preview(traits: .sizeThatFitsLayout) {
-  PremiumUpsellTopicView(topicType: .modelType)
-    .previewLayout(.sizeThatFits)
 }

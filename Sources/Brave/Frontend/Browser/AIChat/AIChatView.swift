@@ -31,7 +31,7 @@ class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   }
   
   var shouldShowPremiumPrompt: Bool {
-    return premiumStatus == .inactive && api.canShowPremiumPrompt
+    return true // premiumStatus == .inactive && api.canShowPremiumPrompt
   }
   
   var hasValidWebPage: Bool {
@@ -181,6 +181,12 @@ struct AIChatView: View {
   @State 
   private var customFeedbackIndex: Int?
   
+  @State
+  private var isPremiumPaywallPresented = false
+  
+  @State
+  private var isAdvancedSettingsPresented = false
+  
   var body: some View {
     VStack(spacing: 0.0) {
       AIChatNavigationView(premiumStatus: model.premiumStatus,
@@ -195,6 +201,15 @@ struct AIChatView: View {
             modelOptions: model.models,
             onModelChanged: { modelKey in
               model.changeModel(modelKey: modelKey)
+            }, onOptionSelected: { option in
+              switch option {
+              case .premium:
+                isPremiumPaywallPresented.toggle()
+              case .advancedSettings:
+                isAdvancedSettingsPresented.toggle()
+              default:
+                break
+              }
             }
           )
             .frame(minWidth: 300)
@@ -309,6 +324,12 @@ struct AIChatView: View {
         .disabled(model.shouldShowPremiumPrompt)
     }
     .background(Color(braveSystemName: .containerBackground))
+    .popover(isPresented: $isPremiumPaywallPresented, content: {
+      AIChatPaywallView()
+    })
+    .popover(isPresented: $isAdvancedSettingsPresented, content: {
+      AIChatAdvancedSettingsView()
+    })
   }
   
   @ViewBuilder
