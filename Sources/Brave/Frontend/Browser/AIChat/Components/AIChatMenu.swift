@@ -68,10 +68,15 @@ private struct AIChatMenuItemView<RightAccessoryView: View>: View {
   }
 }
 
+enum AIChatMenuOptionTypes {
+    case newChat, premium, advancedSettings
+}
+
 struct AIChatMenuView: View {
   let currentModel: AiChat.Model
   let modelOptions: [AiChat.Model]
   let onModelChanged: (String) -> Void
+  let onOptionSelected: (AIChatMenuOptionTypes) -> Void
   
   @Environment(\.presentationMode)
   private var presentationMode
@@ -119,7 +124,8 @@ struct AIChatMenuView: View {
       .frame(height: 8.0)
       
       Button {
-        
+        presentationMode.wrappedValue.dismiss()
+        onOptionSelected(.newChat)
       } label: {
         Text("New Chat")
           .font(.body)
@@ -137,7 +143,8 @@ struct AIChatMenuView: View {
         .frame(height: 1.0)
       
       Button {
-        
+        presentationMode.wrappedValue.dismiss()
+        onOptionSelected(.premium)
       } label: {
         Text("Go Premium")
           .font(.body)
@@ -155,7 +162,8 @@ struct AIChatMenuView: View {
         .frame(height: 1.0)
       
       Button {
-        
+        presentationMode.wrappedValue.dismiss()
+        onOptionSelected(.advancedSettings)
       } label: {
         Text("Advanced Settings")
           .font(.body)
@@ -206,5 +214,5 @@ struct AIChatMenuView: View {
                  ],
                  onModelChanged: {
     print("Model Changed To: \($0)")
-  })
+  }, onOptionSelected: { _ in })
 }
