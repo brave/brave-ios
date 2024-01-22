@@ -28,18 +28,27 @@ private struct AIChatMenuHeaderView: View {
   }
 }
 
-private struct AIChatMenuItemView: View {
+private struct AIChatMenuItemView<RightAccessoryView: View>: View {
   
   let title: String
   let subtitle: String
-  let rightAccessoryView: AnyView?
+  let isSelected: Bool
+  let rightAccessoryView: RightAccessoryView
+  
+  init(title: String, subtitle: String, isSelected: Bool, @ViewBuilder _ rightAccessoryView: () -> RightAccessoryView) {
+    self.title = title
+    self.subtitle = subtitle
+    self.isSelected = isSelected
+    self.rightAccessoryView = rightAccessoryView()
+  }
   
   var body: some View {
-    HStack {
+    HStack(spacing: 0.0) {
       Image(braveSystemName: "leo.check.normal")
         .foregroundStyle(Color(braveSystemName: .textInteractive))
         .padding(.leading, 16.0)
         .padding(.trailing, 8.0)
+        .hidden(isHidden: !isSelected)
       
       VStack {
         Text(title)
@@ -53,9 +62,7 @@ private struct AIChatMenuItemView: View {
           .frame(maxWidth: .infinity, alignment: .leading)
       }
       
-      if let rightAccessoryView {
-        rightAccessoryView
-      }
+      rightAccessoryView
     }
     .padding(.vertical)
   }
@@ -65,6 +72,9 @@ struct AIChatMenuView: View {
   let currentModel: AiChat.Model
   let modelOptions: [AiChat.Model]
   let onModelChanged: (String) -> Void
+  
+  @Environment(\.presentationMode)
+  private var presentationMode
   
   var body: some View {
     LazyVStack(spacing: 0.0) {
@@ -85,69 +95,78 @@ struct AIChatMenuView: View {
       Color(braveSystemName: .dividerSubtle)
         .frame(height: 1.0)
       
-      AIChatMenuItemView(title: "Mixtral 8x7b", subtitle: "Powerful, fast, adaptive", rightAccessoryView: nil)
+      ForEach(Array(modelOptions.enumerated()), id: \.offset) { index, model in
+        Button(action: {
+          onModelChanged(model.key)
+          presentationMode.wrappedValue.dismiss()
+        }, label: {
+          AIChatMenuItemView(title: model.displayName, subtitle: model.displayMaker, isSelected: model.key == currentModel.key) {
+            Image(braveSystemName: "leo.lock.plain")
+              .foregroundStyle(Color(braveSystemName: .iconDefault))
+              .padding(.leading, 16.0)
+              .padding(.trailing, 8.0)
+              .hidden(isHidden: !model.isPremium)
+          }
+        })
+        
+        if index != modelOptions.count - 1 {
+            Color(braveSystemName: .dividerSubtle)
+            .frame(height: 1.0)
+        }
+      }
       
       Color(braveSystemName: .dividerSubtle)
-        .frame(height: 1.0)
+      .frame(height: 8.0)
       
-      AIChatMenuItemView(title: "Claude Instant", subtitle: "Strength in creative tasks", rightAccessoryView: nil)
-      
-      Color(braveSystemName: .dividerSubtle)
-        .frame(height: 1.0)
-      
-      AIChatMenuItemView(title: "Llama-2-13-b", subtitle: "General purpose chat", rightAccessoryView: nil)
-      
-      Color(braveSystemName: .dividerSubtle)
-        .frame(height: 1.0)
-      
-      AIChatMenuItemView(title: "Llama-2-70-b", subtitle: "Advanced and accurate chat", rightAccessoryView: nil)
-      
-      Color(braveSystemName: .dividerSubtle)
-        .frame(height: 1.0)
-      
-      AIChatMenuHeaderView(icon: "leo.code", title: "CODING")
-      
-      Color(braveSystemName: .dividerSubtle)
-        .frame(height: 1.0)
-      
-      AIChatMenuItemView(title: "Code Llama-13b", subtitle: "Code generation and discussion", rightAccessoryView: nil)
-      
-      Color(braveSystemName: .dividerSubtle)
-        .frame(height: 1.0)
-      
-      AIChatMenuItemView(title: "Code Llama-70b", subtitle: "Advanced code assistance", rightAccessoryView: nil)
-      
-      Color(braveSystemName: .dividerSubtle)
-        .frame(height: 7.0)
-      
-      HStack {
+      Button {
+        
+      } label: {
         Text("New Chat")
           .font(.body)
           .foregroundStyle(Color(braveSystemName: .textPrimary))
           .frame(maxWidth: .infinity, alignment: .leading)
           .padding()
+        
+        Image(braveSystemName: "leo.erase")
+          .foregroundStyle(Color(braveSystemName: .iconDefault))
+          .padding(.leading, 16.0)
+          .padding(.trailing, 8.0)
       }
       
       Color(braveSystemName: .dividerSubtle)
         .frame(height: 1.0)
       
-      HStack {
+      Button {
+        
+      } label: {
         Text("Go Premium")
           .font(.body)
           .foregroundStyle(Color(braveSystemName: .textPrimary))
           .frame(maxWidth: .infinity, alignment: .leading)
           .padding()
+        
+        Image(braveSystemName: "leo.lock.open")
+          .foregroundStyle(Color(braveSystemName: .iconDefault))
+          .padding(.leading, 16.0)
+          .padding(.trailing, 8.0)
       }
       
       Color(braveSystemName: .dividerSubtle)
         .frame(height: 1.0)
       
-      HStack {
+      Button {
+        
+      } label: {
         Text("Advanced Settings")
           .font(.body)
           .foregroundStyle(Color(braveSystemName: .textPrimary))
           .frame(maxWidth: .infinity, alignment: .leading)
           .padding()
+        
+        Image(braveSystemName: "leo.settings")
+          .foregroundStyle(Color(braveSystemName: .iconDefault))
+          .padding(.leading, 16.0)
+          .padding(.trailing, 8.0)
       }
     }
   }

@@ -119,7 +119,9 @@ class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   // MARK: - API
   
   func changeModel(modelKey: String) {
-    api.changeModel(modelKey)
+    Task { @MainActor in
+      api.changeModel(modelKey)
+    }
   }
   
   func clearConversationHistory() {
