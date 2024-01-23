@@ -21,13 +21,18 @@ struct AIChatPaywallView: View {
             isPaywallPresented: true)
             .padding(16)
           PremiumUpsellDetailView(isPaywallPresented: true)
-            .padding(8)
+            .padding([.top, .leading, .trailing], 8)
+            .padding(.bottom, 12)
+          tierSelection
+            .padding([.bottom, .leading, .trailing], 8)
+            .padding(.top, 12)
         }
         .navigationTitle("Leo Premium")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
           ToolbarItemGroup(placement: .confirmationAction) {
             Button("Restore") {
+              // TODO: In-app purchase restore
             }
             .foregroundColor(.white)
           }
@@ -59,9 +64,47 @@ struct AIChatPaywallView: View {
     }
   }
   
-  
-  
-  
-  
-  
+  private var tierSelection: some View {
+    Button(action: {
+
+    }) {
+      HStack {
+        VStack(alignment: .leading, spacing: 8) {
+          Text("One Year")
+            .font(.title2.weight(.semibold))
+            .foregroundColor(Color(.white))
+          
+          Text("SAVE UP TO 25%")
+            .font(.caption2.weight(.semibold))
+            .foregroundColor(Color(braveSystemName: .green50))
+            .padding(4)
+            .background(Color(braveSystemName: .green20))
+            .clipShape(RoundedRectangle(cornerRadius: 4.0, style: .continuous))
+        }
+        Spacer()
+
+        HStack(alignment: .center, spacing: 2) {
+          Text("US$")
+            .font(.subheadline)
+            .foregroundColor(Color(braveSystemName: .primitivePrimary30))
+          
+          Text("150")
+            .font(.title)
+            .foregroundColor(.white)
+          
+          Text(" / year")
+            .font(.subheadline)
+            .foregroundColor(Color(braveSystemName: .primitivePrimary30))
+        }
+      }
+    }
+    .frame(maxWidth: .infinity)
+    .padding()
+    .background(Color(braveSystemName: .primitivePrimary60))
+    .overlay(
+      RoundedRectangle(cornerRadius: 8.0, style: .continuous)
+        .strokeBorder(Color(braveSystemName: .primitivePrimary50), lineWidth: 2.0)
+    )
+    .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
+  }
 }

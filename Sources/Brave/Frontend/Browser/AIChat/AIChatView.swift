@@ -66,7 +66,7 @@ class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
         return webView.title
       }
     }
-    return "Brave Leo"
+    return "Leo"
   }
   
   func getLastCommittedURL() -> URL? {

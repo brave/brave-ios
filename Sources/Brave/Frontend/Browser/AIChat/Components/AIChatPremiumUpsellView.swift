@@ -191,7 +191,10 @@ struct PremiumUpsellDetailView: View {
     .frame(maxWidth: .infinity, alignment: .leading)
     .overlay(
       RoundedRectangle(cornerRadius: 8.0, style: .continuous)
-        .strokeBorder(Color(braveSystemName: .dividerSubtle), lineWidth: 1.0)
+        .strokeBorder(isPaywallPresented
+                        ? Color(braveSystemName: .primitivePrimary70)
+                        : Color(braveSystemName: .dividerSubtle), 
+                      lineWidth: 1.0)
     )
     .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
   }
