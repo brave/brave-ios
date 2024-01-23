@@ -41,7 +41,7 @@
 - Fixed toolbar being displayed in landscape mode when changing orientation. ([#8421](https://github.com/brave/brave-ios/issues/8421))
 - Fixed external links not working on New Tab Page. ([#8383](https://github.com/brave/brave-ios/issues/8383))
 - Fixed content blocking to be removed after disabling Ad-blocking. ([#8369](https://github.com/brave/brave-ios/issues/8369))
-- Fixed issue with pages being rendering poorly on https://youtube.com. ([#8364](https://github.com/brave/brave-ios/issues/8364))
+- Fixed issue with pages being rendered poorly on https://youtube.com. ([#8364](https://github.com/brave/brave-ios/issues/8364))
 - Fixed tabs being cleared after relaunching browser. ([#8362](https://github.com/brave/brave-ios/issues/8362))
 - Fixed VPN status to be updated in the menu without having to open the settings page. ([#8317](https://github.com/brave/brave-ios/issues/8317))
 - Fixed "Edit Favorite" appearing as "Edit Bookmark" via context menu when using long press action on Favorites. ([#8286](https://github.com/brave/brave-ios/issues/8286))
