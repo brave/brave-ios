@@ -54,7 +54,7 @@ class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
     api.setConversationActive(true)
     api.isAgreementAccepted = true
     
-    Task {
+    Task { @MainActor in
       self.premiumStatus = await getPremiumStatus()
     }
   }
@@ -86,10 +86,6 @@ class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
       
       completion(articleText, false)
     }
-  }
-  
-  func hasPrimaryMainFrame() -> Bool {
-    return true
   }
   
   func isDocumentOnLoadCompletedInPrimaryFrame() -> Bool {
