@@ -1221,7 +1221,7 @@ extension Strings {
   public static let bookmarksMenuItem = NSLocalizedString("BookmarksMenuItem", tableName: "BraveShared", bundle: .module, value: "Bookmarks", comment: "Title for bookmarks menu item")
   public static let historyMenuItem = NSLocalizedString("HistortMenuItem", tableName: "BraveShared", bundle: .module, value: "History", comment: "Title for history menu item")
   public static let settingsMenuItem = NSLocalizedString("SettingsMenuItem", tableName: "BraveShared", bundle: .module, value: "Settings", comment: "Title for settings menu item")
-  public static let leoMenuItem = NSLocalizedString("LeoMenuItem", tableName: "BraveShared", bundle: .module, value: "Brave Leo", comment: "Title for Brave Leo menu item")
+  public static let leoMenuItem = NSLocalizedString("LeoMenuItem", tableName: "BraveShared", bundle: .module, value: "Leo", comment: "Title for Brave Leo menu item")
   public static let passwordsMenuItem = NSLocalizedString("PasswordsMenuItem", tableName: "BraveShared", bundle: .module, value: "Passwords", comment: "Title for passwords menu item")
   public static let addToMenuItem = NSLocalizedString("AddToMenuItem", tableName: "BraveShared", bundle: .module, value: "Add Bookmark", comment: "Title for the button to add a new website bookmark.")
   public static let openTabsMenuItem = NSLocalizedString("OpenTabsMenuItem", tableName: "BraveShared", bundle: .module, value: "Open Tabs", comment: "Title for open tabs menu item")
