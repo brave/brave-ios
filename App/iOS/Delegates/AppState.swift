@@ -184,6 +184,9 @@ public class AppState {
     
     switches.append(.init(key: .init(rawValue: "force-fieldtrials"), value: "*BraveDebounceStudy/Enabled/"))
     switches.append(.init(key: .init(rawValue: "enable-features"), value: "BraveDebounce<BraveDebounceStudy"))
+    switches.append(.init(key: .init(rawValue: "--env-leo"), value: "staging"))
+    switches.append(.init(key: .init(rawValue: "--env-ai-chat.bsg"), value: "dev"))
+    switches.append(.init(key: .init(rawValue: "--env-ai-chat-premium.bsg"), value: "dev"))
                           
     // Initialize BraveCore
     return BraveCoreMain(userAgent: UserAgent.mobile, additionalSwitches: switches)
