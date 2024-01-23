@@ -55,6 +55,7 @@ class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
     api.isAgreementAccepted = true
     
     Task { @MainActor in
+      api.generateQuestions()
       self.premiumStatus = await getPremiumStatus()
     }
   }
@@ -109,7 +110,7 @@ class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   }
   
   func onModelChanged(_ modelKey: String) {
-    
+    currentModel = models.first(where: { $0.key == modelKey })
   }
   
   func onPageHasContent(_ siteInfo: AiChat.SiteInfo) {
