@@ -3,12 +3,10 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import Foundation
-import UIKit
 import SwiftUI
 import BraveUI
-import Strings
 import DesignSystem
+import Then
 
 struct AIChatPaywallView: View {
 
@@ -18,9 +16,11 @@ struct AIChatPaywallView: View {
     NavigationView {
       ScrollView {
         VStack(spacing: 0) {
-          PremiumUpsellTitleView(upsellType: .premium)
-            .padding(24)
-          PremiumUpsellDetailView()
+          PremiumUpsellTitleView(
+            upsellType: .premium,
+            isPaywallPresented: true)
+            .padding(16)
+          PremiumUpsellDetailView(isPaywallPresented: true)
             .padding(8)
         }
         .navigationTitle("Leo Premium")
@@ -40,21 +40,28 @@ struct AIChatPaywallView: View {
           }
         }
       }
-      .background(Color(red: 22 / 255, green: 16 / 255, blue: 101 / 255))
+      .background(
+        Color(braveSystemName: .primitivePrimary90).edgesIgnoringSafeArea(.all)
+          .overlay(Image("leo-product", bundle: .module),
+                   alignment: .topTrailing))
       .introspectViewController(customize: { vc in
         vc.navigationItem.do {
-          let appearance: UINavigationBarAppearance = {
-            let appearance = UINavigationBarAppearance()
-            appearance.configureWithDefaultBackground()
-            appearance.backgroundColor = #colorLiteral(red: 0.0862745098, green: 0.06274509804, blue: 0.3960784314, alpha: 1)
-            appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
-            appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
-            return appearance
-          }()
+          let appearance = UINavigationBarAppearance().then {
+            $0.configureWithDefaultBackground()
+            $0.backgroundColor = UIColor(braveSystemName: .primitivePrimary90)
+            $0.titleTextAttributes = [.foregroundColor: UIColor.white]
+            $0.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+          }
           $0.standardAppearance = appearance
           $0.scrollEdgeAppearance = appearance
         }
       })
     }
   }
+  
+  
+  
+  
+  
+  
 }
