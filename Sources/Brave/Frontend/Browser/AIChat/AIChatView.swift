@@ -31,7 +31,7 @@ class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   }
   
   var shouldShowPremiumPrompt: Bool {
-    return true // premiumStatus == .inactive && api.canShowPremiumPrompt
+    return premiumStatus == .inactive && api.canShowPremiumPrompt
   }
   
   var hasValidWebPage: Bool {
@@ -232,11 +232,13 @@ struct AIChatView: View {
           ScrollView {
             VStack(spacing: 0.0) {
               if model.shouldShowPremiumPrompt {
-                AIChatPremiumUpsellView(upsellType: model.apiError == .rateLimitReached ? .rateLimit : .premium, 
+                AIChatPremiumUpsellView(
+                  upsellType: model.apiError == .rateLimitReached ? .rateLimit : .premium,
                   upgradeAction: {
-                    
-                  }, dismissAction: {
-                    
+                    // TODO: Upgrade Action
+                  },
+                  dismissAction: {
+                    // TODO: Dismiss Action
                   }
                 )
                   .padding(8)

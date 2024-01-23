@@ -51,9 +51,12 @@ struct AIChatPremiumUpsellView: View {
 
   var body: some View {
     VStack(spacing: 0) {
-      PremiumUpsellTitleView(upsellType: upsellType)
+      PremiumUpsellTitleView(
+        upsellType: upsellType,
+        isPaywallPresented: false)
         .padding(24)
-      PremiumUpsellDetailView()
+      PremiumUpsellDetailView(
+        isPaywallPresented: false)
         .padding(8)
       PremiumUpsellActionView(
         upsellType: upsellType,
@@ -110,6 +113,12 @@ struct PremiumUpsellTitleView: View {
   
   let upsellType: AIChatPremiumUpsellView.UpsellType
   
+  let isPaywallPresented: Bool
+  
+  var foregroundTextColor: Color {
+    isPaywallPresented ? Color.white : Color(braveSystemName: .textPrimary)
+  }
+  
   var body: some View {
     switch upsellType {
     case .premium:
@@ -119,7 +128,7 @@ struct PremiumUpsellTitleView: View {
         .truncationMode(.tail)
         .frame(maxWidth: .infinity, alignment: .center)
         .fixedSize(horizontal: false, vertical: true)
-        .foregroundStyle(Color(braveSystemName: .textPrimary))
+        .foregroundStyle(foregroundTextColor)
     case .rateLimit:
       VStack(alignment: .leading, spacing: 8) {
         Text(upsellType.title)
@@ -128,13 +137,13 @@ struct PremiumUpsellTitleView: View {
           .truncationMode(.tail)
           .frame(maxWidth: .infinity, alignment: .leading)
           .fixedSize(horizontal: false, vertical: true)
-          .foregroundStyle(Color(braveSystemName: .textPrimary))
+          .foregroundStyle(foregroundTextColor)
         if let subtitle = upsellType.subtitle {
           Text(subtitle)
             .font(.footnote)
             .frame(maxWidth: .infinity, alignment: .leading)
             .fixedSize(horizontal: false, vertical: true)
-            .foregroundStyle(Color(braveSystemName: .textPrimary))
+            .foregroundStyle(foregroundTextColor)
         }
       }
     }
@@ -143,30 +152,40 @@ struct PremiumUpsellTitleView: View {
 
 struct PremiumUpsellDetailView: View {
   
+  let isPaywallPresented: Bool
+  
   var body: some View {
     VStack(spacing: 0) {
-      PremiumUpsellTopicView(topicType: .modelType)
+      PremiumUpsellTopicView(
+        topicType: .modelType,
+        isPaywallPresented: isPaywallPresented)
           .padding()
       
       Divider()
         .overlay(Color(braveSystemName: .dividerSubtle))
         .frame(height: 1.0)
       
-      PremiumUpsellTopicView(topicType: .creativity)
+      PremiumUpsellTopicView(
+        topicType: .creativity,
+        isPaywallPresented: isPaywallPresented)
           .padding()
       
       Divider()
         .overlay(Color(braveSystemName: .dividerSubtle))
         .frame(height: 1.0)
       
-      PremiumUpsellTopicView(topicType: .accuracy)
+      PremiumUpsellTopicView(
+        topicType: .accuracy,
+        isPaywallPresented: isPaywallPresented)
           .padding()
       
       Divider()
         .overlay(Color(braveSystemName: .dividerSubtle))
         .frame(height: 1.0)
       
-      PremiumUpsellTopicView(topicType: .chatLength)
+      PremiumUpsellTopicView(
+        topicType: .chatLength,
+        isPaywallPresented: isPaywallPresented)
           .padding()
     }
     .frame(maxWidth: .infinity, alignment: .leading)
@@ -225,6 +244,8 @@ private struct PremiumUpsellTopicView: View {
   
   let topicType: UpsellTopicType
   
+  let isPaywallPresented: Bool
+
   var body: some View {
     HStack {
       Image(braveSystemName: topicType.icon)
@@ -235,12 +256,16 @@ private struct PremiumUpsellTopicView: View {
       
       VStack(alignment: .leading, spacing: 5) {
         Text(topicType.title)
-          .font(.subheadline.weight(.semibold) )
+          .font(isPaywallPresented
+                ? .headline
+                : .subheadline.weight(.semibold))
           .lineLimit(2)
           .truncationMode(.tail)
           .frame(maxWidth: .infinity, alignment: .leading)
           .fixedSize(horizontal: false, vertical: true)
-          .foregroundStyle(Color(braveSystemName: .textPrimary))
+          .foregroundStyle(isPaywallPresented
+                           ? Color.white
+                           : Color(braveSystemName: .textPrimary))
         
         Text(topicType.subTitle)
           .font(.footnote)
@@ -248,7 +273,9 @@ private struct PremiumUpsellTopicView: View {
           .truncationMode(.tail)
           .frame(maxWidth: .infinity, alignment: .leading)
           .fixedSize(horizontal: false, vertical: true)
-          .foregroundStyle(Color(braveSystemName: .textSecondary))
+          .foregroundStyle(isPaywallPresented
+                           ? Color(braveSystemName: .primary20 )
+                           : Color(braveSystemName: .textSecondary))
       }
     }
   }
