@@ -63,6 +63,8 @@ private struct AIChatMenuItemView<RightAccessoryView: View>: View {
       }
       
       rightAccessoryView
+        .padding(.horizontal, 16.0)
+        .padding(.vertical, 8.0)
     }
     .padding(.vertical)
   }
@@ -106,11 +108,24 @@ struct AIChatMenuView: View {
           presentationMode.wrappedValue.dismiss()
         }, label: {
           AIChatMenuItemView(title: model.displayName, subtitle: model.displayMaker, isSelected: model.key == currentModel.key) {
-            Image(braveSystemName: "leo.lock.plain")
-              .foregroundStyle(Color(braveSystemName: .iconDefault))
-              .padding(.leading, 16.0)
-              .padding(.trailing, 8.0)
-              .hidden(isHidden: !model.isPremium)
+            if model.access == .basicAndPremium {
+              Text("LIMITED")
+                .font(.caption2)
+                .foregroundStyle(Color(braveSystemName: .blue50))
+                .padding(.horizontal, 4.0)
+                .padding(.vertical, 2.0)
+                .background(
+                  RoundedRectangle(cornerRadius: 4.0, style: .continuous)
+                    .strokeBorder(Color(braveSystemName: .blue50), lineWidth: 1.0)
+                )
+            } else if model.access == .premium {
+              Image(braveSystemName: "leo.lock.plain")
+                .foregroundStyle(Color(braveSystemName: .iconDefault))
+            } else {
+              Image(braveSystemName: "leo.lock.plain")
+                .foregroundStyle(Color(braveSystemName: .iconDefault))
+                .hidden(isHidden: true)
+            }
           }
         })
         
@@ -135,8 +150,8 @@ struct AIChatMenuView: View {
         
         Image(braveSystemName: "leo.erase")
           .foregroundStyle(Color(braveSystemName: .iconDefault))
-          .padding(.leading, 16.0)
-          .padding(.trailing, 8.0)
+          .padding(.horizontal, 16.0)
+          .padding(.vertical, 8.0)
       }
       
       Color(braveSystemName: .dividerSubtle)
@@ -154,8 +169,8 @@ struct AIChatMenuView: View {
         
         Image(braveSystemName: "leo.lock.open")
           .foregroundStyle(Color(braveSystemName: .iconDefault))
-          .padding(.leading, 16.0)
-          .padding(.trailing, 8.0)
+          .padding(.horizontal, 16.0)
+          .padding(.vertical, 8.0)
       }
       
       Color(braveSystemName: .dividerSubtle)
@@ -173,8 +188,8 @@ struct AIChatMenuView: View {
         
         Image(braveSystemName: "leo.settings")
           .foregroundStyle(Color(braveSystemName: .iconDefault))
-          .padding(.leading, 16.0)
-          .padding(.trailing, 8.0)
+          .padding(.horizontal, 16.0)
+          .padding(.vertical, 8.0)
       }
     }
   }
@@ -182,35 +197,27 @@ struct AIChatMenuView: View {
 
 #Preview {
   AIChatMenuView(currentModel:
-      .init(key: "mixtral_8x7b", name: "Mixtral 8x7b", displayName: "Mixtral 8x7b",
-            displayMaker: "", engineType: .llamaRemote,
-            category: .chat, isPremium: false,
+      .init(key: "mixtral_8x7b", name: "Mixtral-8x7b", displayName: "Mixtral 8x7b",
+            displayMaker: "Powerful, fast and adaptive", engineType: .llamaRemote,
+            category: .chat, access: .basicAndPremium,
             maxPageContentLength: 9000, longConversationWarningCharacterLimit: 20000),
                  modelOptions: [
-                  .init(key: "mx_8x7b", name: "Mixtral 8x7b", displayName: "Mixtral 8x7b",
-                        displayMaker: "", engineType: .llamaRemote,
-                        category: .chat, isPremium: false,
+                  .init(key: "mixtral_8x7b", name: "Mixtral-8x7b", displayName: "Mixtral 8x7b",
+                        displayMaker: "Powerful, fast and adaptive", engineType: .llamaRemote,
+                        category: .chat, access: .basicAndPremium,
                         maxPageContentLength: 9000, longConversationWarningCharacterLimit: 20000),
-                  .init(key: "mixtral_8x7b", name: "Mixtral 8x7b", displayName: "Mixtral 8x7b",
-                        displayMaker: "", engineType: .llamaRemote,
-                        category: .chat, isPremium: false,
+                  .init(key: "claude_instant", name: "Claude-Instant", displayName: "Claude Instant",
+                        displayMaker: "Strength in creative tasks", engineType: .llamaRemote,
+                        category: .chat, access: .basicAndPremium,
                         maxPageContentLength: 9000, longConversationWarningCharacterLimit: 20000),
-                  .init(key: "mixtral_8x7b", name: "Mixtral 8x7b", displayName: "Mixtral 8x7b",
-                        displayMaker: "", engineType: .llamaRemote,
-                        category: .chat, isPremium: false,
+                  .init(key: "llaba_2x13b", name: "Llama-2x13b", displayName: "Llama2 13b",
+                        displayMaker: "General purpose chat", engineType: .llamaRemote,
+                        category: .chat, access: .basic,
                         maxPageContentLength: 9000, longConversationWarningCharacterLimit: 20000),
-                  .init(key: "mixtral_8x7b", name: "Mixtral 8x7b", displayName: "Mixtral 8x7b",
-                        displayMaker: "", engineType: .llamaRemote,
-                        category: .chat, isPremium: false,
+                  .init(key: "llaba_2x70b", name: "Llama-2x70b", displayName: "Llama2 70b",
+                        displayMaker: "Advanced and accurate chat", engineType: .llamaRemote,
+                        category: .chat, access: .premium,
                         maxPageContentLength: 9000, longConversationWarningCharacterLimit: 20000),
-                  .init(key: "mixtral_8x7b", name: "Mixtral 8x7b", displayName: "Mixtral 8x7b",
-                        displayMaker: "", engineType: .llamaRemote,
-                        category: .chat, isPremium: false,
-                        maxPageContentLength: 9000, longConversationWarningCharacterLimit: 20000),
-                  .init(key: "mixtral_8x7b", name: "Mixtral 8x7b", displayName: "Mixtral 8x7b",
-                        displayMaker: "", engineType: .llamaRemote,
-                        category: .chat, isPremium: false,
-                        maxPageContentLength: 9000, longConversationWarningCharacterLimit: 20000)
                  ],
                  onModelChanged: {
     print("Model Changed To: \($0)")
