@@ -1,5 +1,35 @@
 # Changelog
 
+## [1.61](https://github.com/brave/brave-ios/releases/tag/v1.61)
+
+### Web3
+
+- Implemented new UI for the “Transaction Details” page. ([#8379](https://github.com/brave/brave-ios/issues/8379))
+- Implemented new UI for the “Activity” Tab in Brave Wallet. ([#8349](https://github.com/brave/brave-ios/issues/8349))
+- Updated UI and functionality for the NFT details page. ([#8064](https://github.com/brave/brave-ios/issues/8064))
+- Updated UI and functionality for “NFT” Tab under “Portfolio.” ([#8063](https://github.com/brave/brave-ios/issues/8063))
+- Updated SNS interstitial page copy for new provider. ([#8515](https://github.com/brave/brave-ios/issues/8515))
+- Fixed pop-ups to be dismissed when Brave Wallet is auto-locked. ([#8412](https://github.com/brave/brave-ios/issues/8412))
+
+### General 
+
+- Added share icon to the URL bar. ([#8173](https://github.com/brave/brave-ios/issues/8173))
+- Added separator between inactive tabs. ([#8361](https://github.com/brave/brave-ios/issues/8361))
+- Added  “Redeem Code” button for custom offer codes in the VPN subscription page. ([#8365](https://github.com/brave/brave-ios/issues/8353))
+- Added support for handling promotional in-app purchases. ([#8001](https://github.com/brave/brave-ios/issues/8001))
+- Added “Open Browser History” and “Open Tabs From Other Devices” options in “Siri Shortcuts” settings page. ([#8333](https://github.com/brave/brave-ios/issues/8333))
+- Added ability to suppress “Allow link to switch apps?” pop-ups as reported on HackerOne by amit5533. ([#7835](https://github.com/brave/brave-ios/issues/7835))
+- Added new keyboard shortcuts for tab navigation and page zoom on iPad. ([#7592](https://github.com/brave/brave-ios/issues/7592))
+- Fixed color scheme for Brave icons when using Dark Mode for lock screen and news widgets. ([#8502](https://github.com/brave/brave-ios/issues/8502))
+- Fixed links being clickable when using Slide-Over Mode on iPad. ([#8489](https://github.com/brave/brave-ios/issues/8489))
+- Fixed orientation lock for Brave sync screens. ([#6275](https://github.com/brave/brave-ios/issues/6275))
+- Fixed adding correct video to Playlist on https://twitter.com/. ([#8479](https://github.com/brave/brave-ios/issues/8479))
+- Fixed main menu items to all have the same font color. ([#8396](https://github.com/brave/brave-ios/issues/8396))
+- Fixed page to close automatically after downloading ".mobileconfig" files. ([#8393](https://github.com/brave/brave-ios/issues/8393))
+- Fixed camera view from rotating 90 degrees when scanning QR code in landscape orientation. ([#8227](https://github.com/brave/brave-ios/issues/8227))
+- Fixed bookmark count to include bookmarks in subfolders and enabled all URLs in subfolders to be opened as well when using “Open All” action. ([#8169](https://github.com/brave/brave-ios/issues/8169))
+- Fixed inverted colors being shown on Brave Search with Night Mode enabled. ([#7877](https://github.com/brave/brave-ios/issues/7877))
+
  ## [1.60.1](https://github.com/brave/brave-ios/releases/tag/v1.60.1)
 
 - Disabled Screen Time support temporarily to mitigate performance issues. ([#8566](https://github.com/brave/brave-ios/issues/8566))
