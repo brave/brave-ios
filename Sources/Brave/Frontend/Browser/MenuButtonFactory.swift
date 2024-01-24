@@ -76,6 +76,8 @@ class MenuItemFactory {
         return Strings.OptionsMenu.braveTalkItemDescription
       case let .wallet(subtitle):
         return subtitle
+      case .leo:
+        return "Leo is an AI-powered smart assistant, built right into the browser"
       default:
         return nil
       }

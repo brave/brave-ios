@@ -14,53 +14,59 @@ struct AIChatPaywallView: View {
 
   var body: some View {
     NavigationView {
-      ScrollView {
-        VStack(spacing: 0) {
-          PremiumUpsellTitleView(
-            upsellType: .premium,
-            isPaywallPresented: true)
+      VStack(spacing: 0) {
+        ScrollView {
+          VStack(spacing: 0) {
+            PremiumUpsellTitleView(
+              upsellType: .premium,
+              isPaywallPresented: true)
             .padding(16)
-          PremiumUpsellDetailView(isPaywallPresented: true)
-            .padding([.top, .leading, .trailing], 8)
-            .padding(.bottom, 12)
-          tierSelection
-            .padding([.bottom, .leading, .trailing], 8)
-            .padding(.top, 12)
-        }
-        .navigationTitle("Leo Premium")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-          ToolbarItemGroup(placement: .confirmationAction) {
-            Button("Restore") {
-              // TODO: In-app purchase restore
-            }
-            .foregroundColor(.white)
+            PremiumUpsellDetailView(isPaywallPresented: true)
+              .padding([.top, .leading, .trailing], 8)
+              .padding(.bottom, 12)
+            tierSelection
+              .padding([.bottom, .leading, .trailing], 8)
+              .padding(.top, 12)
           }
-          
-          ToolbarItemGroup(placement: .cancellationAction) {
-            Button("Close") {
-              presentationMode.dismiss()
+          .navigationTitle("Leo Premium")
+          .navigationBarTitleDisplayMode(.inline)
+          .toolbar {
+            ToolbarItemGroup(placement: .confirmationAction) {
+              Button("Restore") {
+                // TODO: In-app purchase restore
+              }
+              .foregroundColor(.white)
             }
-            .foregroundColor(.white)
+            
+            ToolbarItemGroup(placement: .cancellationAction) {
+              Button("Close") {
+                presentationMode.dismiss()
+              }
+              .foregroundColor(.white)
+            }
           }
         }
+        .introspectViewController(customize: { vc in
+          vc.navigationItem.do {
+            let appearance = UINavigationBarAppearance().then {
+              $0.configureWithDefaultBackground()
+              $0.backgroundColor = UIColor(braveSystemName: .primitivePrimary90)
+              $0.titleTextAttributes = [.foregroundColor: UIColor.white]
+              $0.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+            }
+            $0.standardAppearance = appearance
+            $0.scrollEdgeAppearance = appearance
+          }
+        })
+        
+        paywallActionView
+          .padding(.top, 8)
+          .padding([.trailing, .bottom, .leading], 16)
       }
       .background(
         Color(braveSystemName: .primitivePrimary90).edgesIgnoringSafeArea(.all)
           .overlay(Image("leo-product", bundle: .module),
                    alignment: .topTrailing))
-      .introspectViewController(customize: { vc in
-        vc.navigationItem.do {
-          let appearance = UINavigationBarAppearance().then {
-            $0.configureWithDefaultBackground()
-            $0.backgroundColor = UIColor(braveSystemName: .primitivePrimary90)
-            $0.titleTextAttributes = [.foregroundColor: UIColor.white]
-            $0.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
-          }
-          $0.standardAppearance = appearance
-          $0.scrollEdgeAppearance = appearance
-        }
-      })
     }
   }
   
@@ -146,6 +152,27 @@ struct AIChatPaywallView: View {
         .foregroundStyle(Color(braveSystemName: .primary20))
         .padding([.leading, .trailing], 16)
         .padding([.top, .bottom], 12)
+    }
+  }
+  
+  private var paywallActionView: some View {
+    VStack(spacing: 0) {
+      Rectangle()
+        .frame(height: 2)
+        .foregroundColor(Color(braveSystemName: .primitivePrimary70))
+        .padding(.bottom, 16)
+      
+      Button(action: {
+        
+      }) {
+        Text("Upgrade Now")
+          .font(.body.weight(.semibold))
+          .foregroundColor(Color(.white))
+      }
+      .frame(maxWidth: .infinity)
+      .padding()
+      .background(Color(braveSystemName: .legacyInteractive1))
+      .clipShape(RoundedRectangle(cornerRadius: 16.0, style: .continuous))
     }
   }
 }
