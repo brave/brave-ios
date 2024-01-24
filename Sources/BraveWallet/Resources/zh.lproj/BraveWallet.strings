@@ -770,7 +770,7 @@
 "wallet.helpCenter" = "帮助中心";
 
 /* A button title which when pressed hides the details screen. */
-"wallet.hideDetailsButtonTitle" = "隱藏詳細資料";
+"wallet.hideDetailsButtonTitle" = "隐藏详细资料";
 
 /* A button title that will redact a private key on the screen */
 "wallet.hidePrivateKeyButtonTitle" = "隐藏隐私密钥";
@@ -1073,7 +1073,7 @@
 "wallet.nftUnspam" = "标记为非垃圾邮件";
 
 /* The empty state description displayed when the user has no accounts associated with a transaction or asset */
-"wallet.noAccountDescription" = "有餘額的帳戶將顯示於此。";
+"wallet.noAccountDescription" = "有余额的账户将显示于此。";
 
 /* The empty state displayed when the user has no accounts associated with a transaction or asset */
 "wallet.noAccounts" = "无账户";
