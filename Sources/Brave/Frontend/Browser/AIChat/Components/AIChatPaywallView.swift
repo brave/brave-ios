@@ -65,46 +65,87 @@ struct AIChatPaywallView: View {
   }
   
   private var tierSelection: some View {
-    Button(action: {
-
-    }) {
-      HStack {
-        VStack(alignment: .leading, spacing: 8) {
-          Text("One Year")
-            .font(.title2.weight(.semibold))
-            .foregroundColor(Color(.white))
+    VStack {
+      Button(action: {
+        
+      }) {
+        HStack {
+          VStack(alignment: .leading, spacing: 8) {
+            Text("One Year")
+              .font(.title2.weight(.semibold))
+              .foregroundColor(Color(.white))
+            
+            Text("SAVE UP TO 25%")
+              .font(.caption2.weight(.semibold))
+              .foregroundColor(Color(braveSystemName: .green50))
+              .padding(4)
+              .background(Color(braveSystemName: .green20))
+              .clipShape(RoundedRectangle(cornerRadius: 4.0, style: .continuous))
+          }
+          Spacer()
           
-          Text("SAVE UP TO 25%")
-            .font(.caption2.weight(.semibold))
-            .foregroundColor(Color(braveSystemName: .green50))
-            .padding(4)
-            .background(Color(braveSystemName: .green20))
-            .clipShape(RoundedRectangle(cornerRadius: 4.0, style: .continuous))
-        }
-        Spacer()
-
-        HStack(alignment: .center, spacing: 2) {
-          Text("US$")
-            .font(.subheadline)
-            .foregroundColor(Color(braveSystemName: .primitivePrimary30))
-          
-          Text("150")
-            .font(.title)
-            .foregroundColor(.white)
-          
-          Text(" / year")
-            .font(.subheadline)
-            .foregroundColor(Color(braveSystemName: .primitivePrimary30))
+          HStack(alignment: .center, spacing: 2) {
+            Text("US$")
+              .font(.subheadline)
+              .foregroundColor(Color(braveSystemName: .primitivePrimary30))
+            
+            Text("150")
+              .font(.title)
+              .foregroundColor(.white)
+            
+            Text(" / year")
+              .font(.subheadline)
+              .foregroundColor(Color(braveSystemName: .primitivePrimary30))
+          }
         }
       }
+      .frame(maxWidth: .infinity)
+      .padding()
+      .background(Color(braveSystemName: .primitivePrimary60))
+      .overlay(
+        RoundedRectangle(cornerRadius: 8.0, style: .continuous)
+          .strokeBorder(Color(braveSystemName: .primitivePrimary50), lineWidth: 2.0)
+      )
+      .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
+      
+      Button(action: {
+        
+      }) {
+        HStack {
+          Text("Monthly")
+            .font(.title2.weight(.semibold))
+            .foregroundColor(Color(.white))
+            
+          Spacer()
+          
+          HStack(alignment: .center, spacing: 2) {
+            Text("US$")
+              .font(.subheadline)
+              .foregroundColor(Color(braveSystemName: .primitivePrimary30))
+            
+            Text("15")
+              .font(.title)
+              .foregroundColor(.white)
+            
+            Text(" / month")
+              .font(.subheadline)
+              .foregroundColor(Color(braveSystemName: .primitivePrimary30))
+          }
+        }
+      }
+      .frame(maxWidth: .infinity)
+      .padding()
+      .background(Color(braveSystemName: .primitivePrimary80))
+      .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
+      
+      Text("All subscriptions are auto-renewed but can be cancelled at any time before renewal.")
+        .multilineTextAlignment(.center)
+        .font(.footnote)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .fixedSize(horizontal: false, vertical: true)
+        .foregroundStyle(Color(braveSystemName: .primary20))
+        .padding([.leading, .trailing], 16)
+        .padding([.top, .bottom], 12)
     }
-    .frame(maxWidth: .infinity)
-    .padding()
-    .background(Color(braveSystemName: .primitivePrimary60))
-    .overlay(
-      RoundedRectangle(cornerRadius: 8.0, style: .continuous)
-        .strokeBorder(Color(braveSystemName: .primitivePrimary50), lineWidth: 2.0)
-    )
-    .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
   }
 }
