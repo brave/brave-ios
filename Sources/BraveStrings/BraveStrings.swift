@@ -794,7 +794,8 @@ extension Strings {
   public static let tabsOptionBottomBar = NSLocalizedString("SettingsTabsOptionBottomBar", tableName: "BraveShared", bundle: .module, value: "Bottom Bar", comment: "An option for the URL bar position. (Top Bar and Bottom Bar). Refers to the location of the url bar")
   public static let otherSettingsSection = NSLocalizedString("OtherSettingsSection", tableName: "BraveShared", bundle: .module, value: "Other Settings", comment: "Section name for other settings.")
   public static let otherPrivacySettingsSection = NSLocalizedString("OtherPrivacySettingsSection", tableName: "BraveShared", bundle: .module, value: "Other Privacy Settings", comment: "Section name for other privacy settings")
-  public static let braveRewardsTitle = NSLocalizedString("BraveRewardsTitle", tableName: "BraveShared", bundle: .module, value: "Brave Rewards", comment: "Brave Rewards settings title")
+  public static let braveRewardsTitle = NSLocalizedString("BraveRewardsTitle", tableName: "BraveShared", bundle: .module, value: "Brave Rewards", comment: "Brave Rewards title")
+  public static let braveRewardsSettingsTitle = NSLocalizedString("BraveRewardsSettingsTitle", tableName: "BraveShared", bundle: .module, value: "Rewards", comment: "Brave Rewards title in settings")
   public static let hideRewardsIcon = NSLocalizedString("HideRewardsIcon", tableName: "BraveShared", bundle: .module, value: "Hide Brave Rewards Icon", comment: "Hides the rewards icon")
   public static let hideRewardsIconSubtitle = NSLocalizedString("HideRewardsIconSubtitle", tableName: "BraveShared", bundle: .module, value: "Hides the Brave Rewards icon when Brave Rewards is not enabled", comment: "Hide the rewards icon explination.")
   public static let walletCreationDate = NSLocalizedString("WalletCreationDate", tableName: "BraveShared", bundle: .module, value: "Wallet Creation Date", comment: "The date your wallet was created")
@@ -1122,6 +1123,7 @@ extension Strings {
   public static let features = NSLocalizedString("Features", tableName: "BraveShared", bundle: .module, value: "Features", comment: "")
 
   public static let braveShieldsAndPrivacy = NSLocalizedString("BraveShieldsAndPrivacy", tableName: "BraveShared", bundle: .module, value: "Brave Shields & Privacy", comment: "")
+  public static let braveShieldsAndPrivacySettingsTitle = NSLocalizedString("BraveShieldsAndPrivacyTitle", tableName: "BraveShared", bundle: .module, value: "Shields & Privacy", comment: "")
   public static let bookmarksImportAction = NSLocalizedString("bookmarksImportAction", tableName: "BraveShared", bundle: .module, value: "Import Bookmarks", comment: "Action to import bookmarks from a file.")
   public static let bookmarksExportAction = NSLocalizedString("bookmarksExportAction", tableName: "BraveShared", bundle: .module, value: "Export Bookmarks", comment: "Action to export bookmarks to another device.")
 }
@@ -3877,6 +3879,10 @@ extension Strings {
     public static let braveNews = NSLocalizedString("today.braveToday", tableName: "BraveShared", bundle: .module,
       value: "Brave News",
       comment: "The name of the feature"
+    )
+    public static let braveNewsTitle = NSLocalizedString("today.braveToday.title", tableName: "BraveShared", bundle: .module,
+      value: "News",
+      comment: "The name of the feature in settings"
     )
     public static let sourcesAndSettings = NSLocalizedString("today.sourcesAndSettings", tableName: "BraveShared", bundle: .module,
       value: "Sources & Settings",

@@ -14,19 +14,18 @@ struct AIChatPaywallView: View {
 
   var body: some View {
     NavigationView {
-      VStack(spacing: 0) {
+      VStack(spacing: 8) {
         ScrollView {
           VStack(spacing: 0) {
             PremiumUpsellTitleView(
               upsellType: .premium,
               isPaywallPresented: true)
-            .padding(16)
+              .padding(16)
             PremiumUpsellDetailView(isPaywallPresented: true)
-              .padding([.top, .leading, .trailing], 8)
-              .padding(.bottom, 12)
+              .padding([.top, .horizontal], 8)
+              .padding(.bottom, 24)
             tierSelection
-              .padding([.bottom, .leading, .trailing], 8)
-              .padding(.top, 12)
+              .padding([.bottom, .horizontal], 8)
           }
           .navigationTitle("Leo Premium")
           .navigationBarTitleDisplayMode(.inline)
@@ -60,8 +59,7 @@ struct AIChatPaywallView: View {
         })
         
         paywallActionView
-          .padding(.top, 8)
-          .padding([.trailing, .bottom, .leading], 16)
+          .padding(.bottom, 16)
       }
       .background(
         Color(braveSystemName: .primitivePrimary90).edgesIgnoringSafeArea(.all)
@@ -150,29 +148,31 @@ struct AIChatPaywallView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .fixedSize(horizontal: false, vertical: true)
         .foregroundStyle(Color(braveSystemName: .primary20))
-        .padding([.leading, .trailing], 16)
-        .padding([.top, .bottom], 12)
+        .padding([.horizontal], 16)
+        .padding([.vertical], 12)
     }
   }
   
   private var paywallActionView: some View {
-    VStack(spacing: 0) {
+    VStack(spacing: 16) {
       Rectangle()
-        .frame(height: 2)
+        .frame(height: 1)
         .foregroundColor(Color(braveSystemName: .primitivePrimary70))
-        .padding(.bottom, 16)
       
-      Button(action: {
-        
-      }) {
-        Text("Upgrade Now")
-          .font(.body.weight(.semibold))
-          .foregroundColor(Color(.white))
+      VStack {
+        Button(action: {
+          
+        }) {
+          Text("Upgrade Now")
+            .font(.body.weight(.semibold))
+            .foregroundColor(Color(.white))
+        }
+        .frame(maxWidth: .infinity)
+        .padding()
+        .background(Color(braveSystemName: .legacyInteractive1))
+        .clipShape(RoundedRectangle(cornerRadius: 16.0, style: .continuous))
       }
-      .frame(maxWidth: .infinity)
-      .padding()
-      .background(Color(braveSystemName: .legacyInteractive1))
-      .clipShape(RoundedRectangle(cornerRadius: 16.0, style: .continuous))
+      .padding([.horizontal], 16)
     }
   }
 }

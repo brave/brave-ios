@@ -240,7 +240,7 @@ class SettingsViewController: TableViewController {
       header: .title(Strings.features),
       rows: [
         Row(
-          text: Strings.braveShieldsAndPrivacy,
+          text: Strings.braveShieldsAndPrivacySettingsTitle,
           selection: { [unowned self] in
             let controller = UIHostingController(rootView: AdvancedShieldsSettingsView(
               profile: self.profile,
@@ -289,7 +289,7 @@ class SettingsViewController: TableViewController {
     if BraveRewards.isAvailable, let rewards = rewards {
       section.rows += [
         Row(
-          text: Strings.braveRewardsTitle,
+          text: Strings.braveRewardsSettingsTitle,
           selection: { [unowned self] in
             let rewardsVC = BraveRewardsSettingsViewController(rewards)
             rewardsVC.walletTransferLearnMoreTapped = { [weak self] in
@@ -307,7 +307,7 @@ class SettingsViewController: TableViewController {
 
     section.rows.append(
       Row(
-        text: Strings.BraveNews.braveNews,
+        text: Strings.BraveNews.braveNewsTitle,
         selection: { [unowned self] in
           let controller = NewsSettingsViewController(dataSource: self.feedDataSource, openURL: { [weak self] url in
             guard let self else { return }
@@ -324,6 +324,17 @@ class SettingsViewController: TableViewController {
         }, image: UIImage(braveSystemNamed: "leo.product.brave-news"), accessory: .disclosureIndicator)
     )
 
+    section.rows.append(
+      Row(
+        text: "Leo",
+        selection: { [unowned self] in
+          let controller = UIHostingController(rootView: AIChatAdvancedSettingsView(isModallyPresented: false))
+          self.navigationController?.pushViewController(controller, animated: true)
+        },
+        image: UIImage(braveSystemNamed: "leo.product.brave-leo"),
+        accessory: .disclosureIndicator)
+    )
+    
     vpnRow = vpnSettingsRow()
     if let vpnRow = vpnRow {
       section.rows.append(vpnRow)

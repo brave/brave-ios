@@ -327,7 +327,7 @@ struct AIChatView: View {
       AIChatPaywallView()
     })
     .popover(isPresented: $isAdvancedSettingsPresented, content: {
-      AIChatAdvancedSettingsView()
+      AIChatAdvancedSettingsView(isModallyPresented: true)
     })
   }
   
