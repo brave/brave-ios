@@ -15,7 +15,7 @@ struct AIChatAdvancedSettingsView: View {
     if isModallyPresented {
       NavigationView {
         settingsView
-        .navigationTitle("Settings")
+        .navigationTitle("Leo")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
           ToolbarItemGroup(placement: .cancellationAction) {

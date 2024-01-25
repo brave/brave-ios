@@ -9,8 +9,15 @@ import DesignSystem
 import Then
 
 struct AIChatPaywallView: View {
-
+  enum TierType {
+    case yearly, montly
+  }
+  
   @Environment(\.presentationMode) @Binding private var presentationMode
+  @State private var selectedTierType: TierType = .yearly
+  
+  var restoreAction: (() -> Void)
+  var upgradeAction: ((TierType) -> Void)
 
   var body: some View {
     NavigationView {
@@ -32,7 +39,7 @@ struct AIChatPaywallView: View {
           .toolbar {
             ToolbarItemGroup(placement: .confirmationAction) {
               Button("Restore") {
-                // TODO: In-app purchase restore
+                restoreAction()
               }
               .foregroundColor(.white)
             }
@@ -71,7 +78,7 @@ struct AIChatPaywallView: View {
   private var tierSelection: some View {
     VStack {
       Button(action: {
-        
+        selectedTierType = .yearly
       }) {
         HStack {
           VStack(alignment: .leading, spacing: 8) {
@@ -105,15 +112,16 @@ struct AIChatPaywallView: View {
       }
       .frame(maxWidth: .infinity)
       .padding()
-      .background(Color(braveSystemName: .primitivePrimary60))
+      .background(Color(braveSystemName: selectedTierType == .yearly ? .primitivePrimary60 : .primitivePrimary80))
       .overlay(
         RoundedRectangle(cornerRadius: 8.0, style: .continuous)
-          .strokeBorder(Color(braveSystemName: .primitivePrimary50), lineWidth: 2.0)
+          .strokeBorder(Color(braveSystemName: .primitivePrimary50), 
+                        lineWidth: selectedTierType == .yearly ? 2 : 0)
       )
       .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
       
       Button(action: {
-        
+        selectedTierType = .montly
       }) {
         HStack {
           Text("Monthly")
@@ -139,7 +147,12 @@ struct AIChatPaywallView: View {
       }
       .frame(maxWidth: .infinity)
       .padding()
-      .background(Color(braveSystemName: .primitivePrimary80))
+      .background(Color(braveSystemName: selectedTierType == .montly ? .primitivePrimary60 : .primitivePrimary80))
+      .overlay(
+        RoundedRectangle(cornerRadius: 8.0, style: .continuous)
+          .strokeBorder(Color(braveSystemName: .primitivePrimary50),
+                        lineWidth: selectedTierType == .montly ? 2 : 0)
+      )
       .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
       
       Text("All subscriptions are auto-renewed but can be cancelled at any time before renewal.")
@@ -161,7 +174,7 @@ struct AIChatPaywallView: View {
       
       VStack {
         Button(action: {
-          
+          upgradeAction(selectedTierType)
         }) {
           Text("Upgrade Now")
             .font(.body.weight(.semibold))
