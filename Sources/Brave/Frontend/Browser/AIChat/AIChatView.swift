@@ -274,9 +274,10 @@ struct AIChatView: View {
                   // TODO: If the user is already premium, are they also rate-limited?
                   AIChatPremiumUpsellView(upsellType: .rateLimit,
                     upgradeAction: {
-                      
-                    }, dismissAction: {
-                      
+                    // TODO: Upgrade Action
+                    },
+                    dismissAction: {
+                    // TODO: Dismiss Action
                     }
                   )
                     .padding(8)
@@ -324,7 +325,13 @@ struct AIChatView: View {
     }
     .background(Color(braveSystemName: .containerBackground))
     .popover(isPresented: $isPremiumPaywallPresented, content: {
-      AIChatPaywallView()
+      AIChatPaywallView(
+        restoreAction: {
+          // TODO: Restore Action
+        },
+        upgradeAction: { tierType in
+          // TODO: Upgrade Action
+        })
     })
     .popover(isPresented: $isAdvancedSettingsPresented, content: {
       AIChatAdvancedSettingsView(isModallyPresented: true)
@@ -369,7 +376,6 @@ struct AIChatView: View {
       print("Erased Chat History")
     }, menuContent: {
       EmptyView()
-      //AIChatMenuView()
     })
     
     Divider()
