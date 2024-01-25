@@ -45,7 +45,7 @@ struct AIChatAdvancedSettingsView: View {
         )
         
         NavigationLink {
-
+          // TODO: Add default model selection
         } label: {
           LabelView(
             title: "Default model for new conversations",
@@ -55,6 +55,19 @@ struct AIChatAdvancedSettingsView: View {
       } header: {
         Text("Leo is an AI-powered smart assistant. built right into the browser")
           .textCase(nil)
+      }
+      
+      Section {
+        Button(action: {
+          // TODO: Add Link subscription process
+        }) {
+          LabelView(
+            title: "Link purchase to your Brave account",
+            subtitle: "Link your Appstore purchase to your Brave account to use Leo on other devices."
+          )
+        }
+      } header: {
+        Text("SUBSCRIPTION")
       }
     }
     .listBackgroundColor(Color(UIColor.braveGroupedBackground))
