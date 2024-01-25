@@ -6,23 +6,24 @@
 import SwiftUI
 import DesignSystem
 
-struct ShieldToggleView: View {
-  typealias OnChangeCallback = (Bool) -> Void
+public struct ToggleView: View {
+  public typealias OnChangeCallback = (Bool) -> Void
+  
   let title: String
   var subtitle: String?
   @Binding var toggle: Bool
   let onChange: OnChangeCallback?
   
-  init(title: String, subtitle: String?, toggle: Binding<Bool>, onChange: OnChangeCallback? = nil) {
+  public init(title: String, subtitle: String?, toggle: Binding<Bool>, onChange: OnChangeCallback? = nil) {
     self.title = title
     self.subtitle = subtitle
     _toggle = toggle
     self.onChange = onChange
   }
   
-  var body: some View {
+  public var body: some View {
     Toggle(isOn: $toggle) {
-      ShieldLabelView(title: title, subtitle: subtitle)
+      LabelView(title: title, subtitle: subtitle)
     }
     .listRowBackground(Color(.secondaryBraveGroupedBackground))
       .toggleStyle(SwitchToggleStyle(tint: .accentColor))

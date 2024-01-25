@@ -6,22 +6,24 @@
 import SwiftUI
 import Preferences
 
-struct OptionToggleView: View {
+public struct OptionToggleView: View {
   let title: String
   var subtitle: String?
   @ObservedObject var option: Preferences.Option<Bool>
-  let onChange: ShieldToggleView.OnChangeCallback?
+  let onChange: ToggleView.OnChangeCallback?
   
-  init(title: String, subtitle: String?,
-       option: Preferences.Option<Bool>, onChange: ShieldToggleView.OnChangeCallback? = nil) {
+ public init(title: String, 
+             subtitle: String?,
+             option: Preferences.Option<Bool>, 
+             onChange: ToggleView.OnChangeCallback? = nil) {
     self.title = title
     self.subtitle = subtitle
     self.option = option
     self.onChange = onChange
   }
   
-  var body: some View {
-    ShieldToggleView(
+  public var body: some View {
+    ToggleView(
       title: title,
       subtitle: subtitle,
       toggle: $option.value,
