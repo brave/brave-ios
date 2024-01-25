@@ -5,11 +5,16 @@
 
 import SwiftUI
 
-struct ShieldLabelView: View {
+public struct LabelView: View {
   let title: String
   var subtitle: String?
   
-  var body: some View {
+  public init(title: String, subtitle: String?) {
+    self.title = title
+    self.subtitle = subtitle
+  }
+  
+  public var body: some View {
     VStack(alignment: .leading, spacing: 4) {
       Text(title)
         .foregroundColor(Color(.bravePrimary))

@@ -3,7 +3,11 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 
 import SwiftUI
+import BraveUI
+import BraveCore
+import Strings
 import DesignSystem
+import Preferences
 
 struct AIChatAdvancedSettingsView: View {
 
@@ -32,10 +36,28 @@ struct AIChatAdvancedSettingsView: View {
   }
   
   private var settingsView: some View {
-    VStack {
-      Text("Advanced Settings")
-        .tint(Color(braveSystemName: .textInteractive))
-        .font(.subheadline)
+    List {
+      Section {
+        OptionToggleView(
+          title: "Show autocomplete suggestions in address bar",
+          subtitle: nil,
+          option: Preferences.LeoAI.autocompleteSuggestionsEnabled
+        )
+        
+        NavigationLink {
+
+        } label: {
+          LabelView(
+            title: "Default model for new conversations",
+            subtitle: "Chat (Llama-2-13b)"
+          )
+        }.listRowBackground(Color(.secondaryBraveGroupedBackground))
+      } header: {
+        Text("Leo is an AI-powered smart assistant. built right into the browser")
+          .textCase(nil)
+      }
     }
+    .listBackgroundColor(Color(UIColor.braveGroupedBackground))
+    .listStyle(.insetGrouped)
   }
 }

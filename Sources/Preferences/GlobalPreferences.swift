@@ -17,6 +17,7 @@ extension Preferences {
     public static let phishingCount = Option<Int>(key: "stats.phishing", default: 0)
     public static let fingerprintingCount = Option<Int>(key: "stats.fingerprinting", default: 0)
   }
+  
   public final class BlockFileVersion {
     public static let adblock = Option<String?>(key: "blockfile.adblock", default: nil)
     public static let httpse = Option<String?>(key: "blockfile.httpse", default: nil)
@@ -160,5 +161,9 @@ extension Preferences {
     public static let syncOpenTabsEnabled = Option<Bool>(key: "chromium.sync.openTabsEnabled", default: false)
     /// Node Id for last bookmark folder
     public static let lastBookmarksFolderNodeId = Option<Int?>(key: "chromium.last.bookmark.folder.node.id", default: nil)
+  }
+  
+  public final class LeoAI {
+    public static let autocompleteSuggestionsEnabled = Option<Bool>(key: "leo.ai.autoCompleteSuggestionsEnabled", default: true)
   }
 }
