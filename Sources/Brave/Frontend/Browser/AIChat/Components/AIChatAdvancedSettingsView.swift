@@ -13,7 +13,7 @@ struct AIChatAdvancedSettingsView: View {
 
   @Environment(\.presentationMode) @Binding private var presentationMode
   
-  @ObservedObject var subscriptionManager = AIChatSubscriptionManager.shared
+  @ObservedObject var subscriptionManager = LeoSubscriptionManager.shared
 
   var isModallyPresented: Bool
 

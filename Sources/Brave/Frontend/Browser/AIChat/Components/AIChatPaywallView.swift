@@ -15,6 +15,7 @@ struct AIChatPaywallView: View {
   
   @Environment(\.presentationMode) @Binding private var presentationMode
   @State private var selectedTierType: TierType = .yearly
+  @State private var productInfo = LeoProductInfo.shared
   
   var restoreAction: (() -> Void)?
   var upgradeAction: ((TierType) -> Void)?
@@ -95,18 +96,23 @@ struct AIChatPaywallView: View {
           }
           Spacer()
           
-          HStack(alignment: .center, spacing: 2) {
-            Text("US$")
-              .font(.subheadline)
-              .foregroundColor(Color(braveSystemName: .primitivePrimary30))
+          if let yearlyProduct = productInfo.yearlySubProduct {
+            HStack(alignment: .center, spacing: 2) {
+              Text("US$")
+                .font(.subheadline)
+                .foregroundColor(Color(braveSystemName: .primitivePrimary30))
+              
+              Text(yearlyProduct.price.frontSymbolCurrencyFormatted(with: yearlyProduct.priceLocale) ?? "$0")
+                .font(.title)
+                .foregroundColor(.white)
             
-            Text("150")
-              .font(.title)
-              .foregroundColor(.white)
-            
-            Text(" / year")
-              .font(.subheadline)
-              .foregroundColor(Color(braveSystemName: .primitivePrimary30))
+              Text(" / year")
+                .font(.subheadline)
+                .foregroundColor(Color(braveSystemName: .primitivePrimary30))
+            }
+          } else {
+            ProgressView()
+              .tint(Color.white)
           }
         }
       }
@@ -130,18 +136,23 @@ struct AIChatPaywallView: View {
             
           Spacer()
           
-          HStack(alignment: .center, spacing: 2) {
-            Text("US$")
-              .font(.subheadline)
-              .foregroundColor(Color(braveSystemName: .primitivePrimary30))
-            
-            Text("15")
-              .font(.title)
-              .foregroundColor(.white)
-            
-            Text(" / month")
-              .font(.subheadline)
-              .foregroundColor(Color(braveSystemName: .primitivePrimary30))
+          if let monthlyProduct = productInfo.monthlySubProduct {
+            HStack(alignment: .center, spacing: 2) {
+              Text("US$")
+                .font(.subheadline)
+                .foregroundColor(Color(braveSystemName: .primitivePrimary30))
+              
+              Text(monthlyProduct.price.frontSymbolCurrencyFormatted(with: monthlyProduct.priceLocale) ?? "$0")
+                .font(.title)
+                .foregroundColor(.white)
+              
+              Text(" / month")
+                .font(.subheadline)
+                .foregroundColor(Color(braveSystemName: .primitivePrimary30))
+            }
+          } else {
+            ProgressView()
+              .tint(Color.white)
           }
         }
       }
@@ -176,14 +187,20 @@ struct AIChatPaywallView: View {
         Button(action: {
           upgradeAction?(selectedTierType)
         }) {
-          Text("Upgrade Now")
-            .font(.body.weight(.semibold))
-            .foregroundColor(Color(.white))
+          if LeoProductInfo.shared.isComplete {
+            Text("Upgrade Now")
+              .font(.body.weight(.semibold))
+              .foregroundColor(Color(.white))
+          } else {
+            ProgressView()
+              .tint(Color.white)
+          }
         }
         .frame(maxWidth: .infinity)
         .padding()
         .background(Color(braveSystemName: .legacyInteractive1))
         .clipShape(RoundedRectangle(cornerRadius: 16.0, style: .continuous))
+        .disabled(!LeoProductInfo.shared.isComplete)
       }
       .padding([.horizontal], 16)
     }
