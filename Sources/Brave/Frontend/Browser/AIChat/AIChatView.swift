@@ -334,7 +334,7 @@ struct AIChatView: View {
         })
     })
     .popover(isPresented: $isAdvancedSettingsPresented, content: {
-      AIChatAdvancedSettingsView(isModallyPresented: true)
+      AIChatAdvancedSettingsView(isModallyPresented: true, aiModel: model)
     })
   }
   

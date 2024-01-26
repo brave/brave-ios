@@ -18,6 +18,8 @@ struct AIChatAdvancedSettingsView: View {
   var isModallyPresented: Bool
 
   var openURL: ((URL) -> Void)?
+  
+  @StateObject var aiModel: AIChatViewModel
 
   var body: some View {
     if isModallyPresented {
@@ -52,7 +54,7 @@ struct AIChatAdvancedSettingsView: View {
         } label: {
           LabelView(
             title: "Default model for new conversations",
-            subtitle: "Chat (Llama-2-13b)"
+            subtitle: aiModel.currentModel.name
           )
         }.listRowBackground(Color(.secondaryBraveGroupedBackground))
       } header: {
