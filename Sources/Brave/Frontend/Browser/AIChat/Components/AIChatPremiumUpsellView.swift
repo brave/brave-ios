@@ -221,7 +221,7 @@ private struct PremiumUpsellTopicView: View {
     var title: String {
       switch self {
       case .modelType:
-        return "Explore different models"
+        return "Explore different AI models"
       case .creativity:
         return "Unlock your creativity"
       case .accuracy:
@@ -234,7 +234,7 @@ private struct PremiumUpsellTopicView: View {
     var subTitle: String {
       switch self {
       case .modelType:
-        return "Priority Access to Claude, Llama-2-70b + more coming soon"
+        return "Priority access to powerful models with different skills"
       case .creativity:
         return "Access models better suited for creative tasks and content generation."
       case .accuracy:
