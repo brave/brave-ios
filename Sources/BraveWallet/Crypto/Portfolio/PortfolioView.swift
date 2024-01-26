@@ -29,6 +29,8 @@ struct PortfolioView: View {
   
   @State private var isPresentingEditUserAssets: Bool = false
   @State private var isPresentingAssetsFilters: Bool = false
+  @State private var isPresentingAddCustomNFT: Bool = false
+  @State private var isPresentingNFTsFilters: Bool = false
   
   var body: some View {
     ScrollView {
@@ -83,6 +85,40 @@ struct PortfolioView: View {
           }
         })
       })
+    .background(Color.clear
+      .sheet(isPresented: $isPresentingAddCustomNFT) {
+        AddCustomAssetView(
+          networkStore: networkStore,
+          networkSelectionStore: networkStore.openNetworkSelectionStore(mode: .formSelection),
+          keyringStore: keyringStore,
+          userAssetStore: cryptoStore.nftStore.userAssetsStore,
+          supportedTokenTypes: [.nft]
+        ) {
+          cryptoStore.updateAssets()
+        }
+      })
+    .background(Color.clear
+      .sheet(isPresented: $isPresentingNFTsFilters) {
+        FiltersDisplaySettingsView(
+          filters: cryptoStore.nftStore.filters,
+          isNFTFilters: true,
+          networkStore: networkStore,
+          save: { filters in
+            cryptoStore.nftStore.saveFilters(filters)
+          }
+        )
+        .osAvailabilityModifiers({ view in
+          if #available(iOS 16, *) {
+            view
+              .presentationDetents([
+                .fraction(0.6),
+                .large
+              ])
+          } else {
+            view
+          }
+        })
+      })
   }
   
   private var contentDrawer: some View {
@@ -108,7 +144,9 @@ struct PortfolioView: View {
             cryptoStore: cryptoStore,
             keyringStore: keyringStore,
             networkStore: cryptoStore.networkStore,
-            nftStore: cryptoStore.nftStore
+            nftStore: cryptoStore.nftStore,
+            isPresentingFilters: $isPresentingNFTsFilters,
+            isPresentingAddCustomNFT: $isPresentingAddCustomNFT
           )
           .padding(.horizontal, 8)
         }
