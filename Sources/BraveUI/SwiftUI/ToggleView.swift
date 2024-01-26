@@ -14,7 +14,10 @@ public struct ToggleView: View {
   @Binding var toggle: Bool
   let onChange: OnChangeCallback?
   
-  public init(title: String, subtitle: String?, toggle: Binding<Bool>, onChange: OnChangeCallback? = nil) {
+  public init(title: String,
+              subtitle: String? = nil,
+              toggle: Binding<Bool>,
+              onChange: OnChangeCallback? = nil) {
     self.title = title
     self.subtitle = subtitle
     _toggle = toggle
