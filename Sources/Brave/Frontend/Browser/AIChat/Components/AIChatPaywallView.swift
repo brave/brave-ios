@@ -16,8 +16,8 @@ struct AIChatPaywallView: View {
   @Environment(\.presentationMode) @Binding private var presentationMode
   @State private var selectedTierType: TierType = .yearly
   
-  var restoreAction: (() -> Void)
-  var upgradeAction: ((TierType) -> Void)
+  var restoreAction: (() -> Void)?
+  var upgradeAction: ((TierType) -> Void)?
 
   var body: some View {
     NavigationView {
@@ -39,7 +39,7 @@ struct AIChatPaywallView: View {
           .toolbar {
             ToolbarItemGroup(placement: .confirmationAction) {
               Button("Restore") {
-                restoreAction()
+                restoreAction?()
               }
               .foregroundColor(.white)
             }
@@ -174,7 +174,7 @@ struct AIChatPaywallView: View {
       
       VStack {
         Button(action: {
-          upgradeAction(selectedTierType)
+          upgradeAction?(selectedTierType)
         }) {
           Text("Upgrade Now")
             .font(.body.weight(.semibold))

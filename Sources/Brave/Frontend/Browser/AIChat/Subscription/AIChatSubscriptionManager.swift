@@ -43,6 +43,11 @@ class AIChatSubscriptionManager: ObservableObject {
   
   static var shared = AIChatSubscriptionManager()
   
+  
+  var isSandbox: Bool {
+    Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"
+  }
+  
   // TODO: Static Type and expiration for test development
   
   @Published var state: SubscriptionState = .purchased
