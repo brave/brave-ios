@@ -17,6 +17,8 @@ struct AIChatAdvancedSettingsView: View {
 
   var isModallyPresented: Bool
 
+  var openURL: ((URL) -> Void)?
+
   var body: some View {
     if isModallyPresented {
       NavigationView {
@@ -62,45 +64,75 @@ struct AIChatAdvancedSettingsView: View {
         if subscriptionManager.state == .purchased {
           LabelDetailView(title: "Status",
                           detail: subscriptionManager.activeType.title)
-          LabelDetailView(title: "Expired", detail: "11/31/23")
+          LabelDetailView(title: "Expires", detail: "11/31/23")
           
           Button(action: {
-            // TODO: Add Link subscription process
+            openURL?(.brave.braveLeoLinkReceiptProd)
           }) {
             LabelView(
               title: "Link purchase to your Brave account",
               subtitle: "Link your Appstore purchase to your Brave account to use Leo on other devices."
             )
           }
-        }
-        
-        Button(action: {
-          switch subscriptionManager.state {
-          case .purchased:
-            print("Manage Subscription Action")
-          case .notPurchased, .expired:
-            print("Show Premium Buyout")
+          
+          if subscriptionManager.isSandbox {
+            Button(action: {
+              openURL?(.brave.braveLeoLinkReceiptStaging)
+            }) {
+              LabelView(
+                title: "[Staging] Link receipt"
+              )
+            }
+            
+            Button(action: {
+              openURL?(.brave.braveLeoLinkReceiptDev)
+            }) {
+              LabelView(
+                title: "[Dev] Link receipt"
+              )
+            }
           }
-        }) {
-          HStack {
-            LabelView(title: subscriptionManager.state.actionTitle)
-            Spacer()
-            Image(braveSystemName: "leo.launch")
-              .foregroundStyle(Color(braveSystemName: .iconDefault))
+          
+          Button(action: {
+            guard let url = URL.apple.manageSubscriptions else { return }
+            if UIApplication.shared.canOpenURL(url) {
+              // Opens Apple's 'manage subscription' screen
+              UIApplication.shared.open(url, options: [:])
+            }
+          }) {
+            premiumActionView
+          }
+        } else {
+          NavigationLink(destination: AIChatPaywallView()) {
+            premiumActionView
           }
         }
+
+      } header: {
+        Text("SUBSCRIPTION")
+      }
+      
+      Section {
         Button(action: {
+          // TODO: Add Clear Leo Data Functionality
         }) {
           Text("Reset And Clear Leo Data")
             .foregroundColor(Color(.braveBlurpleTint))
         }
         .frame(maxWidth: .infinity)
         .listRowBackground(Color(.secondaryBraveGroupedBackground))
-      } header: {
-        Text("SUBSCRIPTION")
       }
     }
     .listBackgroundColor(Color(UIColor.braveGroupedBackground))
     .listStyle(.insetGrouped)
+  }
+
+  var premiumActionView: some View {
+    HStack {
+      LabelView(title: subscriptionManager.state.actionTitle)
+      Spacer()
+      Image(braveSystemName: "leo.launch")
+        .foregroundStyle(Color(braveSystemName: .iconDefault))
+    }
   }
 }
