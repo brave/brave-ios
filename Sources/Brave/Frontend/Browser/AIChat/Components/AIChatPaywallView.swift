@@ -10,16 +10,19 @@ import Then
 
 struct AIChatPaywallView: View {
   enum TierType {
-    case yearly, montly
+    case yearly, monthly
   }
   
   @Environment(\.presentationMode) @Binding private var presentationMode
-  @State private var selectedTierType: TierType = .yearly
+  
+  @State private var selectedTierType: TierType = .monthly
+  @State private var availableTierTypes: [TierType] = [.monthly]
+
   @State private var productInfo = LeoProductInfo.shared
   
   var restoreAction: (() -> Void)?
   var upgradeAction: ((TierType) -> Void)?
-
+  
   var body: some View {
     NavigationView {
       VStack(spacing: 8) {
@@ -78,93 +81,97 @@ struct AIChatPaywallView: View {
   
   private var tierSelection: some View {
     VStack {
-      Button(action: {
-        selectedTierType = .yearly
-      }) {
-        HStack {
-          VStack(alignment: .leading, spacing: 8) {
-            Text("One Year")
+      if availableTierTypes.contains(.yearly) {
+        Button(action: {
+          selectedTierType = .yearly
+        }) {
+          HStack {
+            VStack(alignment: .leading, spacing: 8) {
+              Text("One Year")
+                .font(.title2.weight(.semibold))
+                .foregroundColor(Color(.white))
+              
+              Text("SAVE UP TO 25%")
+                .font(.caption2.weight(.semibold))
+                .foregroundColor(Color(braveSystemName: .green50))
+                .padding(4)
+                .background(Color(braveSystemName: .green20))
+                .clipShape(RoundedRectangle(cornerRadius: 4.0, style: .continuous))
+            }
+            Spacer()
+            
+            if let yearlyProduct = productInfo.yearlySubProduct {
+              HStack(alignment: .center, spacing: 2) {
+                Text("\(yearlyProduct.priceLocale.currencyCode ?? "")\(yearlyProduct.priceLocale.currencySymbol ?? "")")
+                  .font(.subheadline)
+                  .foregroundColor(Color(braveSystemName: .primitivePrimary30))
+                
+                Text(yearlyProduct.price.frontSymbolCurrencyFormatted(with: yearlyProduct.priceLocale) ?? "$0")
+                  .font(.title)
+                  .foregroundColor(.white)
+                
+                Text(" / year")
+                  .font(.subheadline)
+                  .foregroundColor(Color(braveSystemName: .primitivePrimary30))
+              }
+            } else {
+              ProgressView()
+                .tint(Color.white)
+            }
+          }
+        }
+        .frame(maxWidth: .infinity)
+        .padding()
+        .background(Color(braveSystemName: selectedTierType == .yearly ? .primitivePrimary60 : .primitivePrimary80))
+        .overlay(
+          RoundedRectangle(cornerRadius: 8.0, style: .continuous)
+            .strokeBorder(Color(braveSystemName: .primitivePrimary50),
+                          lineWidth: selectedTierType == .yearly ? 2 : 0)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
+      }
+      
+      if availableTierTypes.contains(.monthly) {
+        Button(action: {
+          selectedTierType = .monthly
+        }) {
+          HStack {
+            Text("Monthly")
               .font(.title2.weight(.semibold))
               .foregroundColor(Color(.white))
             
-            Text("SAVE UP TO 25%")
-              .font(.caption2.weight(.semibold))
-              .foregroundColor(Color(braveSystemName: .green50))
-              .padding(4)
-              .background(Color(braveSystemName: .green20))
-              .clipShape(RoundedRectangle(cornerRadius: 4.0, style: .continuous))
-          }
-          Spacer()
-          
-          if let yearlyProduct = productInfo.yearlySubProduct {
-            HStack(alignment: .center, spacing: 2) {
-              Text("\(yearlyProduct.priceLocale.currencyCode ?? "")\(yearlyProduct.priceLocale.currencySymbol ?? "")")
-                .font(.subheadline)
-                .foregroundColor(Color(braveSystemName: .primitivePrimary30))
-              
-              Text(yearlyProduct.price.frontSymbolCurrencyFormatted(with: yearlyProduct.priceLocale) ?? "$0")
-                .font(.title)
-                .foregroundColor(.white)
+            Spacer()
             
-              Text(" / year")
-                .font(.subheadline)
-                .foregroundColor(Color(braveSystemName: .primitivePrimary30))
+            if let monthlyProduct = productInfo.monthlySubProduct {
+              HStack(alignment: .center, spacing: 2) {
+                Text("\(monthlyProduct.priceLocale.currencyCode ?? "")\(monthlyProduct.priceLocale.currencySymbol ?? "")")
+                  .font(.subheadline)
+                  .foregroundColor(Color(braveSystemName: .primitivePrimary30))
+                
+                Text(monthlyProduct.price.frontSymbolCurrencyFormatted(with: monthlyProduct.priceLocale) ?? "$0")
+                  .font(.title)
+                  .foregroundColor(.white)
+                
+                Text(" / month")
+                  .font(.subheadline)
+                  .foregroundColor(Color(braveSystemName: .primitivePrimary30))
+              }
+            } else {
+              ProgressView()
+                .tint(Color.white)
             }
-          } else {
-            ProgressView()
-              .tint(Color.white)
           }
         }
+        .frame(maxWidth: .infinity)
+        .padding()
+        .background(Color(braveSystemName: selectedTierType == .monthly ? .primitivePrimary60 : .primitivePrimary80))
+        .overlay(
+          RoundedRectangle(cornerRadius: 8.0, style: .continuous)
+            .strokeBorder(Color(braveSystemName: .primitivePrimary50),
+                          lineWidth: selectedTierType == .monthly ? 2 : 0)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
       }
-      .frame(maxWidth: .infinity)
-      .padding()
-      .background(Color(braveSystemName: selectedTierType == .yearly ? .primitivePrimary60 : .primitivePrimary80))
-      .overlay(
-        RoundedRectangle(cornerRadius: 8.0, style: .continuous)
-          .strokeBorder(Color(braveSystemName: .primitivePrimary50), 
-                        lineWidth: selectedTierType == .yearly ? 2 : 0)
-      )
-      .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
-      
-      Button(action: {
-        selectedTierType = .montly
-      }) {
-        HStack {
-          Text("Monthly")
-            .font(.title2.weight(.semibold))
-            .foregroundColor(Color(.white))
-            
-          Spacer()
-          
-          if let monthlyProduct = productInfo.monthlySubProduct {
-            HStack(alignment: .center, spacing: 2) {
-              Text("\(monthlyProduct.priceLocale.currencyCode ?? "")\(monthlyProduct.priceLocale.currencySymbol ?? "")")
-                .font(.subheadline)
-                .foregroundColor(Color(braveSystemName: .primitivePrimary30))
-              
-              Text(monthlyProduct.price.frontSymbolCurrencyFormatted(with: monthlyProduct.priceLocale) ?? "$0")
-                .font(.title)
-                .foregroundColor(.white)
-              
-              Text(" / month")
-                .font(.subheadline)
-                .foregroundColor(Color(braveSystemName: .primitivePrimary30))
-            }
-          } else {
-            ProgressView()
-              .tint(Color.white)
-          }
-        }
-      }
-      .frame(maxWidth: .infinity)
-      .padding()
-      .background(Color(braveSystemName: selectedTierType == .montly ? .primitivePrimary60 : .primitivePrimary80))
-      .overlay(
-        RoundedRectangle(cornerRadius: 8.0, style: .continuous)
-          .strokeBorder(Color(braveSystemName: .primitivePrimary50),
-                        lineWidth: selectedTierType == .montly ? 2 : 0)
-      )
-      .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
       
       Text("All subscriptions are auto-renewed but can be cancelled at any time before renewal.")
         .multilineTextAlignment(.center)
