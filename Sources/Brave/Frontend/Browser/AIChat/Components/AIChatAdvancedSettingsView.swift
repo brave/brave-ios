@@ -64,7 +64,9 @@ struct AIChatAdvancedSettingsView: View {
         if subscriptionManager.state == .purchased {
           LabelDetailView(title: "Status",
                           detail: subscriptionManager.activeType.title)
-          LabelDetailView(title: "Expires", detail: "11/31/23")
+          
+          LabelDetailView(title: "Expires", 
+                          detail: subscriptionManager.expirationDateFormatted)
           
           Button(action: {
             openURL?(.brave.braveLeoLinkReceiptProd)
