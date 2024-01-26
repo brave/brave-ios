@@ -98,7 +98,7 @@ struct AIChatPaywallView: View {
           
           if let yearlyProduct = productInfo.yearlySubProduct {
             HStack(alignment: .center, spacing: 2) {
-              Text("US$")
+              Text("\(yearlyProduct.priceLocale.currencyCode ?? "")\(yearlyProduct.priceLocale.currencySymbol ?? "")")
                 .font(.subheadline)
                 .foregroundColor(Color(braveSystemName: .primitivePrimary30))
               
@@ -138,7 +138,7 @@ struct AIChatPaywallView: View {
           
           if let monthlyProduct = productInfo.monthlySubProduct {
             HStack(alignment: .center, spacing: 2) {
-              Text("US$")
+              Text("\(monthlyProduct.priceLocale.currencyCode ?? "")\(monthlyProduct.priceLocale.currencySymbol ?? "")")
                 .font(.subheadline)
                 .foregroundColor(Color(braveSystemName: .primitivePrimary30))
               
