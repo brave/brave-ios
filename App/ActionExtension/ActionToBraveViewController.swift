@@ -1,4 +1,4 @@
-// Copyright 2023 The Brave Authors. All rights reserved.
+// Copyright 2024 The Brave Authors. All rights reserved.
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -37,7 +37,7 @@ class ActionToBraveViewController: UIViewController {
   
   func done() {
     // Return any edited content to the host app, in this case empty
-    extensionContext!.completeRequest(returningItems: [], completionHandler: nil)
+    extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
   }
   
   private func loadAttachmentFor(type: SchemeType, using provider: NSItemProvider) {
