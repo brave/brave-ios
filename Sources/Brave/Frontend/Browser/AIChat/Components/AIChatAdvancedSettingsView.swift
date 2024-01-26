@@ -13,6 +13,8 @@ struct AIChatAdvancedSettingsView: View {
 
   @Environment(\.presentationMode) @Binding private var presentationMode
   
+  @ObservedObject var subscriptionManager = AIChatSubscriptionManager.shared
+
   var isModallyPresented: Bool
 
   var body: some View {
@@ -40,7 +42,6 @@ struct AIChatAdvancedSettingsView: View {
       Section {
         OptionToggleView(
           title: "Show autocomplete suggestions in address bar",
-          subtitle: nil,
           option: Preferences.LeoAI.autocompleteSuggestionsEnabled
         )
         
@@ -58,14 +59,43 @@ struct AIChatAdvancedSettingsView: View {
       }
       
       Section {
-        Button(action: {
-          // TODO: Add Link subscription process
-        }) {
-          LabelView(
-            title: "Link purchase to your Brave account",
-            subtitle: "Link your Appstore purchase to your Brave account to use Leo on other devices."
-          )
+        if subscriptionManager.state == .purchased {
+          LabelDetailView(title: "Status",
+                          detail: subscriptionManager.activeType.title)
+          LabelDetailView(title: "Expired", detail: "11/31/23")
+          
+          Button(action: {
+            // TODO: Add Link subscription process
+          }) {
+            LabelView(
+              title: "Link purchase to your Brave account",
+              subtitle: "Link your Appstore purchase to your Brave account to use Leo on other devices."
+            )
+          }
         }
+        
+        Button(action: {
+          switch subscriptionManager.state {
+          case .purchased:
+            print("Manage Subscription Action")
+          case .notPurchased, .expired:
+            print("Show Premium Buyout")
+          }
+        }) {
+          HStack {
+            LabelView(title: subscriptionManager.state.actionTitle)
+            Spacer()
+            Image(braveSystemName: "leo.launch")
+              .foregroundStyle(Color(braveSystemName: .iconDefault))
+          }
+        }
+        Button(action: {
+        }) {
+          Text("Reset And Clear Leo Data")
+            .foregroundColor(Color(.braveBlurpleTint))
+        }
+        .frame(maxWidth: .infinity)
+        .listRowBackground(Color(.secondaryBraveGroupedBackground))
       } header: {
         Text("SUBSCRIPTION")
       }

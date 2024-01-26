@@ -6,30 +6,48 @@
 import Foundation
 
 /// Singleton Manager handles subscriptions for AI Leo
-public class AIChatSubscriptionManager: NSObject {
+class AIChatSubscriptionManager: ObservableObject {
   
   /// In-app purchase subscription types
-  public enum SubscriptionType {
+  enum SubscriptionType {
     case monthly
     case yearly
     
     var title: String {
       switch self {
       case .monthly:
-        return "Monthly"
+        return "Monthly Subscription"
       case .yearly:
-        return "Yearly"
+        return "Yearly Subscription"
+      }
+    }
+  }
+  
+  /// In-app purchase subscription states
+  enum SubscriptionState: Equatable {
+    case notPurchased
+    case purchased
+    case expired
+    
+    var actionTitle: String {
+      switch self {
+      case .notPurchased, .expired:
+        return "Go Premium"
+      case .purchased:
+        return "Manage Subscription"
       }
     }
   }
   
   // MARK: Lifecycle
   
-  public static var shared = AIChatSubscriptionManager()
+  static var shared = AIChatSubscriptionManager()
   
   // TODO: Static Type and expiration for test development
   
-  public var activesubscriptionType: SubscriptionType = .monthly
+  @Published var state: SubscriptionState = .purchased
   
-  public var subscriptionExpirationDate: Date = Date() + 5.minutes
+  @Published var activeType: SubscriptionType = .monthly
+  
+  @Published var expirationDate: Date = Date() + 5.minutes
 }

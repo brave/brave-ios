@@ -13,7 +13,7 @@ public struct OptionToggleView: View {
   let onChange: ToggleView.OnChangeCallback?
   
  public init(title: String, 
-             subtitle: String?,
+             subtitle: String? = nil,
              option: Preferences.Option<Bool>, 
              onChange: ToggleView.OnChangeCallback? = nil) {
     self.title = title
