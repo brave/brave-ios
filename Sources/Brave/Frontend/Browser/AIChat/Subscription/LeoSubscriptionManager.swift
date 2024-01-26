@@ -43,9 +43,17 @@ class LeoSubscriptionManager: ObservableObject {
   
   static var shared = LeoSubscriptionManager()
   
-  
   var isSandbox: Bool {
     Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"
+  }
+  
+  var expirationDateFormatted: String {
+    let dateFormatter = DateFormatter().then {
+      $0.locale = Locale.current
+      $0.dateFormat = "MM/dd/yy"
+    }
+
+    return dateFormatter.string(from: expirationDate)
   }
   
   // TODO: Static Type and expiration for test development
