@@ -6,7 +6,7 @@
 import Foundation
 
 /// Singleton Manager handles subscriptions for AI Leo
-class AIChatSubscriptionManager: ObservableObject {
+class LeoSubscriptionManager: ObservableObject {
   
   /// In-app purchase subscription types
   enum SubscriptionType {
@@ -41,7 +41,7 @@ class AIChatSubscriptionManager: ObservableObject {
   
   // MARK: Lifecycle
   
-  static var shared = AIChatSubscriptionManager()
+  static var shared = LeoSubscriptionManager()
   
   
   var isSandbox: Bool {
