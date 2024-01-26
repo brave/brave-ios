@@ -53,6 +53,7 @@ class SettingsViewController: TableViewController {
   private let tabManager: TabManager
   private let rewards: BraveRewards?
   private let feedDataSource: FeedDataSource
+  private let braveCore: BraveCoreMain
   private let historyAPI: BraveHistoryAPI
   private let passwordAPI: BravePasswordAPI
   private let syncAPI: BraveSyncAPI
@@ -83,6 +84,7 @@ class SettingsViewController: TableViewController {
     self.feedDataSource = feedDataSource
     self.rewards = rewards
     self.windowProtection = windowProtection
+    self.braveCore = braveCore
     self.historyAPI = braveCore.historyAPI
     self.passwordAPI = braveCore.passwordAPI
     self.syncAPI = braveCore.syncAPI
@@ -328,7 +330,9 @@ class SettingsViewController: TableViewController {
       Row(
         text: "Leo",
         selection: { [unowned self] in
-          let controller = UIHostingController(rootView: AIChatAdvancedSettingsView(isModallyPresented: false))
+          let controller = UIHostingController(rootView: AIChatAdvancedSettingsView(
+            isModallyPresented: false,
+            aiModel: .init(braveCore: self.braveCore, webView: self.tabManager.selectedTab?.webView)))
           self.navigationController?.pushViewController(controller, animated: true)
         },
         image: UIImage(braveSystemNamed: "leo.product.brave-leo"),
