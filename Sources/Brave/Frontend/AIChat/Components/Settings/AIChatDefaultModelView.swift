@@ -9,6 +9,11 @@ import BraveCore
 
 struct AIChatDefaultModelView: View {
   
+  @Environment(\.presentationMode) private var presentationMode
+  @StateObject var aiModel: AIChatViewModel
+
+  let onModelChanged: (String) -> Void
+
   var body: some View {
     modelView
       .navigationTitle("Default Model")
@@ -17,7 +22,49 @@ struct AIChatDefaultModelView: View {
   private var modelView: some View {
     List {
       Section {
-        Text("Test")
+        ForEach(Array(aiModel.models.enumerated()), id: \.offset) { index, model in
+          Button(action: {
+            onModelChanged(model.key)
+            presentationMode.wrappedValue.dismiss()
+          }, label: {
+            HStack(spacing: 0.0) {
+              VStack {
+                Text(model.displayName)
+                  .font(.body)
+                  .foregroundStyle(Color(braveSystemName: .textPrimary))
+                  .frame(maxWidth: .infinity, alignment: .leading)
+                
+                Text(model.displayMaker)
+                  .font(.footnote)
+                  .foregroundStyle(Color(braveSystemName: .textSecondary))
+                  .frame(maxWidth: .infinity, alignment: .leading)
+              }
+              
+              // If the model is selected show check
+              if model.key == aiModel.currentModel.key {
+                Image(braveSystemName: "leo.check.normal")
+                  .foregroundStyle(Color(braveSystemName: .textInteractive))
+                  .padding(.horizontal, 4.0)
+              } else {
+                if model.access == .basicAndPremium {
+                  Text("LIMITED")
+                    .font(.caption2)
+                    .foregroundStyle(Color(braveSystemName: .blue50))
+                    .padding(.horizontal, 4.0)
+                    .padding(.vertical, 2.0)
+                    .background(
+                      RoundedRectangle(cornerRadius: 4.0, style: .continuous)
+                        .strokeBorder(Color(braveSystemName: .blue50), lineWidth: 1.0)
+                    )
+                } else if model.access == .premium {
+                  Image(braveSystemName: "leo.lock.plain")
+                    .foregroundStyle(Color(braveSystemName: .iconDefault))
+                    .padding(.horizontal, 4.0)
+                }
+              }
+            }
+          })
+        }
       } header: {
         Text("CHAT")
       }
@@ -25,5 +72,4 @@ struct AIChatDefaultModelView: View {
     .listBackgroundColor(Color(UIColor.braveGroupedBackground))
     .listStyle(.insetGrouped)
   }
-  
 }
