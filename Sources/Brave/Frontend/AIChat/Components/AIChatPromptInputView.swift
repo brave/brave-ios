@@ -8,7 +8,8 @@ import DesignSystem
 
 struct AIChatPromptInputView: View {
   let onTextSubmitted: (String) -> Void
-  
+  let onVoiceSearchPressed: () -> Void
+
   @State private var prompt: String = ""
 
   var body: some View {
@@ -30,7 +31,7 @@ struct AIChatPromptInputView: View {
       
       if prompt.isEmpty {
         Button {
-          
+          onVoiceSearchPressed()
         } label: {
           Image(braveSystemName: "leo.microphone")
             .foregroundStyle(Color(braveSystemName: .iconDefault))
@@ -69,6 +70,8 @@ struct AIChatPromptInputView: View {
 #Preview(traits: .sizeThatFitsLayout) {
   AIChatPromptInputView() { prompt in
     print("Prompt Submitted: \(prompt)")
+  } onVoiceSearchPressed: {
+    print("Voice Search Activated)")
   }
     .previewLayout(.sizeThatFits)
 }
