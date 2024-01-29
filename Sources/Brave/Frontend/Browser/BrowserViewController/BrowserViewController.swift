@@ -3360,8 +3360,14 @@ extension BrowserViewController {
 
 extension BrowserViewController {
   func openBraveLeo() {
-    let chat = UIHostingController(rootView: AIChatView(model: .init(braveCore: self.braveCore,
-                                                                     webView: self.tabManager.selectedTab?.webView)))
+    let chat = UIHostingController(rootView: AIChatView(
+      model: .init(braveCore: self.braveCore, webView: self.tabManager.selectedTab?.webView),
+      openURL: { [weak self] url in
+        guard let self = self else { return }
+        
+        let forcedPrivate = self.privateBrowsingManager.isPrivateBrowsing
+        self.openURLInNewTab(url, isPrivate: forcedPrivate, isPrivileged: false)
+      }))
     self.present(chat, animated: true)
   }
 }

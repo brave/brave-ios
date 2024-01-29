@@ -188,6 +188,8 @@ struct AIChatView: View {
   @State
   private var isAdvancedSettingsPresented = false
   
+  var openURL: ((URL) -> Void)
+
   var body: some View {
     VStack(spacing: 0.0) {
       AIChatNavigationView(premiumStatus: model.premiumStatus,
@@ -338,7 +340,13 @@ struct AIChatView: View {
         })
     })
     .popover(isPresented: $isAdvancedSettingsPresented, content: {
-      AIChatAdvancedSettingsView(isModallyPresented: true, aiModel: model)
+      AIChatAdvancedSettingsView(
+        aiModel: model,
+        isModallyPresented: true,
+        openURL: { url in
+          openURL(url)
+          presentationMode.wrappedValue.dismiss()
+      })
     })
   }
   

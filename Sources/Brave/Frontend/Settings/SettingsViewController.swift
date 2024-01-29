@@ -330,9 +330,14 @@ class SettingsViewController: TableViewController {
       Row(
         text: "Leo",
         selection: { [unowned self] in
-          let controller = UIHostingController(rootView: AIChatAdvancedSettingsView(
-            isModallyPresented: false,
-            aiModel: .init(braveCore: self.braveCore, webView: self.tabManager.selectedTab?.webView)))
+          let controller = UIHostingController(rootView: 
+            AIChatAdvancedSettingsView(
+              aiModel: .init(braveCore: self.braveCore, webView: self.tabManager.selectedTab?.webView),
+              isModallyPresented: false,
+              openURL: { [unowned self] url in
+                self.settingsDelegate?.settingsOpenURLInNewTab(url)
+                self.dismiss(animated: true)
+            }))
           self.navigationController?.pushViewController(controller, animated: true)
         },
         image: UIImage(braveSystemNamed: "leo.product.brave-leo"),
