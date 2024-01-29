@@ -24,11 +24,11 @@ class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   
   var isPageConnected: Bool {
     get {
-      return api.shouldSendPageContents == true
+      return api.shouldSendPageContents == true && webView?.url?.isWebPage(includeDataURIs: true) == true
     }
     
     set {
-      if api.shouldSendPageContents != newValue {
+      if api.shouldSendPageContents != newValue && webView?.url?.isWebPage(includeDataURIs: true) == true {
         api.shouldSendPageContents = newValue
       }
     }
@@ -45,21 +45,44 @@ class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
     return false
   }
   
+  var isAgreementAccepted: Bool {
+    get {
+      return api.isAgreementAccepted
+    }
+    
+    set {
+      api.isAgreementAccepted = newValue
+      
+      if newValue {
+        isPageConnected = hasValidWebPage
+        api.setConversationActive(true)
+        
+        if isPageConnected {
+          api.generateQuestions()
+        }
+      }
+    }
+  }
+  
   init(braveCore: BraveCoreMain, webView: WKWebView?) {
     self.webView = webView
     
     super.init()
 
     api = braveCore.aiChatAPI(with: self)
-    isPageConnected = hasValidWebPage
     currentModel = api.currentModel
     models = api.models
     
-    api.setConversationActive(true)
-    api.isAgreementAccepted = true
+    if isAgreementAccepted {
+      isPageConnected = hasValidWebPage
+      api.setConversationActive(true)
+      
+      if isPageConnected {
+        api.generateQuestions()
+      }
+    }
     
     Task { @MainActor in
-      api.generateQuestions()
       self.premiumStatus = await getPremiumStatus()
     }
   }
@@ -143,6 +166,12 @@ class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   
   func submitQuery(_ text: String) {
     api.submitHumanConversationEntry(text)
+  }
+  
+  func clearAndResetData() {
+    api.clearConversationHistory()
+    api.setConversationActive(false)
+    api.isAgreementAccepted = false
   }
   
   @MainActor
