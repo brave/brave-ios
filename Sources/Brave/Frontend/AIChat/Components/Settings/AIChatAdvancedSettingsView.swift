@@ -11,8 +11,8 @@ import DesignSystem
 import Preferences
 
 struct AIChatAdvancedSettingsView: View {
-
-  @Environment(\.presentationMode) @Binding private var presentationMode
+  @Environment(\.presentationMode) 
+  @Binding private var presentationMode
   
   @ObservedObject var subscriptionManager = LeoSubscriptionManager.shared
 
@@ -123,7 +123,7 @@ struct AIChatAdvancedSettingsView: View {
       
       Section {
         Button(action: {
-          // TODO: Add Clear Leo Data Functionality
+          aiModel.clearAndResetData()
         }) {
           Text("Reset And Clear Leo Data")
             .foregroundColor(Color(.braveBlurpleTint))

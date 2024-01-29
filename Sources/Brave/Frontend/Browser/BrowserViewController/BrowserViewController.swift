@@ -3360,14 +3360,33 @@ extension BrowserViewController {
 
 extension BrowserViewController {
   func openBraveLeo() {
-    let chat = UIHostingController(rootView: AIChatView(
-      model: .init(braveCore: self.braveCore, webView: self.tabManager.selectedTab?.webView),
-      openURL: { [weak self] url in
+    let model = AIChatViewModel(braveCore: self.braveCore, webView: self.tabManager.selectedTab?.webView)
+    if model.isAgreementAccepted {
+      let chatController = UIHostingController(rootView: AIChatView(model: model, openURL: { [weak self] url in
         guard let self = self else { return }
-        
+
         let forcedPrivate = self.privateBrowsingManager.isPrivateBrowsing
         self.openURLInNewTab(url, isPrivate: forcedPrivate, isPrivileged: false)
       }))
-    self.present(chat, animated: true)
+      self.present(chatController, animated: true)
+    } else {
+      let termsController = UIHostingController(rootView: AIChatTermsAndConditionsView(onTermsAccepted: { [unowned self] in
+        model.isAgreementAccepted = true
+        
+        let chatController = UIHostingController(rootView: AIChatView(model: model, openURL: { [weak self] url in
+          guard let self = self else { return }
+
+          let forcedPrivate = self.privateBrowsingManager.isPrivateBrowsing
+          self.openURLInNewTab(url, isPrivate: forcedPrivate, isPrivileged: false)
+        }))
+        self.present(chatController, animated: true)
+      }, onOpenURL: { [weak self] url in
+        guard let self = self else { return }
+
+        let forcedPrivate = self.privateBrowsingManager.isPrivateBrowsing
+        self.openURLInNewTab(url, isPrivate: forcedPrivate, isPrivileged: false)
+      }))
+      self.present(termsController, animated: true)
+    }
   }
 }
