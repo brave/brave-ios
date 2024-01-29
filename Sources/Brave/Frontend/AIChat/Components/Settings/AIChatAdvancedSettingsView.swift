@@ -16,11 +16,11 @@ struct AIChatAdvancedSettingsView: View {
   
   @ObservedObject var subscriptionManager = LeoSubscriptionManager.shared
 
-  var isModallyPresented: Bool
-
-  var openURL: ((URL) -> Void)?
-  
   @StateObject var aiModel: AIChatViewModel
+
+  var isModallyPresented: Bool
+  
+  var openURL: ((URL) -> Void)
 
   var body: some View {
     if isModallyPresented {
@@ -76,7 +76,7 @@ struct AIChatAdvancedSettingsView: View {
                           detail: subscriptionManager.expirationDateFormatted)
           
           Button(action: {
-            openURL?(.brave.braveLeoLinkReceiptProd)
+            openURL(.brave.braveLeoLinkReceiptProd)
           }) {
             LabelView(
               title: "Link purchase to your Brave account",
@@ -86,7 +86,7 @@ struct AIChatAdvancedSettingsView: View {
           
           if subscriptionManager.isSandbox {
             Button(action: {
-              openURL?(.brave.braveLeoLinkReceiptStaging)
+              openURL(.brave.braveLeoLinkReceiptStaging)
             }) {
               LabelView(
                 title: "[Staging] Link receipt"
@@ -94,7 +94,7 @@ struct AIChatAdvancedSettingsView: View {
             }
             
             Button(action: {
-              openURL?(.brave.braveLeoLinkReceiptDev)
+              openURL(.brave.braveLeoLinkReceiptDev)
             }) {
               LabelView(
                 title: "[Dev] Link receipt"
