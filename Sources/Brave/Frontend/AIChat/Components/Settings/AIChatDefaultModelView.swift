@@ -11,6 +11,7 @@ struct AIChatDefaultModelView: View {
   
   @Environment(\.presentationMode) private var presentationMode
   @StateObject var aiModel: AIChatViewModel
+  @State private var isPresentingPaywallPremium: Bool = false
 
   let onModelChanged: (String) -> Void
 
@@ -24,8 +25,12 @@ struct AIChatDefaultModelView: View {
       Section {
         ForEach(Array(aiModel.models.enumerated()), id: \.offset) { index, model in
           Button(action: {
-            onModelChanged(model.key)
-            presentationMode.wrappedValue.dismiss()
+            if model.access == .premium, aiModel.shouldShowPremiumPrompt {
+              isPresentingPaywallPremium = true
+            } else {
+              onModelChanged(model.key)
+              presentationMode.wrappedValue.dismiss()
+            }
           }, label: {
             HStack(spacing: 0.0) {
               VStack {
@@ -71,5 +76,9 @@ struct AIChatDefaultModelView: View {
     }
     .listBackgroundColor(Color(UIColor.braveGroupedBackground))
     .listStyle(.insetGrouped)
+    .background(Color.clear
+      .sheet(isPresented: $isPresentingPaywallPremium) {
+        AIChatPaywallView()
+      })
   }
 }
