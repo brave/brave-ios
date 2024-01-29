@@ -202,6 +202,8 @@ struct AIChatView: View {
   @StateObject 
   var model: AIChatViewModel
   
+  let speechRecognizer: SpeechRecognizer
+
   @Environment(\.presentationMode)
   private var presentationMode
   
@@ -216,6 +218,12 @@ struct AIChatView: View {
   
   @State
   private var isAdvancedSettingsPresented = false
+  
+  @State
+  private var isVoiceEntryPresented = false
+  
+  @State
+  private var isNoMicrophonePermissionPresented = false
   
   var openURL: ((URL) -> Void)
 
@@ -355,6 +363,16 @@ struct AIChatView: View {
       
       AIChatPromptInputView() { prompt in
         model.submitQuery(prompt)
+      } onVoiceSearchPressed: {
+        Task {
+          let permissionStatus = await speechRecognizer.askForUserPermission()
+          
+          if permissionStatus {
+            isVoiceEntryPresented = true
+          } else {
+            isNoMicrophonePermissionPresented = true
+          }
+        }
       }
         .disabled(model.shouldShowPremiumPrompt)
     }
@@ -377,6 +395,16 @@ struct AIChatView: View {
           presentationMode.wrappedValue.dismiss()
       })
     })
+    .background(Color.clear
+      .alert(isPresented: $isVoiceEntryPresented) {
+        // TODO: Present Voice Entry
+      }
+    )
+    .background(Color.clear
+      .alert(isPresented: $isNoMicrophonePermissionPresented) {
+        // TODO: Present No Microphone Permission
+      }
+    )
   }
   
   @ViewBuilder
@@ -453,6 +481,8 @@ struct AIChatView: View {
     
     AIChatPromptInputView() { prompt in
       print("Prompt Submitted: \(prompt)")
+    } onVoiceSearchPressed: {
+      print("Voice Search Activated)")
     }
   }
   .background(Color(braveSystemName: .containerBackground))

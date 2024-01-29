@@ -3359,33 +3359,29 @@ extension BrowserViewController {
 }
 
 extension BrowserViewController {
+  private func openAIChatURL(_ url: URL) {
+    let forcedPrivate = self.privateBrowsingManager.isPrivateBrowsing
+    self.openURLInNewTab(url, isPrivate: forcedPrivate, isPrivileged: false)
+  }
+  
+  private func presentAIChatController(with model: AIChatViewModel) {
+    let chatController = UIHostingController(rootView:
+                                              AIChatView(model: model,
+                                                         speechRecognizer:
+                                                          speechRecognizer,
+                                                         openURL: openAIChatURL))
+    self.present(chatController, animated: true)
+  }
+  
   func openBraveLeo() {
     let model = AIChatViewModel(braveCore: self.braveCore, webView: self.tabManager.selectedTab?.webView)
     if model.isAgreementAccepted {
-      let chatController = UIHostingController(rootView: AIChatView(model: model, openURL: { [weak self] url in
-        guard let self = self else { return }
-
-        let forcedPrivate = self.privateBrowsingManager.isPrivateBrowsing
-        self.openURLInNewTab(url, isPrivate: forcedPrivate, isPrivileged: false)
-      }))
-      self.present(chatController, animated: true)
+      presentAIChatController(with: model)
     } else {
       let termsController = UIHostingController(rootView: AIChatTermsAndConditionsView(onTermsAccepted: { [unowned self] in
         model.isAgreementAccepted = true
-        
-        let chatController = UIHostingController(rootView: AIChatView(model: model, openURL: { [weak self] url in
-          guard let self = self else { return }
-
-          let forcedPrivate = self.privateBrowsingManager.isPrivateBrowsing
-          self.openURLInNewTab(url, isPrivate: forcedPrivate, isPrivileged: false)
-        }))
-        self.present(chatController, animated: true)
-      }, onOpenURL: { [weak self] url in
-        guard let self = self else { return }
-
-        let forcedPrivate = self.privateBrowsingManager.isPrivateBrowsing
-        self.openURLInNewTab(url, isPrivate: forcedPrivate, isPrivileged: false)
-      }))
+        presentAIChatController(with: model)
+      }, onOpenURL: openAIChatURL))
       self.present(termsController, animated: true)
     }
   }
