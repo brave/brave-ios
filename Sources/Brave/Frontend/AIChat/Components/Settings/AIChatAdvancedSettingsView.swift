@@ -51,11 +51,15 @@ struct AIChatAdvancedSettingsView: View {
         )
         
         NavigationLink {
-          AIChatDefaultModelView()
+          AIChatDefaultModelView(
+            aiModel: aiModel,
+            onModelChanged: { modelKey in
+              aiModel.changeModel(modelKey: modelKey)
+            })
         } label: {
           LabelView(
             title: "Default model for new conversations",
-            subtitle: aiModel.currentModel.name
+            subtitle: aiModel.currentModel.displayName
           )
         }.listRowBackground(Color(.secondaryBraveGroupedBackground))
       } header: {
