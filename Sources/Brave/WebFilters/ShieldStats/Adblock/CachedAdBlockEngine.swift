@@ -13,14 +13,12 @@ import os
 /// and ensures information is always returned on the correct thread on the engine.
 public class CachedAdBlockEngine {
   public enum Source: Hashable, CustomDebugStringConvertible {
-    case adBlock
-    case filterList(componentId: String)
+    case filterList(componentId: String, uuid: String)
     case filterListURL(uuid: String)
     
     public var debugDescription: String {
       switch self {
-      case .adBlock: return "adBlock"
-      case .filterList(let componentId): return "filterList(\(componentId))"
+      case .filterList(let componentId, _): return "filterList(\(componentId))"
       case .filterListURL(let uuid): return "filterListURL(\(uuid))"
       }
     }

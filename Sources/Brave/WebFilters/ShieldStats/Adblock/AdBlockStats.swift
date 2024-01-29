@@ -32,8 +32,7 @@ public actor AdBlockStats {
   /// Return an array of all sources that are enabled according to user's settings
   /// - Note: This does not take into account the domain or global adblock toggle
   @MainActor var enabledSources: [CachedAdBlockEngine.Source] {
-    var enabledSources: [CachedAdBlockEngine.Source] = [.adBlock]
-    enabledSources.append(contentsOf: FilterListStorage.shared.enabledSources)
+    var enabledSources = FilterListStorage.shared.enabledSources
     enabledSources.append(contentsOf: CustomFilterListStorage.shared.enabledSources)
     return enabledSources
   }
@@ -51,23 +50,21 @@ public actor AdBlockStats {
   
   /// Create and add an engine from the given resources.
   /// If an engine already exists for the given source, it will be replaced.
-  ///
-  /// - Note: This method will ensure syncronous compilation
   public func compile(
     lazyInfo: LazyFilterListInfo, resourcesInfo: CachedAdBlockEngine.ResourcesInfo,
     compileContentBlockers: Bool
   ) async {
     await currentCompileTask?.value
     
-    currentCompileTask = Task {
+    currentCompileTask = Task.detached {
       // Compile engine
-      if needsCompilation(for: lazyInfo.filterListInfo, resourcesInfo: resourcesInfo) {
+      if await self.needsCompilation(for: lazyInfo.filterListInfo, resourcesInfo: resourcesInfo) {
         do {
           let engine = try CachedAdBlockEngine.compile(
             filterListInfo: lazyInfo.filterListInfo, resourcesInfo: resourcesInfo, isAlwaysAggressive: lazyInfo.isAlwaysAggressive
           )
           
-          add(engine: engine)
+          await self.add(engine: engine)
         } catch {
           ContentBlockerManager.log.error("Failed to compile engine for \(lazyInfo.filterListInfo.source.debugDescription)")
         }
@@ -256,31 +253,13 @@ public actor AdBlockStats {
 extension FilterListSetting {
   @MainActor var engineSource: CachedAdBlockEngine.Source? {
     guard let componentId = componentId else { return nil }
-    return .filterList(componentId: componentId)
+    return .filterList(componentId: componentId, uuid: uuid)
   }
 }
 
 extension FilterList {
   @MainActor var engineSource: CachedAdBlockEngine.Source {
-    return .filterList(componentId: entry.componentId)
-  }
-}
-
-private extension FilterListStorage {
-  /// Gives us source representations of all the enabled filter lists
-  @MainActor var enabledSources: [CachedAdBlockEngine.Source] {
-    if !filterLists.isEmpty {
-      return filterLists.compactMap { filterList -> CachedAdBlockEngine.Source? in
-        guard filterList.isEnabled else { return nil }
-        return filterList.engineSource
-      }
-    } else {
-      // We may not have the filter lists loaded yet. In which case we load the settings
-      return allFilterListSettings.compactMap { setting -> CachedAdBlockEngine.Source? in
-        guard setting.isEnabled else { return nil }
-        return setting.engineSource
-      }
-    }
+    return .filterList(componentId: entry.componentId, uuid: self.entry.uuid)
   }
 }
 
@@ -290,23 +269,13 @@ extension CustomFilterListSetting {
   }
 }
 
-private extension CustomFilterListStorage {
-  /// Gives us source representations of all the enabled custom filter lists
-  @MainActor var enabledSources: [CachedAdBlockEngine.Source] {
-    return filterListsURLs.compactMap { filterList -> CachedAdBlockEngine.Source? in
-      guard filterList.setting.isEnabled else { return nil }
-      return filterList.setting.engineSource
-    }
-  }
-}
-
 private extension CachedAdBlockEngine.Source {
   /// Returns a boolean indicating if the engine is enabled for the given domain.
   ///
   /// This is determined by checking the source of the engine and checking the appropriate shields.
   @MainActor func isEnabled(for domain: Domain) -> Bool {
     switch self {
-    case .adBlock, .filterList, .filterListURL:
+    case .filterList, .filterListURL:
       // This engine source type is enabled only if shields are enabled
       // for the given domain
       return domain.isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true)
@@ -317,11 +286,14 @@ private extension CachedAdBlockEngine.Source {
 extension AdBlockStats.LazyFilterListInfo {
   var blocklistType: ContentBlockerManager.BlocklistType? {
     switch filterListInfo.source {
-    case .adBlock:
-      // Normally this should be .generic(.blockAds)
-      // but this content blocker is coming from slim-list
-      return nil
-    case .filterList(let componentId):
+    case .filterList(let componentId, let uuid):
+      guard uuid != FilterList.defaultFilterListUUID else {
+        // For now we don't compile this into content blockers because we use the one coming from slim list
+        // We might change this in the future as it ends up with 95k items whereas the limit is 150k.
+        // So there is really no reason to use slim list except perhaps for performance which we need to test out.
+        return nil
+      }
+      
       return .filterList(componentId: componentId, isAlwaysAggressive: isAlwaysAggressive)
     case .filterListURL(let uuid):
       return .customFilterList(uuid: uuid)

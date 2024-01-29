@@ -20,6 +20,7 @@ public final class FilterListSetting: NSManagedObject, CRUD {
   @MainActor @NSManaged public var isEnabled: Bool
   @MainActor @NSManaged public var isHidden: Bool
   @MainActor @NSManaged public var isAlwaysAggressive: Bool
+  @MainActor @NSManaged public var isDefaultEnabled: Bool
   @MainActor @NSManaged public var order: NSNumber?
   @MainActor @NSManaged private var folderPath: String?
   
@@ -51,7 +52,8 @@ public final class FilterListSetting: NSManagedObject, CRUD {
   
   /// Create a filter list setting for the given UUID and enabled status
   @MainActor public class func create(
-    uuid: String, componentId: String?, isEnabled: Bool, isHidden: Bool, order: Int, inMemory: Bool, isAlwaysAggressive: Bool
+    uuid: String, componentId: String?, isEnabled: Bool, isHidden: Bool, order: Int, inMemory: Bool, isAlwaysAggressive: Bool,
+    isDefaultEnabled: Bool
   ) -> FilterListSetting {
     var newSetting: FilterListSetting!
 
@@ -66,6 +68,7 @@ public final class FilterListSetting: NSManagedObject, CRUD {
       newSetting.isEnabled = isEnabled
       newSetting.isHidden = isHidden
       newSetting.isAlwaysAggressive = isAlwaysAggressive
+      newSetting.isDefaultEnabled = isDefaultEnabled
       newSetting.order = NSNumber(value: order)
     }
 

@@ -86,7 +86,6 @@ actor FilterListCustomURLDownloader: ObservableObject {
     )
     
     guard await AdBlockStats.shared.isEnabled(source: source) else {
-      // Don't compile unless eager
       await AdBlockStats.shared.updateIfNeeded(filterListInfo: filterListInfo, isAlwaysAggressive: true)
       
       // To free some space, remove any rule lists that are not needed

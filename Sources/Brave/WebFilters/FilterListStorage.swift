@@ -55,11 +55,15 @@ import Combine
       // Certain filter lists are disabled if they are currently incompatible with iOS
       guard !FilterList.disabledComponentIDs.contains(adBlockFilterList.componentId) else { return nil }
       let setting = allFilterListSettings.first(where: { $0.componentId == adBlockFilterList.componentId })
+      // Some special filter lists don't have specific UI to disable it
+      // (except for disabling all of ad-blocking)
+      // For example the "default" and "first-party" list is controlled using our general Ad-block and TP toggle.
+      let isEnabled = adBlockFilterList.hidden ? adBlockFilterList.defaultEnabled : pendingDefaults[adBlockFilterList.componentId] ?? setting?.isEnabled
       
       return FilterList(
         from: adBlockFilterList,
         order: index,
-        isEnabled: pendingDefaults[adBlockFilterList.componentId] ?? setting?.isEnabled ?? adBlockFilterList.defaultToggle
+        isEnabled: isEnabled
       )
     }
     
@@ -138,7 +142,8 @@ import Combine
       componentId: filterList.entry.componentId,
       allowCreation: true,
       order: filterList.order,
-      isAlwaysAggressive: filterList.isAlwaysAggressive
+      isAlwaysAggressive: filterList.isAlwaysAggressive,
+      isDefaultEnabled: filterList.entry.defaultEnabled
     )
   }
   
@@ -148,7 +153,7 @@ import Combine
   /// - Warning: Do not call this before we load core data
   private func upsertSetting(
     uuid: String, isEnabled: Bool, isHidden: Bool, componentId: String,
-    allowCreation: Bool, order: Int, isAlwaysAggressive: Bool
+    allowCreation: Bool, order: Int, isAlwaysAggressive: Bool, isDefaultEnabled: Bool
   ) {
     if allFilterListSettings.contains(where: { $0.uuid == uuid }) {
       updateSetting(
@@ -157,7 +162,8 @@ import Combine
         isEnabled: isEnabled,
         isHidden: isHidden,
         order: order,
-        isAlwaysAggressive: isAlwaysAggressive
+        isAlwaysAggressive: isAlwaysAggressive,
+        isDefaultEnabled: isDefaultEnabled
       )
     } else if allowCreation {
       create(
@@ -166,7 +172,8 @@ import Combine
         isEnabled: isEnabled,
         isHidden: isHidden,
         order: order,
-        isAlwaysAggressive: isAlwaysAggressive
+        isAlwaysAggressive: isAlwaysAggressive,
+        isDefaultEnabled: isDefaultEnabled
       )
     }
   }
@@ -186,7 +193,10 @@ import Combine
   
   /// Update the filter list settings with the given `componentId` and `isEnabled` status
   /// Will not write unless one of these two values have changed
-  private func updateSetting(uuid: String, componentId: String, isEnabled: Bool, isHidden: Bool, order: Int, isAlwaysAggressive: Bool) {
+  private func updateSetting(
+    uuid: String, componentId: String, isEnabled: Bool, isHidden: Bool, order: Int, isAlwaysAggressive: Bool,
+    isDefaultEnabled: Bool
+  ) {
     guard let index = allFilterListSettings.firstIndex(where: { $0.uuid == uuid }) else {
       return
     }
@@ -198,6 +208,7 @@ import Combine
             || allFilterListSettings[index].order?.intValue != order
             || allFilterListSettings[index].isAlwaysAggressive != isAlwaysAggressive
             || allFilterListSettings[index].isHidden != isHidden
+            || allFilterListSettings[index].isDefaultEnabled != isDefaultEnabled
     else {
       return
     }
@@ -207,14 +218,18 @@ import Combine
     allFilterListSettings[index].isHidden = isHidden
     allFilterListSettings[index].componentId = componentId
     allFilterListSettings[index].order = NSNumber(value: order)
+    allFilterListSettings[index].isDefaultEnabled = isDefaultEnabled
     FilterListSetting.save(inMemory: !persistChanges)
   }
   
   /// Create a filter list setting for the given UUID and enabled status
-  private func create(uuid: String, componentId: String, isEnabled: Bool, isHidden: Bool, order: Int, isAlwaysAggressive: Bool) {
+  private func create(
+    uuid: String, componentId: String, isEnabled: Bool, isHidden: Bool, order: Int, isAlwaysAggressive: Bool,
+    isDefaultEnabled: Bool
+  ) {
     let setting = FilterListSetting.create(
       uuid: uuid, componentId: componentId, isEnabled: isEnabled, isHidden: isHidden, order: order, inMemory: !persistChanges,
-      isAlwaysAggressive: isAlwaysAggressive
+      isAlwaysAggressive: isAlwaysAggressive, isDefaultEnabled: isDefaultEnabled
     )
     allFilterListSettings.append(setting)
   }
@@ -241,31 +256,22 @@ private extension AdblockFilterListCatalogEntry {
   var supportedLanguageCodes: Set<Locale.LanguageCode> {
     return Set(languages.map({ Locale.LanguageCode($0) }))
   }
-  
-  /// This method returns the default value for this filter list if the user does not manually toggle it.
-  /// - Warning: Make sure you use `componentID` to identify the filter list, as `uuid` will be deprecated in the future.
-  var defaultToggle: Bool {
-    let componentIDsToOverride = [
-      FilterList.mobileAnnoyancesComponentID,
-      FilterList.cookieConsentNoticesComponentID
-    ]
-    
-    if componentIDsToOverride.contains(componentId) {
-      return true
-    }
-    
-    // For compatibility reasons, we only enable certian regional filter lists
-    // These are the ones that are known to be well maintained.
-    guard FilterList.maintainedRegionalComponentIDs.contains(componentId) else {
-      return false
-    }
-    
-    if #available(iOS 16, *), let languageCode = Locale.current.language.languageCode {
-      return supportedLanguageCodes.contains(languageCode)
-    } else if let languageCode = Locale.current.languageCode {
-      return languages.contains(languageCode)
+}
+
+extension FilterListStorage {
+  /// Gives us source representations of all the enabled filter lists
+  @MainActor var enabledSources: [CachedAdBlockEngine.Source] {
+    if !filterLists.isEmpty {
+      return filterLists.compactMap { filterList -> CachedAdBlockEngine.Source? in
+        guard filterList.isEnabled else { return nil }
+        return filterList.engineSource
+      }
     } else {
-      return false
+      // We may not have the filter lists loaded yet. In which case we load the settings
+      return allFilterListSettings.compactMap { setting -> CachedAdBlockEngine.Source? in
+        guard setting.isEnabled else { return nil }
+        return setting.engineSource
+      }
     }
   }
 }

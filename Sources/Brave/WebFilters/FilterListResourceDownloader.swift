@@ -47,26 +47,7 @@ public actor FilterListResourceDownloader {
     
     let resourcesInfo = await didUpdateResourcesComponent(folderURL: resourcesFolderURL)
     async let cachedFilterLists: Void = compileCachedFilterLists(resourcesInfo: resourcesInfo)
-    async let compileDefaultEngine: Void = compileDefaultFilterList(resourcesInfo: resourcesInfo)
-    _ = await (cachedFilterLists, compileDefaultEngine)
-  }
-  
-  /// Compile the default filter list from cache
-  private func compileDefaultFilterList(resourcesInfo: CachedAdBlockEngine.ResourcesInfo) async {
-    guard let defaultFilterListFolderURL = await FilterListSetting.makeFolderURL(
-      forComponentFolderPath: Preferences.AppState.lastFilterListCatalogueComponentFolderPath.value
-    ), FileManager.default.fileExists(atPath: defaultFilterListFolderURL.path) else {
-      // We don't really need this but its the most important filter list
-      // so without this not much point compiling anything else because we probably don't have it
-      return
-    }
-    
-    await compileEngine(
-      filterListFolderURL: defaultFilterListFolderURL, resourcesInfo: resourcesInfo,
-      engineSource: .adBlock, isAlwaysAggressive: false,
-      // This is false because we use a slim-list version of the list downloaded from S3
-      compileContentBlockers: false
-    )
+    _ = await (cachedFilterLists)
   }
   
   /// This function adds engine resources to `AdBlockManager` from cached data representing the enabled filter lists.
@@ -149,36 +130,9 @@ public actor FilterListResourceDownloader {
   private func registerAllFilterListsIfNeeded(with adBlockService: AdblockService) async {
     guard !registeredFilterLists else { return }
     self.registeredFilterLists = true
-    registerToDefaultFilterList(with: adBlockService)
     
     for filterList in await FilterListStorage.shared.filterLists {
       register(filterList: filterList)
-    }
-  }
-  
-  /// Register to changes to the default filter list with the given ad-block service
-  private func registerToDefaultFilterList(with adBlockService: AdblockService) {
-    // Register the default filter list
-    Task { @MainActor in
-      for await folderURL in adBlockService.defaultComponentStream() {
-        guard let folderURL = folderURL else {
-          ContentBlockerManager.log.error("Missing folder for filter lists")
-          return
-        }
-        
-        await Task { @MainActor in
-          let folderSubPath = FilterListSetting.extractFolderPath(fromComponentFolderURL: folderURL)
-          Preferences.AppState.lastFilterListCatalogueComponentFolderPath.value = folderSubPath
-        }.value
-        
-        if let resourcesInfo = await AdBlockStats.shared.resourcesInfo {
-          await compileEngine(
-            filterListFolderURL: folderURL, resourcesInfo: resourcesInfo,
-            engineSource: .adBlock, isAlwaysAggressive: false, 
-            compileContentBlockers: false // This is set to false because we unfortunately have to use the slim list version of these lists
-          )
-        }
-      }
     }
   }
   
@@ -260,6 +214,7 @@ public actor FilterListResourceDownloader {
           ContentBlockerManager.log.error("Failed to remove rule lists for \(filterListInfo.debugDescription)")
         }
       }
+      
       return
     }
     
@@ -299,20 +254,6 @@ public actor FilterListResourceDownloader {
 
 /// Helpful extension to the AdblockService
 private extension AdblockService {
-  @MainActor func defaultComponentStream() -> AsyncStream<URL?> {
-    return AsyncStream { continuation in
-      registerDefaultComponent { folderPath in
-        guard let folderPath = folderPath else {
-          continuation.yield(nil)
-          return
-        }
-        
-        let folderURL = URL(fileURLWithPath: folderPath)
-        continuation.yield(folderURL)
-      }
-    }
-  }
-  
   @MainActor func resourcesComponentStream() -> AsyncStream<URL?> {
     return AsyncStream { continuation in
       registerResourceComponent { folderPath in
@@ -329,7 +270,7 @@ private extension AdblockService {
   
   @MainActor func filterListCatalogComponentStream() -> AsyncStream<[AdblockFilterListCatalogEntry]> {
     return AsyncStream { continuation in
-      registerFilterListCatalogComponent { filterListEntries in
+      registerFilterListCatalogComponent(withRegionalCatalog: false) { filterListEntries in
         continuation.yield(filterListEntries)
       }
     }
