@@ -1,7 +1,7 @@
 // Copyright 2024 The Brave Authors. All rights reserved.
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 import SwiftUI
 import BraveUI
@@ -14,9 +14,11 @@ public struct AIChatAdvancedSettingsView: View {
   @Environment(\.presentationMode)
   @Binding private var presentationMode
   
-  @ObservedObject var subscriptionManager = LeoSubscriptionManager.shared
+  @ObservedObject 
+  var subscriptionManager = LeoSubscriptionManager.shared
 
-  @ObservedObject var aiModel: AIChatViewModel
+  @ObservedObject 
+  var aiModel: AIChatViewModel
 
   var isModallyPresented: Bool
   

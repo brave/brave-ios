@@ -3366,26 +3366,14 @@ extension BrowserViewController {
     self.openURLInNewTab(url, isPrivate: forcedPrivate, isPrivileged: false)
   }
   
-  private func presentAIChatController(with model: AIChatViewModel) {
+  func openBraveLeo() {
+    let model = AIChatViewModel(braveCore: self.braveCore,
+                                webView: self.tabManager.selectedTab?.webView,
+                                pageContentFetcher: BraveLeoScriptHandler.getMainArticle)
     let chatController = UIHostingController(rootView: AIChatView(
       model: model,
       speechRecognizer: speechRecognizer,
       openURL: openAIChatURL))
     self.present(chatController, animated: true)
-  }
-  
-  func openBraveLeo() {
-    let model = AIChatViewModel(braveCore: self.braveCore,
-                                webView: self.tabManager.selectedTab?.webView,
-                                pageContentFetcher: BraveLeoScriptHandler.getMainArticle)
-    if model.isAgreementAccepted {
-      presentAIChatController(with: model)
-    } else {
-      let termsController = UIHostingController(rootView: AIChatTermsAndConditionsView(onTermsAccepted: { [unowned self] in
-        model.isAgreementAccepted = true
-        presentAIChatController(with: model)
-      }, onOpenURL: openAIChatURL))
-      self.present(termsController, animated: true)
-    }
   }
 }
