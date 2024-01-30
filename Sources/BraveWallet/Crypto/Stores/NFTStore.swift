@@ -194,6 +194,9 @@ public class NFTStore: ObservableObject, WalletObserverStore {
     self.assetManager = userAssetManager
     self.txService = txService
     
+    // user asset data update observer
+    self.assetManager.addUserAssetDataObserver(self)
+    
     self.setupObservers()
     
     keyringService.isLocked { [self] isLocked in
@@ -658,6 +661,16 @@ extension NFTStore: PreferencesObserver {
   }
   public func preferencesDidChange(for key: String) {
     guard !isSavingFilters else { return }
+    update()
+  }
+}
+
+extension NFTStore: WalletUserAssetDataObserver {
+  public func cachedBalanceRefreshed() {
+    update()
+  }
+  
+  public func userAssetUpdated() {
     update()
   }
 }

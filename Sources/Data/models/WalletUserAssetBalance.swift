@@ -17,12 +17,6 @@ public final class WalletUserAssetBalance: NSManagedObject, CRUD {
   @NSManaged public var balance: String
   @NSManaged public var accountAddress: String
   
-  /// This is the same as `BraveWallet.BlockchainToken.id` that is defined inside `BraveWalletSwiftUIExtension` under `BraveWallet` bundle
-  /// This needs to be updated if `BraveWallet.BlockchainToken.id` is changed
-  public var balanceId: String {
-    contractAddress.lowercased() + chainId + symbol + tokenId
-  }
-  
   @available(*, unavailable)
   public init() {
     fatalError("No Such Initializer: init()")
@@ -102,17 +96,36 @@ public final class WalletUserAssetBalance: NSManagedObject, CRUD {
     }
   }
   
+  /// - Parameters:
+  ///     - asset: An optional value of `BraveWallet.BlockchainToken` to be removed from CD, nil value will remove the restriction of asset matching
+  ///     - account: An optional value of `String`. It is the account's address value. nil value will remove the restriction of account address matching
+  ///     - completion: An optional completion block
   public static func removeBalance(
-    for asset: BraveWallet.BlockchainToken,
+    for asset: BraveWallet.BlockchainToken? = nil,
     account: String? = nil,
     completion: (() -> Void)? = nil
   ) {
-    let predict: NSPredicate
-    if let accountAddress = account {
+    var predict: NSPredicate?
+    if let asset, let accountAddress = account {
       predict = NSPredicate(format: "contractAddress == %@ && chainId == %@ && symbol == %@ && tokenId == %@ && accountAddress == %@", asset.contractAddress, asset.chainId, asset.symbol, asset.tokenId, accountAddress)
-    } else {
+    } else if let asset {
       predict = NSPredicate(format: "contractAddress == %@ && chainId == %@ && symbol == %@ && tokenId == %@", asset.contractAddress, asset.chainId, asset.symbol, asset.tokenId)
     }
+    WalletUserAssetBalance.deleteAll(
+      predicate: predict,
+      completion: completion
+    )
+  }
+  
+  /// - Parameters:
+  ///     - network: `BraveWallet.NetworkInfo`, any user asset balance that matches this network's chainId
+  ///     will be removed
+  ///     - completion: An optional completion block
+  public static func removeBalance(
+    for network: BraveWallet.NetworkInfo,
+    completion: (() -> Void)? = nil
+  ) {
+    let predict = NSPredicate(format: "chainId == %@", network.chainId)
     WalletUserAssetBalance.deleteAll(
       predicate: predict,
       completion: completion

@@ -312,6 +312,8 @@ public class NetworkStore: ObservableObject, WalletObserverStore {
         }
         // delete local stored user assets that in this custom network
         assetManager.removeGroup(for: network.walletUserAssetGroupId, completion: nil)
+        // delete local stored user assets' balances that in this custom network
+        assetManager.removeBalance(for: network, completion: nil)
         Task {
           await updateChainList()
         }

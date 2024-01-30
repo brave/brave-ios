@@ -337,6 +337,9 @@ public class PortfolioStore: ObservableObject, WalletObserverStore {
     self.blockchainRegistry = blockchainRegistry
     self.ipfsApi = ipfsApi
     self.assetManager = userAssetManager
+    
+    // cache balance update observer
+    self.assetManager.addUserAssetDataObserver(self)
 
     self.setupObservers()
 
@@ -455,31 +458,21 @@ public class PortfolioStore: ObservableObject, WalletObserverStore {
           )
         }
       }
-      
-      /// Fetch balance for each token, for all accounts applicable to that token
-      tokenBalancesCache = await withTaskGroup(
-        of: [String: [String: Double]].self,
-        body: { @MainActor [tokenBalancesCache, rpcService] group in
-          for tokenNetworkAccounts in allTokenNetworkAccounts { // for each token
-            group.addTask { @MainActor in
-              let token = tokenNetworkAccounts.token
-              var tokenBalances = tokenBalancesCache[token.id] ?? [:]
-              for account in tokenNetworkAccounts.accounts { // fetch balance for this token for each account
-                let balanceForToken = await rpcService.balance(
-                  for: token,
-                  in: account,
-                  network: tokenNetworkAccounts.network
-                )
-                tokenBalances.merge(with: [account.address: balanceForToken ?? 0])
-              }
-              return [token.id: tokenBalances]
-            }
+    
+      // Looping through `allTokenNetworkAccounts` to get token's cached balance
+      for tokenNetworkAccounts in allTokenNetworkAccounts {
+        if let tokenBalances = assetManager.getBalance(for: tokenNetworkAccounts.token, account: nil) {
+          var result: [String: Double] = [:]
+          for balancePerAccount in tokenBalances {
+            result.merge(with: [balancePerAccount.accountAddress: Double(balancePerAccount.balance) ?? 0])
           }
-          return await group.reduce(into: [String: [String: Double]](), { partialResult, new in
-            partialResult.merge(with: new)
-          })
-        })
-
+          tokenBalancesCache.merge(with: [tokenNetworkAccounts.token.id: result])
+        } else {
+          // should we fetch this asset's balance if we some how don't have it cached in CD?
+          tokenBalancesCache.merge(with: [tokenNetworkAccounts.token.id: [:]])
+        }
+      }
+    
       // fetch price for every token
       let allTokens = allVisibleUserAssets.flatMap(\.tokens)
       let allAssetRatioIds = allTokens.map(\.assetRatioId)
@@ -750,6 +743,16 @@ extension PortfolioStore: PreferencesObserver {
   }
   public func preferencesDidChange(for key: String) {
     guard !isSavingFilters else { return }
+    update()
+  }
+}
+
+extension PortfolioStore: WalletUserAssetDataObserver {
+  public func cachedBalanceRefreshed() {
+    update()
+  }
+  
+  public func userAssetUpdated() {
     update()
   }
 }

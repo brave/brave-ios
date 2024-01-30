@@ -154,7 +154,12 @@ public class CryptoStore: ObservableObject, WalletObserverStore {
     self.ethTxManagerProxy = ethTxManagerProxy
     self.solTxManagerProxy = solTxManagerProxy
     self.ipfsApi = ipfsApi
-    self.userAssetManager = WalletUserAssetManager(rpcService: rpcService, walletService: walletService)
+    self.userAssetManager = WalletUserAssetManager(
+      keyringService: keyringService,
+      rpcService: rpcService,
+      walletService: walletService,
+      txService: txService
+    )
     self.origin = origin
     
     self.networkStore = .init(
@@ -246,7 +251,7 @@ public class CryptoStore: ObservableObject, WalletObserverStore {
         guard let isUpdatingUserAssets = self?.isUpdatingUserAssets, !isUpdatingUserAssets else { return }
         self?.isUpdatingUserAssets = true
         Preferences.Wallet.migrateCoreToWalletUserAssetCompleted.reset()
-        WalletUserAssetGroup.removeAllGroup() {
+        self?.userAssetManager.removeUserAssetsAndBalance {
           self?.userAssetManager.migrateUserAssets(completion: {
             self?.updateAssets()
             self?.isUpdatingUserAssets = false
@@ -357,6 +362,9 @@ public class CryptoStore: ObservableObject, WalletObserverStore {
     transactionsActivityStore.tearDown()
     marketStore.tearDown()
     settingsStore.tearDown()
+    
+    // user asset manager
+    userAssetManager.tearDown()
     
     accountActivityStore?.tearDown()
     assetDetailStore?.tearDown()
@@ -591,11 +599,13 @@ public class CryptoStore: ObservableObject, WalletObserverStore {
   }
   
   func updateAutoDiscoveredAssets() {
-    // at this point, all auto-discovered assets have been added to CD
-    // update `Portfolio/Assets`
-    portfolioStore.update()
-    // fetch junk NFTs from SimpleHash which will also update `Portfolio/NFTs`
-    nftStore.fetchJunkNFTs()
+    // at this point, all auto-discovered assets have been added to CD. We now need to fetch and cache their balance
+    userAssetManager.refreshBalances { [weak self] in
+      // update `Portfolio/Assets`
+      self?.portfolioStore.update()
+      // fetch junk NFTs from SimpleHash which will also update `Portfolio/NFTs`
+      self?.nftStore.fetchJunkNFTs()
+    }
   }
   
   func prepare(isInitialOpen: Bool = false) {

@@ -16,6 +16,7 @@ class WalletUserAssetBalanceTests: CoreDataTestCase {
   let account1 = "0x35DCec532e809A3dAa04ED3Fd949495f7BAc9090"
   let account2 = "0x84D4937cd23753FB71310438b7C2e4Ade45b3896"
   let account3 = "Be6iLdEVKj4bqSMKseMs8qdzBWudLFkebsEVGRmgabcd"
+  let mockSolNetwork = BraveWallet.NetworkInfo(chainId: "0x67", chainName: "Solana Test Network", blockExplorerUrls: [], iconUrls: [], activeRpcEndpointIndex: 0, rpcEndpoints: [], symbol: "SOL", symbolName: "SOL", decimals: 9, coin: .sol, supportedKeyrings: [], isEip1559: false)
   
   let fetchRequest = NSFetchRequest<WalletUserAssetBalance>(entityName: String(describing: WalletUserAssetBalance.self))
   
@@ -67,6 +68,19 @@ class WalletUserAssetBalanceTests: CoreDataTestCase {
     }
     
     XCTAssertEqual(try! DataController.viewContext.count(for: self.fetchRequest), 1)
+  }
+  
+  func testRemoveAssetBalanceByNetwork() {
+    createAndWait(asset: asset, balance: "0.1234", account: account1)
+    createAndWait(asset: asset, balance: "0.8766", account: account2)
+    createAndWait(asset: asset2, balance: "5.6789", account: account3)
+    XCTAssertEqual(try! DataController.viewContext.count(for: fetchRequest), 3)
+    
+    backgroundSaveAndWaitForExpectation {
+      WalletUserAssetBalance.removeBalance(for: mockSolNetwork)
+    }
+    
+    XCTAssertEqual(try! DataController.viewContext.count(for: self.fetchRequest), 2)
   }
   
   // MARK: - Update
