@@ -28,6 +28,7 @@ var package = Package(
     .library(name: "BraveStrings", targets: ["BraveStrings"]),
     .library(name: "BraveVPN", targets: ["BraveVPN"]),
     .library(name: "BraveNews", targets: ["BraveNews"]),
+    .library(name: "AIChat", targets: ["AIChat"]),
     .library(name: "Favicon", targets: ["Favicon"]),
     .library(name: "FaviconModels", targets: ["FaviconModels"]),
     .library(name: "Onboarding", targets: ["Onboarding"]),
@@ -209,6 +210,23 @@ var package = Package(
       ],
       plugins: ["LoggerPlugin"]
     ),
+    .target(
+      name: "AIChat",
+      dependencies: [
+        "BraveCore",
+        "BraveShared",
+        "BraveStrings",
+        "BraveUI",
+        "DesignSystem",
+        "Preferences",
+        "Strings",
+        .product(name: "Collections", package: "swift-collections"),
+        .product(name: "Introspect", package: "SwiftUI-Introspect"),
+        .product(name: "Lottie", package: "lottie-ios"),
+      ],
+      resources: [],
+      plugins: ["LoggerPlugin"]
+    ),
     .target(name: "Preferences", dependencies: ["Shared"], plugins: ["LoggerPlugin"]),
     .target(
       name: "Onboarding",
@@ -335,6 +353,7 @@ var braveTarget: PackageDescription.Target = .target(
     "BraveWidgetsModels",
     "BraveVPN",
     "BraveNews",
+    "AIChat",
     "Onboarding",
     "Growth",
     "CodableHelpers",

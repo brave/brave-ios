@@ -19,6 +19,7 @@ import BraveVPN
 import BraveNews
 import Growth
 import NetworkExtension
+import AIChat
 
 extension TabBarVisibility: RepresentableOptionType {
   public var displayString: String {

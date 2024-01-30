@@ -6,6 +6,17 @@
 import SwiftUI
 import BraveCore
 
+extension View {
+  @ViewBuilder 
+  public func hidden(isHidden: Bool) -> some View {
+    if isHidden {
+      self.hidden()
+    } else {
+      self
+    }
+  }
+}
+
 private struct AIChatMenuHeaderView: View {
   
   let icon: String

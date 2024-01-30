@@ -7,8 +7,9 @@ import SwiftUI
 import DesignSystem
 import BraveCore
 import Shared
+import Speech
 
-class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
+public class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   private var api: AIChat!
   private let webView: WKWebView?
   
@@ -22,7 +23,7 @@ class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   @Published var requestInProgress: Bool = false
   @Published var apiError: AiChat.APIError = .none
   
-  var isPageConnected: Bool {
+  public var isPageConnected: Bool {
     get {
       return api.shouldSendPageContents == true && webView?.url?.isWebPage(includeDataURIs: true) == true
     }
@@ -34,18 +35,18 @@ class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
     }
   }
   
-  var shouldShowPremiumPrompt: Bool {
+  public var shouldShowPremiumPrompt: Bool {
     return premiumStatus == .inactive && api.canShowPremiumPrompt
   }
   
-  var hasValidWebPage: Bool {
+  public var hasValidWebPage: Bool {
     if let url = webView?.url {
       return url.isWebPage() && !InternalURL.isValid(url: url)
     }
     return false
   }
   
-  var isAgreementAccepted: Bool {
+  public var isAgreementAccepted: Bool {
     get {
       return api.isAgreementAccepted
     }
@@ -64,7 +65,7 @@ class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
     }
   }
   
-  init(braveCore: BraveCoreMain, webView: WKWebView?) {
+  public init(braveCore: BraveCoreMain, webView: WKWebView?) {
     self.webView = webView
     
     super.init()
@@ -87,7 +88,7 @@ class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
     }
   }
   
-  func getPageTitle() -> String? {
+  public func getPageTitle() -> String? {
     if isPageConnected {
       if let webView = webView {
         return webView.title
@@ -96,55 +97,57 @@ class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
     return "Leo"
   }
   
-  func getLastCommittedURL() -> URL? {
+  public func getLastCommittedURL() -> URL? {
     return webView?.url
   }
   
-  func getPageContent(completion: @escaping (String?, Bool) -> Void) {
+  public func getPageContent(completion: @escaping (String?, Bool) -> Void) {
     guard let webView = webView else {
       completion(nil, false)
       return
     }
     
-    BraveLeoScriptHandler.getMainArticle(webView: webView) { articleText in
+    completion("Temporary", false)
+    
+    /*BraveLeoScriptHandler.getMainArticle(webView: webView) { articleText in
       guard let articleText = articleText else {
         completion(nil, false)
         return
       }
       
       completion(articleText, false)
-    }
+    }*/
   }
   
-  func isDocumentOnLoadCompletedInPrimaryFrame() -> Bool {
+  public func isDocumentOnLoadCompletedInPrimaryFrame() -> Bool {
     return webView?.isLoading == false
   }
   
-  func onHistoryUpdate() {
+  public func onHistoryUpdate() {
     conversationHistory = api.conversationHistory
   }
   
-  func onAPIRequest(inProgress: Bool) {
+  public func onAPIRequest(inProgress: Bool) {
     requestInProgress = inProgress
   }
   
-  func onAPIResponseError(_ error: AiChat.APIError) {
+  public func onAPIResponseError(_ error: AiChat.APIError) {
     apiError = error
   }
   
-  func onSuggestedQuestionsChanged(_ questions: [String], status: AiChat.SuggestionGenerationStatus) {
+  public func onSuggestedQuestionsChanged(_ questions: [String], status: AiChat.SuggestionGenerationStatus) {
     suggestedQuestions = questions
   }
   
-  func onModelChanged(_ modelKey: String) {
+  public func onModelChanged(_ modelKey: String) {
     currentModel = models.first(where: { $0.key == modelKey })
   }
   
-  func onPageHasContent(_ siteInfo: AiChat.SiteInfo) {
+  public func onPageHasContent(_ siteInfo: AiChat.SiteInfo) {
     
   }
   
-  func onConversationEntryPending() {
+  public func onConversationEntryPending() {
     
   }
   
@@ -198,11 +201,11 @@ class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   }
 }
 
-struct AIChatView: View {
-  @StateObject 
+public struct AIChatView: View {
+  @ObservedObject
   var model: AIChatViewModel
   
-  let speechRecognizer: SpeechRecognizer
+//  let speechRecognizer: SpeechRecognizer
 
   @Environment(\.presentationMode)
   private var presentationMode
@@ -226,8 +229,13 @@ struct AIChatView: View {
   private var isNoMicrophonePermissionPresented = false
   
   var openURL: ((URL) -> Void)
+  
+  public init(model: AIChatViewModel, openURL: @escaping (URL) -> Void) {
+    self.model = model
+    self.openURL = openURL
+  }
 
-  var body: some View {
+  public var body: some View {
     VStack(spacing: 0.0) {
       AIChatNavigationView(premiumStatus: model.premiumStatus,
       onClose: {
@@ -364,15 +372,15 @@ struct AIChatView: View {
       AIChatPromptInputView() { prompt in
         model.submitQuery(prompt)
       } onVoiceSearchPressed: {
-        Task {
-          let permissionStatus = await speechRecognizer.askForUserPermission()
-          
-          if permissionStatus {
-            isVoiceEntryPresented = true
-          } else {
-            isNoMicrophonePermissionPresented = true
-          }
-        }
+//        Task {
+//          let permissionStatus = await speechRecognizer.askForUserPermission()
+//          
+//          if permissionStatus {
+//            isVoiceEntryPresented = true
+//          } else {
+//            isNoMicrophonePermissionPresented = true
+//          }
+//        }
       }
         .disabled(model.shouldShowPremiumPrompt)
     }
@@ -398,11 +406,13 @@ struct AIChatView: View {
     .background(Color.clear
       .alert(isPresented: $isVoiceEntryPresented) {
         // TODO: Present Voice Entry
+        EmptyView() as! Alert
       }
     )
     .background(Color.clear
       .alert(isPresented: $isNoMicrophonePermissionPresented) {
         // TODO: Present No Microphone Permission
+        EmptyView() as! Alert
       }
     )
   }

@@ -5,6 +5,7 @@
 
 import SwiftUI
 import DesignSystem
+import Favicon
 
 struct AIChatPageInfoBanner: View {
   let url: URL?
