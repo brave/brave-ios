@@ -333,7 +333,7 @@ class SettingsViewController: TableViewController {
         selection: { [unowned self] in
           let controller = UIHostingController(rootView: 
             AIChatAdvancedSettingsView(
-              aiModel: .init(braveCore: self.braveCore, webView: self.tabManager.selectedTab?.webView),
+              aiModel: .init(braveCore: self.braveCore, webView: self.tabManager.selectedTab?.webView, pageContentFetcher: BraveLeoScriptHandler.getMainArticle),
               isModallyPresented: false,
               openURL: { [unowned self] url in
                 self.settingsDelegate?.settingsOpenURLInNewTab(url)

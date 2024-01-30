@@ -46,17 +46,16 @@ class BraveLeoScriptHandler: NSObject, TabContentScript {
 }
 
 extension BraveLeoScriptHandler {
-
-  static func getMainArticle(webView: WKWebView, completion: @escaping (String?) -> Void) {
-    webView.evaluateSafeJavaScript(functionName: "window.__firefox__.\(getMainArticle)",
-                                        args: [Self.scriptId],
-                                        contentWorld: Self.scriptSandbox,
-                                        asFunction: true) { value, error in
-      if let error = error {
-        Logger.module.error("Error Retrieving Main Article From Page: \(error.localizedDescription)")
-      }
-      
-      completion(value as? String)
+  @MainActor
+  static func getMainArticle(webView: WKWebView) async -> String? {
+    do {
+      let articleText = try await webView.evaluateSafeJavaScriptThrowing(functionName: "window.__firefox__.\(getMainArticle)",
+                                                                         contentWorld: Self.scriptSandbox,
+                                                                         asFunction: true) as? String
+      return articleText
+    } catch {
+      Logger.module.error("Error Retrieving Main Article From Page: \(error.localizedDescription)")
+      return nil
     }
   }
 }
