@@ -9,17 +9,19 @@ import Shared
 import Preferences
 import Data
 
-struct VoiceSearchInputView: View {
+public struct SpeechToTextInputView: View {
   @Environment(\.presentationMode) @Binding private var presentationMode
   @ObservedObject var speechModel: SpeechRecognizer
-
+  let disclaimer: String
+  
   var onEnterSearchKeyword: (() -> Void)?
-
-  private func dismissView() {
-    presentationMode.dismiss()
+  
+  public init(speechModel: SpeechRecognizer, disclaimer: String) {
+    self.speechModel = speechModel
+    self.disclaimer = disclaimer
   }
   
-  var body: some View {
+  public var body: some View {
     inputView
   }
   
@@ -36,7 +38,7 @@ struct VoiceSearchInputView: View {
         }
       }
       transcriptView
-      Text(Strings.VoiceSearch.screenDisclaimer)
+      Text(disclaimer)
         .font(.footnote)
         .multilineTextAlignment(.center)
         .foregroundColor(Color(.secondaryBraveLabel))
@@ -90,9 +92,13 @@ struct VoiceSearchInputView: View {
     }
     .padding(.vertical, 45)
   }
+  
+  private func dismissView() {
+    presentationMode.dismiss()
+  }
 }
 
-extension VoiceSearchInputView {
+public extension SpeechToTextInputView {
     
   private var outerCircleScale: CGFloat {
     switch speechModel.animationType {

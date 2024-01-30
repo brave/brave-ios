@@ -4884,14 +4884,6 @@ extension Strings {
 
 extension Strings {
   public struct VoiceSearch {
-    public static let screenTitle =
-      NSLocalizedString(
-        "voice.search.screenn.title",
-        tableName: "BraveShared",
-        bundle: .module,
-        value: "Voice Search",
-        comment: "Title for screen to search using voice.")
-    
     public static let screenDisclaimer =
       NSLocalizedString(
         "voice.search.screen.disclaimer",

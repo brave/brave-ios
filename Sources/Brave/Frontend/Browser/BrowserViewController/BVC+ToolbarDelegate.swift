@@ -18,6 +18,7 @@ import Preferences
 import CertificateUtilities
 import AVFoundation
 import Playlist
+import SpeechRecognition
 
 // MARK: - TopToolbarDelegate
 
@@ -532,7 +533,8 @@ extension BrowserViewController: TopToolbarDelegate {
         pipMediaPlayer.pause()
       }
       
-      voiceSearchViewController = PopupViewController(rootView: VoiceSearchInputView(speechModel: speechRecognizer))
+      voiceSearchViewController = PopupViewController(
+        rootView: SpeechToTextInputView(speechModel: speechRecognizer, disclaimer: Strings.VoiceSearch.screenDisclaimer))
       
       if let voiceSearchController = voiceSearchViewController {
         voiceSearchController.modalTransitionStyle = .crossDissolve
