@@ -103,7 +103,7 @@ public struct AIChatView: View {
                       // TODO: Dismiss Action
                     }
                   )
-                  .padding(8)
+                  .padding()
                 } else {
                   ForEach(Array(model.conversationHistory.enumerated()), id: \.offset) { index, turn in
                     if turn.characterType == .human {
@@ -133,8 +133,8 @@ public struct AIChatView: View {
                   }
                   
                   if model.apiError == .connectionIssue {
-                    // TODO: Connection Issue View
-                    EmptyView()
+                    AIChatNetworkErrorView()
+                      .padding()
                   } else if model.apiError == .rateLimitReached {
                     // TODO: If the user is already premium, are they also rate-limited?
                     AIChatPremiumUpsellView(upsellType: .rateLimit,
@@ -144,10 +144,10 @@ public struct AIChatView: View {
                                             dismissAction: {
                       // TODO: Dismiss Action
                     })
-                    .padding(8)
+                    .padding()
                   } else if model.apiError == .contextLimitReached {
-                    // TODO: Conversation Length Limit View
-                    EmptyView()
+                    AIChatContextLimitErrorView()
+                      .padding()
                   }
                   
                   Color.clear.id(lastMessageId)
@@ -156,6 +156,7 @@ public struct AIChatView: View {
                       !model.suggestedQuestions.isEmpty &&
                       model.apiError == .none {
                     AIChatSuggestionsView(geometry: geometry, suggestions: model.suggestedQuestions) { suggestion in
+                      hasSeenIntro = true
                       model.submitSuggestion(suggestion)
                     }
                     .padding()
@@ -174,9 +175,12 @@ public struct AIChatView: View {
                 }
               }
             } else {
-              AIChatIntroView()
-                .padding()
-                .frame(minHeight: geometry.size.height)
+              AIChatIntroView(onSummarizePage: model.isPageConnected ? {
+                hasSeenIntro = true
+                model.submitQuery("Summarize this page")
+              } : nil)
+              .padding()
+              .frame(minHeight: geometry.size.height)
             }
           }
         }

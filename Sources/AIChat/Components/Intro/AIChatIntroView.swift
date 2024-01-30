@@ -10,6 +10,7 @@ private struct AIChatIntroBubbleView: View {
   let title: String
   let subtitle: String
   let image: String
+  let onSummarizePage: (() -> Void)?
   
   var body: some View {
     VStack {
@@ -28,6 +29,28 @@ private struct AIChatIntroBubbleView: View {
         .fixedSize(horizontal: false, vertical: true)
         .padding(.horizontal)
         .padding(.bottom)
+      
+      if let onSummarizePage = onSummarizePage {
+        HStack {
+          Button {
+            onSummarizePage()
+          } label: {
+            Text("Summarize this page")
+              .font(.callout)
+              .foregroundColor(Color(braveSystemName: .textInteractive))
+          }
+          .padding(12.0)
+          .background(
+            RoundedRectangle(cornerRadius: 12.0, style: .continuous)
+              .strokeBorder(Color(braveSystemName: .dividerInteractive), lineWidth: 1.0)
+          )
+          .clipShape(RoundedRectangle(cornerRadius: 12.0, style: .continuous))
+          
+          Spacer()
+        }
+        .padding(.horizontal)
+        .padding(.bottom)
+      }
     }
     .background(
       HStack {
@@ -35,12 +58,15 @@ private struct AIChatIntroBubbleView: View {
         Image(image, bundle: .module)
           .resizable()
           .aspectRatio(contentMode: .fit)
+          .frame(alignment: .bottomTrailing)
       }
     )
   }
 }
 
 struct AIChatIntroView: View {
+  let onSummarizePage: (() -> Void)?
+  
   var body: some View {
     VStack(spacing: 0.0) {
       Text("Hi, I'm Leo!")
@@ -58,15 +84,19 @@ struct AIChatIntroView: View {
         .padding(.bottom)
       
       AIChatIntroBubbleView(title: "Need help with a website?",
-                            subtitle: "I can help you summarizing articles, expanding on a site's content and much more.",
-                            image: "leo-intro-website-shape")
+                            subtitle: onSummarizePage != nil ? "I can help you summarizing articles, expanding on a site's content and much more. Not sure where to start? Try this:" : "I can help you summarizing articles, expanding on a site's content and much more.",
+                            image: "leo-intro-website-shape",
+                            onSummarizePage: onSummarizePage
+      )
       .background(Color(braveSystemName: .purple10))
       .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
       .padding(.bottom)
       
       AIChatIntroBubbleView(title: "Just want to chat?",
                             subtitle: "Ask me anything! We can talk about any topic you want. I'm always learning and improving to provide better answers.",
-                            image: "leo-intro-star-burst")
+                            image: "leo-intro-star-burst",
+                            onSummarizePage: nil
+      )
       .background(Color(braveSystemName: .teal10))
       .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
       .padding(.bottom)
@@ -75,5 +105,5 @@ struct AIChatIntroView: View {
 }
 
 #Preview {
-  AIChatIntroView()
+  AIChatIntroView(onSummarizePage: nil)
 }

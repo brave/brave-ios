@@ -22,10 +22,7 @@ public struct AIChatTermsAndConditionsView: View {
     VStack {
       ScrollView {
         VStack {
-          Image(braveSystemName: "leo.product.brave-leo")
-            .frame(minWidth: 100.0, minHeight: 100.0)
-          
-          Text("About Leo")
+          Text("Privacy agreement")
             .multilineTextAlignment(.leading)
             .frame(maxWidth: .infinity, alignment: .leading)
             .fixedSize(horizontal: false, vertical: true)
@@ -33,7 +30,7 @@ public struct AIChatTermsAndConditionsView: View {
             .foregroundStyle(Color(braveSystemName: .textPrimary))
             .padding(.bottom, 8.0)
           
-          Text("Brave Leo is an AI smart assistant that can summarize web pages, transcribe videos, and answer questions. Brave Leo Premium uses advanced **[AI models](https://github.com/brave/brave-browser/wiki/Brave-Leo)** for even more nuanced replies, and gives early access to new features.\n\nThe accuracy of responses is not guaranteed, and may include inaccurate, misleading, or false information. Don't submit sensitive or private info, and use caution with any answers related to health, finance, personal safety, or similar.\n\nLeo does not collect identifiers such as your IP Address that can be linked to you. No personal data is retained by the AI model or any 3rd-party model providers.")
+          Text("Brave Leo is an AI smart assistant that can summarize web pages, transcribe videos, and answer questions. Brave Leo Premium uses advanced AI models for even more nuanced replies, and gives early access to new features.\n\nThe accuracy of responses is not guaranteed, and may include inaccurate, misleading, or false information. Don't submit sensitive or private info, and use caution with any answers related to health, finance, personal safety, or similar.\n\nLeo does not collect or otherwise process identifiers such as IP Address that can be linked to you. No personal data is retained by the AI model or any 3rd-party model providers.")
             .multilineTextAlignment(.leading)
             .frame(maxWidth: .infinity, alignment: .leading)
             .fixedSize(horizontal: false, vertical: true)
