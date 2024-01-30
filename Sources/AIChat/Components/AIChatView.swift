@@ -190,6 +190,8 @@ public struct AIChatView: View {
 //          }
 //        }
       }
+        .padding(.horizontal)
+        .padding(.bottom, 8.0)
         .disabled(model.shouldShowPremiumPrompt)
     }
     .background(Color(braveSystemName: .containerBackground))
