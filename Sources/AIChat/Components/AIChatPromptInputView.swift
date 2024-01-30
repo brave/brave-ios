@@ -13,15 +13,27 @@ struct AIChatPromptInputView: View {
   @State private var prompt: String = ""
 
   var body: some View {
-    HStack {
-      TextField("", text: $prompt, 
+    HStack(spacing: 0.0) {
+      Text("/")
+        .font(.caption2)
+        .foregroundStyle(Color(braveSystemName: .textTertiary))
+        .padding(.horizontal, 12.0)
+        .padding(.vertical, 4.0)
+        .background(
+          RoundedRectangle(cornerRadius: 4.0, style: .continuous)
+            .strokeBorder(Color(braveSystemName: .dividerSubtle), lineWidth: 1.0)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 4.0, style: .continuous))
+        .padding()
+      
+      TextField("", text: $prompt,
                 prompt: Text("Enter a prompt here")
                           .font(.subheadline)
                           .foregroundColor(Color(braveSystemName: .textTertiary))
       )
       .font(.subheadline)
       .foregroundColor(Color(braveSystemName: .textPrimary))
-      .padding()
+      //.padding()
       .onSubmit {
         if !prompt.isEmpty {
           onTextSubmitted(prompt)
@@ -51,16 +63,6 @@ struct AIChatPromptInputView: View {
     .background(
       RoundedRectangle(cornerRadius: 8.0, style: .continuous)
         .strokeBorder(Color(braveSystemName: .dividerStrong), lineWidth: 1.0)
-        .mask(
-          VStack {
-            Rectangle()
-              .offset(.init(x: 0.0, y: 0.0))
-              .padding(.bottom, 14.0)
-            Rectangle()
-              .padding(.horizontal)
-              .padding(.bottom)
-          }
-        ).allowsHitTesting(false)
     )
     .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
   }
@@ -71,7 +73,7 @@ struct AIChatPromptInputView: View {
   AIChatPromptInputView() { prompt in
     print("Prompt Submitted: \(prompt)")
   } onVoiceSearchPressed: {
-    print("Voice Search Activated)")
+    print("Voice Search Activated")
   }
     .previewLayout(.sizeThatFits)
 }
