@@ -3375,7 +3375,9 @@ extension BrowserViewController {
   }
   
   func openBraveLeo() {
-    let model = AIChatViewModel(braveCore: self.braveCore, webView: self.tabManager.selectedTab?.webView)
+    let model = AIChatViewModel(braveCore: self.braveCore,
+                                webView: self.tabManager.selectedTab?.webView,
+                                pageContentFetcher: BraveLeoScriptHandler.getMainArticle)
     if model.isAgreementAccepted {
       presentAIChatController(with: model)
     } else {
