@@ -7,13 +7,13 @@ import SwiftUI
 import DesignSystem
 import BraveCore
 import Shared
-import Speech
+import SpeechRecognition
 
 public struct AIChatView: View {
   @ObservedObject
   var model: AIChatViewModel
   
-//  let speechRecognizer: SpeechRecognizer
+  let speechRecognizer: SpeechRecognizer
 
   @Environment(\.presentationMode)
   private var presentationMode
@@ -38,8 +38,9 @@ public struct AIChatView: View {
   
   var openURL: ((URL) -> Void)
   
-  public init(model: AIChatViewModel, openURL: @escaping (URL) -> Void) {
+  public init(model: AIChatViewModel, speechRecognizer: SpeechRecognizer, openURL: @escaping (URL) -> Void) {
     self.model = model
+    self.speechRecognizer = speechRecognizer
     self.openURL = openURL
   }
 
@@ -180,15 +181,15 @@ public struct AIChatView: View {
       AIChatPromptInputView() { prompt in
         model.submitQuery(prompt)
       } onVoiceSearchPressed: {
-//        Task {
-//          let permissionStatus = await speechRecognizer.askForUserPermission()
-//          
-//          if permissionStatus {
-//            isVoiceEntryPresented = true
-//          } else {
-//            isNoMicrophonePermissionPresented = true
-//          }
-//        }
+        Task {
+          let permissionStatus = await speechRecognizer.askForUserPermission()
+          
+          if permissionStatus {
+            isVoiceEntryPresented = true
+          } else {
+            isNoMicrophonePermissionPresented = true
+          }
+        }
       }
         .padding(.horizontal)
         .padding(.bottom, 8.0)
