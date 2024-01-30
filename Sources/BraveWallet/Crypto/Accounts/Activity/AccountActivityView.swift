@@ -206,21 +206,21 @@ struct AccountActivityView: View {
           )
         )
       })
-      /*
-      Divider()
-      NavigationLink(destination: {
-        DappsSettings(
-          coin: account.coin,
-          siteConnectionStore: .previewStore
-        )
-      }, label: {
-        RowView(
-          iconBraveSystemName: "leo.lock.dots",
-          title: "Security",
-          description: "Connected Sites and Allowances"
-        )
-      })
-      */
+      if WalletConstants.supportedCoinTypes(.dapps).contains(store.account.coin) {
+        Divider()
+        NavigationLink(destination: {
+          DappsSettings(
+            coin: store.account.coin,
+            siteConnectionStore: cryptoStore.settingsStore.manageSiteConnectionsStore(keyringStore: keyringStore)
+          )
+        }, label: {
+          RowView(
+            iconBraveSystemName: "leo.lock.dots",
+            title: Strings.Wallet.securityTitle,
+            description: Strings.Wallet.accountSecurityDescription
+          )
+        })
+      }
     }
     .background(
       Color(braveSystemName: .containerBackground)

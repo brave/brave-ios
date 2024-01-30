@@ -4850,5 +4850,19 @@ extension Strings {
       value: "Search",
       comment: "The label as a placeholder in search fields."
     )
+    public static let securityTitle = NSLocalizedString(
+      "wallet.securityTitle",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Security",
+      comment: "The title used in the row opening DApp settings in Account Details."
+    )
+    public static let accountSecurityDescription = NSLocalizedString(
+      "wallet.accountSecurityDescription",
+      tableName: "BraveWallet",
+      bundle: .module,
+      value: "Connected Sites and Allowances",
+      comment: "The description used below Security title in the row opening DApp settings in Account Details."
+    )
   }
 }
