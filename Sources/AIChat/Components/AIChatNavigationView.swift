@@ -1,7 +1,7 @@
 // Copyright 2024 The Brave Authors. All rights reserved.
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 import SwiftUI
 import DesignSystem
@@ -38,6 +38,7 @@ private struct TopView<L, C, R>: View where L: View, C: View, R: View {
 }
 
 struct AIChatNavigationView<Content>: View where Content: View {
+  let isMenusAvailable: Bool
   let premiumStatus: AiChat.PremiumStatus
   let onClose: (() -> Void)
   let onErase: (() -> Void)
@@ -79,25 +80,27 @@ struct AIChatNavigationView<Content>: View where Content: View {
         }
       }
     } right: {
-      HStack(spacing: 0.0) {
-        Button {
-          onErase()
-        } label: {
-          Image(braveSystemName: "leo.erase")
-            .tint(Color(braveSystemName: .textInteractive))
+      if isMenusAvailable {
+        HStack(spacing: 0.0) {
+          Button {
+            onErase()
+          } label: {
+            Image(braveSystemName: "leo.erase")
+              .tint(Color(braveSystemName: .textInteractive))
+          }
+          
+          Button {
+            showSettingsMenu = true
+          } label: {
+            Image(braveSystemName: "leo.settings")
+              .tint(Color(braveSystemName: .textInteractive))
+          }
+          .padding()
+          .popover(isPresented: $showSettingsMenu,
+                   content: {
+            menuContent()
+          })
         }
-        
-        Button {
-          showSettingsMenu = true
-        } label: {
-          Image(braveSystemName: "leo.settings")
-            .tint(Color(braveSystemName: .textInteractive))
-        }
-        .padding()
-        .popover(isPresented: $showSettingsMenu,
-                 content: {
-          menuContent()
-        })
       }
     }
     .background(Color(braveSystemName: .pageBackground))
@@ -106,13 +109,16 @@ struct AIChatNavigationView<Content>: View where Content: View {
 
 @available(iOS 17.0, *)
 #Preview(traits: .sizeThatFitsLayout) {
-  AIChatNavigationView(premiumStatus: .active,
-  onClose: {
-    print("Closed Chat")
-  }, onErase: {
-    print("Erased Chat History")
-  }, menuContent: {
-    EmptyView()
-  })
-    .previewLayout(.sizeThatFits)
+  AIChatNavigationView(
+    isMenusAvailable: true,
+    premiumStatus: .active,
+    onClose: {
+      print("Closed Chat")
+    }, onErase: {
+      print("Erased Chat History")
+    }, menuContent: {
+      EmptyView()
+    }
+  )
+  .previewLayout(.sizeThatFits)
 }

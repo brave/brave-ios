@@ -4,15 +4,10 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 import Foundation
-import SwiftUI
+import Preferences
 
-extension View {
-  @ViewBuilder
-  public func hidden(isHidden: Bool) -> some View {
-    if isHidden {
-      self.hidden()
-    } else {
-      self
-    }
+extension Preferences {
+  public enum AIChat {
+    public static let hasSeenIntro = Option<Bool>(key: "aichat.intro.hasBeenSeen", default: false)
   }
 }

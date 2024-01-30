@@ -1,7 +1,7 @@
 // Copyright 2024 The Brave Authors. All rights reserved.
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 import SwiftUI
 import BraveUI
@@ -13,30 +13,36 @@ struct AIChatPaywallView: View {
     case yearly, monthly
   }
   
-  @Environment(\.presentationMode) @Binding private var presentationMode
+  @Environment(\.presentationMode) 
+  @Binding private var presentationMode
   
-  @State private var selectedTierType: TierType = .monthly
-  @State private var availableTierTypes: [TierType] = [.monthly]
+  @State 
+  private var selectedTierType: TierType = .monthly
+  
+  @State
+  private var availableTierTypes: [TierType] = [.monthly]
 
-  @State private var productInfo = LeoProductInfo.shared
+  @State 
+  private var productInfo = LeoProductInfo.shared
   
   var restoreAction: (() -> Void)?
   var upgradeAction: ((TierType) -> Void)?
   
   var body: some View {
     NavigationView {
-      VStack(spacing: 8) {
+      VStack(spacing: 8.0) {
         ScrollView {
-          VStack(spacing: 0) {
+          VStack(spacing: 0.0) {
             PremiumUpsellTitleView(
               upsellType: .premium,
               isPaywallPresented: true)
-              .padding(16)
+            .padding(16.0)
+            
             PremiumUpsellDetailView(isPaywallPresented: true)
-              .padding([.top, .horizontal], 8)
-              .padding(.bottom, 24)
+              .padding([.top, .horizontal], 8.0)
+              .padding(.bottom, 24.0)
             tierSelection
-              .padding([.bottom, .horizontal], 8)
+              .padding([.bottom, .horizontal], 8.0)
           }
           .navigationTitle("Leo Premium")
           .navigationBarTitleDisplayMode(.inline)
@@ -70,10 +76,11 @@ struct AIChatPaywallView: View {
         })
         
         paywallActionView
-          .padding(.bottom, 16)
+          .padding(.bottom, 16.0)
       }
       .background(
-        Color(braveSystemName: .primitivePrimary90).edgesIgnoringSafeArea(.all)
+        Color(braveSystemName: .primitivePrimary90)
+          .edgesIgnoringSafeArea(.all)
           .overlay(Image("leo-product", bundle: .module),
                    alignment: .topTrailing))
     }
@@ -86,7 +93,7 @@ struct AIChatPaywallView: View {
           selectedTierType = .yearly
         }) {
           HStack {
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 8.0) {
               Text("One Year")
                 .font(.title2.weight(.semibold))
                 .foregroundColor(Color(.white))
@@ -94,7 +101,7 @@ struct AIChatPaywallView: View {
               Text("SAVE UP TO 25%")
                 .font(.caption2.weight(.semibold))
                 .foregroundColor(Color(braveSystemName: .green50))
-                .padding(4)
+                .padding(4.0)
                 .background(Color(braveSystemName: .green20))
                 .clipShape(RoundedRectangle(cornerRadius: 4.0, style: .continuous))
             }
@@ -126,7 +133,7 @@ struct AIChatPaywallView: View {
         .overlay(
           RoundedRectangle(cornerRadius: 8.0, style: .continuous)
             .strokeBorder(Color(braveSystemName: .primitivePrimary50),
-                          lineWidth: selectedTierType == .yearly ? 2 : 0)
+                          lineWidth: selectedTierType == .yearly ? 2.0 : 0.0)
         )
         .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
       }
@@ -143,7 +150,7 @@ struct AIChatPaywallView: View {
             Spacer()
             
             if let monthlyProduct = productInfo.monthlySubProduct {
-              HStack(alignment: .center, spacing: 2) {
+              HStack(alignment: .center, spacing: 2.0) {
                 Text("\(monthlyProduct.priceLocale.currencyCode ?? "")\(monthlyProduct.priceLocale.currencySymbol ?? "")")
                   .font(.subheadline)
                   .foregroundColor(Color(braveSystemName: .primitivePrimary30))
@@ -168,7 +175,7 @@ struct AIChatPaywallView: View {
         .overlay(
           RoundedRectangle(cornerRadius: 8.0, style: .continuous)
             .strokeBorder(Color(braveSystemName: .primitivePrimary50),
-                          lineWidth: selectedTierType == .monthly ? 2 : 0)
+                          lineWidth: selectedTierType == .monthly ? 2.0 : 0.0)
         )
         .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
       }
@@ -179,15 +186,15 @@ struct AIChatPaywallView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .fixedSize(horizontal: false, vertical: true)
         .foregroundStyle(Color(braveSystemName: .primary20))
-        .padding([.horizontal], 16)
-        .padding([.vertical], 12)
+        .padding([.horizontal], 16.0)
+        .padding([.vertical], 12.0)
     }
   }
   
   private var paywallActionView: some View {
-    VStack(spacing: 16) {
+    VStack(spacing: 16.0) {
       Rectangle()
-        .frame(height: 1)
+        .frame(height: 1.0)
         .foregroundColor(Color(braveSystemName: .primitivePrimary70))
       
       VStack {
@@ -209,7 +216,7 @@ struct AIChatPaywallView: View {
         .clipShape(RoundedRectangle(cornerRadius: 16.0, style: .continuous))
         .disabled(!LeoProductInfo.shared.isComplete)
       }
-      .padding([.horizontal], 16)
+      .padding([.horizontal], 16.0)
     }
   }
 }

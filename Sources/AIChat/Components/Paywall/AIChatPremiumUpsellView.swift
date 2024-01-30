@@ -1,7 +1,7 @@
 // Copyright 2024 The Brave Authors. All rights reserved.
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 import SwiftUI
 import DesignSystem
@@ -50,14 +50,14 @@ struct AIChatPremiumUpsellView: View {
   var dismissAction: (() -> Void)?
 
   var body: some View {
-    VStack(spacing: 0) {
+    VStack(spacing: 0.0) {
       PremiumUpsellTitleView(
         upsellType: upsellType,
         isPaywallPresented: false)
-        .padding(24)
+      .padding(24.0)
       PremiumUpsellDetailView(
         isPaywallPresented: false)
-        .padding(8)
+      .padding(8.0)
       PremiumUpsellActionView(
         upsellType: upsellType,
         upgradeAction: {
@@ -84,28 +84,28 @@ struct PremiumUpsellActionView: View {
     }) {
       Text(upsellType.primaryActionTitle)
         .font(.subheadline.weight(.medium))
-        .padding([.top, .bottom], 12)
-        .padding([.leading, .trailing], 16)
+        .padding([.top, .bottom], 12.0)
+        .padding([.leading, .trailing], 16.0)
         .frame(maxWidth: .infinity)
     }
     .background(Color(braveSystemName: .buttonBackground))
     .foregroundStyle(.white)
     .clipShape(RoundedRectangle(cornerRadius: 12.0, style: .continuous))
-    .padding(16)
+    .padding(16.0)
     
     Button(action: {
       dismissAction?()
     }) {
       Text(upsellType.dismissActionTitle)
         .font(.subheadline.weight(.medium))
-        .padding([.top, .bottom], 12)
-        .padding([.leading, .trailing], 16)
+        .padding([.top, .bottom], 12.0)
+        .padding([.leading, .trailing], 16.0)
         .frame(maxWidth: .infinity)
     }
     .background(.clear)
     .foregroundStyle(Color(braveSystemName: .textSecondary))
-    .padding([.bottom], 12)
-    .padding([.leading, .trailing], 16)
+    .padding([.bottom], 12.0)
+    .padding([.leading, .trailing], 16.0)
   }
 }
 

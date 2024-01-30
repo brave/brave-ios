@@ -1,7 +1,7 @@
 // Copyright 2024 The Brave Authors. All rights reserved.
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 import Foundation
 import SwiftUI
@@ -26,10 +26,12 @@ public class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   
   public var isPageConnected: Bool {
     get {
-      return api.shouldSendPageContents == true && webView?.url?.isWebPage(includeDataURIs: true) == true
+      return api.shouldSendPageContents && webView?.url?.isWebPage(includeDataURIs: true) == true
     }
     
     set {
+      objectWillChange.send()
+      
       if api.shouldSendPageContents != newValue && webView?.url?.isWebPage(includeDataURIs: true) == true {
         api.shouldSendPageContents = newValue
       }
@@ -53,6 +55,7 @@ public class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
     }
     
     set {
+      objectWillChange.send()
       api.isAgreementAccepted = newValue
       
       if newValue {
@@ -149,24 +152,30 @@ public class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   // MARK: - API
   
   func changeModel(modelKey: String) {
-    Task { @MainActor in
-      api.changeModel(modelKey)
-    }
+    api.changeModel(modelKey)
   }
   
   func clearConversationHistory() {
+    apiError = .none
     api.clearConversationHistory()
   }
   
   func submitSuggestion(_ suggestion: String) {
+    apiError = .none
     submitQuery(suggestion)
   }
   
   func submitQuery(_ text: String) {
+    apiError = .none
     api.submitHumanConversationEntry(text)
   }
   
+  func retryLastRequest() {
+    api.retryAPIRequest()
+  }
+  
   func clearAndResetData() {
+    apiError = .none
     api.clearConversationHistory()
     api.setConversationActive(false)
     api.isAgreementAccepted = false
