@@ -6,14 +6,19 @@
 import SwiftUI
 import DesignSystem
 
-struct AIChatTermsAndConditionsView: View {
+public struct AIChatTermsAndConditionsView: View {
   let onTermsAccepted: () -> Void
   let onOpenURL: (URL) -> Void
   
   @Environment(\.presentationMode)
   private var presentationMode
   
-  var body: some View {
+  public init(onTermsAccepted: @escaping () -> Void, onOpenURL: @escaping (URL) -> Void) {
+    self.onTermsAccepted = onTermsAccepted
+    self.onOpenURL = onOpenURL
+  }
+  
+  public var body: some View {
     VStack {
       ScrollView {
         VStack {

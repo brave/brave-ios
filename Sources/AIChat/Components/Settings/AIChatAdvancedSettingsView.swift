@@ -10,19 +10,25 @@ import Strings
 import DesignSystem
 import Preferences
 
-struct AIChatAdvancedSettingsView: View {
-  @Environment(\.presentationMode) 
+public struct AIChatAdvancedSettingsView: View {
+  @Environment(\.presentationMode)
   @Binding private var presentationMode
   
   @ObservedObject var subscriptionManager = LeoSubscriptionManager.shared
 
-  @StateObject var aiModel: AIChatViewModel
+  @ObservedObject var aiModel: AIChatViewModel
 
   var isModallyPresented: Bool
   
   var openURL: ((URL) -> Void)
+  
+  public init(aiModel: AIChatViewModel, isModallyPresented: Bool, openURL: @escaping (URL) -> Void) {
+    self.aiModel = aiModel
+    self.isModallyPresented = isModallyPresented
+    self.openURL = openURL
+  }
 
-  var body: some View {
+  public var body: some View {
     if isModallyPresented {
       NavigationView {
         settingsView

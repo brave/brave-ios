@@ -1,14 +1,10 @@
-// Copyright 2023 The Brave Authors. All rights reserved.
+// Copyright 2024 The Brave Authors. All rights reserved.
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import Foundation
 import SwiftUI
-import Shared
-import BraveShared
-import Data
-import BraveUI
-import Favicon
 
 private class FaviconHelper: ObservableObject {
   @Published var image: UIImage?
@@ -23,12 +19,12 @@ private class FaviconHelper: ObservableObject {
   }
 }
 
-struct FaviconImage: View {
+public struct FaviconImage: View {
   let url: URL?
   private let isPrivateBrowsing: Bool
   @StateObject private var faviconLoader = FaviconHelper()
   
-  init(url: String?, isPrivateBrowsing: Bool) {
+  public init(url: String?, isPrivateBrowsing: Bool) {
     self.isPrivateBrowsing = isPrivateBrowsing
     
     if let url = url {
@@ -38,7 +34,7 @@ struct FaviconImage: View {
     }
   }
   
-  var body: some View {
+  public var body: some View {
     Image(uiImage: faviconLoader.image ?? .init(named: "defaultFavicon", in: .module, compatibleWith: nil)!)
       .resizable()
       .aspectRatio(contentMode: .fit)
