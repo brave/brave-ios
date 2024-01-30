@@ -7,13 +7,14 @@ import Foundation
 import AVFoundation
 import Speech
 import SwiftUI
+import BraveShared
 import os.log
 
 protocol SpeechRecognizerDelegate: AnyObject {
   func speechRecognizerDidFinishQuery(query: String)
 }
 
-class SpeechRecognizer: ObservableObject {
+public class SpeechRecognizer: ObservableObject {
   
   private let log = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "voiceRecognizer")
   
@@ -38,10 +39,14 @@ class SpeechRecognizer: ObservableObject {
   /// Formatted transcript from speech recognizer
   @Published var transcript: String = " "
   @Published var transcriptedIcon: String = "leo.microphone"
-  @Published var finalizedRecognition: (status: Bool, searchQuery: String) = (false, "")
+  @Published public var finalizedRecognition: (status: Bool, searchQuery: String) = (false, "")
   @Published private(set) var animationType: AnimationType = .pulse(scale: 1)
+  
+  public init() {
+    // Default constructor for public initialization
+  }
 
-  var isVoiceSearchAvailable: Bool {
+  public var isVoiceSearchAvailable: Bool {
     if let recognizer, recognizer.isAvailable, recognizer.supportsOnDeviceRecognition {
       return true
     }
@@ -57,7 +62,7 @@ class SpeechRecognizer: ObservableObject {
   private let recognizer = SFSpeechRecognizer()
   
   @MainActor
-  func askForUserPermission() async -> Bool {
+  public func askForUserPermission() async -> Bool {
     // Ask for Record Permission if not permitted throw error
     guard await AVAudioSession.sharedInstance().hasPermissionToRecord() else {
       return false
@@ -203,7 +208,7 @@ class SpeechRecognizer: ObservableObject {
     }
   }
   
-  nonisolated func clearSearch() {
+  nonisolated public func clearSearch() {
     Task { @MainActor in
       transcript = " "
       transcriptedIcon = "leo.microphone"

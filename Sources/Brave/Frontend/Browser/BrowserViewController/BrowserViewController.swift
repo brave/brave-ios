@@ -31,6 +31,7 @@ import BraveShields
 import CertificateUtilities
 import ScreenTime
 import AIChat
+import SpeechRecognition
 
 private let KVOs: [KVOConstants] = [
   .estimatedProgress,
@@ -142,7 +143,7 @@ public class BrowserViewController: UIViewController {
   var onPendingRequestUpdatedCancellable: AnyCancellable?
   
   /// Voice Search
-  var voiceSearchViewController: PopupViewController<VoiceSearchInputView>?
+  var voiceSearchViewController: PopupViewController<SpeechToTextInputView>?
   var voiceSearchCancelable: AnyCancellable?
   let speechRecognizer = SpeechRecognizer()
   
