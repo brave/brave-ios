@@ -38,6 +38,10 @@ public struct AIChatView: View {
   
   var openURL: ((URL) -> Void)
   
+  // TODO: Change To PREFERENCE
+  @State
+  private var hasSeenIntro = false
+  
   public init(model: AIChatViewModel, speechRecognizer: SpeechRecognizer, openURL: @escaping (URL) -> Void) {
     self.model = model
     self.speechRecognizer = speechRecognizer
@@ -87,85 +91,92 @@ public struct AIChatView: View {
       GeometryReader { geometry in
         ScrollViewReader { scrollViewReader in
           ScrollView {
-            VStack(spacing: 0.0) {
-              if model.shouldShowPremiumPrompt {
-                AIChatPremiumUpsellView(
-                  upsellType: model.apiError == .rateLimitReached ? .rateLimit : .premium,
-                  upgradeAction: {
-                    // TODO: Upgrade Action
-                  },
-                  dismissAction: {
-                    // TODO: Dismiss Action
-                  }
-                )
-                  .padding(8)
-              } else {
-                ForEach(Array(model.conversationHistory.enumerated()), id: \.offset) { index, turn in
-                  if turn.characterType == .human {
-                    AIChatUserMessageView(prompt: turn.text)
-                      .padding()
-                      .background(Color(braveSystemName: .pageBackground))
-                    
-                    if index == 0 && model.isPageConnected {
-                      AIChatPageInfoBanner(url: model.getLastCommittedURL(), pageTitle: model.getPageTitle() ?? "")
-                        .padding([.horizontal, .bottom])
-                        .background(Color(braveSystemName: .pageBackground))
-                    }
-                  } else {
-                    AIChatResponseMessageView(prompt: turn.text)
-                      .padding()
-                      .background(Color(braveSystemName: .containerBackground))
-                      .contextMenu {
-                        responseContextMenuItems(for: index, turn: turn)
-                      }
-                    
-                    if let customFeedbackIndex = customFeedbackIndex,
-                       customFeedbackIndex == index {
-                      AIChatFeedbackView()
-                        .padding()
-                    }
-                  }
-                }
-                
-                if model.apiError == .connectionIssue {
-                  // TODO: Connection Issue View
-                  EmptyView()
-                } else if model.apiError == .rateLimitReached {
-                  // TODO: If the user is already premium, are they also rate-limited?
-                  AIChatPremiumUpsellView(upsellType: .rateLimit,
+            if hasSeenIntro {
+              VStack(spacing: 0.0) {
+                if model.shouldShowPremiumPrompt {
+                  AIChatPremiumUpsellView(
+                    upsellType: model.apiError == .rateLimitReached ? .rateLimit : .premium,
                     upgradeAction: {
-                    // TODO: Upgrade Action
+                      // TODO: Upgrade Action
                     },
                     dismissAction: {
-                    // TODO: Dismiss Action
+                      // TODO: Dismiss Action
                     }
                   )
-                    .padding(8)
-                } else if model.apiError == .contextLimitReached {
-                  // TODO: Conversation Length Limit View
-                  EmptyView()
-                }
-                
-                Color.clear.id(lastMessageId)
-                
-                if !model.requestInProgress && !model.suggestedQuestions.isEmpty {
-                  AIChatSuggestionsView(geometry: geometry, suggestions: model.suggestedQuestions) { suggestion in
-                    model.submitSuggestion(suggestion)
+                  .padding(8)
+                } else {
+                  ForEach(Array(model.conversationHistory.enumerated()), id: \.offset) { index, turn in
+                    if turn.characterType == .human {
+                      AIChatUserMessageView(prompt: turn.text)
+                        .padding()
+                        .background(Color(braveSystemName: .pageBackground))
+                      
+                      if index == 0 && model.isPageConnected {
+                        AIChatPageInfoBanner(url: model.getLastCommittedURL(), pageTitle: model.getPageTitle() ?? "")
+                          .padding([.horizontal, .bottom])
+                          .background(Color(braveSystemName: .pageBackground))
+                      }
+                    } else {
+                      AIChatResponseMessageView(prompt: turn.text)
+                        .padding()
+                        .background(Color(braveSystemName: .containerBackground))
+                        .contextMenu {
+                          responseContextMenuItems(for: index, turn: turn)
+                        }
+                      
+                      if let customFeedbackIndex = customFeedbackIndex,
+                         customFeedbackIndex == index {
+                        AIChatFeedbackView()
+                          .padding()
+                      }
+                    }
                   }
-                  .padding()
+                  
+                  if model.apiError == .connectionIssue {
+                    // TODO: Connection Issue View
+                    EmptyView()
+                  } else if model.apiError == .rateLimitReached {
+                    // TODO: If the user is already premium, are they also rate-limited?
+                    AIChatPremiumUpsellView(upsellType: .rateLimit,
+                                            upgradeAction: {
+                      // TODO: Upgrade Action
+                    },
+                                            dismissAction: {
+                      // TODO: Dismiss Action
+                    })
+                    .padding(8)
+                  } else if model.apiError == .contextLimitReached {
+                    // TODO: Conversation Length Limit View
+                    EmptyView()
+                  }
+                  
+                  Color.clear.id(lastMessageId)
+                  
+                  if !model.requestInProgress &&
+                      !model.suggestedQuestions.isEmpty &&
+                      model.apiError == .none {
+                    AIChatSuggestionsView(geometry: geometry, suggestions: model.suggestedQuestions) { suggestion in
+                      model.submitSuggestion(suggestion)
+                    }
+                    .padding()
+                  }
                 }
               }
-            } 
-            .onChange(of: model.conversationHistory) { _ in
-              scrollViewReader.scrollTo(lastMessageId, anchor: .bottom)
-            }
-            .onChange(of: model.conversationHistory.last?.text) { _ in
-              scrollViewReader.scrollTo(lastMessageId, anchor: .bottom)
-            }
-            .onChange(of: customFeedbackIndex) { _ in
-              withAnimation {
+              .onChange(of: model.conversationHistory) { _ in
                 scrollViewReader.scrollTo(lastMessageId, anchor: .bottom)
               }
+              .onChange(of: model.conversationHistory.last?.text) { _ in
+                scrollViewReader.scrollTo(lastMessageId, anchor: .bottom)
+              }
+              .onChange(of: customFeedbackIndex) { _ in
+                withAnimation {
+                  scrollViewReader.scrollTo(lastMessageId, anchor: .bottom)
+                }
+              }
+            } else {
+              AIChatIntroView()
+                .padding()
+                .frame(minHeight: geometry.size.height)
             }
           }
         }
@@ -173,15 +184,18 @@ public struct AIChatView: View {
       
       Spacer()
       
-      AIChatPageContextView(
-        isToggleOn: model.shouldShowPremiumPrompt ? .constant(false) : $model.isPageConnected,
-        isToggleEnabled: !model.shouldShowPremiumPrompt && model.hasValidWebPage)
+      if hasSeenIntro && model.apiError == .none {
+        AIChatPageContextView(
+          isToggleOn: model.shouldShowPremiumPrompt ? .constant(false) : $model.isPageConnected,
+          isToggleEnabled: !model.shouldShowPremiumPrompt && model.hasValidWebPage)
         .padding()
+      }
       
       AIChatPromptInputView() { prompt in
+        hasSeenIntro = true
         model.submitQuery(prompt)
       } onVoiceSearchPressed: {
-        Task {
+        Task { @MainActor in
           let permissionStatus = await speechRecognizer.askForUserPermission()
           
           if permissionStatus {
