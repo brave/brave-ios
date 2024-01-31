@@ -101,7 +101,7 @@ public struct AIChatView: View {
                     AIChatPremiumUpsellView(
                       upsellType: model.apiError == .rateLimitReached ? .rateLimit : .premium,
                       upgradeAction: {
-                        // TODO: Upgrade Action
+                        isPremiumPaywallPresented = true
                       },
                       dismissAction: {
                         if let basicModel = model.models.first(where: { $0.access == .basic }) {
@@ -154,7 +154,7 @@ public struct AIChatView: View {
                       AIChatPremiumUpsellView(
                         upsellType: .rateLimit,
                         upgradeAction: {
-                          // TODO: Upgrade Action
+                          isPremiumPaywallPresented = true
                         },
                         dismissAction: {
                           if let basicModel = model.models.first(where: { $0.access == .basic }) {
@@ -271,14 +271,20 @@ public struct AIChatView: View {
     })
     .background(Color.clear
       .alert(isPresented: $isVoiceEntryPresented) {
-        // TODO: Present Voice Entry
-        EmptyView() as! Alert
+        Alert(
+          title: Text("Voice Search"),
+          message: Text("Coming in the next build"),
+          dismissButton: .default(Text("Got it!"))
+        )
       }
     )
     .background(Color.clear
       .alert(isPresented: $isNoMicrophonePermissionPresented) {
-        // TODO: Present No Microphone Permission
-        EmptyView() as! Alert
+        Alert(
+          title: Text("Voice Search"),
+          message: Text("Microphone Permission Denied -- Voice Search coming in the next build"),
+          dismissButton: .default(Text("Got it!"))
+        )
       }
     )
   }

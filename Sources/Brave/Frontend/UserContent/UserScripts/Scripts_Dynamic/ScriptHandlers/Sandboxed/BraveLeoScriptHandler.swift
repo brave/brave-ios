@@ -50,6 +50,7 @@ extension BraveLeoScriptHandler {
   static func getMainArticle(webView: WKWebView) async -> String? {
     do {
       let articleText = try await webView.evaluateSafeJavaScriptThrowing(functionName: "window.__firefox__.\(getMainArticle)",
+                                                                         args: [Self.scriptId],
                                                                          contentWorld: Self.scriptSandbox,
                                                                          asFunction: true) as? String
       return articleText

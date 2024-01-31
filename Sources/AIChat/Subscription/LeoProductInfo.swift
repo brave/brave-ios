@@ -60,6 +60,7 @@ public class LeoProductInfo: NSObject, ObservableObject {
 
 extension LeoProductInfo: SKProductsRequestDelegate {
   public func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
+    objectWillChange.send()
     response.products.forEach {
       switch $0.productIdentifier {
       case ProductIdentifiers.monthlySub:
