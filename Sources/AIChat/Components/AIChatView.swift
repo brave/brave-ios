@@ -37,6 +37,9 @@ public struct AIChatView: View {
   @State
   private var isNoMicrophonePermissionPresented = false
   
+  @State
+  private var isShowingFeedbackToast = false
+  
   @ObservedObject
   private var hasSeenIntro = Preferences.AIChat.hasSeenIntro
   
@@ -142,9 +145,16 @@ public struct AIChatView: View {
                            feedbackIndex == index {
                           AIChatFeedbackView(onSubmit: {
                             customFeedbackIndex = nil
-                            // TODO: Show Feedback Toast
+                            isShowingFeedbackToast = true
                           }, onCancel: {
                             customFeedbackIndex = nil
+                            isShowingFeedbackToast = true
+                          }, openURL: { url in
+                            if url.host == "dismiss" {
+                              
+                            } else {
+                              openURL(url)
+                            }
                           })
                             .padding()
                         }
@@ -256,6 +266,7 @@ public struct AIChatView: View {
       }
     }
     .background(Color(braveSystemName: .containerBackground))
+    .toastView($isShowingFeedbackToast)
     .popover(isPresented: $isPremiumPaywallPresented, content: {
       AIChatPaywallView(
         restoreAction: {
@@ -358,6 +369,8 @@ public struct AIChatView: View {
             print("Feedback submitted")
           }, onCancel: {
             print("Feedback cancelled")
+          }, openURL: {
+            print("Open Feedback URL: \($0)")
           })
             .padding()
           

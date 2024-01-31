@@ -6,7 +6,7 @@
 import SwiftUI
 import DesignSystem
 
-struct MenuScaleTransition: GeometryEffect {
+private struct MenuScaleTransition: GeometryEffect {
   var scalePercent: Double
   
   var animatableData: Double {
@@ -23,7 +23,7 @@ struct MenuScaleTransition: GeometryEffect {
   }
 }
 
-struct DropdownView<ActionView, MenuView>: View where ActionView: View, MenuView: View {
+private struct DropdownView<ActionView, MenuView>: View where ActionView: View, MenuView: View {
   
   @Binding
   var showMenu: Bool
@@ -57,7 +57,7 @@ struct DropdownView<ActionView, MenuView>: View where ActionView: View, MenuView
     }
 }
 
-struct AIChatDropdownButton: View {
+private struct AIChatDropdownButton: View {
   var action: () -> Void
   var title: String
   
@@ -84,7 +84,7 @@ struct AIChatDropdownButton: View {
   }
 }
 
-struct AIChatDropdownMenu<Item>: View where Item: RawRepresentable, Item.RawValue: StringProtocol, Item: Identifiable {
+private struct AIChatDropdownMenu<Item>: View where Item: RawRepresentable, Item.RawValue: StringProtocol, Item: Identifiable {
   @Binding
   var selectedIndex: Int
   var items: [Item]
@@ -123,7 +123,7 @@ struct AIChatDropdownMenu<Item>: View where Item: RawRepresentable, Item.RawValu
   }
 }
 
-struct AIChatDropdownView: View {
+private struct AIChatDropdownView: View {
   private enum Options: String, CaseIterable, Identifiable {
     case notHelpful = "Answer is not helpful"
     case notWorking = "Something doesn't work"
@@ -168,7 +168,7 @@ struct AIChatDropdownView: View {
   }
 }
 
-struct AIChatFeedbackInputView: View {
+private struct AIChatFeedbackInputView: View {
   @State var text: String
   
   var body: some View {
@@ -214,10 +214,11 @@ struct AIChatFeedbackInputView: View {
   }
 }
 
-struct AIChatFeedbackLeoPremiumAdView: View {
+private struct AIChatFeedbackLeoPremiumAdView: View {
+  let openURL: (URL) -> Void
 
   var body: some View {
-    Text("Brave Leo Premium provides access to an expanded set of language models for even greater answer nuance. [Learn more](https://brave.com/)")
+    Text("Leo Premium provides access to an expanded set of language models for even greater answer nuance. [Learn more](https://brave.com/) - [Dismiss](braveai://dismiss)")
       .tint(Color(braveSystemName: .textInteractive))
       .font(.subheadline)
       .foregroundStyle(Color(braveSystemName: .textSecondary))
@@ -234,8 +235,8 @@ struct AIChatFeedbackLeoPremiumAdView: View {
       )
       .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
       .environment(\.openURL, OpenURLAction { url in
-          print("Open \(url)")
-          return .handled
+        openURL(url)
+        return .handled
       })
   }
 }
@@ -243,6 +244,7 @@ struct AIChatFeedbackLeoPremiumAdView: View {
 struct AIChatFeedbackView: View {
   let onSubmit: () -> Void
   let onCancel: () -> Void
+  let openURL: (URL) -> Void
   
   var body: some View {
     VStack {
@@ -265,7 +267,7 @@ struct AIChatFeedbackView: View {
       AIChatFeedbackInputView(text: "")
         .padding([.horizontal, .bottom])
       
-      AIChatFeedbackLeoPremiumAdView()
+      AIChatFeedbackLeoPremiumAdView(openURL: openURL)
         .padding(.horizontal)
       
       HStack {
@@ -300,6 +302,8 @@ struct AIChatFeedbackView: View {
     print("Submitted Feedback")
   }, onCancel: {
     print("Cancelled Feedback")
+  }, openURL: {
+    print("Open Feedback URL: \($0)")
   })
     .previewLayout(.sizeThatFits)
 }
