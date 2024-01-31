@@ -277,7 +277,7 @@ private struct PremiumUpsellTopicView: View {
           .frame(maxWidth: .infinity, alignment: .leading)
           .fixedSize(horizontal: false, vertical: true)
           .foregroundStyle(isPaywallPresented
-                           ? Color(braveSystemName: .primary20 )
+                           ? Color(braveSystemName: .primitivePrimary20 )
                            : Color(braveSystemName: .textSecondary))
       }
     }

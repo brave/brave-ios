@@ -185,7 +185,7 @@ struct AIChatPaywallView: View {
         .font(.footnote)
         .frame(maxWidth: .infinity, alignment: .leading)
         .fixedSize(horizontal: false, vertical: true)
-        .foregroundStyle(Color(braveSystemName: .primary20))
+        .foregroundStyle(Color(braveSystemName: .primitivePrimary20))
         .padding([.horizontal], 16.0)
         .padding([.vertical], 12.0)
     }
