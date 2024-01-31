@@ -7,6 +7,7 @@ import SwiftUI
 import DesignSystem
 
 struct AIChatPromptInputView: View {
+  let isSpeechToTextAvilable: Bool
   let onTextSubmitted: (String) -> Void
   let onVoiceSearchPressed: () -> Void
 
@@ -48,6 +49,7 @@ struct AIChatPromptInputView: View {
           Image(braveSystemName: "leo.microphone")
             .foregroundStyle(Color(braveSystemName: .iconDefault))
         }
+        .hidden(isHidden: !isSpeechToTextAvilable)
         .padding()
       } else {
         Button {
@@ -70,7 +72,7 @@ struct AIChatPromptInputView: View {
 
 @available(iOS 17.0, *)
 #Preview(traits: .sizeThatFitsLayout) {
-  AIChatPromptInputView() { prompt in
+  AIChatPromptInputView(isSpeechToTextAvilable: true) { prompt in
     print("Prompt Submitted: \(prompt)")
   } onVoiceSearchPressed: {
     print("Voice Search Activated")

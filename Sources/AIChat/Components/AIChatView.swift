@@ -9,13 +9,15 @@ import DesignSystem
 import BraveCore
 import Shared
 import Preferences
+import BraveUI
+import AVFoundation
 
 public struct AIChatView: View {
   @ObservedObject
   var model: AIChatViewModel
   
-  let speechRecognizer: SpeechRecognizer
-
+  @ObservedObject var speechRecognizer: SpeechRecognizer
+  
   @Environment(\.presentationMode)
   private var presentationMode
   
@@ -246,7 +248,7 @@ public struct AIChatView: View {
       
       if model.isAgreementAccepted ||
           (!hasSeenIntro.value && !model.isAgreementAccepted) {
-        AIChatPromptInputView() { prompt in
+        AIChatPromptInputView(isSpeechToTextAvilable: speechRecognizer.isVoiceSearchAvailable) { prompt in
           hasSeenIntro.value = true
           model.submitQuery(prompt)
         } onVoiceSearchPressed: {
@@ -285,24 +287,43 @@ public struct AIChatView: View {
           presentationMode.wrappedValue.dismiss()
       })
     })
-    .background(Color.clear
-      .alert(isPresented: $isVoiceEntryPresented) {
-        Alert(
-          title: Text("Voice Search"),
-          message: Text("Coming in the next build"),
-          dismissButton: .default(Text("Got it!"))
-        )
-      }
-    )
+    .background {
+      SpeechToTextInputContentView(
+        isPresented: $isVoiceEntryPresented,
+        dismissAction: {
+          isVoiceEntryPresented = false
+        },
+        speecModel: speechRecognizer,
+        disclaimer: "Brave does not store or share your voice searches.")
+    }
     .background(Color.clear
       .alert(isPresented: $isNoMicrophonePermissionPresented) {
         Alert(
-          title: Text("Voice Search"),
-          message: Text("Microphone Permission Denied -- Voice Search coming in the next build"),
-          dismissButton: .default(Text("Got it!"))
+          title: Text("Microphone Access Required"),
+          message: Text("Please allow microphone access in iOS system eettings for Brave to use anonymous voice entry."),
+          primaryButton: Alert.Button.default(
+            Text("Settings"),
+            action: {
+              let url = URL(string: UIApplication.openSettingsURLString)!
+              UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
+          ),
+          secondaryButton: Alert.Button.cancel(Text(Strings.CancelString))
         )
       }
     )
+    .onReceive(speechRecognizer.$finalizedRecognition) { recognition in
+      if recognition.status {
+        // Feedback indicating recognition is finalized
+        AudioServicesPlayAlertSound(SystemSoundID(kSystemSoundID_Vibrate))
+        UIImpactFeedbackGenerator(style: .medium).bzzt()
+        
+        // Submit the query and restart the speech recognizer
+        model.submitQuery(recognition.searchQuery)
+        speechRecognizer.clearSearch()
+        isVoiceEntryPresented = false
+      }
+    }
   }
   
   @ViewBuilder
@@ -386,7 +407,7 @@ public struct AIChatView: View {
     AIChatPageContextView(isToggleOn: .constant(true), isToggleEnabled: true)
       .padding()
     
-    AIChatPromptInputView() { prompt in
+    AIChatPromptInputView(isSpeechToTextAvilable: true) { prompt in
       print("Prompt Submitted: \(prompt)")
     } onVoiceSearchPressed: {
       print("Voice Search Activated)")
