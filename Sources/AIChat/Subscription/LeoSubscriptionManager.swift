@@ -4,9 +4,10 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import Foundation
+import StoreKit
 
 /// Singleton Manager handles subscriptions for AI Leo
-class LeoSubscriptionManager: ObservableObject {
+class LeoSubscriptionManager: NSObject, ObservableObject {
   
   /// In-app purchase subscription types
   enum SubscriptionType {
@@ -63,4 +64,31 @@ class LeoSubscriptionManager: ObservableObject {
   @Published var activeType: SubscriptionType = .monthly
   
   @Published var expirationDate: Date = Date() + 5.minutes
+}
+
+extension LeoSubscriptionManager: SKPaymentTransactionObserver {
+  func restorePayments() {
+    SKPaymentQueue.default().add(self)
+    SKPaymentQueue.default().restoreCompletedTransactions()
+  }
+  
+  func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
+    let paymentQueue = SKPaymentQueue.default()
+    
+    // TODO: Finish Delegate stuff
+    transactions.sorted(using: KeyPathComparator(\.transactionDate, order: .reverse)).forEach { transaction in
+      switch transaction.transactionState {
+      case .purchased:
+        paymentQueue.finishTransaction(transaction)
+      case .failed:
+        paymentQueue.finishTransaction(transaction)
+      case .restored:
+        paymentQueue.finishTransaction(transaction)
+      case .purchasing, .deferred:
+        paymentQueue.finishTransaction(transaction)
+      @unknown default:
+        assertionFailure("Unknown Transaction State: \(transaction.transactionState)")
+      }
+    }
+  }
 }
