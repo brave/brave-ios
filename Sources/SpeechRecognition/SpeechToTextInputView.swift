@@ -15,10 +15,12 @@ public struct SpeechToTextInputView: View {
   let disclaimer: String
   
   var onEnterSearchKeyword: (() -> Void)?
-  
-  public init(speechModel: SpeechRecognizer, disclaimer: String) {
+  var dismiss: (() -> Void)?
+
+  public init(speechModel: SpeechRecognizer, disclaimer: String, dismissAction: (() -> Void)? = nil) {
     self.speechModel = speechModel
     self.disclaimer = disclaimer
+    self.dismiss = dismissAction
   }
   
   public var body: some View {
@@ -94,6 +96,8 @@ public struct SpeechToTextInputView: View {
   }
   
   private func dismissView() {
+    dismiss?()
+    speechModel.clearSearch()
     presentationMode.dismiss()
   }
 }
@@ -126,5 +130,59 @@ public extension SpeechToTextInputView {
 private extension UIColor {
   static var microphoneBackground: UIColor {
     UIColor(rgb: 0x423eee)
+  }
+}
+
+public struct SpeechToTextInputContentView: UIViewControllerRepresentable {
+  @Binding var isPresented: Bool
+  
+  var dismissAction: (() -> Void)?
+  
+  var speechModel: SpeechRecognizer
+  var disclaimer: String
+  
+  public init(
+    isPresented: Binding<Bool>,
+    dismissAction: (() -> Void)? = nil,
+    speecModel: SpeechRecognizer,
+    disclaimer: String) {
+      _isPresented = isPresented
+      self.dismissAction = dismissAction
+      self.speechModel = speecModel
+      self.disclaimer = disclaimer
+  }
+  
+  public func makeUIViewController(context: Context) -> UIViewController {
+    .init()
+  }
+  
+  public func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
+    if isPresented {
+      if uiViewController.presentedViewController != nil {
+        return
+      }
+
+      let controller = PopupViewController(
+        rootView: SpeechToTextInputView(
+          speechModel: speechModel,
+          disclaimer: disclaimer,
+          dismissAction: dismissAction))
+      
+      context.coordinator.presentedViewController = .init(controller)
+      uiViewController.present(controller, animated: true)
+    } else {
+      if let presentedViewController = context.coordinator.presentedViewController?.value,
+         presentedViewController == uiViewController.presentedViewController {
+        uiViewController.presentedViewController?.dismiss(animated: true)
+      }
+    }
+  }
+  
+  public class Coordinator {
+    var presentedViewController: WeakRef<UIViewController>?
+  }
+  
+  public func makeCoordinator() -> Coordinator {
+    Coordinator()
   }
 }
