@@ -241,6 +241,8 @@ struct AIChatFeedbackLeoPremiumAdView: View {
 }
 
 struct AIChatFeedbackView: View {
+  let onSubmit: () -> Void
+  let onCancel: () -> Void
   
   var body: some View {
     VStack {
@@ -268,7 +270,7 @@ struct AIChatFeedbackView: View {
       
       HStack {
         Button {
-        
+          onCancel()
         } label: {
           Text("Cancel")
             .font(.callout)
@@ -278,7 +280,7 @@ struct AIChatFeedbackView: View {
         .padding()
         
         Button {
-        
+          onSubmit()
         } label: {
           Text("Submit")
         }
@@ -294,6 +296,10 @@ struct AIChatFeedbackView: View {
 
 @available(iOS 17.0, *)
 #Preview(traits: .sizeThatFitsLayout) {
-  AIChatFeedbackView()
+  AIChatFeedbackView(onSubmit: {
+    print("Submitted Feedback")
+  }, onCancel: {
+    print("Cancelled Feedback")
+  })
     .previewLayout(.sizeThatFits)
 }
