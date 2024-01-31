@@ -5,6 +5,8 @@
 
 import SwiftUI
 import DesignSystem
+import SpeechRecognition
+import AVFoundation
 
 private struct MenuScaleTransition: GeometryEffect {
   var scalePercent: Double
@@ -169,7 +171,11 @@ private struct AIChatDropdownView: View {
 }
 
 private struct AIChatFeedbackInputView: View {
-  @State var text: String
+  @ObservedObject
+  var model: AIChatSpeechRecognitionModel
+  
+  @Binding
+  var text: String
   
   var body: some View {
     HStack {
@@ -198,11 +204,21 @@ private struct AIChatFeedbackInputView: View {
       .padding(.trailing)
       
       Button {
-        
+        Task { @MainActor in
+          let permissionStatus = await model.speechRecognizer.askForUserPermission()
+          if permissionStatus {
+            model.isVoiceEntryPresented = true
+            model.activeInputView = .feedbackView
+          } else {
+            model.isNoMicrophonePermissionPresented = true
+            model.activeInputView = .none
+          }
+        }
       } label: {
         Image(braveSystemName: "leo.microphone")
           .foregroundStyle(Color(braveSystemName: .iconDefault))
       }
+      .hidden(isHidden: !model.speechRecognizer.isVoiceSearchAvailable)
     }
     .padding(12.0)
     .overlay {
@@ -211,6 +227,21 @@ private struct AIChatFeedbackInputView: View {
     }
     .background(.white)
     .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
+    .onReceive(model.speechRecognizer.$finalizedRecognition) { recognition in
+      if recognition.status && model.activeInputView == .feedbackView {
+        // Feedback indicating recognition is finalized
+        AudioServicesPlayAlertSound(SystemSoundID(kSystemSoundID_Vibrate))
+        UIImpactFeedbackGenerator(style: .medium).bzzt()
+        
+        // Update Prompt
+        text = recognition.searchQuery
+        
+        // Clear the SpeechRecognizer
+        model.speechRecognizer.clearSearch()
+        model.isVoiceEntryPresented = false
+        model.activeInputView = .none
+      }
+    }
   }
 }
 
@@ -242,7 +273,13 @@ private struct AIChatFeedbackLeoPremiumAdView: View {
 }
 
 struct AIChatFeedbackView: View {
-  let onSubmit: () -> Void
+  @State
+  private var feedbackText: String = ""
+  
+  @ObservedObject
+  var model: AIChatSpeechRecognitionModel
+  
+  let onSubmit: (String) -> Void
   let onCancel: () -> Void
   let openURL: (URL) -> Void
   
@@ -264,8 +301,11 @@ struct AIChatFeedbackView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding([.horizontal, .top])
       
-      AIChatFeedbackInputView(text: "")
-        .padding([.horizontal, .bottom])
+      AIChatFeedbackInputView(
+        model: model,
+        text: $feedbackText
+      )
+      .padding([.horizontal, .bottom])
       
       AIChatFeedbackLeoPremiumAdView(openURL: openURL)
         .padding(.horizontal)
@@ -282,7 +322,7 @@ struct AIChatFeedbackView: View {
         .padding()
         
         Button {
-          onSubmit()
+          onSubmit(feedbackText)
         } label: {
           Text("Submit")
         }
@@ -298,12 +338,20 @@ struct AIChatFeedbackView: View {
 
 @available(iOS 17.0, *)
 #Preview(traits: .sizeThatFitsLayout) {
-  AIChatFeedbackView(onSubmit: {
-    print("Submitted Feedback")
-  }, onCancel: {
-    print("Cancelled Feedback")
-  }, openURL: {
-    print("Open Feedback URL: \($0)")
-  })
-    .previewLayout(.sizeThatFits)
+  AIChatFeedbackView(
+    model: AIChatSpeechRecognitionModel(
+      speechRecognizer: SpeechRecognizer(),
+      activeInputView: .constant(.none),
+      isVoiceEntryPresented: .constant(false),
+      isNoMicrophonePermissionPresented: .constant(false)
+    ),
+    onSubmit: {
+      print("Submitted Feedback: \($0)")
+    }, onCancel: {
+      print("Cancelled Feedback")
+    }, openURL: {
+      print("Open Feedback URL: \($0)")
+    }
+  )
+  .previewLayout(.sizeThatFits)
 }

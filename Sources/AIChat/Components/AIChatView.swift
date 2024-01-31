@@ -10,13 +10,13 @@ import BraveCore
 import Shared
 import Preferences
 import BraveUI
-import AVFoundation
 
 public struct AIChatView: View {
   @ObservedObject
   var model: AIChatViewModel
   
-  @ObservedObject var speechRecognizer: SpeechRecognizer
+  @ObservedObject 
+  var speechRecognizer: SpeechRecognizer
   
   @Environment(\.presentationMode)
   private var presentationMode
@@ -145,20 +145,34 @@ public struct AIChatView: View {
                         
                         if let feedbackIndex = customFeedbackIndex,
                            feedbackIndex == index {
-                          AIChatFeedbackView(onSubmit: {
-                            customFeedbackIndex = nil
-                            isShowingFeedbackToast = true
-                          }, onCancel: {
-                            customFeedbackIndex = nil
-                            isShowingFeedbackToast = true
-                          }, openURL: { url in
-                            if url.host == "dismiss" {
+                          AIChatFeedbackView(
+                            model: AIChatSpeechRecognitionModel(
+                              speechRecognizer: speechRecognizer,
+                              activeInputView: .constant(.feedbackView),
+                              isVoiceEntryPresented: $isVoiceEntryPresented,
+                              isNoMicrophonePermissionPresented: $isNoMicrophonePermissionPresented
+                            ),
+                            onSubmit: { feedback in
+                              Task { @MainActor in
+                                await model.submitFeedback(feedback: feedback)
+                              }
                               
-                            } else {
-                              openURL(url)
+                              customFeedbackIndex = nil
+                              isShowingFeedbackToast = true
+                            },
+                            onCancel: {
+                              customFeedbackIndex = nil
+                              isShowingFeedbackToast = false
+                            },
+                            openURL: { url in
+                              if url.host == "dismiss" {
+                                //TODO: Dismiss feedback learn-more prompt
+                              } else {
+                                openURL(url)
+                              }
                             }
-                          })
-                            .padding()
+                          )
+                          .padding()
                         }
                       }
                     }
@@ -248,20 +262,18 @@ public struct AIChatView: View {
       
       if model.isAgreementAccepted ||
           (!hasSeenIntro.value && !model.isAgreementAccepted) {
-        AIChatPromptInputView(isSpeechToTextAvilable: speechRecognizer.isVoiceSearchAvailable) { prompt in
-          hasSeenIntro.value = true
-          model.submitQuery(prompt)
-        } onVoiceSearchPressed: {
-          Task { @MainActor in
-            let permissionStatus = await speechRecognizer.askForUserPermission()
-            
-            if permissionStatus {
-              isVoiceEntryPresented = true
-            } else {
-              isNoMicrophonePermissionPresented = true
-            }
+        AIChatPromptInputView(
+          model: AIChatSpeechRecognitionModel(
+            speechRecognizer: speechRecognizer,
+            activeInputView: .constant(.promptView),
+            isVoiceEntryPresented: $isVoiceEntryPresented,
+            isNoMicrophonePermissionPresented: $isNoMicrophonePermissionPresented
+          ),
+          onTextSubmitted: { prompt in
+            hasSeenIntro.value = true
+            model.submitQuery(prompt)
           }
-        }
+        )
         .padding(.horizontal)
         .padding(.bottom, 8.0)
         .disabled(model.shouldShowPremiumPrompt)
@@ -295,7 +307,7 @@ public struct AIChatView: View {
         dismissAction: {
           isVoiceEntryPresented = false
         },
-        speecModel: speechRecognizer,
+        speechModel: speechRecognizer,
         disclaimer: "Brave does not store or share your voice searches.")
     }
     .background(Color.clear
@@ -314,18 +326,6 @@ public struct AIChatView: View {
         )
       }
     )
-    .onReceive(speechRecognizer.$finalizedRecognition) { recognition in
-      if recognition.status {
-        // Feedback indicating recognition is finalized
-        AudioServicesPlayAlertSound(SystemSoundID(kSystemSoundID_Vibrate))
-        UIImpactFeedbackGenerator(style: .medium).bzzt()
-        
-        // Submit the query and restart the speech recognizer
-        model.submitQuery(recognition.searchQuery)
-        speechRecognizer.clearSearch()
-        isVoiceEntryPresented = false
-      }
-    }
   }
   
   @ViewBuilder
@@ -388,14 +388,22 @@ public struct AIChatView: View {
             .padding()
             .background(Color(braveSystemName: .containerBackground))
 
-          AIChatFeedbackView(onSubmit: {
-            print("Feedback submitted")
-          }, onCancel: {
-            print("Feedback cancelled")
-          }, openURL: {
-            print("Open Feedback URL: \($0)")
-          })
-            .padding()
+          AIChatFeedbackView(
+            model: AIChatSpeechRecognitionModel(
+              speechRecognizer: SpeechRecognizer(),
+              activeInputView: .constant(.none),
+              isVoiceEntryPresented: .constant(false),
+              isNoMicrophonePermissionPresented: .constant(false)
+            ),
+            onSubmit: {
+              print("Submitted Feedback: \($0)")
+            }, onCancel: {
+              print("Cancelled Feedback")
+            }, openURL: {
+              print("Open Feedback URL: \($0)")
+            }
+          )
+          .padding()
           
           AIChatSuggestionsView(geometry: geometry, suggestions: ["What Bluetooth version does it use?", "Summarize this page?", "What is Leo?", "What can the Leo assistant do for me?"])
             .padding()
@@ -409,11 +417,17 @@ public struct AIChatView: View {
     AIChatPageContextView(isToggleOn: .constant(true), isToggleEnabled: true)
       .padding()
     
-    AIChatPromptInputView(isSpeechToTextAvilable: true) { prompt in
-      print("Prompt Submitted: \(prompt)")
-    } onVoiceSearchPressed: {
-      print("Voice Search Activated)")
-    }
+    AIChatPromptInputView(
+      model: AIChatSpeechRecognitionModel(
+        speechRecognizer: SpeechRecognizer(),
+        activeInputView: .constant(.none),
+        isVoiceEntryPresented: .constant(false),
+        isNoMicrophonePermissionPresented: .constant(false)
+      ),
+      onTextSubmitted: {
+        print("Prompt Submitted: \($0)")
+      }
+    )
   }
   .background(Color(braveSystemName: .containerBackground))
     .previewLayout(.sizeThatFits)

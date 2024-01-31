@@ -203,4 +203,9 @@ public class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
       })
     }
   }
+  
+  @MainActor
+  func submitFeedback(feedback: String) async {
+    //TODO: Brave-Core
+  }
 }
