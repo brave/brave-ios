@@ -269,24 +269,26 @@ public struct AIChatView: View {
     }
     .background(Color(braveSystemName: .containerBackground))
     .toastView($isShowingFeedbackToast)
-    .popover(isPresented: $isPremiumPaywallPresented, content: {
-      AIChatPaywallView(
-        restoreAction: {
-          // TODO: Restore Action
-        },
-        upgradeAction: { tierType in
-          // TODO: Upgrade Action
-        })
-    })
-    .popover(isPresented: $isAdvancedSettingsPresented, content: {
-      AIChatAdvancedSettingsView(
-        aiModel: model,
-        isModallyPresented: true,
-        openURL: { url in
-          openURL(url)
-          presentationMode.wrappedValue.dismiss()
+    .background(Color.clear
+      .sheet(isPresented: $isPremiumPaywallPresented) {
+        AIChatPaywallView(
+          restoreAction: {
+            // TODO: Restore Action
+          },
+          upgradeAction: { tierType in
+            // TODO: Upgrade Action
+          })
       })
-    })
+    .background(Color.clear
+      .sheet(isPresented: $isAdvancedSettingsPresented) {
+        AIChatAdvancedSettingsView(
+          aiModel: model,
+          isModallyPresented: true,
+          openURL: { url in
+            openURL(url)
+            presentationMode.wrappedValue.dismiss()
+        })
+      })
     .background {
       SpeechToTextInputContentView(
         isPresented: $isVoiceEntryPresented,

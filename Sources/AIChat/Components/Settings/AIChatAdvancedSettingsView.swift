@@ -128,6 +128,7 @@ public struct AIChatAdvancedSettingsView: View {
       } header: {
         Text("SUBSCRIPTION")
       }
+      .listRowBackground(Color(.secondaryBraveGroupedBackground))
       
       Section {
         Button(action: {
