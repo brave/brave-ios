@@ -144,11 +144,11 @@ public struct SpeechToTextInputContentView: UIViewControllerRepresentable {
   public init(
     isPresented: Binding<Bool>,
     dismissAction: (() -> Void)? = nil,
-    speecModel: SpeechRecognizer,
+    speechModel: SpeechRecognizer,
     disclaimer: String) {
       _isPresented = isPresented
       self.dismissAction = dismissAction
-      self.speechModel = speecModel
+      self.speechModel = speechModel
       self.disclaimer = disclaimer
   }
   
