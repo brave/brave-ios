@@ -6,17 +6,13 @@
 import SwiftUI
 import DesignSystem
 
-protocol AIChatToastDismissable {
-  func setOnDismiss(_ onDismiss: @escaping () -> Void)
-}
-
-struct AIChatFeedbackToastModifier<Toast: View & AIChatToastDismissable>: ViewModifier {
+struct AIChatFeedbackToastModifier<Toast>: ViewModifier where Toast: View {
   @State
   private var task: Task<Void, Error>?
   
-  let displayDuration = 3.0
+  private let displayDuration = 3.0
 
-  let toast: Toast
+  let toastView: Toast
   
   @Binding
   var isShowing: Bool
@@ -29,7 +25,7 @@ struct AIChatFeedbackToastModifier<Toast: View & AIChatToastDismissable>: ViewMo
           if isShowing {
             VStack {
               Spacer()
-              toast
+              toastView
             }
             .transition(.move(edge: .bottom))
             .offset(y: -10.0)
@@ -64,9 +60,9 @@ struct AIChatFeedbackToastModifier<Toast: View & AIChatToastDismissable>: ViewMo
   }
 }
 
-struct AIChatFeedbackToastView: View & AIChatToastDismissable {
-  @State
-  private var onDismiss: (() -> Void)?
+struct AIChatFeedbackToastView: View {
+  @Binding
+  var isShowing: Bool
   
   var body: some View {
     HStack(spacing: 0.0) {
@@ -78,7 +74,7 @@ struct AIChatFeedbackToastView: View & AIChatToastDismissable {
         .padding(.trailing)
       
       Button {
-        onDismiss?()
+        isShowing = false
       } label: {
         Image(systemName: "xmark")
           .foregroundStyle(Color(braveSystemName: .primary30))
@@ -90,17 +86,13 @@ struct AIChatFeedbackToastView: View & AIChatToastDismissable {
     .shadow(color: Color.black.opacity(0.25), radius: 8.0, x: 0.0, y: 1.0)
     .padding(.horizontal)
   }
-  
-  func setOnDismiss(_ onDismiss: @escaping () -> Void) {
-    self.onDismiss = onDismiss
-  }
 }
 
 extension View {
   func toastView(_ isShowing: Binding<Bool>) -> some View {
     self.modifier(
       AIChatFeedbackToastModifier(
-        toast: AIChatFeedbackToastView(),
+        toastView: AIChatFeedbackToastView(isShowing: isShowing),
         isShowing: isShowing
       )
     )
@@ -108,5 +100,5 @@ extension View {
 }
 
 #Preview {
-  AIChatFeedbackToastView()
+  AIChatFeedbackToastView(isShowing: .constant(true))
 }
