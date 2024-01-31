@@ -22,7 +22,7 @@ struct AIChatPaywallView: View {
   @State
   private var availableTierTypes: [TierType] = [.monthly]
 
-  @State 
+  @ObservedObject
   private var productInfo = LeoProductInfo.shared
   
   var restoreAction: (() -> Void)?

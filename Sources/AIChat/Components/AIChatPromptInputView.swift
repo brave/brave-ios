@@ -14,7 +14,7 @@ struct AIChatPromptInputView: View {
 
   var body: some View {
     HStack(spacing: 0.0) {
-      Text("/")
+      /*Text("/")
         .font(.caption2)
         .foregroundStyle(Color(braveSystemName: .textTertiary))
         .padding(.horizontal, 12.0)
@@ -24,7 +24,7 @@ struct AIChatPromptInputView: View {
             .strokeBorder(Color(braveSystemName: .dividerSubtle), lineWidth: 1.0)
         )
         .clipShape(RoundedRectangle(cornerRadius: 4.0, style: .continuous))
-        .padding()
+        .padding()*/
       
       TextField("", text: $prompt,
                 prompt: Text("Enter a prompt here")
@@ -39,6 +39,7 @@ struct AIChatPromptInputView: View {
           prompt = ""
         }
       }
+      .padding(.leading)
       
       if prompt.isEmpty {
         Button {
