@@ -106,7 +106,7 @@ public class IAPObserver: NSObject, SKPaymentTransactionObserver {
   // MARK: - Handling promoted in-app purchases
   
   public func paymentQueue(_ queue: SKPaymentQueue, shouldAddStorePayment payment: SKPayment, for product: SKProduct) -> Bool {
-    // Check if ther eis an active onboarding happening
+    // Check if there is an active onboarding happening
     let shouldDeferPayment = Preferences.AppState.isOnboardingActive.value
     
     // If you need to defer until onboarding is complete, save the payment and return false.
