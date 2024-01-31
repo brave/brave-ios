@@ -138,9 +138,14 @@ public struct AIChatView: View {
                             responseContextMenuItems(for: index, turn: turn)
                           }
                         
-                        if let customFeedbackIndex = customFeedbackIndex,
-                           customFeedbackIndex == index {
-                          AIChatFeedbackView()
+                        if let feedbackIndex = customFeedbackIndex,
+                           feedbackIndex == index {
+                          AIChatFeedbackView(onSubmit: {
+                            customFeedbackIndex = nil
+                            // TODO: Show Feedback Toast
+                          }, onCancel: {
+                            customFeedbackIndex = nil
+                          })
                             .padding()
                         }
                       }
@@ -296,7 +301,7 @@ public struct AIChatView: View {
     })
     
     AIChatResponseMessageViewContextMenuButton(title: "Regenerate", icon: Image(braveSystemName: "leo.refresh"), onSelected: {
-      
+      model.retryLastRequest()
     })
     
     AIChatResponseMessageViewContextMenuButton(title: "Copy", icon: Image(braveSystemName: "leo.copy"), onSelected: {
@@ -349,7 +354,11 @@ public struct AIChatView: View {
             .padding()
             .background(Color(braveSystemName: .containerBackground))
 
-          AIChatFeedbackView()
+          AIChatFeedbackView(onSubmit: {
+            print("Feedback submitted")
+          }, onCancel: {
+            print("Feedback cancelled")
+          })
             .padding()
           
           AIChatSuggestionsView(geometry: geometry, suggestions: ["What Bluetooth version does it use?", "Summarize this page?", "What is Leo?", "What can the Leo assistant do for me?"])
