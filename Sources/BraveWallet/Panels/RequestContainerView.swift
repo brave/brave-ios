@@ -26,10 +26,7 @@ struct RequestContainerView<DismissContent: ToolbarContent>: View {
               confirmationStore: cryptoStore.openConfirmationStore(),
               networkStore: cryptoStore.networkStore,
               keyringStore: keyringStore,
-              onDismiss: {
-                cryptoStore.closeConfirmationStore()
-                onDismiss()
-              }
+              onDismiss: onDismiss
             )
           case .addSuggestedToken(let request):
             AddSuggestedTokenView(
@@ -60,10 +57,7 @@ struct RequestContainerView<DismissContent: ToolbarContent>: View {
               keyringStore: keyringStore,
               cryptoStore: cryptoStore,
               networkStore: cryptoStore.networkStore,
-              onDismiss: {
-                onDismiss()
-                cryptoStore.closeSignMessageRequestStore()
-              }
+              onDismiss: onDismiss
             )
           case let .signMessageError(signMessageErrors):
             SignMessageErrorView(
@@ -108,8 +102,11 @@ struct RequestContainerView<DismissContent: ToolbarContent>: View {
       }
     }
     .navigationViewStyle(.stack)
-    .onAppear {
-      // TODO: Fetch pending requests
+    .onDisappear {
+      // `onDisappear` on individual views will trigger for navigation pushes.
+      // Close stores when navigation covers manual dismiss & onDismiss() cases.
+      cryptoStore.closeConfirmationStore()
+      cryptoStore.closeSignMessageRequestStore()
     }
   }
 }
