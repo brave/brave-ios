@@ -71,7 +71,29 @@ private struct AIChatMenuItemView<RightAccessoryView: View>: View {
 }
 
 enum AIChatMenuOptionTypes {
-    case newChat, premium, advancedSettings
+  case newChat, premium, advancedSettings
+  
+  var title: String {
+    switch self {
+    case .newChat:
+      return "New Chat"
+    case .premium:
+      return "Go Premium"
+    case .advancedSettings:
+      return "Advanced Settings"
+    }
+  }
+  
+  var imageName: String {
+    switch self {
+    case .newChat:
+      return "leo.erase"
+    case .premium:
+      return "leo.lock.open"
+    case .advancedSettings:
+      return "leo.settings"
+    }
+  }
 }
 
 struct AIChatMenuView: View {
@@ -83,6 +105,9 @@ struct AIChatMenuView: View {
   @Environment(\.presentationMode)
   private var presentationMode
   
+  @State 
+  private var appStoreConnectionErrorPresented = false
+
   var body: some View {
     LazyVStack(spacing: 0.0) {
       Text("LANGUAGE MODELS")
@@ -138,59 +163,44 @@ struct AIChatMenuView: View {
       Color(braveSystemName: .dividerSubtle)
       .frame(height: 8.0)
       
-      Button {
-        presentationMode.wrappedValue.dismiss()
-        onOptionSelected(.newChat)
-      } label: {
-        Text("New Chat")
-          .font(.body)
-          .foregroundStyle(Color(braveSystemName: .textPrimary))
-          .frame(maxWidth: .infinity, alignment: .leading)
-          .padding()
-        
-        Image(braveSystemName: "leo.erase")
-          .foregroundStyle(Color(braveSystemName: .iconDefault))
-          .padding(.horizontal, 16.0)
-          .padding(.vertical, 8.0)
-      }
+      generateMenuActionItems(menuOption: .newChat)
       
       Color(braveSystemName: .dividerSubtle)
         .frame(height: 1.0)
       
-      Button {
-        presentationMode.wrappedValue.dismiss()
-        onOptionSelected(.premium)
-      } label: {
-        Text("Go Premium")
-          .font(.body)
-          .foregroundStyle(Color(braveSystemName: .textPrimary))
-          .frame(maxWidth: .infinity, alignment: .leading)
-          .padding()
-        
-        Image(braveSystemName: "leo.lock.open")
-          .foregroundStyle(Color(braveSystemName: .iconDefault))
-          .padding(.horizontal, 16.0)
-          .padding(.vertical, 8.0)
-      }
+      generateMenuActionItems(menuOption: .premium)
       
       Color(braveSystemName: .dividerSubtle)
         .frame(height: 1.0)
       
-      Button {
+      generateMenuActionItems(menuOption: .advancedSettings)
+    }
+    .alert(isPresented: $appStoreConnectionErrorPresented) {
+        Alert(title: Text("App Store Error"),
+              message: Text("Could not connect to Appstore, please try again later."),
+              dismissButton: .default(Text("OK")))
+    }
+  }
+  
+  func generateMenuActionItems(menuOption: AIChatMenuOptionTypes) -> some View {
+    Button {
+      if menuOption == .premium, !LeoProductInfo.shared.isComplete {
+        appStoreConnectionErrorPresented = true
+      } else {
         presentationMode.wrappedValue.dismiss()
-        onOptionSelected(.advancedSettings)
-      } label: {
-        Text("Advanced Settings")
-          .font(.body)
-          .foregroundStyle(Color(braveSystemName: .textPrimary))
-          .frame(maxWidth: .infinity, alignment: .leading)
-          .padding()
-        
-        Image(braveSystemName: "leo.settings")
-          .foregroundStyle(Color(braveSystemName: .iconDefault))
-          .padding(.horizontal, 16.0)
-          .padding(.vertical, 8.0)
+        onOptionSelected(menuOption)
       }
+    } label: {
+      Text(menuOption.title)
+        .font(.body)
+        .foregroundStyle(Color(braveSystemName: .textPrimary))
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding()
+      
+      Image(braveSystemName: menuOption.imageName)
+        .foregroundStyle(Color(braveSystemName: .iconDefault))
+        .padding(.horizontal, 16.0)
+        .padding(.vertical, 8.0)
     }
   }
 }

@@ -19,6 +19,8 @@ public struct AIChatAdvancedSettingsView: View {
 
   @ObservedObject 
   var aiModel: AIChatViewModel
+  
+  @State private var appStoreConnectionErrorPresented = false
 
   var isModallyPresented: Bool
   
@@ -120,13 +122,26 @@ public struct AIChatAdvancedSettingsView: View {
             premiumActionView
           }
         } else {
-          NavigationLink(destination: AIChatPaywallView()) {
-            premiumActionView
+          if LeoProductInfo.shared.isComplete {
+            NavigationLink(destination: AIChatPaywallView()) {
+              premiumActionView
+            }
+          } else {
+            Button(action: {
+              appStoreConnectionErrorPresented = true
+            }) {
+              premiumActionView
+            }
           }
         }
 
       } header: {
         Text("SUBSCRIPTION")
+      }
+      .alert(isPresented: $appStoreConnectionErrorPresented) {
+          Alert(title: Text("App Store Error"), 
+                message: Text("Could not connect to Appstore, please try again later."),
+                dismissButton: .default(Text("OK")))
       }
       .listRowBackground(Color(.secondaryBraveGroupedBackground))
       

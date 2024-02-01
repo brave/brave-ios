@@ -151,11 +151,12 @@ struct AIChatPaywallView: View {
             
             if let monthlyProduct = productInfo.monthlySubProduct {
               HStack(alignment: .center, spacing: 2.0) {
-                Text("\(monthlyProduct.priceLocale.currencyCode ?? "")\(monthlyProduct.priceLocale.currencySymbol ?? "")")
+                Text("\(monthlyProduct.priceLocale.currencySymbol ?? "")")
                   .font(.subheadline)
                   .foregroundColor(Color(braveSystemName: .primitivePrimary30))
                 
-                Text(monthlyProduct.price.frontSymbolCurrencyFormatted(with: monthlyProduct.priceLocale) ?? "$0")
+                Text(monthlyProduct.price.frontSymbolCurrencyFormatted(
+                  with: monthlyProduct.priceLocale, isSymbolIncluded: false) ?? "$0")
                   .font(.title)
                   .foregroundColor(.white)
                 
