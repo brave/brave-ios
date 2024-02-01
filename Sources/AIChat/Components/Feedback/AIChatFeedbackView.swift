@@ -126,7 +126,7 @@ private struct AIChatDropdownMenu<Item>: View where Item: RawRepresentable, Item
 }
 
 private struct AIChatDropdownView: View {
-  private enum Options: String, CaseIterable, Identifiable {
+  enum Options: String, CaseIterable, Identifiable {
     case notHelpful = "Answer is not helpful"
     case notWorking = "Something doesn't work"
     case other = "Other"
@@ -134,8 +134,8 @@ private struct AIChatDropdownView: View {
     var id: Self { self }
   }
   
-  @State
-  private var selectedIndex: Int = 0
+  @Binding
+  var selectedIndex: Int
   
   @State
   private var showMenu = false
@@ -284,12 +284,15 @@ private struct AIChatFeedbackLeoPremiumAdView: View {
 
 struct AIChatFeedbackView: View {
   @State
+  private var categoryIndex: Int = 0
+  
+  @State
   private var feedbackText: String = ""
   
   @ObservedObject
   var model: AIChatSpeechRecognitionModel
   
-  let onSubmit: (String) -> Void
+  let onSubmit: (String, String) -> Void
   let onCancel: () -> Void
   let openURL: (URL) -> Void
   
@@ -301,7 +304,7 @@ struct AIChatFeedbackView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
       
-      AIChatDropdownView()
+      AIChatDropdownView(selectedIndex: $categoryIndex)
         .zIndex(999)
         .padding(.horizontal)
       
@@ -332,7 +335,7 @@ struct AIChatFeedbackView: View {
         .padding()
         
         Button {
-          onSubmit(feedbackText)
+          onSubmit(AIChatDropdownView.Options.allCases[categoryIndex].rawValue, feedbackText)
         } label: {
           Text("Submit")
         }
@@ -356,7 +359,7 @@ struct AIChatFeedbackView: View {
       isNoMicrophonePermissionPresented: .constant(false)
     ),
     onSubmit: {
-      print("Submitted Feedback: \($0)")
+      print("Submitted Feedback: \($0) -- \($1)")
     }, onCancel: {
       print("Cancelled Feedback")
     }, openURL: {

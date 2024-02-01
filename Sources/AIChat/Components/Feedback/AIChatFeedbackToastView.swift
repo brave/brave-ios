@@ -6,35 +6,33 @@
 import SwiftUI
 import DesignSystem
 
-struct AIChatFeedbackToastModifier<Toast>: ViewModifier where Toast: View {
+private struct AIChatFeedbackToastModifier: ViewModifier {
   @State
   private var task: Task<Void, Error>?
   
-  private let displayDuration = 3.0
+  private let displayDuration = 5.0
 
-  let toastView: Toast
-  
   @Binding
-  var isShowing: Bool
+  var toastType: AIChatFeedbackToastType
   
   func body(content: Content) -> some View {
     content
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .overlay(
         ZStack {
-          if isShowing {
+          if toastType != .none {
             VStack {
               Spacer()
-              toastView
+              AIChatFeedbackToastView(toastType: $toastType)
             }
             .transition(.move(edge: .bottom))
             .offset(y: -10.0)
           }
         }
-          .animation(.spring(), value: isShowing)
+          .animation(.spring(), value: toastType)
       )
-      .onChange(of: isShowing) { isShowing in
-        if isShowing {
+      .onChange(of: toastType) { toastType in
+        if toastType != .none {
           show()
         }
       }
@@ -52,33 +50,50 @@ struct AIChatFeedbackToastModifier<Toast>: ViewModifier where Toast: View {
   
   private func dismiss() {
     withAnimation {
-      isShowing = false
+      toastType = .none
     }
     
     task?.cancel()
-    isShowing = false
+    toastType = .none
+  }
+}
+
+enum AIChatFeedbackToastType: Equatable {
+  case none
+  case error(message: String)
+  case success(isLiked: Bool, onAddFeedback: (() -> Void)? = nil)
+  case submitted
+  
+  static func == (lhs: AIChatFeedbackToastType, rhs: AIChatFeedbackToastType) -> Bool {
+    switch (lhs, rhs) {
+    case (.none, .none), (.submitted, .submitted):
+      return true
+    case (.error(let errorA), .error(let errorB)):
+      return errorA == errorB
+    case (.success(let isLikedA, let onAddFeedbackA),
+          .success(let isLikedB, let onAddFeedbackB)):
+      return isLikedA == isLikedB &&
+             String(describing: onAddFeedbackA) == String(describing: onAddFeedbackB)
+    default:
+      return false
+    }
   }
 }
 
 struct AIChatFeedbackToastView: View {
   @Binding
-  var isShowing: Bool
+  var toastType: AIChatFeedbackToastType
   
   var body: some View {
     HStack(spacing: 0.0) {
-      Text("Feedback sent successfully")
+      Text(title)
         .font(.subheadline)
         .foregroundStyle(Color(braveSystemName: .gray10))
         .fixedSize(horizontal: false, vertical: true)
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.trailing)
       
-      Button {
-        isShowing = false
-      } label: {
-        Image(systemName: "xmark")
-          .foregroundStyle(Color(braveSystemName: .primary30))
-      }
+      rightViewButton()
     }
     .padding()
     .background(Color(braveSystemName: .primary70))
@@ -86,19 +101,58 @@ struct AIChatFeedbackToastView: View {
     .shadow(color: Color.black.opacity(0.25), radius: 8.0, x: 0.0, y: 1.0)
     .padding(.horizontal)
   }
+  
+  private var title: String {
+    switch toastType {
+    case .none:
+      return ""
+    case .error(let message):
+      return message
+    case .success(let isLiked, _):
+      return isLiked ? "Answer Liked" : "Answer Disliked"
+    case .submitted:
+      return "Feedback sent successfully"
+    }
+  }
+  
+  @ViewBuilder
+  private func rightViewButton() -> some View {
+    switch toastType {
+    case .none:
+      EmptyView()
+    case .success(let isLiked, let onAddFeedback):
+      if isLiked {
+        Button {
+          toastType = .none
+        } label: {
+          Image(systemName: "xmark")
+            .foregroundStyle(Color(braveSystemName: .primary30))
+        }
+      } else {
+        Button {
+          toastType = .none
+          onAddFeedback?()
+        } label: {
+          Text("Add Feedback")
+        }
+      }
+    case .error, .submitted:
+      Button {
+        toastType = .none
+      } label: {
+        Image(systemName: "xmark")
+          .foregroundStyle(Color(braveSystemName: .primary30))
+      }
+    }
+  }
 }
 
 extension View {
-  func toastView(_ isShowing: Binding<Bool>) -> some View {
-    self.modifier(
-      AIChatFeedbackToastModifier(
-        toastView: AIChatFeedbackToastView(isShowing: isShowing),
-        isShowing: isShowing
-      )
-    )
+  func toastView(_ toastType: Binding<AIChatFeedbackToastType>) -> some View {
+    self.modifier(AIChatFeedbackToastModifier(toastType: toastType))
   }
 }
 
 #Preview {
-  AIChatFeedbackToastView(isShowing: .constant(true))
+  AIChatFeedbackToastView(toastType: .constant(.success(isLiked: true)))
 }

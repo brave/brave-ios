@@ -205,7 +205,7 @@ public class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   }
   
   @MainActor
-  func submitFeedback(feedback: String) async {
-    //TODO: Brave-Core
+  func submitFeedback(category: String, feedback: String, ratingId: String) async -> Bool {
+    await api.sendFeedback(category, feedback: feedback, ratingId: ratingId)
   }
 }
