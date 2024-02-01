@@ -20,7 +20,7 @@ public struct AIChatTermsAndConditionsView: View {
   
   public var body: some View {
     VStack {
-      Text("Privacy Agreement")
+      Text("Chat Privately with Brave Leo")
         .multilineTextAlignment(.leading)
         .frame(maxWidth: .infinity, alignment: .leading)
         .fixedSize(horizontal: false, vertical: true)
@@ -28,7 +28,7 @@ public struct AIChatTermsAndConditionsView: View {
         .foregroundStyle(Color(braveSystemName: .textPrimary))
         .padding(.bottom)
       
-      Text("Brave Leo is an AI smart assistant that can summarize web pages, transcribe videos, and answer questions. Brave Leo Premium uses advanced **[AI models](https://github.com/brave/brave-browser/wiki/Brave-Leo)** for even more nuanced replies, and gives early access to new features.\n\nThe accuracy of responses is not guaranteed, and may include inaccurate, misleading, or false information. Don't submit sensitive or private info, and use caution with any answers related to health, finance, personal safety, or similar.\n\nLeo does not collect or otherwise process identifiers such as IP Address that can be linked to you. No personal data is retained by the AI model or any 3rd-party model providers.")
+      Text("Brave Leo is a private AI smart assistant that enhances your use of the Internet. Leo is free to use with limited access. Brave Leo Premium offers more models, higher limits and gives subscribers early access to new features. The default model for all users is currently Mixtral 8x7B. See the **[Brave wiki](https://github.com/brave/brave-browser/wiki/Brave-Leo)** for more details.\n\nWhen you ask Leo a question it may use the context of the web page you are viewing or text you highlight to provide a response. The accuracy of responses is not guaranteed, and may include inaccurate, misleading, or false information. Leo uses data from Brave Search to improve response quality. Don't submit sensitive or private info, and use caution with any answers related to health, finance, personal safety, or similar. You can adjust Leo’s options in Settings any time.\n\nLeo does not collect identifiers such as your IP address that can be linked to you. No personal data is retained by the AI model or any 3rd-party model providers. See the **[privacy policy](https://brave.com/privacy/browser/#brave-leo)** for more information")
         .multilineTextAlignment(.leading)
         .frame(maxWidth: .infinity, alignment: .leading)
         .fixedSize(horizontal: false, vertical: true)
@@ -45,7 +45,7 @@ public struct AIChatTermsAndConditionsView: View {
       Button(action: {
         onTermsAccepted()
       }) {
-        Text("Accept and Begin")
+        Text("I Understand")
           .font(.subheadline.weight(.semibold))
           .padding([.top, .bottom], 12)
           .padding([.leading, .trailing], 16)
