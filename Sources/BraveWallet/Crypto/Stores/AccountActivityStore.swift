@@ -56,7 +56,8 @@ class AccountActivityStore: ObservableObject, WalletObserverStore {
   private var walletServiceObserver: WalletServiceObserver?
   
   var isObserving: Bool {
-    keyringServiceObserver != nil && rpcServiceObserver != nil && txServiceObserver != nil && walletServiceObserver != nil
+    keyringServiceObserver != nil && rpcServiceObserver != nil 
+    && txServiceObserver != nil && walletServiceObserver != nil
   }
   
   init(
@@ -161,6 +162,7 @@ class AccountActivityStore: ObservableObject, WalletObserverStore {
         networks: networksForAccount,
         includingUserDeleted: true
       )
+      let allUserAssets = allUserNetworkAssets.flatMap(\.tokens)
       let allTokens = await blockchainRegistry.allTokens(in: networksForAccountCoin).flatMap(\.tokens)
       (self.userAssets, self.userNFTs) = buildAssetsAndNFTs(
         userNetworkAssets: allUserNetworkAssets,
@@ -174,7 +176,7 @@ class AccountActivityStore: ObservableObject, WalletObserverStore {
         transactions: transactions,
         networksForCoin: [account.coin: networksForAccountCoin],
         accountInfos: allAccountsForCoin,
-        userAssets: userAssets.map(\.token),
+        userAssets: allUserAssets,
         allTokens: allTokens,
         tokenPrices: tokenPricesCache,
         nftMetadata: nftMetadataCache,
@@ -189,7 +191,6 @@ class AccountActivityStore: ObservableObject, WalletObserverStore {
       tokenBalanceCache.merge(with: tokenBalances)
       
       // fetch price for every user asset
-      let allUserAssets = allUserNetworkAssets.flatMap(\.tokens)
       let prices: [String: String] = await assetRatioService.fetchPrices(
         for: allUserAssets.map(\.assetRatioId),
         toAssets: [currencyFormatter.currencyCode],
@@ -221,7 +222,7 @@ class AccountActivityStore: ObservableObject, WalletObserverStore {
         transactions: transactions,
         networksForCoin: [account.coin: networksForAccountCoin],
         accountInfos: allAccountsForCoin,
-        userAssets: userAssets.map(\.token),
+        userAssets: allUserAssets,
         allTokens: allTokens,
         tokenPrices: tokenPricesCache,
         nftMetadata: nftMetadataCache,
@@ -230,9 +231,7 @@ class AccountActivityStore: ObservableObject, WalletObserverStore {
       
       // fetch NFTs metadata
       let allNFTMetadata = await rpcService.fetchNFTMetadata(
-        tokens: userNFTs
-          .map(\.token)
-          .filter({ $0.isErc721 || $0.isNft }),
+        tokens: userNFTs.map(\.token),
         ipfsApi: ipfsApi
       )
       nftMetadataCache.merge(with: allNFTMetadata)
@@ -248,7 +247,7 @@ class AccountActivityStore: ObservableObject, WalletObserverStore {
         transactions: transactions,
         networksForCoin: [account.coin: networksForAccountCoin],
         accountInfos: allAccountsForCoin,
-        userAssets: userAssets.map(\.token),
+        userAssets: allUserAssets,
         allTokens: allTokens,
         tokenPrices: tokenPricesCache,
         nftMetadata: nftMetadataCache,
@@ -277,7 +276,7 @@ class AccountActivityStore: ObservableObject, WalletObserverStore {
           transactions: transactions,
           networksForCoin: [account.coin: networksForAccountCoin],
           accountInfos: allAccountsForCoin,
-          userAssets: userAssets.map(\.token),
+          userAssets: allUserAssets,
           allTokens: allTokens,
           tokenPrices: tokenPricesCache,
           nftMetadata: allNFTMetadata,
