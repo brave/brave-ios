@@ -59,7 +59,7 @@ class LeoSubscriptionManager: NSObject, ObservableObject {
   
   // TODO: Static Type and expiration for test development
   
-  @Published var state: SubscriptionState = .purchased
+  @Published var state: SubscriptionState = .notPurchased
   
   @Published var activeType: SubscriptionType = .monthly
   
