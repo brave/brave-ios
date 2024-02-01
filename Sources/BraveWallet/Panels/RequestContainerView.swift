@@ -26,11 +26,11 @@ struct RequestContainerView<DismissContent: ToolbarContent>: View {
               confirmationStore: cryptoStore.openConfirmationStore(),
               networkStore: cryptoStore.networkStore,
               keyringStore: keyringStore,
-              onDismiss: onDismiss
+              onDismiss: {
+                cryptoStore.closeConfirmationStore()
+                onDismiss()
+              }
             )
-            .onDisappear {
-              cryptoStore.closeConfirmationStore()
-            }
           case .addSuggestedToken(let request):
             AddSuggestedTokenView(
               token: request.token,
@@ -60,11 +60,11 @@ struct RequestContainerView<DismissContent: ToolbarContent>: View {
               keyringStore: keyringStore,
               cryptoStore: cryptoStore,
               networkStore: cryptoStore.networkStore,
-              onDismiss: onDismiss
+              onDismiss: {
+                onDismiss()
+                cryptoStore.closeSignMessageRequestStore()
+              }
             )
-            .onDisappear {
-              cryptoStore.closeSignMessageRequestStore()
-            }
           case let .signMessageError(signMessageErrors):
             SignMessageErrorView(
               signMessageErrors: signMessageErrors,
