@@ -183,7 +183,7 @@ public class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   
   @MainActor
   func getPremiumStatus() async -> AiChat.PremiumStatus {
-    return await withCheckedContinuation { continuation in
+    return await withCheckedContinuation { @MainActor continuation in
       api.getPremiumStatus { status in
         DispatchQueue.main.async {
           self.premiumStatus = status
@@ -195,7 +195,7 @@ public class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   
   @MainActor
   func rateConversation(isLiked: Bool, turnId: UInt) async -> String? {
-    return await withCheckedContinuation { continuation in
+    return await withCheckedContinuation { @MainActor continuation in
       api.rateMessage(isLiked, turnId: turnId, completion: { identifier in
         DispatchQueue.main.async {
           continuation.resume(returning: identifier)

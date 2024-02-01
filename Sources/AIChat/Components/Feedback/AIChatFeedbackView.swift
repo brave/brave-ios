@@ -81,7 +81,7 @@ private struct AIChatDropdownButton: View {
       RoundedRectangle(cornerRadius: 8.0, style: .continuous)
         .stroke(Color(braveSystemName: .iconDefault), lineWidth: 0.5)
     }
-    .background(.white)
+    .background(Color(braveSystemName: .containerBackground))
     .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
   }
 }
@@ -119,7 +119,7 @@ private struct AIChatDropdownMenu<Item>: View where Item: RawRepresentable, Item
       RoundedRectangle(cornerRadius: 8.0, style: .continuous)
         .stroke(Color(braveSystemName: .iconDefault), lineWidth: 0.5)
     }
-    .background(.white)
+    .background(Color(braveSystemName: .containerBackground))
     .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
     .shadow(color: .black.opacity(0.25), radius: 10.0, x: 0.0, y: 2.0)
   }
@@ -186,6 +186,16 @@ private struct AIChatFeedbackInputView: View {
           .frame(minHeight: 80.0)
           .autocorrectionDisabled()
           .autocapitalization(.none)
+          .osAvailabilityModifiers({ view in
+            if #available(iOS 16.4, *) {
+              view
+                .scrollContentBackground(.hidden)
+            } else {
+              view.onAppear {
+                UITextView.appearance().backgroundColor = .clear
+              }
+            }
+          })
         
         if text.isEmpty {
           VStack {
@@ -225,7 +235,7 @@ private struct AIChatFeedbackInputView: View {
       RoundedRectangle(cornerRadius: 8.0, style: .continuous)
         .stroke(Color(braveSystemName: .iconDefault), lineWidth: 0.5)
     }
-    .background(.white)
+    .background(Color(braveSystemName: .containerBackground))
     .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
     .onReceive(model.speechRecognizer.$finalizedRecognition) { recognition in
       if recognition.status && model.activeInputView == .feedbackView {

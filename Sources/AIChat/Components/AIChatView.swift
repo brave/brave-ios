@@ -37,6 +37,9 @@ public struct AIChatView: View {
   private var isVoiceEntryPresented = false
   
   @State
+  private var voiceSearchActiveInputView: AIChatSpeechRecognitionActiveView = .none
+  
+  @State
   private var isNoMicrophonePermissionPresented = false
   
   @State
@@ -148,7 +151,7 @@ public struct AIChatView: View {
                           AIChatFeedbackView(
                             model: AIChatSpeechRecognitionModel(
                               speechRecognizer: speechRecognizer,
-                              activeInputView: .constant(.feedbackView),
+                              activeInputView: $voiceSearchActiveInputView,
                               isVoiceEntryPresented: $isVoiceEntryPresented,
                               isNoMicrophonePermissionPresented: $isNoMicrophonePermissionPresented
                             ),
@@ -265,7 +268,7 @@ public struct AIChatView: View {
         AIChatPromptInputView(
           model: AIChatSpeechRecognitionModel(
             speechRecognizer: speechRecognizer,
-            activeInputView: .constant(.promptView),
+            activeInputView: $voiceSearchActiveInputView,
             isVoiceEntryPresented: $isVoiceEntryPresented,
             isNoMicrophonePermissionPresented: $isNoMicrophonePermissionPresented
           ),

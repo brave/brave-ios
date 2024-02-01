@@ -78,6 +78,7 @@ struct AIChatDefaultModelView: View {
       } header: {
         Text("CHAT")
       }
+      .listRowBackground(Color(.secondaryBraveGroupedBackground))
     }
     .listBackgroundColor(Color(UIColor.braveGroupedBackground))
     .listStyle(.insetGrouped)
