@@ -43,7 +43,7 @@ public struct AIChatView: View {
   private var isNoMicrophonePermissionPresented = false
   
   @State
-  private var isShowingFeedbackToast = false
+  private var feedbackToast: AIChatFeedbackToastType = .none
   
   @ObservedObject
   private var hasSeenIntro = Preferences.AIChat.hasSeenIntro
@@ -155,17 +155,19 @@ public struct AIChatView: View {
                               isVoiceEntryPresented: $isVoiceEntryPresented,
                               isNoMicrophonePermissionPresented: $isNoMicrophonePermissionPresented
                             ),
-                            onSubmit: { feedback in
+                            onSubmit: { category, feedback in
                               Task { @MainActor in
-                                await model.submitFeedback(feedback: feedback)
+                                await model.submitFeedback(category: category,
+                                                           feedback: feedback,
+                                                           ratingId: "\(index)")
                               }
                               
                               customFeedbackIndex = nil
-                              isShowingFeedbackToast = true
+                              feedbackToast = .success(isLiked: true)
                             },
                             onCancel: {
                               customFeedbackIndex = nil
-                              isShowingFeedbackToast = false
+                              feedbackToast = .none
                             },
                             openURL: { url in
                               if url.host == "dismiss" {
@@ -283,7 +285,6 @@ public struct AIChatView: View {
       }
     }
     .background(Color(braveSystemName: .containerBackground))
-    .toastView($isShowingFeedbackToast)
     .background(Color.clear
       .sheet(isPresented: $isPremiumPaywallPresented) {
         AIChatPaywallView(
@@ -329,14 +330,11 @@ public struct AIChatView: View {
         )
       }
     )
+    .toastView($feedbackToast)
   }
   
   @ViewBuilder
   private func responseContextMenuItems(for turnIndex: Int, turn: AiChat.ConversationTurn) -> some View {
-    AIChatResponseMessageViewContextMenuButton(title: "Follow-ups", icon: Image(braveSystemName: "leo.message.bubble-comments"), onSelected: {
-      customFeedbackIndex = turnIndex
-    })
-    
     AIChatResponseMessageViewContextMenuButton(title: "Regenerate", icon: Image(braveSystemName: "leo.refresh"), onSelected: {
       model.retryLastRequest()
     })
@@ -346,14 +344,26 @@ public struct AIChatView: View {
     })
     
     AIChatResponseMessageViewContextMenuButton(title: "Like Answer", icon: Image(braveSystemName: "leo.thumb.up"), onSelected: {
-      Task {
-        await model.rateConversation(isLiked: true, turnId: UInt(turnIndex))
+      Task { @MainActor in
+        let ratingId = await model.rateConversation(isLiked: true, turnId: UInt(turnIndex))
+        if let ratingId = ratingId {
+          feedbackToast = .success(isLiked: true)
+        } else {
+          feedbackToast = .error(message: "Failed to update rating")
+        }
       }
     })
     
     AIChatResponseMessageViewContextMenuButton(title: "Dislike Answer", icon: Image(braveSystemName: "leo.thumb.down"), onSelected: {
-      Task {
-        await model.rateConversation(isLiked: false, turnId: UInt(turnIndex))
+      Task { @MainActor in
+        let ratingId = await model.rateConversation(isLiked: false, turnId: UInt(turnIndex))
+        if let ratingId = ratingId {
+          feedbackToast = .success(isLiked: false, onAddFeedback: {
+            customFeedbackIndex = turnIndex
+          })
+        } else {
+          feedbackToast = .error(message: "Failed to update rating")
+        }
       }
     })
   }
@@ -399,7 +409,7 @@ public struct AIChatView: View {
               isNoMicrophonePermissionPresented: .constant(false)
             ),
             onSubmit: {
-              print("Submitted Feedback: \($0)")
+              print("Submitted Feedback: \($0) -- \($1)")
             }, onCancel: {
               print("Cancelled Feedback")
             }, openURL: {
