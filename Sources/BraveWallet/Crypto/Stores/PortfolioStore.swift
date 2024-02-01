@@ -468,8 +468,34 @@ public class PortfolioStore: ObservableObject, WalletObserverStore {
           }
           tokenBalancesCache.merge(with: [tokenNetworkAccounts.token.id: result])
         } else {
-          // should we fetch this asset's balance if we some how don't have it cached in CD?
-          tokenBalancesCache.merge(with: [tokenNetworkAccounts.token.id: [:]])
+          // 1. We have a user asset from CD but wallet has never
+          // fetched it's balance. Should never happen. But we will fetch its
+          // balance and cache it in CD.
+          // 2. Test Cases will come here, we will fetch balance using
+          // a mock `rpcService`
+          let fetchedTokenBalances = await withTaskGroup(
+            of: [String: [String: Double]].self,
+            body: { @MainActor [tokenBalancesCache, rpcService, assetManager] group in
+              group.addTask { @MainActor in
+                let token = tokenNetworkAccounts.token
+                var tokenBalances = tokenBalancesCache[token.id] ?? [:]
+                for account in tokenNetworkAccounts.accounts { // fetch balance for this token for each account
+                  let balanceForToken = await rpcService.balance(
+                    for: token,
+                    in: account,
+                    network: tokenNetworkAccounts.network
+                  )
+                  tokenBalances.merge(with: [account.address: balanceForToken ?? 0])
+                  assetManager.updateBalance(for: token, account: account.address, balance: "\(balanceForToken ?? 0)", completion: nil)
+                }
+                return [token.id: tokenBalances]
+              }
+              return await group.reduce(into: [String: [String: Double]](), { partialResult, new in
+                partialResult.merge(with: new)
+              })
+            }
+          )
+          tokenBalancesCache.merge(with: fetchedTokenBalances)
         }
       }
     

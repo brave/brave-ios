@@ -59,9 +59,7 @@ struct PortfolioView: View {
           networkStore: networkStore,
           keyringStore: keyringStore,
           userAssetsStore: portfolioStore.userAssetsStore
-        ) {
-          cryptoStore.updateAssets()
-        }
+        )
       })
     .background(Color.clear
       .sheet(isPresented: $isPresentingAssetsFilters) {
