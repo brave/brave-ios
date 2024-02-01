@@ -210,8 +210,6 @@ public struct AIChatView: View {
                         .padding()
                     }
                     
-                    Color.clear.id(lastMessageId)
-                    
                     if !model.requestInProgress &&
                         !model.suggestedQuestions.isEmpty &&
                         model.apiError == .none {
@@ -221,6 +219,8 @@ public struct AIChatView: View {
                       }
                       .padding()
                     }
+                    
+                    Color.clear.id(lastMessageId)
                   }
                 }
                 .onChange(of: model.conversationHistory) { _ in
