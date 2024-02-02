@@ -45,6 +45,13 @@ class LeoSubscriptionManager: NSObject, ObservableObject {
   
   static var shared = LeoSubscriptionManager()
   
+  override init() {
+    super.init()
+    inAppPurchaseObserver.delegate = self
+  }
+  
+  let inAppPurchaseObserver = LeoInAppPurchaseObserver()
+
   var isSandbox: Bool {
     Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"
   }
@@ -60,7 +67,7 @@ class LeoSubscriptionManager: NSObject, ObservableObject {
       
   @Published var activeType: SubscriptionType = .monthly
   
-  @Published var state: SubscriptionState = .notPurchased
+  @Published var subscriptionState: SubscriptionState = .notPurchased
   
   @Published var expirationDate: Date = Date()
 }
@@ -123,5 +130,20 @@ extension LeoSubscriptionManager {
   
   func restorePurchasesAction() {
     SKPaymentQueue.default().restoreCompletedTransactions()
+  }
+}
+
+
+extension LeoSubscriptionManager: LeoInAppPurchaseObserverDelegate {
+  func purchasedOrRestoredProduct(validateReceipt: Bool) {
+    if validateReceipt {
+      // TODO: Validate Receipt
+    }
+    
+    subscriptionState = .purchased
+  }
+  
+  func purchaseFailed(error: LeoInAppPurchaseObserver.PurchaseError) {
+    // TODO: Logic for purchase fail error
   }
 }
