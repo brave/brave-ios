@@ -399,7 +399,7 @@ class SettingsViewController: TableViewController {
               
               self.navigationController?.pushViewController(syncWelcomeViewController, animated: true)
             }
-          }, image: UIImage(braveSystemNamed: "leo.sync"), accessory: .disclosureIndicator,
+          }, image: UIImage(braveSystemNamed: "leo.product.sync"), accessory: .disclosureIndicator,
           cellClass: MultilineValue1Cell.self),
         .boolRow(title: Strings.bookmarksLastVisitedFolderTitle, option: Preferences.General.showLastVisitedBookmarksFolder, image: UIImage(braveSystemNamed: "leo.folder.open")),
         Row(

@@ -19,16 +19,15 @@ private struct AIChatIntroBubbleView: View {
         .foregroundStyle(Color(braveSystemName: .textPrimary))
         .frame(maxWidth: .infinity, alignment: .leading)
         .fixedSize(horizontal: false, vertical: true)
-        .padding(.horizontal)
-        .padding(.top)
+        .padding([.horizontal, .top], 24.0)
+        .padding(.bottom, 8.0)
       
       Text(subtitle)
         .font(.footnote)
         .foregroundStyle(Color(braveSystemName: .textTertiary))
         .frame(maxWidth: .infinity, alignment: .leading)
         .fixedSize(horizontal: false, vertical: true)
-        .padding(.horizontal)
-        .padding(.bottom)
+        .padding([.horizontal, .bottom], 24.0)
       
       if let onSummarizePage = onSummarizePage {
         HStack {
@@ -39,7 +38,8 @@ private struct AIChatIntroBubbleView: View {
               .font(.callout)
               .foregroundColor(Color(braveSystemName: .textInteractive))
           }
-          .padding(12.0)
+          .padding(.horizontal, 12.0)
+          .padding(.vertical, 8.0)
           .background(
             RoundedRectangle(cornerRadius: 12.0, style: .continuous)
               .strokeBorder(Color(braveSystemName: .dividerInteractive), lineWidth: 1.0)
@@ -48,17 +48,17 @@ private struct AIChatIntroBubbleView: View {
           
           Spacer()
         }
-        .padding(.horizontal)
-        .padding(.bottom)
+        .padding([.horizontal, .bottom], 24.0)
       }
     }
     .background(
-      HStack {
+      VStack {
         Spacer()
-        Image(image, bundle: .module)
-          .resizable()
-          .aspectRatio(contentMode: .fit)
-          .frame(alignment: .bottomTrailing)
+        HStack {
+          Spacer()
+          Image(image, bundle: .module)
+            .frame(alignment: .bottomTrailing)
+        }
       }
     )
   }
@@ -70,18 +70,20 @@ struct AIChatIntroView: View {
   var body: some View {
     VStack(spacing: 0.0) {
       Text("Hi, I'm Leo!")
-        .font(.title2.weight(.semibold))
+        .font(.largeTitle.weight(.semibold))
         .foregroundStyle(Color(braveSystemName: .textPrimary))
         .frame(maxWidth: .infinity, alignment: .leading)
         .fixedSize(horizontal: false, vertical: true)
-        .padding(.bottom)
+        .padding(.horizontal, 24.0)
+        .padding(.bottom, 8.0)
       
       Text("An AI-powered intelligent assistant, built right into Brave.")
-        .font(.title2.weight(.semibold))
+        .font(.title.weight(.semibold))
         .foregroundStyle(Color(braveSystemName: .textSecondary))
         .frame(maxWidth: .infinity, alignment: .leading)
         .fixedSize(horizontal: false, vertical: true)
-        .padding(.bottom)
+        .padding(.horizontal, 24.0)
+        .padding(.bottom, 36.0)
       
       AIChatIntroBubbleView(title: "Need help with a website?",
                             subtitle: onSummarizePage != nil ? "I can help you summarizing articles, expanding on a site's content and much more. Not sure where to start? Try this:" : "I can help you summarizing articles, expanding on a site's content and much more.",
@@ -90,7 +92,7 @@ struct AIChatIntroView: View {
       )
       .background(Color(braveSystemName: .purple10))
       .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
-      .padding(.bottom)
+      .padding([.horizontal, .bottom], 12.0)
       
       AIChatIntroBubbleView(title: "Just want to chat?",
                             subtitle: "Ask me anything! We can talk about any topic you want. I'm always learning and improving to provide better answers.",
@@ -99,7 +101,7 @@ struct AIChatIntroView: View {
       )
       .background(Color(braveSystemName: .teal10))
       .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
-      .padding(.bottom)
+      .padding([.horizontal, .bottom], 12.0)
     }
   }
 }
