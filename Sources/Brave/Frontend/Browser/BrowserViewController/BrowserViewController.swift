@@ -271,7 +271,7 @@ public class BrowserViewController: UIViewController {
   var topToolbarDidPressReloadTask: Task<(), Never>?
   
   /// In app purchase obsever for VPN Subscription action
-  let iapObserver: IAPObserver
+  let iapObserver: BraveVPNInAppPurchaseObserver
   
   private let ntpP3AHelper: NewTabPageP3AHelper
 
@@ -3274,12 +3274,12 @@ extension BrowserViewController {
   }
 }
 
-extension BrowserViewController: IAPObserverDelegate {
+extension BrowserViewController: BraveVPNInAppPurchaseObserverDelegate {
   public func purchasedOrRestoredProduct(validateReceipt: Bool) {
     // No-op
   }
   
-  public func purchaseFailed(error: IAPObserver.PurchaseError) {
+  public func purchaseFailed(error: BraveVPNInAppPurchaseObserver.PurchaseError) {
     // No-op
   }
   

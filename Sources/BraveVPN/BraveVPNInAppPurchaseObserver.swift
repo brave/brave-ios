@@ -9,20 +9,20 @@ import Shared
 import os.log
 import Preferences
 
-public protocol IAPObserverDelegate: AnyObject {
+public protocol BraveVPNInAppPurchaseObserverDelegate: AnyObject {
   func purchasedOrRestoredProduct(validateReceipt: Bool)
-  func purchaseFailed(error: IAPObserver.PurchaseError)
+  func purchaseFailed(error: BraveVPNInAppPurchaseObserver.PurchaseError)
   func handlePromotedInAppPurchase()
 }
 
-public class IAPObserver: NSObject, SKPaymentTransactionObserver {
+public class BraveVPNInAppPurchaseObserver: NSObject, SKPaymentTransactionObserver {
 
   public enum PurchaseError {
     case transactionError(error: SKError?)
     case receiptError
   }
 
-  public weak var delegate: IAPObserverDelegate?
+  public weak var delegate: BraveVPNInAppPurchaseObserverDelegate?
   public var savedPayment: SKPayment?
   
   // MARK: - Handling transactions
@@ -106,6 +106,14 @@ public class IAPObserver: NSObject, SKPaymentTransactionObserver {
   // MARK: - Handling promoted in-app purchases
   
   public func paymentQueue(_ queue: SKPaymentQueue, shouldAddStorePayment payment: SKPayment, for product: SKProduct) -> Bool {
+    // Check the product triggered from ad is a VPN product
+    // This check is done because this observer is used in browser
+    let productIdentifier = product.productIdentifier
+    guard productIdentifier == VPNProductInfo.ProductIdentifiers.monthlySub ||
+            productIdentifier == VPNProductInfo.ProductIdentifiers.yearlySub else {
+      return false
+    }
+    
     // Check if there is an active onboarding happening
     let shouldDeferPayment = Preferences.AppState.isOnboardingActive.value
     

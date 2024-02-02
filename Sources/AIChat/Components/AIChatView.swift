@@ -110,6 +110,7 @@ public struct AIChatView: View {
                       upsellType: model.apiError == .rateLimitReached ? .rateLimit : .premium,
                       upgradeAction: {
                         isPremiumPaywallPresented = true
+                        
                       },
                       dismissAction: {
                         if let basicModel = model.models.first(where: { $0.access == .basic }) {

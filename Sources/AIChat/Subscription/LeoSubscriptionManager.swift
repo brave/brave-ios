@@ -5,40 +5,41 @@
 
 import Foundation
 import StoreKit
+import os.log
+
+/// In-app purchase subscription types
+enum SubscriptionType {
+  case monthly
+  case yearly
+  
+  var title: String {
+    switch self {
+    case .monthly:
+      return "Monthly Subscription"
+    case .yearly:
+      return "Yearly Subscription"
+    }
+  }
+}
+
+/// In-app purchase subscription states
+enum SubscriptionState: Equatable {
+  case notPurchased
+  case purchased
+  case expired
+  
+  var actionTitle: String {
+    switch self {
+    case .notPurchased, .expired:
+      return "Go Premium"
+    case .purchased:
+      return "Manage Subscription"
+    }
+  }
+}
 
 /// Singleton Manager handles subscriptions for AI Leo
 class LeoSubscriptionManager: NSObject, ObservableObject {
-  
-  /// In-app purchase subscription types
-  enum SubscriptionType {
-    case monthly
-    case yearly
-    
-    var title: String {
-      switch self {
-      case .monthly:
-        return "Monthly Subscription"
-      case .yearly:
-        return "Yearly Subscription"
-      }
-    }
-  }
-  
-  /// In-app purchase subscription states
-  enum SubscriptionState: Equatable {
-    case notPurchased
-    case purchased
-    case expired
-    
-    var actionTitle: String {
-      switch self {
-      case .notPurchased, .expired:
-        return "Go Premium"
-      case .purchased:
-        return "Manage Subscription"
-      }
-    }
-  }
   
   // MARK: Lifecycle
   
@@ -56,15 +57,15 @@ class LeoSubscriptionManager: NSObject, ObservableObject {
 
     return dateFormatter.string(from: expirationDate)
   }
-  
-  // TODO: Static Type and expiration for test development
+      
+  @Published var activeType: SubscriptionType = .monthly
   
   @Published var state: SubscriptionState = .notPurchased
   
-  @Published var activeType: SubscriptionType = .monthly
-  
-  @Published var expirationDate: Date = Date() + 5.minutes
+  @Published var expirationDate: Date = Date()
 }
+
+// MARK: SKPaymentTransactionObserver
 
 extension LeoSubscriptionManager: SKPaymentTransactionObserver {
   func restorePayments() {
@@ -90,5 +91,37 @@ extension LeoSubscriptionManager: SKPaymentTransactionObserver {
         assertionFailure("Unknown Transaction State: \(transaction.transactionState)")
       }
     }
+  }
+}
+
+// MARK: Subscription Methods
+
+extension LeoSubscriptionManager {
+  
+  func startSubscriptionAction(with type: SubscriptionType) {
+    addPaymentForSubcription(type: type)
+  }
+  
+  private func addPaymentForSubcription(type: SubscriptionType) {
+    var subscriptionProduct: SKProduct?
+    
+    switch type {
+    case .yearly:
+      subscriptionProduct = LeoProductInfo.shared.yearlySubProduct
+    case .monthly:
+      subscriptionProduct = LeoProductInfo.shared.monthlySubProduct
+    }
+    
+    guard let subscriptionProduct = subscriptionProduct else {
+      Logger.module.error("Failed to retrieve \(type.title) subcription product")
+      return
+    }
+    
+    let payment = SKPayment(product: subscriptionProduct)
+    SKPaymentQueue.default().add(payment)
+  }
+  
+  func restorePurchasesAction() {
+    SKPaymentQueue.default().restoreCompletedTransactions()
   }
 }
