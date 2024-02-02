@@ -9,24 +9,28 @@ import DesignSystem
 import Then
 
 struct AIChatPaywallView: View {
-  enum TierType {
-    case yearly, monthly
-  }
   
   @Environment(\.presentationMode) 
   @Binding private var presentationMode
   
   @State 
-  private var selectedTierType: TierType = .monthly
+  private var selectedTierType: SubscriptionType = .monthly
   
   @State
-  private var availableTierTypes: [TierType] = [.monthly]
+  private var availableTierTypes: [SubscriptionType] = [.monthly]
 
   @ObservedObject
   private var productInfo = LeoProductInfo.shared
   
+  @ObservedObject
+  var subscriptionManager = LeoSubscriptionManager.shared
+  
   var restoreAction: (() -> Void)?
-  var upgradeAction: ((TierType) -> Void)?
+  var upgradeAction: ((SubscriptionType) -> Void)?
+  
+  @State
+  var inAppPurchaseActionOngoing = false
+  
   
   var body: some View {
     NavigationView {
@@ -48,8 +52,16 @@ struct AIChatPaywallView: View {
           .navigationBarTitleDisplayMode(.inline)
           .toolbar {
             ToolbarItemGroup(placement: .confirmationAction) {
-              Button("Restore") {
-                restoreAction?()
+              Button(action: {
+                subscriptionManager.restorePayments()
+                inAppPurchaseActionOngoing.toggle()
+              }) {
+                if inAppPurchaseActionOngoing {
+                  ProgressView()
+                    .tint(Color.white)
+                } else {
+                  Text("Restore")
+                }
               }
               .foregroundColor(.white)
             }
@@ -200,22 +212,23 @@ struct AIChatPaywallView: View {
       
       VStack {
         Button(action: {
-          upgradeAction?(selectedTierType)
+          subscriptionManager.startSubscriptionAction(with: selectedTierType)
+          inAppPurchaseActionOngoing.toggle()
         }) {
-          if LeoProductInfo.shared.isComplete {
+          if inAppPurchaseActionOngoing {
+            ProgressView()
+              .tint(Color.white)
+          } else {
             Text("Upgrade Now")
               .font(.body.weight(.semibold))
               .foregroundColor(Color(.white))
-          } else {
-            ProgressView()
-              .tint(Color.white)
           }
         }
         .frame(maxWidth: .infinity)
         .padding()
         .background(Color(braveSystemName: .legacyInteractive1))
         .clipShape(RoundedRectangle(cornerRadius: 16.0, style: .continuous))
-        .disabled(!LeoProductInfo.shared.isComplete)
+        .disabled(inAppPurchaseActionOngoing)
       }
       .padding([.horizontal], 16.0)
     }
