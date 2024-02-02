@@ -13,18 +13,20 @@ struct AIChatPageContextView: View {
   
   var body: some View {
     Toggle(isOn: $isToggleOn) {
-      Text("Use page context for response \(Image(braveSystemName: "leo.info.outline"))")
+      Text("Shape answers based on the page's contents \(Image(braveSystemName: "leo.info.outline"))")
         .font(.footnote)
         .foregroundStyle(Color(braveSystemName: .textTertiary))
     }
     .disabled(!isToggleEnabled)
     .tint(Color(braveSystemName: .primary60))
-    .padding(8.0)
+    .padding([.vertical, .trailing], 8.0)
+    .padding(.leading, 12.0)
     .background(
       RoundedRectangle(cornerRadius: 8.0, style: .continuous)
         .foregroundStyle(Color(braveSystemName: .pageBackground))
     )
     .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
+    .shadow(color: .black.opacity(0.15), radius: 4.0, x: 0.0, y: 1.0)
   }
 }
 

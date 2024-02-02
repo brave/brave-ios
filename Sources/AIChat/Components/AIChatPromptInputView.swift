@@ -80,6 +80,7 @@ struct AIChatPromptInputView: View {
         .strokeBorder(Color(braveSystemName: .dividerStrong), lineWidth: 1.0)
     )
     .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
+    .shadow(color: .black.opacity(0.15), radius: 4.0, x: 0.0, y: 1.0)
     .onReceive(model.speechRecognizer.$finalizedRecognition) { recognition in
       if recognition.status && model.activeInputView == .promptView {
         // Feedback indicating recognition is finalized

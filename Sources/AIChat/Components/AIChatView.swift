@@ -248,21 +248,21 @@ public struct AIChatView: View {
                 hasSeenIntro.value = true
                 model.submitQuery("Summarize this page")
               } : nil)
-              .padding()
-              .frame(minHeight: geometry.size.height)
+              .frame(minHeight: geometry.size.height, alignment: .bottom)
             }
           }
         }
       }
       
-      Spacer()
+      Spacer(minLength: 0.0)
       
       if model.apiError == .none && model.isAgreementAccepted ||
           (!hasSeenIntro.value && !model.isAgreementAccepted) {
         AIChatPageContextView(
           isToggleOn: model.shouldShowPremiumPrompt ? .constant(false) : $model.isPageConnected,
           isToggleEnabled: !model.shouldShowPremiumPrompt && model.hasValidWebPage)
-        .padding()
+        .padding(.horizontal, 8.0)
+        .padding(.bottom, 12.0)
       }
       
       if model.isAgreementAccepted ||
@@ -279,8 +279,7 @@ public struct AIChatView: View {
             model.submitQuery(prompt)
           }
         )
-        .padding(.horizontal)
-        .padding(.bottom, 8.0)
+        .padding([.horizontal, .bottom], 8.0)
       }
     }
     .background(Color(braveSystemName: .containerBackground))
