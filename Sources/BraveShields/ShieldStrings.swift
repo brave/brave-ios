@@ -195,4 +195,18 @@ public extension Strings.Shields {
     value: "Because you requested to aggressively block trackers and ads, Brave is blocking this site before the first network connection.",
     comment: "A description in the warning page that appears when a page was blocked"
   )
+  
+  /// Text for a button in a blocked page info screen that allows you to proceed regardless of the privacy warning
+  static let domainBlockedProceedAction = NSLocalizedString(
+    "DomainBlockedProceedAction", tableName: "BraveShared", bundle: .module,
+    value: "Proceed",
+    comment: "Text for a button in a blocked page info screen that allows you to proceed regardless of the privacy warning"
+  )
+  
+  /// A description in the warning page that appears when a page was blocked
+  static let domainBlockedGoBackAction = NSLocalizedString(
+    "DomainBlockedGoBackAction", tableName: "BraveShared", bundle: .module,
+    value: "Go Back",
+    comment: "Text for a button in a blocked page info screen that takes you back where you came from"
+  )
 }
