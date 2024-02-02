@@ -18,7 +18,7 @@ public class LeoProductInfo: NSObject, ObservableObject {
   public static let shared = LeoProductInfo()
 
   public var isComplete: Bool {
-    switch LeoSubscriptionManager.shared.state {
+    switch LeoSubscriptionManager.shared.subscriptionState {
     case .purchased:
       return true
     case .notPurchased, .expired:
