@@ -78,7 +78,7 @@ public struct AIChatAdvancedSettingsView: View {
       }
       
       Section {
-        if subscriptionManager.state == .purchased {
+        if subscriptionManager.subscriptionState == .purchased {
           LabelDetailView(title: "Status",
                           detail: subscriptionManager.activeType.title)
           
@@ -162,7 +162,7 @@ public struct AIChatAdvancedSettingsView: View {
 
   var premiumActionView: some View {
     HStack {
-      LabelView(title: subscriptionManager.state.actionTitle)
+      LabelView(title: subscriptionManager.subscriptionState.actionTitle)
       Spacer()
       Image(braveSystemName: "leo.launch")
         .foregroundStyle(Color(braveSystemName: .iconDefault))
