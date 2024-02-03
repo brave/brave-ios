@@ -183,9 +183,10 @@ private struct AIChatFeedbackInputView: View {
         TextEditor(text: $text)
           .font(.subheadline)
           .foregroundStyle(Color(braveSystemName: .textPrimary))
-          .frame(minHeight: 80.0)
           .autocorrectionDisabled()
           .autocapitalization(.none)
+          .submitLabel(.done)
+          .frame(minHeight: 80.0)
           .osAvailabilityModifiers({ view in
             if #available(iOS 16.4, *) {
               view

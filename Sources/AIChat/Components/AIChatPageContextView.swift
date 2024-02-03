@@ -18,7 +18,7 @@ struct AIChatPageContextView: View {
         .foregroundStyle(Color(braveSystemName: .textTertiary))
     }
     .disabled(!isToggleEnabled)
-    .tint(Color(braveSystemName: .primary60))
+    .tint(isToggleOn ? Color(braveSystemName: .primary60) : Color(braveSystemName: .gray30))
     .padding([.vertical, .trailing], 8.0)
     .padding(.leading, 12.0)
     .background(

@@ -227,12 +227,15 @@ public struct AIChatView: View {
                   }
                 }
                 .onChange(of: model.conversationHistory) { _ in
+                  hideKeyboard()
                   scrollViewReader.scrollTo(lastMessageId, anchor: .bottom)
                 }
                 .onChange(of: model.conversationHistory.last?.text) { _ in
+                  hideKeyboard()
                   scrollViewReader.scrollTo(lastMessageId, anchor: .bottom)
                 }
                 .onChange(of: customFeedbackIndex) { _ in
+                  hideKeyboard()
                   withAnimation {
                     scrollViewReader.scrollTo(lastMessageId, anchor: .bottom)
                   }
@@ -280,6 +283,7 @@ public struct AIChatView: View {
             model.submitQuery(prompt)
           }
         )
+        .disabled(model.requestInProgress || model.apiError == .contextLimitReached)
         .padding([.horizontal, .bottom], 8.0)
       }
     }
@@ -365,6 +369,15 @@ public struct AIChatView: View {
         }
       }
     })
+  }
+  
+  private func hideKeyboard() {
+    UIApplication.shared.sendAction(
+      #selector(UIResponder.resignFirstResponder),
+      to: nil,
+      from: nil,
+      for: nil
+    )
   }
 }
 

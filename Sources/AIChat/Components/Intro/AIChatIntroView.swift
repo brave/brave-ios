@@ -6,10 +6,10 @@
 import SwiftUI
 import DesignSystem
 
-private struct AIChatIntroBubbleView: View {
+private struct AIChatIntroBubbleView<ImageOverlay: View>: View {
   let title: String
   let subtitle: String
-  let image: String
+  let image: ImageOverlay
   let onSummarizePage: (() -> Void)?
   
   var body: some View {
@@ -24,7 +24,7 @@ private struct AIChatIntroBubbleView: View {
       
       Text(subtitle)
         .font(.footnote)
-        .foregroundStyle(Color(braveSystemName: .textTertiary))
+        .foregroundStyle(Color(braveSystemName: .textSecondary))
         .frame(maxWidth: .infinity, alignment: .leading)
         .fixedSize(horizontal: false, vertical: true)
         .padding([.horizontal, .bottom], 24.0)
@@ -56,7 +56,8 @@ private struct AIChatIntroBubbleView: View {
         Spacer()
         HStack {
           Spacer()
-          Image(image, bundle: .module)
+          image
+            .opacity(0.40)
             .frame(alignment: .bottomTrailing)
         }
       }
@@ -79,25 +80,32 @@ struct AIChatIntroView: View {
       
       Text("An AI-powered intelligent assistant, built right into Brave.")
         .font(.title.weight(.semibold))
-        .foregroundStyle(Color(braveSystemName: .textSecondary))
+        .foregroundStyle(Color(braveSystemName: .textTertiary))
         .frame(maxWidth: .infinity, alignment: .leading)
         .fixedSize(horizontal: false, vertical: true)
         .padding(.horizontal, 24.0)
         .padding(.bottom, 36.0)
       
-      AIChatIntroBubbleView(title: "Need help with a website?",
-                            subtitle: onSummarizePage != nil ? "I can help you summarizing articles, expanding on a site's content and much more. Not sure where to start? Try this:" : "I can help you summarizing articles, expanding on a site's content and much more.",
-                            image: "leo-intro-website-shape",
-                            onSummarizePage: onSummarizePage
+      AIChatIntroBubbleView(
+        title: "Need help with a website?",
+        subtitle: onSummarizePage != nil ? "I can help you summarizing articles, expanding on a site's content and much more. Not sure where to start? Try this:" : "I can help you summarizing articles, expanding on a site's content and much more.",
+        image: Image("leo-intro-website-shape", bundle: .module)
+          .renderingMode(.template)
+          .foregroundStyle(Color(braveSystemName: .purple20)),
+        onSummarizePage: onSummarizePage
       )
       .background(Color(braveSystemName: .purple10))
       .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
       .padding([.horizontal, .bottom], 12.0)
       
-      AIChatIntroBubbleView(title: "Just want to chat?",
-                            subtitle: "Ask me anything! We can talk about any topic you want. I'm always learning and improving to provide better answers.",
-                            image: "leo-intro-star-burst",
-                            onSummarizePage: nil
+      AIChatIntroBubbleView(
+        title: "Just want to chat?",
+                            
+        subtitle: "Ask me anything! We can talk about any topic you want. I'm always learning and improving to provide better answers.",
+        image: Image("leo-intro-star-burst", bundle: .module)
+          .renderingMode(.template)
+          .foregroundStyle(Color(braveSystemName: .teal20)),
+        onSummarizePage: nil
       )
       .background(Color(braveSystemName: .teal10))
       .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))

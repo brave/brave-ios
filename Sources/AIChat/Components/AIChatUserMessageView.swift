@@ -15,6 +15,8 @@ struct AIChatUserMessageView: View {
         ZStack {
           Color(braveSystemName: .containerHighlight)
           Image(braveSystemName: "leo.user.circle")
+            .renderingMode(.template)
+            .foregroundStyle(Color(braveSystemName: .iconDefault))
             .padding(8.0)
         }
         .fixedSize()

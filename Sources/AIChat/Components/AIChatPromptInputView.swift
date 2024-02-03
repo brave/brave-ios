@@ -19,7 +19,7 @@ struct AIChatPromptInputView: View {
 
   var body: some View {
     HStack(spacing: 0.0) {
-      /*Text("/")
+      Text("/")
         .font(.caption2)
         .foregroundStyle(Color(braveSystemName: .textTertiary))
         .padding(.horizontal, 12.0)
@@ -29,22 +29,25 @@ struct AIChatPromptInputView: View {
             .strokeBorder(Color(braveSystemName: .dividerSubtle), lineWidth: 1.0)
         )
         .clipShape(RoundedRectangle(cornerRadius: 4.0, style: .continuous))
-        .padding()*/
+        .padding()
       
-      TextField("", text: $prompt,
-                prompt: Text("Enter a prompt here")
-                          .font(.subheadline)
-                          .foregroundColor(Color(braveSystemName: .textTertiary))
+      TextField(
+        "",
+        text: $prompt,
+        prompt: Text("Enter a prompt here")
+          .font(.subheadline)
+          .foregroundColor(Color(braveSystemName: .textTertiary))
       )
       .font(.subheadline)
       .foregroundColor(Color(braveSystemName: .textPrimary))
+      .submitLabel(.send)
       .onSubmit {
         if !prompt.isEmpty {
           onTextSubmitted(prompt)
           prompt = ""
         }
       }
-      .padding(.leading)
+      //.padding(.leading)
       
       if prompt.isEmpty {
         Button {
@@ -75,7 +78,8 @@ struct AIChatPromptInputView: View {
         .padding()
       }
     }
-    .background(
+    .background(Color(braveSystemName: .containerBackground))
+    .overlay(
       RoundedRectangle(cornerRadius: 8.0, style: .continuous)
         .strokeBorder(Color(braveSystemName: .dividerStrong), lineWidth: 1.0)
     )
