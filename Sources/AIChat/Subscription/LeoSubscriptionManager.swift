@@ -45,11 +45,12 @@ class LeoSubscriptionManager: ObservableObject {
   
   static var shared = LeoSubscriptionManager()
   
+  let inAppPurchaseObserver = LeoInAppPurchaseObserver()
+  
   init() {
     inAppPurchaseObserver.delegate = self
+    SKPaymentQueue.default().add(inAppPurchaseObserver)
   }
-  
-  let inAppPurchaseObserver = LeoInAppPurchaseObserver()
 
   var isSandbox: Bool {
     Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"
