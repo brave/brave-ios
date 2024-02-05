@@ -69,8 +69,6 @@ public class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
     }
   }
   
-  private let skusManager = try BraveLeoSkusManager(product: .leoMonthly, isPrivateMode: false)
-  
   public init(braveCore: BraveCoreMain, webView: WKWebView?, pageContentFetcher: @escaping (WKWebView) async -> String?) {
     self.webView = webView
     self.pageContentFetcher = pageContentFetcher
@@ -93,18 +91,6 @@ public class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
     Task { @MainActor in
       self.premiumStatus = await getPremiumStatus()
     }
-    
-    /*Task { @MainActor in
-      do {
-        let orderId = try await skusManager.createOrder()
-        print(orderId)
-
-        let response = try await skusManager.submitReceipt(orderId: orderId)
-        print(response)
-      } catch {
-        print("ERROR: \(error)")
-      }
-    }*/
   }
   
   public func getPageTitle() -> String? {

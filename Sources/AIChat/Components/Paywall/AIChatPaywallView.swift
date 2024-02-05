@@ -96,7 +96,7 @@ struct AIChatPaywallView: View {
                    alignment: .topTrailing))
       .onAppear {
         // Observe subscription manager events
-        subscriptionManager.inAppPurchaseObserver.delegate = observerDelegate
+        subscriptionManager.purchaseObserver.delegate = observerDelegate
       }
       .alert(isPresented: $observerDelegate.isShowingPurchaseAlert) {
         Alert(
