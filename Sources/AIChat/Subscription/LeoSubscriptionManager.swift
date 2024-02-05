@@ -46,13 +46,11 @@ class LeoSubscriptionManager: ObservableObject {
   
   static var shared = LeoSubscriptionManager()
   
-  let inAppPurchaseObserver = LeoInAppPurchaseObserver()
-  
-  init() {
-    SKPaymentQueue.default().add(inAppPurchaseObserver)
-    inAppPurchaseObserver.delegate = self
-    SKPaymentQueue.default().add(inAppPurchaseObserver)
+  private init() {
+    SKPaymentQueue.default().add(purchaseObserver)
   }
+  
+  let purchaseObserver = LeoInAppPurchaseObserver()
 
   var isSandbox: Bool {
     Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"
@@ -72,11 +70,24 @@ class LeoSubscriptionManager: ObservableObject {
   @Published var subscriptionState: SubscriptionState = .notPurchased
   
   @Published var expirationDate: Date = Date()
+  
+  private let monthlySDK = LeoSkusSDK(product: .leoMonthly, isPrivateMode: false)
 }
 
 // MARK: Subscription Methods
 
 extension LeoSubscriptionManager {
+  
+  @MainActor
+  func updateSkusPurchaseState() async throws {
+    let orderId = try await monthlySDK.createOrder()
+    let order = try await monthlySDK.refreshOrder(orderId: orderId)
+    let errorCode = try await monthlySDK.fetchCredentials(orderId: orderId)
+    
+    if orderId.isEmpty || order.isEmpty || !errorCode.isEmpty {
+      throw LeoSkusSDK.SkusError.invalidReceiptData
+    }
+  }
   
   func startSubscriptionAction(with type: SubscriptionType) {
     addPaymentForSubcription(type: type)
@@ -88,6 +99,7 @@ extension LeoSubscriptionManager {
     switch type {
     case .yearly:
       subscriptionProduct = LeoProductInfo.shared.yearlySubProduct
+      
     case .monthly:
       subscriptionProduct = LeoProductInfo.shared.monthlySubProduct
     }
@@ -106,16 +118,6 @@ extension LeoSubscriptionManager {
   }
 }
 
-extension LeoSubscriptionManager: LeoInAppPurchaseObserverDelegate {
-  func purchasedOrRestoredProduct(validateReceipt: Bool) {
-    // Not needed in the singleton instance
-  }
-  
-  func purchaseFailed(error: LeoInAppPurchaseObserver.PurchaseError) {
-    // Not needed in the singleton instance
-  }
-}
-
 class PaymentObserverDelegate: ObservableObject, LeoInAppPurchaseObserverDelegate {
   
   enum PaymentStatus {
@@ -131,9 +133,19 @@ class PaymentObserverDelegate: ObservableObject, LeoInAppPurchaseObserverDelegat
   @Published
   var shouldDismiss: Bool = false
 
-
   func purchasedOrRestoredProduct(validateReceipt: Bool) {
     if validateReceipt {
+      Task { @MainActor in
+        do {
+          try await LeoSubscriptionManager.shared.updateSkusPurchaseState()
+          purchasedStatus = (.success, nil)
+          shouldDismiss.toggle()
+        } catch {
+          purchasedStatus = (.failure, .receiptError)
+          isShowingPurchaseAlert.toggle()
+        }
+      }
+      
       // TODO: Receipt Validation Logic
       // Check the result of receipt validation and use
       // purchasedStatus(.success, nil)  or
@@ -141,10 +153,10 @@ class PaymentObserverDelegate: ObservableObject, LeoInAppPurchaseObserverDelegat
       // isShowingPurchaseAlert.toggle() for showing alert
       // shouldDismiss.toggle() for dismissing
       // return
+    } else {
+      purchasedStatus = (.success, nil)
+      shouldDismiss.toggle()
     }
-    
-    purchasedStatus = (.success, nil)
-    shouldDismiss.toggle()
   }
   
   func purchaseFailed(error: LeoInAppPurchaseObserver.PurchaseError) {

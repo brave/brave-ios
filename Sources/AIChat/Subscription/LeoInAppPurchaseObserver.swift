@@ -26,37 +26,52 @@ class LeoInAppPurchaseObserver: NSObject, SKPaymentTransactionObserver {
   // MARK: - Handling transactions
   
   func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
+    var observer = delegate
+    
     transactions
-      .sorted(by: { $0.transactionDate ?? Date() > $1.transactionDate ?? Date() })
-      .forEach { paymentTransaction in
-        switch paymentTransaction.transactionState {
+      .sorted(using: KeyPathComparator(\.transactionDate, order: .reverse))
+      .forEach { transaction in
+        switch transaction.transactionState {
         case .purchased:
           Logger.module.debug("Received transaction state: purchased")
+          SKPaymentQueue.default().finishTransaction(transaction)
           
-          SKPaymentQueue.default().finishTransaction(paymentTransaction)
+          observer?.purchasedOrRestoredProduct(validateReceipt: true)
+          observer = nil
           
-          self.delegate?.purchasedOrRestoredProduct(validateReceipt: true)
         case .restored:
           Logger.module.debug("Received transaction state: restored")
-          
-          SKPaymentQueue.default().finishTransaction(paymentTransaction)
+          SKPaymentQueue.default().finishTransaction(transaction)
           
           // TODO: Receipt Validation Logic
           // Check the result of receipt validation and use
           // purchasedOrRestoredProduct(validateReceipt: false) or
           // purchaseFailed(error:) accordingly
           
-          self.delegate?.purchaseFailed(error: .receiptError)
+          if let purchaseObserver = observer {
+            observer = nil
+            Task { @MainActor in
+              do {
+                try await LeoSubscriptionManager.shared.updateSkusPurchaseState()
+                purchaseObserver.purchasedOrRestoredProduct(validateReceipt: false)
+              } catch {
+                purchaseObserver.purchaseFailed(error: .receiptError)
+              }
+            }
+          }
+          
         case .purchasing, .deferred:
           Logger.module.debug("Received transaction state: purchasing")
+          
         case .failed:
           Logger.module.debug("Received transaction state: failed")
+          SKPaymentQueue.default().finishTransaction(transaction)
           
-          SKPaymentQueue.default().finishTransaction(paymentTransaction)
+          observer?.purchaseFailed(error: .transactionError(error: transaction.error as? SKError))
+          observer = nil
           
-          self.delegate?.purchaseFailed(
-            error: .transactionError(error: paymentTransaction.error as? SKError))
         @unknown default:
+          observer = nil
           assertionFailure("Unknown transactionState")
         }
       }

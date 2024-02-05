@@ -279,6 +279,7 @@ public struct AIChatView: View {
           onTextSubmitted: { prompt in
             hasSeenIntro.value = true
             model.submitQuery(prompt)
+            hideKeyboard()
           }
         )
         .disabled(model.requestInProgress || model.apiError == .contextLimitReached)
@@ -290,7 +291,9 @@ public struct AIChatView: View {
       .sheet(isPresented: $isPremiumPaywallPresented) {
         AIChatPaywallView(
           premiumUpgrageSuccessful: { _ in
-            // TODO: Upgrade Action
+            Task { @MainActor in
+              _ = await model.getPremiumStatus()
+            }
           })
       })
     .background(Color.clear
