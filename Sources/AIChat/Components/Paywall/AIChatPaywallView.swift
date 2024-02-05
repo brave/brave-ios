@@ -28,9 +28,6 @@ struct AIChatPaywallView: View {
   var restoreAction: (() -> Void)?
   var upgradeAction: ((SubscriptionType) -> Void)?
   
-  @State
-  var inAppPurchaseActionOngoing = false
-  
   @StateObject 
   var observerDelegate = PaymentObserverDelegate()
 
@@ -56,9 +53,9 @@ struct AIChatPaywallView: View {
             ToolbarItemGroup(placement: .confirmationAction) {
               Button(action: {
                 subscriptionManager.restorePurchasesAction()
-                inAppPurchaseActionOngoing.toggle()
+                observerDelegate.purchasedStatus = (.ongoing, nil)
               }) {
-                if inAppPurchaseActionOngoing {
+                if observerDelegate.purchasedStatus.status == .ongoing {
                   ProgressView()
                     .tint(Color.white)
                 } else {
@@ -66,6 +63,7 @@ struct AIChatPaywallView: View {
                 }
               }
               .foregroundColor(.white)
+              .disabled(observerDelegate.purchasedStatus.status == .ongoing)
             }
             
             ToolbarItemGroup(placement: .cancellationAction) {
@@ -219,9 +217,9 @@ struct AIChatPaywallView: View {
       VStack {
         Button(action: {
           subscriptionManager.startSubscriptionAction(with: selectedTierType)
-          inAppPurchaseActionOngoing.toggle()
+          observerDelegate.purchasedStatus = (.ongoing, nil)
         }) {
-          if inAppPurchaseActionOngoing {
+          if observerDelegate.purchasedStatus.status == .ongoing {
             ProgressView()
               .tint(Color.white)
           } else {
@@ -240,7 +238,7 @@ struct AIChatPaywallView: View {
                                    startPoint: .init(x: 0.0, y: 0.0),
                                    endPoint: .init(x: 0.0, y: 1.0)))
         .clipShape(RoundedRectangle(cornerRadius: 16.0, style: .continuous))
-        .disabled(inAppPurchaseActionOngoing)
+        .disabled(observerDelegate.purchasedStatus.status == .ongoing)
       }
       .padding([.horizontal], 16.0)
     }
@@ -249,22 +247,26 @@ struct AIChatPaywallView: View {
 
 class PaymentObserverDelegate: ObservableObject, LeoInAppPurchaseObserverDelegate {
   
+  enum PaymentStatus {
+    case ongoing, success, failure
+  }
+  
   @Published
-  var purchasedStatus: (success: Bool, LeoInAppPurchaseObserver.PurchaseError?) = (false, nil)
+  var purchasedStatus: (status: PaymentStatus, error: LeoInAppPurchaseObserver.PurchaseError?) = (.success, nil)
     
   func purchasedOrRestoredProduct(validateReceipt: Bool) {
     if validateReceipt {
       // TODO: Receipt Validation Logic
       // Check the result of receipt validation and use
-      // purchasedStatus(true, nil)  or
-      // purchasedStatus(false, .receiptError) accordingly and
+      // purchasedStatus(.success, nil)  or
+      // purchasedStatus(.failure, .receiptError) accordingly and
       // return
     }
     
-    purchasedStatus = (true, nil)
+    purchasedStatus = (.success, nil)
   }
   
   func purchaseFailed(error: LeoInAppPurchaseObserver.PurchaseError) {
-    purchasedStatus = (false, error)
+    purchasedStatus = (.failure, error)
   }
 }
