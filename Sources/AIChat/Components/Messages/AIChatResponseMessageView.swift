@@ -42,7 +42,7 @@ struct AIChatResponseMessageView: View {
           .padding(8.0)
       }
       .fixedSize()
-      .clipShape(Capsule())
+      .clipShape(Circle())
       
       Text(prompt)
         .font(.subheadline)
