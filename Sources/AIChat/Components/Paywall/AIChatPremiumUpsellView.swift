@@ -161,8 +161,7 @@ struct PremiumUpsellDetailView: View {
         isPaywallPresented: isPaywallPresented)
           .padding()
       
-      Divider()
-        .overlay(Color(braveSystemName: .dividerSubtle))
+      Color(braveSystemName: .primitivePrimary70)
         .frame(height: 1.0)
       
       PremiumUpsellTopicView(
@@ -170,8 +169,7 @@ struct PremiumUpsellDetailView: View {
         isPaywallPresented: isPaywallPresented)
           .padding()
       
-      Divider()
-        .overlay(Color(braveSystemName: .dividerSubtle))
+      Color(braveSystemName: .primitivePrimary70)
         .frame(height: 1.0)
       
       PremiumUpsellTopicView(
@@ -179,8 +177,7 @@ struct PremiumUpsellDetailView: View {
         isPaywallPresented: isPaywallPresented)
           .padding()
       
-      Divider()
-        .overlay(Color(braveSystemName: .dividerSubtle))
+      Color(braveSystemName: .primitivePrimary70)
         .frame(height: 1.0)
       
       PremiumUpsellTopicView(
@@ -191,9 +188,7 @@ struct PremiumUpsellDetailView: View {
     .frame(maxWidth: .infinity, alignment: .leading)
     .overlay(
       RoundedRectangle(cornerRadius: 8.0, style: .continuous)
-        .strokeBorder(isPaywallPresented
-                        ? Color(braveSystemName: .primitivePrimary70)
-                        : Color(braveSystemName: .dividerSubtle), 
+        .strokeBorder(Color(braveSystemName: .primitivePrimary70),
                       lineWidth: 1.0)
     )
     .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
@@ -253,8 +248,8 @@ private struct PremiumUpsellTopicView: View {
     HStack {
       Image(braveSystemName: topicType.icon)
         .padding(8.0)
-        .background(Color(braveSystemName: .primary20))
-        .foregroundColor(Color(braveSystemName: .primary60))
+        .background(Color(braveSystemName: .primitivePrimary30))
+        .foregroundColor(Color(braveSystemName: .primitivePrimary80))
         .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
       
       VStack(alignment: .leading, spacing: 5) {
@@ -277,7 +272,7 @@ private struct PremiumUpsellTopicView: View {
           .frame(maxWidth: .infinity, alignment: .leading)
           .fixedSize(horizontal: false, vertical: true)
           .foregroundStyle(isPaywallPresented
-                           ? Color(braveSystemName: .primitivePrimary20 )
+                           ? Color(braveSystemName: .primitivePrimary30 )
                            : Color(braveSystemName: .textSecondary))
       }
     }
