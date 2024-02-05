@@ -219,6 +219,7 @@ extension TransactionConfirmationStore {
       }(),
       solTxManagerProxy: BraveWallet.TestSolanaTxManagerProxy.previewProxy,
       ipfsApi: TestIpfsAPI(),
+      walletP3A: TestWalletP3A(),
       userAssetManager: TestableWalletUserAssetManager()
     )
   }

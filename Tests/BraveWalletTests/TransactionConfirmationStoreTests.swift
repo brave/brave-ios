@@ -131,6 +131,7 @@ import Preferences
       keyringService: keyringService,
       solTxManagerProxy: solTxManagerProxy,
       ipfsApi: TestIpfsAPI(),
+      walletP3A: TestWalletP3A(),
       userAssetManager: mockAssetManager
     )
   }
