@@ -20,7 +20,7 @@ struct AIChatUserMessageView: View {
             .padding(8.0)
         }
         .fixedSize()
-        .clipShape(Capsule())
+        .clipShape(Circle())
         
         Spacer()
       }

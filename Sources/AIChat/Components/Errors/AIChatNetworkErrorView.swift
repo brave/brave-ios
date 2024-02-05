@@ -7,6 +7,8 @@ import SwiftUI
 import DesignSystem
 
 struct AIChatNetworkErrorView: View {
+  let onRetryRequest: () -> Void
+  
   var body: some View {
     HStack(alignment: .top, spacing: 0.0) {
       Image(braveSystemName: "leo.warning.circle-filled")
@@ -21,7 +23,7 @@ struct AIChatNetworkErrorView: View {
         
         HStack {
           Button(action: {
-            
+            onRetryRequest()
           }) {
             Text("Retry")
               .font(.body.weight(.semibold))
@@ -43,5 +45,7 @@ struct AIChatNetworkErrorView: View {
 }
 
 #Preview {
-  AIChatNetworkErrorView()
+  AIChatNetworkErrorView() {
+    print("Retrying Request")
+  }
 }

@@ -115,12 +115,7 @@ public struct AIChatView: View {
                       dismissAction: {
                         if let basicModel = model.models.first(where: { $0.access == .basic }) {
                           model.changeModel(modelKey: basicModel.key)
-                          
-                          if let lastRequest = model.conversationHistory.last {
-                            model.submitQuery(lastRequest.text)
-                          } else {
-                            model.retryLastRequest()
-                          }
+                          model.retryLastRequest()
                         } else {
                           // TODO: LOG Error Switching Model
                         }
@@ -128,16 +123,20 @@ public struct AIChatView: View {
                     )
                     .padding()
                   } else {
+                    AIChatIntroMessageView(prompt: "Hi, I'm Leo. I'm a fully hosted AI assistant by Brave. I'm powered by Mixtral 8x7B, a model created by Mistral AI to handle advanced tasks.")
+                      .padding()
+                      .background(Color(braveSystemName: .containerBackground))
+                    
                     ForEach(Array(model.conversationHistory.enumerated()), id: \.offset) { index, turn in
                       if turn.characterType == .human {
                         AIChatUserMessageView(prompt: turn.text)
                           .padding()
-                          .background(Color(braveSystemName: .pageBackground))
+                          .background(Color(braveSystemName: .containerBackground))
                         
                         if index == 0 && model.isPageConnected {
                           AIChatPageInfoBanner(url: model.getLastCommittedURL(), pageTitle: model.getPageTitle() ?? "")
                             .padding([.horizontal, .bottom])
-                            .background(Color(braveSystemName: .pageBackground))
+                            .background(Color(braveSystemName: .containerBackground))
                         }
                       } else {
                         AIChatResponseMessageView(prompt: turn.text)
@@ -184,7 +183,11 @@ public struct AIChatView: View {
                     }
                     
                     if model.apiError == .connectionIssue {
-                      AIChatNetworkErrorView()
+                      AIChatNetworkErrorView() {
+                        if !model.conversationHistory.isEmpty {
+                          model.retryLastRequest()
+                        }
+                      }
                         .padding()
                     } else if model.apiError == .rateLimitReached {
                       // TODO: If the user is already premium, are they also rate-limited?
@@ -196,12 +199,7 @@ public struct AIChatView: View {
                         dismissAction: {
                           if let basicModel = model.models.first(where: { $0.access == .basic }) {
                             model.changeModel(modelKey: basicModel.key)
-                            
-                            if let lastRequest = model.conversationHistory.last {
-                              model.submitQuery(lastRequest.text)
-                            } else {
-                              model.retryLastRequest()
-                            }
+                            model.retryLastRequest()
                           } else {
                             // TODO: LOG Error Switching Model
                           }
