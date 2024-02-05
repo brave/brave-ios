@@ -232,7 +232,13 @@ struct AIChatPaywallView: View {
         }
         .frame(maxWidth: .infinity)
         .padding()
-        .background(Color(braveSystemName: .legacyInteractive1))
+        .background(LinearGradient(gradient:
+                                    Gradient(colors: [
+                                      Color(UIColor(rgb: 0xFF5500)),
+                                      Color(UIColor(rgb: 0xFF006B))
+                                    ]),
+                                   startPoint: .init(x: 0.0, y: 0.0),
+                                   endPoint: .init(x: 0.0, y: 1.0)))
         .clipShape(RoundedRectangle(cornerRadius: 16.0, style: .continuous))
         .disabled(inAppPurchaseActionOngoing)
       }
