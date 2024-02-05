@@ -415,6 +415,9 @@ public class PortfolioStore: ObservableObject, WalletObserverStore {
   func update() {
     self.updateTask?.cancel()
     self.updateTask = Task { @MainActor in
+      let isLocked = await keyringService.isLocked()
+      guard !isLocked else { return } // `update() will be called after unlock`
+      
       self.isLoadingBalances = true
       self.allAccounts = await keyringService.allAccounts().accounts
         .filter { account in

@@ -81,6 +81,8 @@ public class WalletUserAssetManager: WalletUserAssetManagerType, WalletObserverS
     self.txService = txService
     
     setupObservers()
+    
+    Preferences.Wallet.showTestNetworks.observe(from: self)
   }
   
   public func tearDown() {
@@ -320,36 +322,21 @@ public class WalletUserAssetManager: WalletUserAssetManagerType, WalletObserverS
         networks: allNetworks,
         includingUserDeleted: false
       )
-      typealias TokenNetworkAccounts = (token: BraveWallet.BlockchainToken, network: BraveWallet.NetworkInfo, accounts: [BraveWallet.AccountInfo])
-      let allTokenNetworkAccounts = allUserAssets.flatMap { networkAssets in
-        networkAssets.tokens.map { token in
-          TokenNetworkAccounts(
-            token: token,
-            network: networkAssets.network,
-            accounts: accounts.filter {
-              if token.coin == .fil {
-                return $0.keyringId == BraveWallet.KeyringId.keyringId(for: token.coin, on: token.chainId)
-              } else {
-                return $0.coin == token.coin
-              }
-            }
-          )
-        }
-      }
-      /// Fetch balance for each token, for all accounts applicable to that token
       await withTaskGroup(
         of: Void.self,
         body: { @MainActor [rpcService] group in
-          for tokenNetworkAccounts in allTokenNetworkAccounts { // for each token
+          for account in accounts {
             group.addTask { @MainActor in
-              let token = tokenNetworkAccounts.token
-              for account in tokenNetworkAccounts.accounts { // fetch balance for this token for each account
-                let balanceForToken = await rpcService.balance(
-                  for: token,
-                  in: account,
-                  network: tokenNetworkAccounts.network
-                )
-                WalletUserAssetBalance.updateBalance(for: token, balance: String(balanceForToken ?? 0), account: account.address)
+              let allTokenBalanceForAccount = await rpcService.fetchBalancesForTokens(account: account, networkAssets: allUserAssets)
+              for tokenBalanceForAccount in allTokenBalanceForAccount {
+                let networkAssets = allUserAssets.first { oneNetworkAssets in
+                  oneNetworkAssets.tokens.contains { asset in
+                    asset.id == tokenBalanceForAccount.key
+                  }
+                }
+                if let token = networkAssets?.tokens.first(where: { $0.id == tokenBalanceForAccount.key }) {
+                  WalletUserAssetBalance.updateBalance(for: token, balance: String(tokenBalanceForAccount.value), account: account.address)
+                }
               }
             }
           }
@@ -429,6 +416,16 @@ public class WalletUserAssetManager: WalletUserAssetManagerType, WalletObserverS
   
   private func retriveAllDataObserver() -> [WalletUserAssetDataObserver] {
     return dataObservers.allObjects as? [WalletUserAssetDataObserver] ?? []
+  }
+}
+
+extension WalletUserAssetManager: PreferencesObserver {
+  public func preferencesDidChange(for key: String) {
+    if key == Preferences.Wallet.showTestNetworks.key {
+      refreshBalances { [weak self] in
+        self?.retriveAllDataObserver().forEach { $0.cachedBalanceRefreshed() }
+      }
+    }
   }
 }
 

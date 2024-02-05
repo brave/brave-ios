@@ -91,9 +91,7 @@ struct PortfolioView: View {
           keyringStore: keyringStore,
           userAssetStore: cryptoStore.nftStore.userAssetsStore,
           supportedTokenTypes: [.nft]
-        ) {
-          cryptoStore.updateAssets()
-        }
+        ) 
       })
     .background(Color.clear
       .sheet(isPresented: $isPresentingNFTsFilters) {

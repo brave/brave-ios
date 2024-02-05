@@ -270,6 +270,9 @@ public class NFTStore: ObservableObject, WalletObserverStore {
   func update(forceUpdateNFTBalances: Bool = false) {
     self.updateTask?.cancel()
     self.updateTask = Task { @MainActor in
+      let isLocked = await keyringService.isLocked()
+      guard !isLocked else { return } // `update() will be called after unlock`
+      
       self.allAccounts = await keyringService.allAccounts().accounts
         .filter { account in
           WalletConstants.supportedCoinTypes().contains(account.coin)
