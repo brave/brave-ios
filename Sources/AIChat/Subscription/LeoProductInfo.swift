@@ -8,16 +8,16 @@ import StoreKit
 import Shared
 import os.log
 
-public class LeoProductInfo: NSObject, ObservableObject {
+class LeoProductInfo: NSObject, ObservableObject {
   @Published
   var monthlySubProduct: SKProduct?
   
   @Published
   var yearlySubProduct: SKProduct?
   
-  public static let shared = LeoProductInfo()
+  static let shared = LeoProductInfo()
 
-  public var isComplete: Bool {
+  var isComplete: Bool {
     switch LeoSubscriptionManager.shared.subscriptionState {
     case .purchased:
       return true
@@ -59,7 +59,7 @@ public class LeoProductInfo: NSObject, ObservableObject {
 }
 
 extension LeoProductInfo: SKProductsRequestDelegate {
-  public func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
+  func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
     response.products.forEach {
       switch $0.productIdentifier {
       case ProductIdentifiers.monthlySub:
@@ -72,7 +72,7 @@ extension LeoProductInfo: SKProductsRequestDelegate {
     }
   }
 
-  public func request(_ request: SKRequest, didFailWithError error: Error) {
+  func request(_ request: SKRequest, didFailWithError error: Error) {
     Logger.module.error("SKProductsRequestDelegate error: \(error.localizedDescription)")
   }
 }

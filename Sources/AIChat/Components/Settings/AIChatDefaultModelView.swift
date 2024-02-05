@@ -84,7 +84,10 @@ struct AIChatDefaultModelView: View {
     .listStyle(.insetGrouped)
     .background(Color.clear
       .sheet(isPresented: $isPresentingPaywallPremium) {
-        AIChatPaywallView()
+        AIChatPaywallView(
+          premiumUpgrageSuccessful: { _ in 
+            // TODO: Upgrade Action
+          })
       })
   }
 }

@@ -25,8 +25,7 @@ struct AIChatPaywallView: View {
   @ObservedObject
   var subscriptionManager = LeoSubscriptionManager.shared
   
-  var restoreAction: (() -> Void)?
-  var upgradeAction: ((SubscriptionType) -> Void)?
+  var premiumUpgrageSuccessful: ((SubscriptionType) -> Void)?
   
   @StateObject 
   var observerDelegate = PaymentObserverDelegate()
@@ -90,15 +89,29 @@ struct AIChatPaywallView: View {
         paywallActionView
           .padding(.bottom, 16.0)
       }
-      .onAppear {
-        // Observe subscription manager events
-        subscriptionManager.inAppPurchaseObserver.delegate = observerDelegate
-      }
       .background(
         Color(braveSystemName: .primitivePrimary90)
           .edgesIgnoringSafeArea(.all)
           .overlay(Image("leo-product", bundle: .module),
                    alignment: .topTrailing))
+      .onAppear {
+        // Observe subscription manager events
+        subscriptionManager.inAppPurchaseObserver.delegate = observerDelegate
+      }
+      .alert(isPresented: $observerDelegate.isShowingPurchaseAlert) {
+        Alert(
+          title: Text("Error"),
+          message: Text("Unable to complete purchase. Please try again, or check your payment details on Apple and try again."),
+          dismissButton: .default(Text("OK")))
+      }
+      .onChange(of: observerDelegate.shouldDismiss) { shouldDismiss in
+        premiumUpgrageSuccessful?(subscriptionManager.activeType)
+        
+        if shouldDismiss {
+          presentationMode.dismiss()
+        }
+      }
+
     }
   }
   
@@ -242,31 +255,5 @@ struct AIChatPaywallView: View {
       }
       .padding([.horizontal], 16.0)
     }
-  }
-}
-
-class PaymentObserverDelegate: ObservableObject, LeoInAppPurchaseObserverDelegate {
-  
-  enum PaymentStatus {
-    case ongoing, success, failure
-  }
-  
-  @Published
-  var purchasedStatus: (status: PaymentStatus, error: LeoInAppPurchaseObserver.PurchaseError?) = (.success, nil)
-    
-  func purchasedOrRestoredProduct(validateReceipt: Bool) {
-    if validateReceipt {
-      // TODO: Receipt Validation Logic
-      // Check the result of receipt validation and use
-      // purchasedStatus(.success, nil)  or
-      // purchasedStatus(.failure, .receiptError) accordingly and
-      // return
-    }
-    
-    purchasedStatus = (.success, nil)
-  }
-  
-  func purchaseFailed(error: LeoInAppPurchaseObserver.PurchaseError) {
-    purchasedStatus = (.failure, error)
   }
 }
