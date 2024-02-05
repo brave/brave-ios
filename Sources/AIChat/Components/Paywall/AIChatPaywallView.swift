@@ -31,7 +31,9 @@ struct AIChatPaywallView: View {
   @State
   var inAppPurchaseActionOngoing = false
   
-  
+  @StateObject 
+  var observerDelegate = PaymentObserverDelegate()
+
   var body: some View {
     NavigationView {
       VStack(spacing: 8.0) {
@@ -53,7 +55,7 @@ struct AIChatPaywallView: View {
           .toolbar {
             ToolbarItemGroup(placement: .confirmationAction) {
               Button(action: {
-                subscriptionManager.restorePayments()
+                subscriptionManager.restorePurchasesAction()
                 inAppPurchaseActionOngoing.toggle()
               }) {
                 if inAppPurchaseActionOngoing {
@@ -89,6 +91,10 @@ struct AIChatPaywallView: View {
         
         paywallActionView
           .padding(.bottom, 16.0)
+      }
+      .onAppear {
+        // Observe subscription manager events
+        subscriptionManager.inAppPurchaseObserver.delegate = observerDelegate
       }
       .background(
         Color(braveSystemName: .primitivePrimary90)
@@ -232,5 +238,27 @@ struct AIChatPaywallView: View {
       }
       .padding([.horizontal], 16.0)
     }
+  }
+}
+
+class PaymentObserverDelegate: ObservableObject, LeoInAppPurchaseObserverDelegate {
+  
+  @Published
+  var purchasedStatus: (success: Bool, LeoInAppPurchaseObserver.PurchaseError?) = (false, nil)
+    
+  func purchasedOrRestoredProduct(validateReceipt: Bool) {
+    if validateReceipt {
+      // TODO: Receipt Validation Logic
+      // Check the result of receipt validation and use
+      // purchasedStatus(true, nil)  or
+      // purchasedStatus(false, .receiptError) accordingly and
+      // return
+    }
+    
+    purchasedStatus = (true, nil)
+  }
+  
+  func purchaseFailed(error: LeoInAppPurchaseObserver.PurchaseError) {
+    purchasedStatus = (false, error)
   }
 }
