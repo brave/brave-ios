@@ -6,6 +6,7 @@
 import Foundation
 import StoreKit
 import os.log
+import SwiftUI
 
 /// In-app purchase subscription types
 enum SubscriptionType {
@@ -48,6 +49,7 @@ class LeoSubscriptionManager: ObservableObject {
   let inAppPurchaseObserver = LeoInAppPurchaseObserver()
   
   init() {
+    SKPaymentQueue.default().add(inAppPurchaseObserver)
     inAppPurchaseObserver.delegate = self
     SKPaymentQueue.default().add(inAppPurchaseObserver)
   }
@@ -111,5 +113,48 @@ extension LeoSubscriptionManager: LeoInAppPurchaseObserverDelegate {
   
   func purchaseFailed(error: LeoInAppPurchaseObserver.PurchaseError) {
     // Not needed in the singleton instance
+  }
+}
+
+class PaymentObserverDelegate: ObservableObject, LeoInAppPurchaseObserverDelegate {
+  
+  enum PaymentStatus {
+    case ongoing, success, failure
+  }
+  
+  @Published
+  var purchasedStatus: (status: PaymentStatus, error: LeoInAppPurchaseObserver.PurchaseError?) = (.success, nil)
+    
+  @Published
+  var isShowingPurchaseAlert = false
+  
+  @Published
+  var shouldDismiss: Bool = false
+
+
+  func purchasedOrRestoredProduct(validateReceipt: Bool) {
+    if validateReceipt {
+      // TODO: Receipt Validation Logic
+      // Check the result of receipt validation and use
+      // purchasedStatus(.success, nil)  or
+      // purchasedStatus(.failure, .receiptError) accordingly and
+      // isShowingPurchaseAlert.toggle() for showing alert
+      // shouldDismiss.toggle() for dismissing
+      // return
+    }
+    
+    purchasedStatus = (.success, nil)
+    shouldDismiss.toggle()
+  }
+  
+  func purchaseFailed(error: LeoInAppPurchaseObserver.PurchaseError) {
+    purchasedStatus = (.failure, error)
+    
+    // User intentionally tapped to cancel purchase, no need to show any alert on our side
+    if case .transactionError(let err) = error, err?.code == SKError.paymentCancelled {
+      return
+    }
+    
+    isShowingPurchaseAlert.toggle()
   }
 }

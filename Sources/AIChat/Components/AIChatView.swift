@@ -289,10 +289,7 @@ public struct AIChatView: View {
     .background(Color.clear
       .sheet(isPresented: $isPremiumPaywallPresented) {
         AIChatPaywallView(
-          restoreAction: {
-            // TODO: Restore Action
-          },
-          upgradeAction: { tierType in
+          premiumUpgrageSuccessful: { _ in
             // TODO: Upgrade Action
           })
       })
