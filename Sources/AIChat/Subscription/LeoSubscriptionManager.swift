@@ -39,14 +39,13 @@ enum SubscriptionState: Equatable {
 }
 
 /// Singleton Manager handles subscriptions for AI Leo
-class LeoSubscriptionManager: NSObject, ObservableObject {
+class LeoSubscriptionManager: ObservableObject {
   
   // MARK: Lifecycle
   
   static var shared = LeoSubscriptionManager()
   
-  override init() {
-    super.init()
+  init() {
     inAppPurchaseObserver.delegate = self
   }
   
@@ -70,35 +69,6 @@ class LeoSubscriptionManager: NSObject, ObservableObject {
   @Published var subscriptionState: SubscriptionState = .notPurchased
   
   @Published var expirationDate: Date = Date()
-}
-
-// MARK: SKPaymentTransactionObserver
-
-extension LeoSubscriptionManager: SKPaymentTransactionObserver {
-  func restorePayments() {
-    SKPaymentQueue.default().add(self)
-    SKPaymentQueue.default().restoreCompletedTransactions()
-  }
-  
-  func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
-    let paymentQueue = SKPaymentQueue.default()
-    
-    // TODO: Finish Delegate stuff
-    transactions.sorted(using: KeyPathComparator(\.transactionDate, order: .reverse)).forEach { transaction in
-      switch transaction.transactionState {
-      case .purchased:
-        paymentQueue.finishTransaction(transaction)
-      case .failed:
-        paymentQueue.finishTransaction(transaction)
-      case .restored:
-        paymentQueue.finishTransaction(transaction)
-      case .purchasing, .deferred:
-        paymentQueue.finishTransaction(transaction)
-      @unknown default:
-        assertionFailure("Unknown Transaction State: \(transaction.transactionState)")
-      }
-    }
-  }
 }
 
 // MARK: Subscription Methods
@@ -133,17 +103,12 @@ extension LeoSubscriptionManager {
   }
 }
 
-
 extension LeoSubscriptionManager: LeoInAppPurchaseObserverDelegate {
   func purchasedOrRestoredProduct(validateReceipt: Bool) {
-    if validateReceipt {
-      // TODO: Validate Receipt
-    }
-    
-    subscriptionState = .purchased
+    // Not needed in the singleton instance
   }
   
   func purchaseFailed(error: LeoInAppPurchaseObserver.PurchaseError) {
-    // TODO: Logic for purchase fail error
+    // Not needed in the singleton instance
   }
 }

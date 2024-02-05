@@ -27,48 +27,37 @@ public class LeoInAppPurchaseObserver: NSObject, SKPaymentTransactionObserver {
   // MARK: - Handling transactions
   
   public func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) {
-    // This helper variable helps to call the IAPObserverDelegate delegate purchased method only once
-    // delegate purchased method only once similar logic with VPN in-app Purchase
-    var canInvokePurchaseDelegate = true
-    
-    transactions
-      .sorted(by: { $0.transactionDate ?? Date() > $1.transactionDate ?? Date() })
-      .forEach { transaction in
-      switch transaction.transactionState {
-      case .purchased:
-        Logger.module.debug("Received transaction state: purchased")
+    for transaction: AnyObject in transactions {
+      if let paymentTransaction = transaction as? SKPaymentTransaction {
         
-        SKPaymentQueue.default().finishTransaction(transaction)
-        
-        if canInvokePurchaseDelegate {
+        switch paymentTransaction.transactionState {
+        case .purchased:
+          Logger.module.debug("Received transaction state: purchased")
+          
+          SKPaymentQueue.default().finishTransaction(paymentTransaction)
+          
           self.delegate?.purchasedOrRestoredProduct(validateReceipt: true)
-        }
-        
-        canInvokePurchaseDelegate = false
-      case .restored:
-        Logger.module.debug("Received transaction state: restored")
-
-        SKPaymentQueue.default().finishTransaction(transaction)
-        
-        if canInvokePurchaseDelegate {
+        case .restored:
+          Logger.module.debug("Received transaction state: restored")
+          
+          SKPaymentQueue.default().finishTransaction(paymentTransaction)
+          
           // TODO: Receipt Validation Logic
           // Check the result of receipt validation and use
           // purchasedOrRestoredProduct(validateReceipt: false) or
           // purchaseFailed(error:) accordingly
+        case .purchasing, .deferred:
+          Logger.module.debug("Received transaction state: purchasing")
+        case .failed:
+          Logger.module.debug("Received transaction state: failed")
+          
+          SKPaymentQueue.default().finishTransaction(paymentTransaction)
+          
+          self.delegate?.purchaseFailed(
+            error: .transactionError(error: transaction.error as? SKError))
+        @unknown default:
+          assertionFailure("Unknown transactionState")
         }
-        
-        canInvokePurchaseDelegate = false
-      case .purchasing, .deferred:
-        Logger.module.debug("Received transaction state: purchasing")
-      case .failed:
-        Logger.module.debug("Received transaction state: failed")
-        
-        SKPaymentQueue.default().finishTransaction(transaction)
-        
-        self.delegate?.purchaseFailed(
-          error: .transactionError(error: transaction.error as? SKError))
-      @unknown default:
-        assertionFailure("Unknown transactionState")
       }
     }
   }
@@ -89,5 +78,11 @@ public class LeoInAppPurchaseObserver: NSObject, SKPaymentTransactionObserver {
       let errorRestore = SKError(SKError.unknown, userInfo: ["detail": "not-purchased"])
       delegate?.purchaseFailed(error: .transactionError(error: errorRestore))
     }
+  }
+  
+  // Sent when a user initiates an IAP buy from the App Store
+  // Only used for VPN right now and this might change when Leo Ads start
+  public func paymentQueue(_ queue: SKPaymentQueue, shouldAddStorePayment payment: SKPayment, for product: SKProduct) -> Bool {
+    return false
   }
 }
