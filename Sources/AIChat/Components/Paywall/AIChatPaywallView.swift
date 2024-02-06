@@ -7,6 +7,7 @@ import SwiftUI
 import BraveUI
 import DesignSystem
 import Then
+import StoreKit
 
 struct AIChatPaywallView: View {
   
@@ -29,6 +30,9 @@ struct AIChatPaywallView: View {
   
   @StateObject 
   var observerDelegate = PaymentObserverDelegate()
+  
+  // Timer used for resetting the restore action to prevent infinite loading
+  @State private var iapRestoreTimer: Timer?
 
   var body: some View {
     NavigationView {
@@ -51,8 +55,24 @@ struct AIChatPaywallView: View {
           .toolbar {
             ToolbarItemGroup(placement: .confirmationAction) {
               Button(action: {
-                subscriptionManager.restorePurchasesAction()
                 observerDelegate.purchasedStatus = (.ongoing, nil)
+
+                subscriptionManager.restorePurchasesAction()
+                
+                if iapRestoreTimer != nil {
+                  iapRestoreTimer?.invalidate()
+                  iapRestoreTimer = nil
+                }
+                
+                // Adding 1 minute timer for restore
+                iapRestoreTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: false) { timer in
+                  //Creata custom error and return it
+                  let errorRestore = SKError(SKError.unknown, userInfo: ["detail": "time-out"])
+                  observerDelegate.purchasedStatus = (.failure, .transactionError(error: errorRestore))
+
+                  // Show Alert for failure of restore
+                  observerDelegate.isShowingPurchaseAlert.toggle()
+                }
               }) {
                 if observerDelegate.purchasedStatus.status == .ongoing {
                   ProgressView()
