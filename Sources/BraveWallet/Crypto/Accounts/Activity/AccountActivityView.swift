@@ -161,13 +161,14 @@ struct AccountActivityView: View {
           keyringStore: keyringStore
         )
       }, label: {
+        let assetsCount = store.userAssets.count
         RowView(
           iconBraveSystemName: "leo.crypto.wallets",
           title: Strings.Wallet.assetsTitle,
-          description: String(
-            format: "%d %@",
-            store.userAssets.count,
-            Strings.Wallet.assetsTitle.lowercased()
+          description: String.localizedStringWithFormat(
+            assetsCount == 1 ?
+            Strings.Wallet.assetsSingularDescription : Strings.Wallet.assetsDescription,
+            assetsCount
           )
         )
       })
@@ -179,13 +180,14 @@ struct AccountActivityView: View {
           keyringStore: keyringStore
         )
       }, label: {
+        let nftCount = store.userNFTs.count
         RowView(
           iconBraveSystemName: "leo.grid04",
           title: Strings.Wallet.nftsTitle,
-          description: String(
-            format: "%d %@",
-            store.userNFTs.count,
-            Strings.Wallet.nftsTitle
+          description: String.localizedStringWithFormat(
+            nftCount == 1 ?
+            Strings.Wallet.nftsSingularDescription : Strings.Wallet.nftsDescription,
+            nftCount
           )
         )
       })
@@ -196,13 +198,14 @@ struct AccountActivityView: View {
           networkStore: cryptoStore.networkStore
         )
       }, label: {
+        let transactionCount = store.transactionSections.flatMap(\.transactions).count
         RowView(
           iconBraveSystemName: "leo.history",
           title: Strings.Wallet.transactionsTitle,
-          description: String(
-            format: "%d %@",
-            store.transactionSections.flatMap(\.transactions).count,
-            Strings.Wallet.transactionsTitle.lowercased()
+          description: String.localizedStringWithFormat(
+            transactionCount == 1 ?
+            Strings.Wallet.transactionsSingularDescription : Strings.Wallet.transactionsDescription,
+            transactionCount
           )
         )
       })
