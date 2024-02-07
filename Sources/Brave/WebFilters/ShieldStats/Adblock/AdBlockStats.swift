@@ -189,7 +189,7 @@ public actor AdBlockStats {
   func shouldBlock(requestURL: URL, sourceURL: URL, resourceType: AdblockEngine.ResourceType, isAggressiveMode: Bool) async -> Bool {
     let sources = await self.enabledSources
     return await cachedEngines(for: sources).asyncConcurrentMap({ cachedEngine in
-      return await cachedEngine.shouldBlock(
+      return cachedEngine.shouldBlock(
         requestURL: requestURL,
         sourceURL: sourceURL,
         resourceType: resourceType,
@@ -232,7 +232,7 @@ public actor AdBlockStats {
   func cosmeticFilterModels(forFrameURL frameURL: URL, domain: Domain) async -> [CosmeticFilterModelTuple] {
     return await cachedEngines(for: domain).asyncConcurrentCompactMap { cachedEngine -> CosmeticFilterModelTuple? in
       do {
-        guard let model = try await cachedEngine.cosmeticFilterModel(forFrameURL: frameURL) else {
+        guard let model = try cachedEngine.cosmeticFilterModel(forFrameURL: frameURL) else {
           return nil
         }
         return (cachedEngine.isAlwaysAggressive, model)
