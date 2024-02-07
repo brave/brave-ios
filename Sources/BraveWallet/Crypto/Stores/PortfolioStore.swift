@@ -312,6 +312,7 @@ public class PortfolioStore: ObservableObject, WalletObserverStore {
   private let assetRatioService: BraveWalletAssetRatioService
   private let blockchainRegistry: BraveWalletBlockchainRegistry
   private let ipfsApi: IpfsAPI
+  private let walletP3A: BraveWalletBraveWalletP3A
   private let assetManager: WalletUserAssetManagerType
   private var rpcServiceObserver: JsonRpcServiceObserver?
   private var keyringServiceObserver: KeyringServiceObserver?
@@ -328,6 +329,7 @@ public class PortfolioStore: ObservableObject, WalletObserverStore {
     assetRatioService: BraveWalletAssetRatioService,
     blockchainRegistry: BraveWalletBlockchainRegistry,
     ipfsApi: IpfsAPI,
+    walletP3A: BraveWalletBraveWalletP3A,
     userAssetManager: WalletUserAssetManagerType
   ) {
     self.keyringService = keyringService
@@ -336,6 +338,7 @@ public class PortfolioStore: ObservableObject, WalletObserverStore {
     self.assetRatioService = assetRatioService
     self.blockchainRegistry = blockchainRegistry
     self.ipfsApi = ipfsApi
+    self.walletP3A = walletP3A
     self.assetManager = userAssetManager
 
     self.setupObservers()
@@ -553,6 +556,8 @@ public class PortfolioStore: ObservableObject, WalletObserverStore {
         balanceDifference = nil
       }
       
+      recordP3AActiveWallets()
+      
       isLoadingBalances = false
     }
   }
@@ -738,6 +743,46 @@ public class PortfolioStore: ObservableObject, WalletObserverStore {
       })
     }
     return priceHistories
+  }
+  
+  private func recordP3AActiveWallets() {
+    Task {
+      let shouldCountTestNetworks = Preferences.BraveCore.activeSwitches.value.contains(BraveWallet.P3aCountTestNetworksSwitch)
+      let allAccounts = await keyringService.allAccounts().accounts
+      let allNetworks = await rpcService.allNetworksForSupportedCoins(respectTestnetPreference: false)
+      let p3aNetworks = allNetworks.optionallyFilter(
+        shouldFilter: !shouldCountTestNetworks,
+        isIncluded: { network in
+          !WalletConstants.supportedTestNetworkChainIds.contains(where: { $0 == network.chainId })
+        }
+      )
+      let userAssets = assetManager.getAllUserAssetsInNetworkAssets(
+        networks: p3aNetworks,
+        includingUserDeleted: true
+      )
+      // likely not needed for p3a
+      let blockchainAssets = await blockchainRegistry.allTokens(in: p3aNetworks)
+      let allAssets = userAssets.flatMap(\.tokens) + blockchainAssets.flatMap(\.tokens)
+      
+      let accountsForCoin = Dictionary(grouping: allAccounts, by: \.coin)
+      let supportedCoinTypes = WalletConstants.supportedCoinTypes()
+      for coin in supportedCoinTypes {
+        let accounts = accountsForCoin[coin] ?? []
+        // TODO: replace with balance caching methods.
+        // currently this only has balances for networks selected in Portfolio filters (excludes test networks)
+        let hasBalance: (BraveWallet.AccountInfo) -> Bool = { [tokenBalancesCache] account in
+          tokenBalancesCache.contains { (tokenId: String, balancesForToken: [String : Double]) in
+            guard let token = allAssets.first(where: { $0.id == tokenId }) else {
+              return false
+            }
+            return (balancesForToken[account.id] ?? 0) > 0
+          }
+        }
+        let accountsWithBalance = accounts.filter(hasBalance)
+        let accountCountPerCoin = Int32(accountsWithBalance.count)
+        walletP3A.recordActiveWalletCount(accountCountPerCoin, coinType: coin)
+      }
+    }
   }
 }
 

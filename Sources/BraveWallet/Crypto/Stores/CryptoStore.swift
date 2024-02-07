@@ -175,6 +175,7 @@ public class CryptoStore: ObservableObject, WalletObserverStore {
       assetRatioService: assetRatioService,
       blockchainRegistry: blockchainRegistry,
       ipfsApi: ipfsApi,
+      walletP3A: walletP3A,
       userAssetManager: userAssetManager
     )
     self.nftStore = .init(
