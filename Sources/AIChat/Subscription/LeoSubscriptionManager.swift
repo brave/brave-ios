@@ -10,7 +10,7 @@ import SwiftUI
 import Preferences
 
 /// In-app purchase subscription types
-enum SubscriptionType {
+public enum SubscriptionType {
   case monthly
   case yearly
   
@@ -25,7 +25,7 @@ enum SubscriptionType {
 }
 
 /// In-app purchase subscription states
-enum SubscriptionState: Equatable {
+public enum SubscriptionState: Equatable {
   case notPurchased
   case purchased
   case expired
@@ -41,13 +41,13 @@ enum SubscriptionState: Equatable {
 }
 
 /// Singleton Manager handles subscriptions for AI Leo
-class LeoSubscriptionManager: ObservableObject {
+public class LeoSubscriptionManager: ObservableObject {
   
   // MARK: Lifecycle
   
-  static var shared = LeoSubscriptionManager()
+  public static var shared = LeoSubscriptionManager()
   
-  private init() {
+  public init() {
     SKPaymentQueue.default().add(purchaseObserver)
   }
   
@@ -78,11 +78,20 @@ class LeoSubscriptionManager: ObservableObject {
   @Published var subscriptionState: SubscriptionState = .notPurchased
   
   @Published var expirationDate: Date? = Preferences.AIChat.subscriptionExpirationDate.value
+  
+  var skuSDKActive: LeoSkusSDK {
+    switch activeType {
+    case .monthly:
+      return LeoSkusSDK(product: .leoMonthly, isPrivateMode: false)
+    case .yearly:
+      return LeoSkusSDK(product: .leoYearly, isPrivateMode: false)
+    }
+  }
 }
 
 // MARK: Subscription Methods
 
-extension LeoSubscriptionManager {
+public extension LeoSubscriptionManager {
   
   @MainActor
   func updateSkusPurchaseState() async throws {
@@ -101,6 +110,22 @@ extension LeoSubscriptionManager {
       Preferences.AIChat.subscriptionOrderId.value = purchaseOrder.orderId
     } catch {
       throw error
+    }
+  }
+  
+  @MainActor
+  func checkExpirationAndRefreshOrder() async {
+    // Check If user subscribed to AIChat
+    if let aiChatExpiryDate = Preferences.AIChat.subscriptionExpirationDate.value,
+       let aiChatOrderId = Preferences.AIChat.subscriptionOrderId.value {
+      // If the order is expired - refresh
+      if Date() > aiChatExpiryDate {
+        do {
+          try await skuSDKActive.refreshOrder(orderId: aiChatOrderId)
+        } catch {
+          Logger.module.error("Failed while refreshing order using orderID \(aiChatOrderId) subcription product")
+        }
+      }
     }
   }
   
