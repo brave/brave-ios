@@ -108,6 +108,9 @@
             isEnabled = "YES">
          </EnvironmentVariable>
       </EnvironmentVariables>
+      <StoreKitConfigurationFileReference
+         identifier = "../../../Sources/AIChat/Subscription/StoreKit.storekit">
+      </StoreKitConfigurationFileReference>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Debug"

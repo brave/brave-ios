@@ -211,6 +211,7 @@ class LeoSkusSDK {
   // MARK: - Implementation
   
   /// Creates an order from an AppStore Receipt
+  /// Returns existing Order-ID if one is already created
   /// Returns Order-ID
   @MainActor
   func createOrder() async throws -> String {

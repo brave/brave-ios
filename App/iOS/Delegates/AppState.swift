@@ -16,6 +16,7 @@ import Storage
 import BraveNews
 import os.log
 import UserAgent
+import AIChat
 
 private let adsRewardsLog = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "ads-rewards")
 
@@ -42,6 +43,9 @@ public class AppState {
       case .launching(_, let isActive):
         if didBecomeActive {
           assertionFailure("Cannot set launching state twice!")
+        }
+        if !isActive {
+          _ = AppStoreProductSDK.shared
         }
         
         if isActive && !didBecomeActive {
