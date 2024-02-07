@@ -34,14 +34,13 @@ class LeoInAppPurchaseObserver: NSObject, SKPaymentTransactionObserver {
         switch transaction.transactionState {
         case .purchased:
           Logger.module.debug("Received transaction state: purchased")
-          SKPaymentQueue.default().finishTransaction(transaction)
-          
+
           observer?.purchasedOrRestoredProduct(validateReceipt: true)
           observer = nil
+          SKPaymentQueue.default().finishTransaction(transaction)
           
         case .restored:
           Logger.module.debug("Received transaction state: restored")
-          SKPaymentQueue.default().finishTransaction(transaction)
           
           if let purchaseObserver = observer {
             observer = nil
@@ -54,16 +53,17 @@ class LeoInAppPurchaseObserver: NSObject, SKPaymentTransactionObserver {
               }
             }
           }
+          SKPaymentQueue.default().finishTransaction(transaction)
           
         case .purchasing, .deferred:
           Logger.module.debug("Received transaction state: purchasing")
           
         case .failed:
           Logger.module.debug("Received transaction state: failed")
-          SKPaymentQueue.default().finishTransaction(transaction)
-          
+
           observer?.purchaseFailed(error: .transactionError(error: transaction.error as? SKError))
           observer = nil
+          SKPaymentQueue.default().finishTransaction(transaction)
           
         @unknown default:
           observer = nil
