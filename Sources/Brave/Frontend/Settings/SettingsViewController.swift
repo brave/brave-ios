@@ -327,23 +327,13 @@ class SettingsViewController: TableViewController {
         }, image: UIImage(braveSystemNamed: "leo.product.brave-news"), accessory: .disclosureIndicator)
     )
 
-    section.rows.append(
-      Row(
-        text: "Leo",
-        selection: { [unowned self] in
-          let controller = UIHostingController(rootView: 
-            AIChatAdvancedSettingsView(
-              aiModel: .init(braveCore: self.braveCore, webView: self.tabManager.selectedTab?.webView, pageContentFetcher: BraveLeoScriptHandler.getMainArticle),
-              isModallyPresented: false,
-              openURL: { [unowned self] url in
-                self.settingsDelegate?.settingsOpenURLInNewTab(url)
-                self.dismiss(animated: true)
-            }))
-          self.navigationController?.pushViewController(controller, animated: true)
-        },
-        image: UIImage(braveSystemNamed: "leo.product.brave-leo"),
-        accessory: .disclosureIndicator)
-    )
+    if !tabManager.privateBrowsingManager.isPrivateBrowsing {
+      aiChatRow = aiChatSettingsRow()
+      
+      if let aiChatRow = aiChatRow {
+        section.rows.append(aiChatRow)
+      }
+    }
     
     vpnRow = vpnSettingsRow()
     if let vpnRow = vpnRow {
@@ -614,7 +604,6 @@ class SettingsViewController: TableViewController {
   private var vpnRow: Row?
 
   private func vpnSettingsRow() -> Row {
-
     let (text, color) = { () -> (String, UIColor) in
       if Preferences.VPN.vpnReceiptStatus.value == BraveVPN.ReceiptResponse.Status.retryPeriod.rawValue {
         return (Strings.VPN.updateActionCellTitle, .braveErrorLabel)
@@ -674,6 +663,30 @@ class SettingsViewController: TableViewController {
         : UIImage(braveSystemNamed: "leo.product.vpn"),
       accessory: .disclosureIndicator,
       cellClass: ColoredDetailCell.self, context: [ColoredDetailCell.colorKey: color], uuid: "vpnrow")
+  }
+  
+  private var aiChatRow: Row?
+  
+  private func aiChatSettingsRow() -> Row {
+    return Row(
+      text: "Leo",
+      selection: { [unowned self] in
+        let controller = UIHostingController(rootView:
+          AIChatAdvancedSettingsView(
+            aiModel: .init(
+              braveCore: self.braveCore,
+              webView: self.tabManager.selectedTab?.webView, 
+              pageContentFetcher: BraveLeoScriptHandler.getMainArticle),
+            isModallyPresented: false,
+            openURL: { [unowned self] url in
+            self.settingsDelegate?.settingsOpenURLInNewTab(url)
+            self.dismiss(animated: true)
+          }))
+        
+        self.navigationController?.pushViewController(controller, animated: true)
+      },
+      image: UIImage(braveSystemNamed: "leo.product.brave-leo"),
+      accessory: .disclosureIndicator)
   }
 
   private lazy var securitySection: Static.Section = {
