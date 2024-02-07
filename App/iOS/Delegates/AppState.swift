@@ -16,6 +16,7 @@ import Storage
 import BraveNews
 import os.log
 import UserAgent
+import AIChat
 
 private let adsRewardsLog = Logger(subsystem: Bundle.main.bundleIdentifier!, category: "ads-rewards")
 
@@ -43,6 +44,10 @@ public class AppState {
         if didBecomeActive {
           assertionFailure("Cannot set launching state twice!")
         }
+        
+        /*if !isActive {
+          _ = BraveStoreSDK.shared
+        }*/
         
         if isActive && !didBecomeActive {
           // We have to wait until pre 1.12 migration is done until we proceed with database
