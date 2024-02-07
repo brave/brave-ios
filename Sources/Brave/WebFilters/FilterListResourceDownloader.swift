@@ -88,7 +88,7 @@ public actor FilterListResourceDownloader {
       try await filterListSettings.asyncConcurrentForEach { setting in
         guard await setting.isEnabled == true else { return }
         guard let componentId = await setting.componentId else { return }
-        guard FilterList.disabledComponentIDs.contains(componentId) else { return }
+        guard !FilterList.disabledComponentIDs.contains(componentId) else { return }
         
         // Try to load the filter list folder. We always have to compile this at start
         guard let folderURL = await setting.folderURL, FileManager.default.fileExists(atPath: folderURL.path) else {
