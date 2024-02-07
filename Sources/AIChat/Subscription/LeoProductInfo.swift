@@ -60,14 +60,16 @@ class LeoProductInfo: NSObject, ObservableObject {
 
 extension LeoProductInfo: SKProductsRequestDelegate {
   func productsRequest(_ request: SKProductsRequest, didReceive response: SKProductsResponse) {
-    response.products.forEach {
-      switch $0.productIdentifier {
-      case ProductIdentifiers.monthlySub:
-        monthlySubProduct = $0
-      case ProductIdentifiers.yearlySub:
-        yearlySubProduct = $0
-      default:
-        assertionFailure("Found product identifier that doesn't match")
+    Task { @MainActor in
+      response.products.forEach {
+        switch $0.productIdentifier {
+        case ProductIdentifiers.monthlySub:
+          monthlySubProduct = $0
+        case ProductIdentifiers.yearlySub:
+          yearlySubProduct = $0
+        default:
+          assertionFailure("Found product identifier that doesn't match")
+        }
       }
     }
   }
