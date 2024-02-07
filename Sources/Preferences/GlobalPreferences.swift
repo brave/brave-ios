@@ -162,8 +162,4 @@ extension Preferences {
     /// Node Id for last bookmark folder
     public static let lastBookmarksFolderNodeId = Option<Int?>(key: "chromium.last.bookmark.folder.node.id", default: nil)
   }
-  
-  public final class LeoAI {
-    public static let autocompleteSuggestionsEnabled = Option<Bool>(key: "leo.ai.autoCompleteSuggestionsEnabled", default: true)
-  }
 }

@@ -2765,6 +2765,10 @@ extension BrowserViewController: SearchViewControllerDelegate {
     topToolbar.leaveOverlayMode()
     processAddressBar(text: query, isBraveSearchPromotion: braveSearchPromotion)
   }
+  
+  func searchViewController(_ searchViewController: SearchViewController, didSubmitAIChat query: String) {
+    // TODO: Submit query to ai chat 
+  }
 
   func searchViewController(_ searchViewController: SearchViewController, didSelectURL url: URL) {
     finishEditingAndSubmit(url)
