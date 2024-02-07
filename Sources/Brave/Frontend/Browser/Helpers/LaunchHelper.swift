@@ -39,6 +39,7 @@ public actor LaunchHelper {
     // Otherwise prepare the services and await the task
     let task = Task {
       let signpostID = Self.signpost.makeSignpostID()
+      ContentBlockerManager.log.debug("Loading blocking launch data")
       let state = Self.signpost.beginInterval("blockingLaunchTask", id: signpostID)
       // We only want to compile the necessary content blockers during launch
       // We will compile other ones after launch
@@ -50,6 +51,7 @@ public actor LaunchHelper {
       async let adblockResourceCache: Void = AdblockResourceDownloader.shared.loadCachedAndBundledDataIfNeeded(allowedModes: launchBlockModes)
       _ = await (filterListCache, adblockResourceCache)
       Self.signpost.emitEvent("loadedCachedData", id: signpostID, "Loaded cached data")
+      ContentBlockerManager.log.debug("Loaded blocking launch data")
       
       // This one is non-blocking
       performPostLoadTasks(adBlockService: adBlockService, loadedBlockModes: launchBlockModes)
@@ -128,7 +130,7 @@ private extension FilterListStorage {
   var validBlocklistTypes: Set<ContentBlockerManager.BlocklistType> {
     if filterLists.isEmpty {
       // If we don't have filter lists yet loaded, use the settings
-      return Set(allFilterListSettings.compactMap { setting in
+      return Set(allFilterListSettings.compactMap { setting -> ContentBlockerManager.BlocklistType? in
         guard let componentId = setting.componentId else { return nil }
         return .filterList(
           componentId: componentId,

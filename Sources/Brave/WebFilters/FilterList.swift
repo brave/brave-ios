@@ -46,6 +46,10 @@ struct FilterList: Identifiable {
   let entry: AdblockFilterListCatalogEntry
   var isEnabled: Bool = false
   
+  var isHidden: Bool {
+    // TODO: @JS get this from entry.hidden once it is available.
+    return false
+  }
   /// Tells us if this filter list is regional (i.e. if it contains language restrictions)
   var isRegional: Bool {
     return !entry.languages.isEmpty

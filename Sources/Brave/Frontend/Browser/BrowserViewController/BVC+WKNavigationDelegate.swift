@@ -149,7 +149,6 @@ extension BrowserViewController: WKNavigationDelegate {
 
   @MainActor
   public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, preferences: WKWebpagePreferences) async -> (WKNavigationActionPolicy, WKWebpagePreferences) {
-    
     guard var requestURL = navigationAction.request.url else {
       return (.cancel, preferences)
     }
@@ -255,6 +254,9 @@ extension BrowserViewController: WKNavigationDelegate {
       return (.cancel, preferences)
     }
     
+    let signpostID = ContentBlockerManager.signpost.makeSignpostID()
+    let state = ContentBlockerManager.signpost.beginInterval("decidePolicyFor", id: signpostID)
+    
     // before loading any ad-block scripts
     // await the preparation of the ad-block services
     await LaunchHelper.shared.prepareAdBlockServices(
@@ -279,6 +281,7 @@ extension BrowserViewController: WKNavigationDelegate {
           ContentBlockerManager.log.debug("Redirected user to `\(url.absoluteString, privacy: .private)`")
         }
         
+        ContentBlockerManager.signpost.endInterval("decidePolicyFor", state, "Redirected navigation")
         return (.cancel, preferences)
       } else {
         tab?.isInternalRedirect = false
@@ -321,6 +324,7 @@ extension BrowserViewController: WKNavigationDelegate {
         var modifiedRequest = URLRequest(url: requestURL)
         modifiedRequest.setValue("1", forHTTPHeaderField: "X-Brave-Ads-Enabled")
         tab?.loadRequest(modifiedRequest)
+        ContentBlockerManager.signpost.endInterval("decidePolicyFor", state, "Redirected to search")
         return (.cancel, preferences)
       }
 
@@ -373,6 +377,7 @@ extension BrowserViewController: WKNavigationDelegate {
             if let url = components?.url {
               let request = PrivilegedRequest(url: url) as URLRequest
               tab?.loadRequest(request)
+              ContentBlockerManager.signpost.endInterval("decidePolicyFor", state, "Blocked navigation")
               return (.cancel, preferences)
             }
           }
@@ -437,6 +442,7 @@ extension BrowserViewController: WKNavigationDelegate {
         self.shouldDownloadNavigationResponse = true
       }
       
+      ContentBlockerManager.signpost.endInterval("decidePolicyFor", state)
       return (.allow, preferences)
     }
 

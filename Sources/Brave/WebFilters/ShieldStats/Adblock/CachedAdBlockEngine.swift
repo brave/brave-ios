@@ -7,6 +7,7 @@ import Foundation
 import BraveCore
 import Data
 import Preferences
+import os
 
 /// An object that wraps around an `AdblockEngine` and caches some results
 /// and ensures information is always returned on the correct thread on the engine.
@@ -51,6 +52,7 @@ public class CachedAdBlockEngine {
     let version: String
   }
   
+  static let signpost = OSSignposter(logger: ContentBlockerManager.log)
   /// We cache the models so that they load faster when we need to poll information about the frame
   private var cachedCosmeticFilterModels = FifoDict<URL, CosmeticFilterModel?>()
   /// We cache the models so that they load faster when doing stats tracking or request blocking
@@ -201,12 +203,22 @@ public class CachedAdBlockEngine {
   ) throws -> CachedAdBlockEngine {
     switch filterListInfo.fileType {
     case .text:
-      let engine = try AdblockEngine(textFileURL: filterListInfo.localFileURL, resourcesFileURL: resourcesInfo.localFileURL)
-      let serialQueue = DispatchQueue(label: "com.brave.WrappedAdBlockEngine.\(UUID().uuidString)")
-      return CachedAdBlockEngine(
-        engine: engine, filterListInfo: filterListInfo, resourcesInfo: resourcesInfo,
-        serialQueue: serialQueue, isAlwaysAggressive: isAlwaysAggressive
-      )
+      let signpostID = Self.signpost.makeSignpostID()
+      let state = Self.signpost.beginInterval("compileEngine", id: signpostID, "\(filterListInfo.debugDescription)")
+      
+      do {
+        let engine = try AdblockEngine(textFileURL: filterListInfo.localFileURL, resourcesFileURL: resourcesInfo.localFileURL)
+        let serialQueue = DispatchQueue(label: "com.brave.WrappedAdBlockEngine.\(UUID().uuidString)")
+        Self.signpost.endInterval("compileEngine", state)
+        
+        return CachedAdBlockEngine(
+          engine: engine, filterListInfo: filterListInfo, resourcesInfo: resourcesInfo,
+          serialQueue: serialQueue, isAlwaysAggressive: isAlwaysAggressive
+        )
+      } catch {
+        Self.signpost.endInterval("compileEngine", state, "\(error.localizedDescription)")
+        throw error
+      }
     }
   }
 }

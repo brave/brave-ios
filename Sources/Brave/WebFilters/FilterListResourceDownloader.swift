@@ -46,11 +46,9 @@ public actor FilterListResourceDownloader {
     }
     
     let resourcesInfo = await didUpdateResourcesComponent(folderURL: resourcesFolderURL)
-    async let startedCustomFilterListsDownloader: Void = FilterListCustomURLDownloader.shared.startIfNeeded()
     async let cachedFilterLists: Void = compileCachedFilterLists(resourcesInfo: resourcesInfo)
     async let compileDefaultEngine: Void = compileDefaultFilterList(resourcesInfo: resourcesInfo)
-    
-    _ = await (startedCustomFilterListsDownloader, cachedFilterLists, compileDefaultEngine)
+    _ = await (cachedFilterLists, compileDefaultEngine)
   }
   
   /// Compile the default filter list from cache
@@ -86,9 +84,10 @@ public actor FilterListResourceDownloader {
       
     do {
       try await filterListSettings.asyncConcurrentForEach { setting in
-        guard await setting.isEnabled == true else { return }
+        guard await setting.isEagerlyLoaded == true else { return }
         guard let componentId = await setting.componentId else { return }
-        guard FilterList.disabledComponentIDs.contains(componentId) else { return }
+        guard !FilterList.disabledComponentIDs.contains(componentId) else { return }
+        guard let source = await setting.engineSource else { return }
         
         // Try to load the filter list folder. We always have to compile this at start
         guard let folderURL = await setting.folderURL, FileManager.default.fileExists(atPath: folderURL.path) else {
@@ -96,7 +95,7 @@ public actor FilterListResourceDownloader {
         }
         
         await self.compileFilterListEngineIfNeeded(
-          fromComponentId: componentId, folderURL: folderURL,
+          source: source, folderURL: folderURL,
           isAlwaysAggressive: setting.isAlwaysAggressive,
           resourcesInfo: resourcesInfo,
           compileContentBlockers: false
@@ -138,7 +137,7 @@ public actor FilterListResourceDownloader {
     Task { @MainActor in
       for await filterListEntries in adBlockService.filterListCatalogComponentStream() {
         FilterListStorage.shared.loadFilterLists(from: filterListEntries)
-        
+        ContentBlockerManager.log.debug("Loaded filter list catalog")
         if await AdBlockStats.shared.resourcesInfo != nil {
           await registerAllFilterListsIfNeeded(with: adBlockService)
         }
@@ -227,22 +226,30 @@ public actor FilterListResourceDownloader {
   
   /// Load general filter lists (shields) from the given `AdblockService` `shieldsInstallPath` `URL`.
   private func compileFilterListEngineIfNeeded(
-    fromComponentId componentId: String, folderURL: URL,
+    source: CachedAdBlockEngine.Source,
+    folderURL: URL,
     isAlwaysAggressive: Bool,
     resourcesInfo: CachedAdBlockEngine.ResourcesInfo,
     compileContentBlockers: Bool
   ) async {
     let version = folderURL.lastPathComponent
-    let source = CachedAdBlockEngine.Source.filterList(componentId: componentId)
+    let filterListURL = folderURL.appendingPathComponent("list.txt", conformingTo: .text)
+    
+    guard FileManager.default.fileExists(atPath: filterListURL.relativePath) else {
+      // We are loading the old component from cache. We don't want this file to be loaded.
+      // When we download the new component shortly we will update our cache.
+      // This should only trigger after an app update and eventually this check can be removed.
+      return
+    }
+    
     let filterListInfo = CachedAdBlockEngine.FilterListInfo(
-      source: source,
-      localFileURL: folderURL.appendingPathComponent("list.txt", conformingTo: .text),
+      source: source, localFileURL: filterListURL,
       version: version, fileType: .text
     )
     let lazyInfo = AdBlockStats.LazyFilterListInfo(filterListInfo: filterListInfo, isAlwaysAggressive: isAlwaysAggressive)
-    guard await AdBlockStats.shared.isEagerlyLoaded(source: source) else {
-      // Don't compile unless eager
-      await AdBlockStats.shared.updateIfNeeded(resourcesInfo: resourcesInfo)
+    
+    //  Check if we should load these rules
+    guard await AdBlockStats.shared.isEnabled(source: source) else {
       await AdBlockStats.shared.updateIfNeeded(filterListInfo: filterListInfo, isAlwaysAggressive: isAlwaysAggressive)
       
       // To free some space, remove any rule lists that are not needed
@@ -275,46 +282,18 @@ public actor FilterListResourceDownloader {
           assertionFailure("We shouldn't have started downloads before getting this value")
           return
         }
+        let source = filterList.engineSource
         
-        await self.loadShields(
-          fromComponentId: filterList.entry.componentId, folderURL: folderURL, relativeOrder: filterList.order,
-          loadContentBlockers: true,
-          isAlwaysAggressive: filterList.isAlwaysAggressive,
-          resourcesInfo: resourcesInfo
+        // Add or remove the filter list from the engine depending if it's been enabled or not
+        await self.compileFilterListEngineIfNeeded(
+          source: source, folderURL: folderURL, isAlwaysAggressive: filterList.isAlwaysAggressive,
+          resourcesInfo: resourcesInfo, compileContentBlockers: true
         )
         
         // Save the downloaded folder for later (caching) purposes
         FilterListStorage.shared.set(folderURL: folderURL, forUUID: filterList.entry.uuid)
       }
     }
-  }
-  
-  /// Handle the downloaded component folder url of a filter list.
-  ///
-  /// The folder URL should point to a `AdblockFilterListEntry` download location as given by the `AdBlockService`.
-  ///
-  /// If `loadContentBlockers` is set to `true`, this method will compile the rule lists to content blocker format and load them into the `WKContentRuleListStore`.
-  /// As both these procedures are expensive, this should be set to `false` if this method is called on a blocking UI process such as the launch of the application.
-  private func loadShields(
-    fromComponentId componentId: String, folderURL: URL, relativeOrder: Int, loadContentBlockers: Bool, isAlwaysAggressive: Bool,
-    resourcesInfo: CachedAdBlockEngine.ResourcesInfo
-  ) async {
-    // Check if we're loading the new component or an old component from cache.
-    // The new component has a file `list.txt` which we check the presence of.
-    let filterListURL = folderURL.appendingPathComponent("list.txt", conformingTo: .text)
-    
-    guard FileManager.default.fileExists(atPath: filterListURL.relativePath) else {
-      // We are loading the old component from cache. We don't want this file to be loaded.
-      // When we download the new component shortly we will update our cache.
-      // This should only trigger after an app update and eventually this check can be removed.
-      return
-    }
-    
-    // Add or remove the filter list from the engine depending if it's been enabled or not
-    await self.compileFilterListEngineIfNeeded(
-      fromComponentId: componentId, folderURL: folderURL, isAlwaysAggressive: isAlwaysAggressive,
-      resourcesInfo: resourcesInfo, compileContentBlockers: loadContentBlockers
-    )
   }
 }
 

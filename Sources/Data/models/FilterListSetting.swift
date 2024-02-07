@@ -22,6 +22,17 @@ public final class FilterListSetting: NSManagedObject, CRUD {
   @MainActor @NSManaged public var isAlwaysAggressive: Bool
   @MainActor @NSManaged public var order: NSNumber?
   @MainActor @NSManaged private var folderPath: String?
+  
+  /// Tells us which filter lists should be compiled during launch.
+  ///
+  /// The filter lists that will be eagerly loaded are ones that are:
+  /// 1. Enabled
+  /// 2. Hidden (i.e. there is no UI to disable/enable them).
+  /// This includes the "default" and "first party" filter lists.
+  /// These are not available when using the regional catalog (i.e. `regional_catalog.json`).
+  @MainActor public var isEagerlyLoaded: Bool {
+    return isEnabled && isHidden
+  }
 
   @MainActor public var folderURL: URL? {
     get {

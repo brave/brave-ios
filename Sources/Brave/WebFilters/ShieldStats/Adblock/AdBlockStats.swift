@@ -29,16 +29,6 @@ public actor AdBlockStats {
   /// The current task that is compiling.
   private var currentCompileTask: Task<(), Never>?
   
-  /// Return all the critical sources
-  ///
-  /// Critical sources are those that are enabled and are "on" by default. Giving us the most important sources.
-  /// Used for memory managment so we know which filter lists to disable upon a memory warning
-  @MainActor var criticalSources: [CachedAdBlockEngine.Source] {
-    var enabledSources: [CachedAdBlockEngine.Source] = [.adBlock]
-    enabledSources.append(contentsOf: FilterListStorage.shared.criticalSources)
-    return enabledSources
-  }
-  
   /// Return an array of all sources that are enabled according to user's settings
   /// - Note: This does not take into account the domain or global adblock toggle
   @MainActor var enabledSources: [CachedAdBlockEngine.Source] {
@@ -125,6 +115,12 @@ public actor AdBlockStats {
   func updateIfNeeded(resourcesInfo: CachedAdBlockEngine.ResourcesInfo) {
     guard self.resourcesInfo == nil || resourcesInfo.version > self.resourcesInfo!.version else { return }
     self.resourcesInfo = resourcesInfo
+    
+    if #available(iOS 16.0, *) {
+      ContentBlockerManager.log.debug(
+        "Updated resources component: `\(resourcesInfo.localFileURL.path(percentEncoded: false))`"
+      )
+    }
   }
   
   /// Remove all the engines
@@ -177,12 +173,8 @@ public actor AdBlockStats {
     }
   }
   
-  /// Tells us if this source should be eagerly loaded.
-  ///
-  /// Eagerness is determined by several factors:
-  /// * If the source represents a fitler list or a custom filter list, it is eager if it is enabled
-  /// * If the source represents the `adblock` default filter list, it is always eager regardless of shield settings
-  @MainActor func isEagerlyLoaded(source: CachedAdBlockEngine.Source) -> Bool {
+  /// Tells us if this source should be loaded.
+  @MainActor func isEnabled(source: CachedAdBlockEngine.Source) -> Bool {
     return enabledSources.contains(source)
   }
   
@@ -275,21 +267,6 @@ extension FilterList {
 }
 
 private extension FilterListStorage {
-  /// Gives us source representations of all the critical filter lists
-  ///
-  /// Critical filter lists are those that are enabled and are "on" by default. Giving us the most important filter lists.
-  /// Used for memory managment so we know which filter lists to disable upon a memory warning
-  @MainActor var criticalSources: [CachedAdBlockEngine.Source] {
-    return enabledSources.filter { source in
-      switch source {
-      case .filterList(let componentId):
-        return FilterList.defaultOnComponentIds.contains(componentId)
-      default:
-        return false
-      }
-    }
-  }
-  
   /// Gives us source representations of all the enabled filter lists
   @MainActor var enabledSources: [CachedAdBlockEngine.Source] {
     if !filterLists.isEmpty {

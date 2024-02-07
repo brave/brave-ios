@@ -134,7 +134,7 @@ import Combine
     upsertSetting(
       uuid: filterList.entry.uuid,
       isEnabled: filterList.isEnabled,
-      isHidden: false,
+      isHidden: filterList.isHidden,
       componentId: filterList.entry.componentId,
       allowCreation: true,
       order: filterList.order,
