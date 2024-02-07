@@ -30,6 +30,10 @@ public struct AIChatAdvancedSettingsView: View {
     self.aiModel = aiModel
     self.isModallyPresented = isModallyPresented
     self.openURL = openURL
+    
+    Task { @MainActor in
+      await aiModel.getPremiumStatus()
+    }
   }
 
   public var body: some View {
@@ -83,7 +87,7 @@ public struct AIChatAdvancedSettingsView: View {
                           detail: subscriptionManager.activeType.title)
           
           LabelDetailView(title: "Expires", 
-                          detail: subscriptionManager.expirationDateFormatted)
+                          detail: subscriptionManager.expirationDateFormatted ?? "")
           
           Button(action: {
             openURL(.brave.braveLeoLinkReceiptProd)

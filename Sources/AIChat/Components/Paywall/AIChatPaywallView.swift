@@ -66,7 +66,7 @@ struct AIChatPaywallView: View {
                 
                 // Adding 1 minute timer for restore
                 iapRestoreTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: false) { timer in
-                  //Creata custom error and return it
+                  // Create a custom error and return it
                   let errorRestore = SKError(SKError.unknown, userInfo: ["detail": "time-out"])
                   observerDelegate.purchasedStatus = (.failure, .transactionError(error: errorRestore))
 

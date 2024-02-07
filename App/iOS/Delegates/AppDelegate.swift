@@ -122,6 +122,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       await BraveVPN.hideActiveStorePromotion()
     }
     
+    // TODO: Check Preferences.AIChat.subscriptionExpirationDate value
+    // and refresh order accordingly for the samed orderID
+    
     // Override point for customization after application launch.
     var shouldPerformAdditionalDelegateHandling = true
     AdblockEngine.setDomainResolver()

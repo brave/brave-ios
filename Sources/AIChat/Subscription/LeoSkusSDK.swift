@@ -257,6 +257,33 @@ class LeoSkusSDK {
     return await skusService.refreshOrder(product.skusDomain, orderId: orderId)
   }
   
+  ///  Fetch and refresh order details of a subscription
+  @MainActor
+  func fetchAndRefreshOrderDetails() async throws -> (orderId: String, orderDetails: Order) {
+    func decode<T: Decodable>(_ response: String) throws -> T {
+      guard let data = response.data(using: .utf8) else {
+        throw SkusError.decodingError
+      }
+       
+      return try self.jsonDecoder.decode(T.self, from: data)
+    }
+    
+    do {
+      let orderId = try await createOrder()
+      let order = try await decode(refreshOrder(orderId: orderId)) as Order
+      let errorCode = try await fetchCredentials(orderId: orderId)
+      
+      if orderId.isEmpty || !errorCode.isEmpty {
+        throw SkusError.invalidReceiptData
+      }
+
+      return (orderId, order)
+    } catch {
+      throw error
+    }
+
+  }
+  
   /// Fetches Credentials Summary.
   @MainActor
   func credentialsSummary() async throws -> String {

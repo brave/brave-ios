@@ -7,6 +7,7 @@ import Foundation
 import StoreKit
 import os.log
 import SwiftUI
+import Preferences
 
 /// In-app purchase subscription types
 enum SubscriptionType {
@@ -56,22 +57,27 @@ class LeoSubscriptionManager: ObservableObject {
     Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt"
   }
   
-  var expirationDateFormatted: String {
+  var expirationDateFormatted: String? {
     let dateFormatter = DateFormatter().then {
       $0.locale = Locale.current
       $0.dateFormat = "MM/dd/yy"
     }
 
-    return dateFormatter.string(from: expirationDate)
+    if let date = expirationDate {
+      return dateFormatter.string(from: date)
+    }
+    
+    return nil
   }
       
+  // Not used right now since the only available option is monthly
+  // But when yearly is activated it will dynmically effect paywall
   @Published var activeType: SubscriptionType = .monthly
   
+  // Subscription State is updated together with model premiumStatus
   @Published var subscriptionState: SubscriptionState = .notPurchased
   
-  @Published var expirationDate: Date = Date()
-  
-  private let monthlySDK = LeoSkusSDK(product: .leoMonthly, isPrivateMode: false)
+  @Published var expirationDate: Date? = Preferences.AIChat.subscriptionExpirationDate.value
 }
 
 // MARK: Subscription Methods
@@ -80,12 +86,21 @@ extension LeoSubscriptionManager {
   
   @MainActor
   func updateSkusPurchaseState() async throws {
-    let orderId = try await monthlySDK.createOrder()
-    let order = try await monthlySDK.refreshOrder(orderId: orderId)
-    let errorCode = try await monthlySDK.fetchCredentials(orderId: orderId)
+    var skuSDKActive: LeoSkusSDK
     
-    if orderId.isEmpty || order.isEmpty || !errorCode.isEmpty {
-      throw LeoSkusSDK.SkusError.invalidReceiptData
+    switch activeType {
+    case .monthly:
+      skuSDKActive = LeoSkusSDK(product: .leoMonthly, isPrivateMode: false)
+    case .yearly:
+      skuSDKActive = LeoSkusSDK(product: .leoYearly, isPrivateMode: false)
+    }
+    
+    do {
+      let purchaseOrder = try await skuSDKActive.fetchAndRefreshOrderDetails()
+      Preferences.AIChat.subscriptionExpirationDate.value = purchaseOrder.orderDetails.expiresAt
+      Preferences.AIChat.subscriptionOrderId.value = purchaseOrder.orderId
+    } catch {
+      throw error
     }
   }
   
@@ -145,14 +160,6 @@ class PaymentObserverDelegate: ObservableObject, LeoInAppPurchaseObserverDelegat
           isShowingPurchaseAlert.toggle()
         }
       }
-      
-      // TODO: Receipt Validation Logic
-      // Check the result of receipt validation and use
-      // purchasedStatus(.success, nil)  or
-      // purchasedStatus(.failure, .receiptError) accordingly and
-      // isShowingPurchaseAlert.toggle() for showing alert
-      // shouldDismiss.toggle() for dismissing
-      // return
     } else {
       purchasedStatus = (.success, nil)
       shouldDismiss.toggle()

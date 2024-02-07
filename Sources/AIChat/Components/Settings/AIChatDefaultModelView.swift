@@ -86,7 +86,9 @@ struct AIChatDefaultModelView: View {
       .sheet(isPresented: $isPresentingPaywallPremium) {
         AIChatPaywallView(
           premiumUpgrageSuccessful: { _ in 
-            // TODO: Upgrade Action
+            Task { @MainActor in
+              await aiModel.getPremiumStatus()
+            }
           })
       })
   }

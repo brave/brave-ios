@@ -43,11 +43,6 @@ class LeoInAppPurchaseObserver: NSObject, SKPaymentTransactionObserver {
           Logger.module.debug("Received transaction state: restored")
           SKPaymentQueue.default().finishTransaction(transaction)
           
-          // TODO: Receipt Validation Logic
-          // Check the result of receipt validation and use
-          // purchasedOrRestoredProduct(validateReceipt: false) or
-          // purchaseFailed(error:) accordingly
-          
           if let purchaseObserver = observer {
             observer = nil
             Task { @MainActor in
