@@ -251,7 +251,7 @@ public class CryptoStore: ObservableObject, WalletObserverStore {
         guard let isUpdatingUserAssets = self?.isUpdatingUserAssets, !isUpdatingUserAssets else { return }
         self?.isUpdatingUserAssets = true
         Preferences.Wallet.migrateCoreToWalletUserAssetCompleted.reset()
-        self?.userAssetManager.removeUserAssetsAndBalance {
+        self?.userAssetManager.removeUserAssetsAndBalance(for: nil) {
           self?.userAssetManager.migrateUserAssets(completion: {
             self?.updateAssets()
             self?.isUpdatingUserAssets = false
@@ -338,6 +338,9 @@ public class CryptoStore: ObservableObject, WalletObserverStore {
     transactionsActivityStore.setupObservers()
     marketStore.setupObservers()
     settingsStore.setupObservers()
+    
+    // user asset manager's observers
+    userAssetManager.setupObservers()
     
     accountActivityStore?.setupObservers()
     assetDetailStore?.setupObservers()

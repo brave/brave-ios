@@ -57,8 +57,15 @@ public final class WalletUserAssetBalance: NSManagedObject, CRUD {
     if asset == nil, account == nil { // all `WalletAssetBalnce` with no restriction on assets or accounts
       return WalletUserAssetBalance.all()
     } else if let asset, account == nil {
+      let predicate = NSPredicate(
+        format: "contractAddress == %@ && chainId == %@ && symbol == %@ && tokenId == %@",
+        asset.contractAddress,
+        asset.chainId,
+        asset.symbol,
+        asset.tokenId
+      )
       return WalletUserAssetBalance.all(
-        where: NSPredicate(format: "contractAddress == %@ && chainId == %@ && symbol == %@ && tokenId == %@", asset.contractAddress, asset.chainId, asset.symbol, asset.tokenId),
+        where: predicate,
         context: context ?? DataController.viewContext
       )
     } else if asset == nil, let account {
@@ -67,8 +74,16 @@ public final class WalletUserAssetBalance: NSManagedObject, CRUD {
         context: context ?? DataController.viewContext
       )
     } else if let asset, let account {
+      let predicate = NSPredicate(
+        format: "contractAddress == %@ && chainId == %@ && symbol == %@ && tokenId == %@ && accountAddress == %@",
+        asset.contractAddress,
+        asset.chainId,
+        asset.symbol,
+        asset.tokenId,
+        account
+      )
       return WalletUserAssetBalance.all(
-        where: NSPredicate(format: "contractAddress == %@ && chainId == %@ && symbol == %@ && tokenId == %@ && accountAddress == %@", asset.contractAddress, asset.chainId, asset.symbol, asset.tokenId, account),
+        where: predicate,
         context: context ?? DataController.viewContext
       )
     }
@@ -82,7 +97,15 @@ public final class WalletUserAssetBalance: NSManagedObject, CRUD {
     completion: (() -> Void)? = nil
   ) {
     DataController.perform(context: .new(inMemory: false), save: false) { context in
-      if let asset = WalletUserAssetBalance.first(where: NSPredicate(format: "contractAddress == %@ && chainId == %@ && symbol == %@ && tokenId == %@ && accountAddress == %@", asset.contractAddress, asset.chainId, asset.symbol, asset.tokenId, account), context: context) {
+      let predicate = NSPredicate(
+        format: "contractAddress == %@ && chainId == %@ && symbol == %@ && tokenId == %@ && accountAddress == %@",
+        asset.contractAddress,
+        asset.chainId,
+        asset.symbol,
+        asset.tokenId,
+        account
+      )
+      if let asset = WalletUserAssetBalance.first(where: predicate, context: context) {
         asset.balance = balance
       } else {
         _ = WalletUserAssetBalance(context: context, asset: asset, balance: balance, account: account)
@@ -105,14 +128,27 @@ public final class WalletUserAssetBalance: NSManagedObject, CRUD {
     account: String? = nil,
     completion: (() -> Void)? = nil
   ) {
-    var predict: NSPredicate?
+    var predicate: NSPredicate?
     if let asset, let accountAddress = account {
-      predict = NSPredicate(format: "contractAddress == %@ && chainId == %@ && symbol == %@ && tokenId == %@ && accountAddress == %@", asset.contractAddress, asset.chainId, asset.symbol, asset.tokenId, accountAddress)
+      predicate = NSPredicate(
+        format: "contractAddress == %@ && chainId == %@ && symbol == %@ && tokenId == %@ && accountAddress == %@",
+        asset.contractAddress,
+        asset.chainId,
+        asset.symbol,
+        asset.tokenId,
+        accountAddress
+      )
     } else if let asset {
-      predict = NSPredicate(format: "contractAddress == %@ && chainId == %@ && symbol == %@ && tokenId == %@", asset.contractAddress, asset.chainId, asset.symbol, asset.tokenId)
+      predicate = NSPredicate(
+        format: "contractAddress == %@ && chainId == %@ && symbol == %@ && tokenId == %@",
+        asset.contractAddress,
+        asset.chainId,
+        asset.symbol,
+        asset.tokenId
+      )
     }
     WalletUserAssetBalance.deleteAll(
-      predicate: predict,
+      predicate: predicate,
       completion: completion
     )
   }

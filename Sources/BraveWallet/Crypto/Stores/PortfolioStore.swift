@@ -464,7 +464,7 @@ public class PortfolioStore: ObservableObject, WalletObserverStore {
     
       // Looping through `allTokenNetworkAccounts` to get token's cached balance
       for tokenNetworkAccounts in allTokenNetworkAccounts {
-        if let tokenBalances = assetManager.getBalance(for: tokenNetworkAccounts.token, account: nil) {
+        if let tokenBalances = assetManager.getBalances(for: tokenNetworkAccounts.token, account: nil) {
           var result: [String: Double] = [:]
           for balancePerAccount in tokenBalances {
             result.merge(with: [balancePerAccount.accountAddress: Double(balancePerAccount.balance) ?? 0])
