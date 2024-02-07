@@ -249,6 +249,7 @@ class LeoSkusSDK {
   
   /// Updates the local cached order via the given Order-ID
   @MainActor
+  @discardableResult
   func refreshOrder(orderId: String) async throws -> String {
     guard let skusService = skusService else {
       throw SkusError.skusServiceUnavailable
@@ -270,14 +271,15 @@ class LeoSkusSDK {
     
     do {
       let orderId = try await createOrder()
-      let order = try await decode(refreshOrder(orderId: orderId)) as Order
+      let order = try await refreshOrder(orderId: orderId)
+      let decodedOrder = try decode(order) as Order
       let errorCode = try await fetchCredentials(orderId: orderId)
       
-      if orderId.isEmpty || !errorCode.isEmpty {
+      if orderId.isEmpty || order.isEmpty || !errorCode.isEmpty {
         throw SkusError.invalidReceiptData
       }
 
-      return (orderId, order)
+      return (orderId, decodedOrder)
     } catch {
       throw error
     }

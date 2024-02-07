@@ -31,6 +31,7 @@ import BraveShields
 import PrivateCDN
 import Playlist
 import UserAgent
+import AIChat
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -122,8 +123,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       await BraveVPN.hideActiveStorePromotion()
     }
     
-    // TODO: Check Preferences.AIChat.subscriptionExpirationDate value
-    // and refresh order accordingly for the samed orderID
+    // AIChat Refresh order accordingly for the same orderID
+    Task { @MainActor in
+      await LeoSubscriptionManager.shared.checkExpirationAndRefreshOrder()
+    }
     
     // Override point for customization after application launch.
     var shouldPerformAdditionalDelegateHandling = true
