@@ -61,7 +61,7 @@ public struct AIChatAdvancedSettingsView: View {
       Section {
         OptionToggleView(
           title: "Show autocomplete suggestions in address bar",
-          option: Preferences.LeoAI.autocompleteSuggestionsEnabled
+          option: Preferences.AIChat.autocompleteSuggestionsEnabled
         )
         
         NavigationLink {
