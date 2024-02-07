@@ -6,45 +6,17 @@
 import Foundation
 import StoreKit
 
-public enum AppStoreProduct: String, CaseIterable {
-  case vpnMonthly = "bravevpn.monthly"
-  case vpnYearly = "bravevpn.yearly"
-  
-  case leoMonthly = "braveleo.monthly"
-  case leoYearly = "braveleo.yearly"
-  
-  var subscriptionGroup: String {
-    switch self {
-    case .vpnMonthly, .vpnYearly: return "Brave VPN"
-    case .leoMonthly, .leoYearly: return "Brave Leo"
-    }
-  }
-  
-  var webSessionStorageKey: String {
-    switch self {
-    case .vpnMonthly, .vpnYearly: return "braveVpn.receipt"
-    case .leoMonthly, .leoYearly: return "braveLeo.receipt"
-    }
-  }
-  
-  var skusDomain: String {
-    #if DEBUG
-    switch self {
-    case .vpnMonthly, .vpnYearly: return "vpn.bravesoftware.com"
-    case .leoMonthly, .leoYearly: return "leo.bravesoftware.com"
-    }
-    #else
-    switch self {
-    case .vpnMonthly, .vpnYearly: return "vpn.brave.com"
-    case .leoMonthly, .leoYearly: return "leo.brave.com"
-    }
-    #endif
-  }
+public protocol AppStoreProduct: RawRepresentable<String>, CaseIterable {
+  var subscriptionGroup: String { get }
+  var webSessionStorageKey: String { get }
+  var skusDomain: String { get }
 }
 
 public class AppStoreProductSDK: ObservableObject {
   
-  public static let shared = AppStoreProductSDK()
+  public var allAppStoreProducts: [any AppStoreProduct] {
+    fatalError("Not Implemented - Implement via Inheritance")
+  }
   
   @Published
   private(set) var consumableProducts = [Product]()
@@ -62,7 +34,7 @@ public class AppStoreProductSDK: ObservableObject {
   
   private var updateTask: Task<Void, Error>?
   
-  private init() {
+  public init() {
     // Start updater immediately
     updateTask = Task.detached {
       for await result in Transaction.updates {
@@ -88,23 +60,23 @@ public class AppStoreProductSDK: ObservableObject {
   }
   
   @MainActor
-  func subscription(for product: AppStoreProduct) async -> Product? {
+  func subscription(for product: any AppStoreProduct) async -> Product? {
     autoRenewableProducts.first(where: { $0.id == product.rawValue })
   }
   
   @MainActor
-  func status(for product: AppStoreProduct) async -> [Product.SubscriptionInfo.Status] {
+  func status(for product: any AppStoreProduct) async -> [Product.SubscriptionInfo.Status] {
     (try? await subscription(for: product)?.subscription?.status) ?? []
   }
   
   @MainActor
-  func renewalState(for product: AppStoreProduct) async -> Product.SubscriptionInfo.RenewalState? {
+  func renewalState(for product: any AppStoreProduct) async -> Product.SubscriptionInfo.RenewalState? {
     await status(for: product).first?.state
   }
   
   /// Transaction History for a product
   @MainActor
-  func latestTransaction(for product: AppStoreProduct) async -> Transaction? {
+  func latestTransaction(for product: any AppStoreProduct) async -> Transaction? {
     if let transaction = await Transaction.latest(for: product.rawValue) {
       do {
         return try verify(transaction)
@@ -118,7 +90,7 @@ public class AppStoreProductSDK: ObservableObject {
   
   /// Transaction the user is entitled to, that unlocks the product
   @MainActor
-  func currentTransaction(for product: AppStoreProduct) async -> Transaction? {
+  func currentTransaction(for product: any AppStoreProduct) async -> Transaction? {
     if let transaction = await Transaction.currentEntitlement(for: product.rawValue) {
       do {
         return try verify(transaction)
@@ -180,7 +152,7 @@ public class AppStoreProductSDK: ObservableObject {
   @MainActor
   private func fetchProducts() async {
     do {
-      let products = try await Product.products(for: AppStoreProduct.allCases.map({ $0.rawValue }))
+      let products = try await Product.products(for: allAppStoreProducts.map({ $0.rawValue }))
       for product in products {
         switch product.type {
         case .consumable:

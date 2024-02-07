@@ -82,9 +82,9 @@ public class LeoSubscriptionManager: ObservableObject {
   var skuSDKActive: LeoSkusSDK {
     switch activeType {
     case .monthly:
-      return LeoSkusSDK(product: .leoMonthly, isPrivateMode: false)
+      return LeoSkusSDK(product: BraveStoreProduct.leoMonthly, isPrivateMode: false)
     case .yearly:
-      return LeoSkusSDK(product: .leoYearly, isPrivateMode: false)
+      return LeoSkusSDK(product: BraveStoreProduct.leoYearly, isPrivateMode: false)
     }
   }
 }
@@ -99,9 +99,9 @@ public extension LeoSubscriptionManager {
     
     switch activeType {
     case .monthly:
-      skuSDKActive = LeoSkusSDK(product: .leoMonthly, isPrivateMode: false)
+      skuSDKActive = LeoSkusSDK(product: BraveStoreProduct.leoMonthly, isPrivateMode: false)
     case .yearly:
-      skuSDKActive = LeoSkusSDK(product: .leoYearly, isPrivateMode: false)
+      skuSDKActive = LeoSkusSDK(product: BraveStoreProduct.leoYearly, isPrivateMode: false)
     }
     
     do {

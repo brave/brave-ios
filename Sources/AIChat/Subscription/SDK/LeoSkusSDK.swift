@@ -94,29 +94,12 @@ struct Order: Codable {
 /// Class for handling Skus SDK via SkusService
 class LeoSkusSDK {
   
-  init(product: Product, isPrivateMode: Bool) {
+  init(product: any AppStoreProduct, isPrivateMode: Bool) {
     self.product = product
     self.skusService = Skus.SkusServiceFactory.get(privateMode: isPrivateMode)
   }
   
   // MARK: - Structures
-  
-  enum Product: String {
-    case leoMonthly = "braveleo.monthly"
-    case leoYearly = "braveleo.yearly"
-    
-    var webStorageKey: String {
-      switch self {
-      case .leoMonthly, .leoYearly: return "braveLeo.receipt"
-      }
-    }
-    
-    var skusDomain: String {
-      switch self {
-      case .leoMonthly, .leoYearly: return "leo.bravesoftware.com"
-      }
-    }
-  }
   
   enum SkusError: Error {
     case skusServiceUnavailable
@@ -130,7 +113,7 @@ class LeoSkusSDK {
   
   // MARK: - Private
   
-  private let product: Product
+  private let product: any AppStoreProduct
   
   private let skusService: SkusSkusService?
   
@@ -174,7 +157,7 @@ class LeoSkusSDK {
     }
   }
   
-  private var encodedReceipt: (product: Product, value: String) {
+  private var encodedReceipt: (product: any AppStoreProduct, value: String) {
     get throws {
       struct Receipt: Codable {
         let type: String
@@ -284,7 +267,6 @@ class LeoSkusSDK {
     } catch {
       throw error
     }
-
   }
   
   /// Fetches Credentials Summary.
