@@ -182,11 +182,21 @@ public class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   }
   
   @MainActor
+  @discardableResult
   func getPremiumStatus() async -> AiChat.PremiumStatus {
     return await withCheckedContinuation { @MainActor continuation in
       api.getPremiumStatus { status in
         DispatchQueue.main.async {
           self.premiumStatus = status
+          
+          let subscriptionManager = LeoSubscriptionManager.shared
+          switch status {
+          case .active:
+            subscriptionManager.subscriptionState = .purchased
+          default:
+            subscriptionManager.subscriptionState = .expired
+          }
+          
           continuation.resume(returning: status)
         }
       }

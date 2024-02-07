@@ -9,5 +9,7 @@ import Preferences
 extension Preferences {
   public enum AIChat {
     public static let hasSeenIntro = Option<Bool>(key: "aichat.intro.hasBeenSeen", default: false)
+    public static let subscriptionExpirationDate = Option<Date?>(key: "aichat.expiration-date", default: nil)
+    public static let subscriptionOrderId = Option<String?>(key: "aichat.order-id", default: nil)
   }
 }

@@ -54,6 +54,10 @@ public struct AIChatView: View {
     self.model = model
     self.speechRecognizer = speechRecognizer
     self.openURL = openURL
+    
+    Task { @MainActor in
+      await model.getPremiumStatus()
+    }
   }
 
   public var body: some View {
@@ -292,7 +296,7 @@ public struct AIChatView: View {
         AIChatPaywallView(
           premiumUpgrageSuccessful: { _ in
             Task { @MainActor in
-              _ = await model.getPremiumStatus()
+              await model.getPremiumStatus()
             }
           })
       })
