@@ -179,6 +179,17 @@ public class AppState {
     }
     switches.append(.init(key: .rewardsFlags, value: BraveRewards.Configuration.current().flags))
     
+    if AppConstants.buildChannel == .release {
+      // Chrome iOS sends "stable" and not "release" or anything else.
+      // Anything else will only work on staging builds.
+      switches.append(.init(key: .init(rawValue: "fake-variations-channel"), value: "stable"))
+    } else if AppConstants.buildChannel == .beta {
+      // Chrome iOS sends "stable" and not "release" or anything else.
+      // Anything else will only work on staging builds.
+      switches.append(.init(key: .init(rawValue: "fake-variations-channel"), value: "beta"))
+    }
+
+    
     // Initialize BraveCore
     return BraveCoreMain(userAgent: UserAgent.mobile, additionalSwitches: switches)
   }
