@@ -299,7 +299,12 @@ extension BrowserViewController: WKNavigationDelegate {
           // The tracker protection script
           // This script will track what is blocked and increase stats
           .trackerProtectionStats: requestURL.isWebPage(includeDataURIs: false) &&
-                                   domainForMainFrame.isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true)
+                                   domainForMainFrame.isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true),
+
+          // Add Brave search result ads processing script.
+          .searchResultAd: BraveSearchManager.isValidURL(requestURL) && 
+                           !isPrivateBrowsing &&
+                           !rewards.isEnabled
         ])
       }
       
@@ -324,6 +329,8 @@ extension BrowserViewController: WKNavigationDelegate {
         return (.cancel, preferences)
       }
 
+      tab?.braveSearchResultAdManager = BraveSearchResultAdManager(url: requestURL, rewards: rewards, isPrivateBrowsing: isPrivateBrowsing)
+
       // We fetch cookies to determine if backup search was enabled on the website.
       let profile = self.profile
       let cookies = await webView.configuration.websiteDataStore.httpCookieStore.allCookies()
@@ -347,6 +354,7 @@ extension BrowserViewController: WKNavigationDelegate {
         }
       }
     } else {
+      tab?.braveSearchResultAdManager = nil
       tab?.braveSearchManager = nil
     }
 
