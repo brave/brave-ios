@@ -555,8 +555,7 @@ public class SearchViewController: SiteTableViewController, LoaderListener {
       let cell = TwoLineTableViewCell().then {
         $0.textLabel?.text = dataSource.searchQuery + " - " + "Ask Leo"
         $0.textLabel?.textColor = .bravePrimary
-        $0.imageView?.image = UIImage(
-          braveSystemNamed: "leo.product.brave-leo")?.withRenderingMode(.alwaysTemplate)
+        $0.imageView?.image = UIImage(named: "aichat-avatar", in: .module, compatibleWith: nil)
         $0.imageView?.tintColor = browserColors.iconDefault
         $0.imageView?.contentMode = .center
         $0.backgroundColor = .clear

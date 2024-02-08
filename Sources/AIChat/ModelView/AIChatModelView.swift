@@ -13,6 +13,7 @@ public class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   private var api: AIChat!
   private let webView: WKWebView?
   private let pageContentFetcher: (WKWebView) async -> String?
+  public var querySubmited: String?
   
   @Published var siteInfo: AiChat.SiteInfo?
   @Published var premiumStatus: AiChat.PremiumStatus = .inactive
@@ -23,7 +24,7 @@ public class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   
   @Published var requestInProgress: Bool = false
   @Published var apiError: AiChat.APIError = .none
-  
+   
   public var isPageConnected: Bool {
     get {
       return api.shouldSendPageContents && webView?.url?.isWebPage(includeDataURIs: true) == true
@@ -69,8 +70,12 @@ public class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
     }
   }
   
-  public init(braveCore: BraveCoreMain, webView: WKWebView?, pageContentFetcher: @escaping (WKWebView) async -> String?) {
+  public init(braveCore: BraveCoreMain,
+              webView: WKWebView?,
+              querySubmited: String? = nil,
+              pageContentFetcher: @escaping (WKWebView) async -> String?) {
     self.webView = webView
+    self.querySubmited = querySubmited
     self.pageContentFetcher = pageContentFetcher
     
     super.init()
