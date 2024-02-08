@@ -326,7 +326,7 @@ public struct AIChatView: View {
           isVoiceEntryPresented = false
         },
         speechModel: speechRecognizer,
-        disclaimer: "Brave does not store or share your voice searches.")
+        disclaimer: "Brave does not store or share your voice inputs.")
     }
     .background(Color.clear
       .alert(isPresented: $isNoMicrophonePermissionPresented) {
