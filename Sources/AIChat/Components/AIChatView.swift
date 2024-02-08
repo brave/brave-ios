@@ -50,6 +50,9 @@ public struct AIChatView: View {
   
   var openURL: ((URL) -> Void)
   
+  @State
+  private var isQuerySubmited = false
+  
   public init(model: AIChatViewModel, speechRecognizer: SpeechRecognizer, openURL: @escaping (URL) -> Void) {
     self.model = model
     self.speechRecognizer = speechRecognizer
@@ -57,6 +60,11 @@ public struct AIChatView: View {
     
     Task { @MainActor in
       await model.getPremiumStatus()
+    }
+    
+    if let query = model.querySubmited {
+      isQuerySubmited = true
+      model.submitQuery(query)
     }
   }
 
@@ -217,7 +225,8 @@ public struct AIChatView: View {
                     
                     if !model.requestInProgress &&
                         !model.suggestedQuestions.isEmpty &&
-                        model.apiError == .none {
+                        model.apiError == .none,
+                        !isQuerySubmited {
                       AIChatSuggestionsView(geometry: geometry, suggestions: model.suggestedQuestions) { suggestion in
                         hasSeenIntro.value = true
                         model.submitSuggestion(suggestion)

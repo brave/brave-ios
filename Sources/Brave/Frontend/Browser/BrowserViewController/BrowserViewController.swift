@@ -2767,7 +2767,8 @@ extension BrowserViewController: SearchViewControllerDelegate {
   }
   
   func searchViewController(_ searchViewController: SearchViewController, didSubmitAIChat query: String) {
-    // TODO: Submit query to ai chat 
+    self.popToBVC()
+    self.openBraveLeo(with: query)
   }
 
   func searchViewController(_ searchViewController: SearchViewController, didSelectURL url: URL) {
@@ -3370,9 +3371,10 @@ extension BrowserViewController {
     self.openURLInNewTab(url, isPrivate: forcedPrivate, isPrivileged: false)
   }
   
-  func openBraveLeo() {
+  func openBraveLeo(with query: String? = nil) {
     let model = AIChatViewModel(braveCore: self.braveCore,
                                 webView: self.tabManager.selectedTab?.webView,
+                                querySubmited: query,
                                 pageContentFetcher: BraveLeoScriptHandler.getMainArticle)
     let chatController = UIHostingController(rootView: AIChatView(
       model: model,
