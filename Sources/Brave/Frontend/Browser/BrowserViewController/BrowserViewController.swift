@@ -3372,14 +3372,19 @@ extension BrowserViewController {
   }
   
   func openBraveLeo(with query: String? = nil) {
-    let model = AIChatViewModel(braveCore: self.braveCore,
-                                webView: self.tabManager.selectedTab?.webView,
-                                querySubmited: query,
-                                pageContentFetcher: BraveLeoScriptHandler.getMainArticle)
+    let webView = (query == nil) ? nil : tabManager.selectedTab?.webView
+    
+    let model = AIChatViewModel(
+      braveCore: braveCore,
+      webView: webView,
+      querySubmited: query,
+      pageContentFetcher: BraveLeoScriptHandler.getMainArticle)
+    
     let chatController = UIHostingController(rootView: AIChatView(
       model: model,
       speechRecognizer: speechRecognizer,
       openURL: openAIChatURL))
-    self.present(chatController, animated: true)
+    
+    present(chatController, animated: true)
   }
 }
