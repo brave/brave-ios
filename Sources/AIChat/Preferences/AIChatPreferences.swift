@@ -11,6 +11,7 @@ extension Preferences {
     public static let hasSeenIntro = Option<Bool>(key: "aichat.intro.hasBeenSeen", default: false)
     public static let subscriptionExpirationDate = Option<Date?>(key: "aichat.expiration-date", default: nil)
     public static let subscriptionOrderId = Option<String?>(key: "aichat.order-id", default: nil)
+    public static let subscriptionHasCredentials = Option<Bool>(key: "aichat.credentials", default: false)
     public static let autocompleteSuggestionsEnabled = Option<Bool>(key: "aichat.autocompletesuggestions-enabled", default: true)
   }
 }

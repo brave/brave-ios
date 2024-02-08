@@ -92,11 +92,11 @@ struct Order: Codable {
 }
 
 /// Class for handling Skus SDK via SkusService
-class LeoSkusSDK {
+class SkusSDK {
   
-  init(product: any AppStoreProduct, isPrivateMode: Bool) {
+  init(product: BraveStoreProduct) {
     self.product = product
-    self.skusService = Skus.SkusServiceFactory.get(privateMode: isPrivateMode)
+    self.skusService = Skus.SkusServiceFactory.get(privateMode: false)
   }
   
   // MARK: - Structures
@@ -113,7 +113,7 @@ class LeoSkusSDK {
   
   // MARK: - Private
   
-  private let product: any AppStoreProduct
+  private let product: BraveStoreProduct
   
   private let skusService: SkusSkusService?
   
@@ -234,17 +234,11 @@ class LeoSkusSDK {
   /// Updates the local cached order via the given Order-ID
   @MainActor
   @discardableResult
-  func refreshOrder(orderId: String) async throws -> String {
+  func refreshOrder(orderId: String) async throws -> Order {
     guard let skusService = skusService else {
       throw SkusError.skusServiceUnavailable
     }
     
-    return await skusService.refreshOrder(product.skusDomain, orderId: orderId)
-  }
-  
-  ///  Fetch and refresh order details of a subscription
-  @MainActor
-  func fetchAndRefreshOrderDetails() async throws -> (orderId: String, orderDetails: Order) {
     func decode<T: Decodable>(_ response: String) throws -> T {
       guard let data = response.data(using: .utf8) else {
         throw SkusError.decodingError
@@ -253,17 +247,22 @@ class LeoSkusSDK {
       return try self.jsonDecoder.decode(T.self, from: data)
     }
     
+    return try await decode(skusService.refreshOrder(product.skusDomain, orderId: orderId)) as Order
+  }
+  
+  ///  Fetch and refresh order details of a subscription
+  @MainActor
+  func fetchAndRefreshOrderDetails() async throws -> (orderId: String, orderDetails: Order) {
     do {
       let orderId = try await createOrder()
       let order = try await refreshOrder(orderId: orderId)
-      let decodedOrder = try decode(order) as Order
       let errorCode = try await fetchCredentials(orderId: orderId)
       
-      if orderId.isEmpty || order.isEmpty || !errorCode.isEmpty {
+      if orderId.isEmpty || !errorCode.isEmpty {
         throw SkusError.invalidReceiptData
       }
 
-      return (orderId, decodedOrder)
+      return (orderId, order)
     } catch {
       throw error
     }
@@ -271,12 +270,20 @@ class LeoSkusSDK {
   
   /// Fetches Credentials Summary.
   @MainActor
-  func credentialsSummary() async throws -> String {
+  func credentialsSummary() async throws -> CredentialSummary {
+    func decode<T: Decodable>(_ response: String) throws -> T {
+      guard let data = response.data(using: .utf8) else {
+        throw SkusError.decodingError
+      }
+      
+      return try self.jsonDecoder.decode(T.self, from: data)
+    }
+    
     guard let skusService = skusService else {
       throw SkusError.skusServiceUnavailable
     }
     
-    return await skusService.credentialSummary(product.skusDomain)
+    return try await decode(skusService.credentialSummary(product.skusDomain)) as CredentialSummary
   }
   
   @MainActor
@@ -302,16 +309,8 @@ class LeoSkusSDK {
   
   @MainActor
   func testSkus() async throws {
-    func decode<T: Decodable>(_ response: String) throws -> T {
-      guard let data = response.data(using: .utf8) else {
-        throw SkusError.decodingError
-      }
-      
-      return try self.jsonDecoder.decode(T.self, from: data)
-    }
-    
     let orderId = try await createOrder()
-    let order = try await decode(refreshOrder(orderId: orderId)) as Order
+    let order = try await refreshOrder(orderId: orderId)
     assert(orderId == order.id, "Skus Order-Id Mismatch")
     
     let errorCode = try await fetchCredentials(orderId: order.id)
@@ -320,7 +319,7 @@ class LeoSkusSDK {
     let credentialsToken = try await prepareCredentials(path: "/")
     assert(credentialsToken.starts(with: "__Secure-sku#brave-leo-premium"), "Invalid Skus Credentials")
     
-    let credentials = try await decode(credentialsSummary()) as CredentialSummary
+    let credentials = try await credentialsSummary()
     assert(credentials.order.id ==  orderId, "Skus Credentials Mismatch")
   }
 }

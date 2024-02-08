@@ -53,3 +53,12 @@ public extension NSDecimalNumber {
     return isSymbolIncluded ? currencySymbol + formatted : formatted
   }
 }
+
+public extension Decimal {
+
+  /// Returns a currency formatted string where the currency's symbol is in front.
+  /// For example $19.99.
+  func frontSymbolCurrencyFormatted(with locale: Locale, isSymbolIncluded: Bool = true) -> String? {
+    return (self as NSDecimalNumber).frontSymbolCurrencyFormatted(with: locale, isSymbolIncluded: isSymbolIncluded)
+  }
+}

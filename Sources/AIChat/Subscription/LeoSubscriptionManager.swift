@@ -79,12 +79,12 @@ public class LeoSubscriptionManager: ObservableObject {
   
   @Published var expirationDate: Date? = Preferences.AIChat.subscriptionExpirationDate.value
   
-  var skuSDKActive: LeoSkusSDK {
+  var skuSDKActive: SkusSDK {
     switch activeType {
     case .monthly:
-      return LeoSkusSDK(product: BraveStoreProduct.leoMonthly, isPrivateMode: false)
+      return SkusSDK(product: BraveStoreProduct.leoMonthly)
     case .yearly:
-      return LeoSkusSDK(product: BraveStoreProduct.leoYearly, isPrivateMode: false)
+      return SkusSDK(product: BraveStoreProduct.leoYearly)
     }
   }
 }
@@ -95,13 +95,13 @@ public extension LeoSubscriptionManager {
   
   @MainActor
   func updateSkusPurchaseState() async throws {
-    var skuSDKActive: LeoSkusSDK
+    var skuSDKActive: SkusSDK
     
     switch activeType {
     case .monthly:
-      skuSDKActive = LeoSkusSDK(product: BraveStoreProduct.leoMonthly, isPrivateMode: false)
+      skuSDKActive = SkusSDK(product: BraveStoreProduct.leoMonthly)
     case .yearly:
-      skuSDKActive = LeoSkusSDK(product: BraveStoreProduct.leoYearly, isPrivateMode: false)
+      skuSDKActive = SkusSDK(product: BraveStoreProduct.leoYearly)
     }
     
     do {
