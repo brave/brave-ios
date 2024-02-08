@@ -253,9 +253,8 @@ public class WalletUserAssetManager: WalletUserAssetManagerType, WalletObserverS
         migrateUserAssets(for: Array(WalletConstants.supportedCoinTypes()), completion: { [weak self] in
           // new wallet created or new wallet restored. finished user asset migration
           // so we want to fetch user assets balances and cache them
-          self?.refreshBalances {
-            completion?()
-          }
+          self?.refreshBalances()
+          completion?()
         })
       } else {
         let allNetworks = await rpcService.allNetworksForSupportedCoins(respectTestnetPreference: false)
@@ -265,9 +264,8 @@ public class WalletUserAssetManager: WalletUserAssetManagerType, WalletObserverS
             // new coin type introduced, so we want to fetch user assets balances and cache them after
             // new coin type assets have been migrated to CD
             self.migrateUserAssets(for: newCoins, completion: { [weak self] in
-              self?.refreshBalances {
-                completion?()
-              }
+              self?.refreshBalances()
+              completion?()
             })
           } else {
             // no migration happens. refreshing user assets balance will happen after unlock
