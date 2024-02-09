@@ -9,6 +9,12 @@ import DesignSystem
 import Then
 import StoreKit
 
+enum AIChatPaymentStatus {
+  case ongoing
+  case success
+  case failure
+}
+
 struct AIChatPaywallView: View {
   
   @Environment(\.presentationMode) 
@@ -19,20 +25,23 @@ struct AIChatPaywallView: View {
   
   @State
   private var availableTierTypes: [SubscriptionType] = [.monthly]
-
-  @ObservedObject
-  private var productInfo = LeoProductInfo.shared
   
   @ObservedObject
-  var subscriptionManager = LeoSubscriptionManager.shared
+  private(set) var storeSDK = BraveStoreSDK.shared
   
-  var premiumUpgrageSuccessful: ((SubscriptionType) -> Void)?
+  @State
+  private var paymentStatus: AIChatPaymentStatus = .success
   
-  @StateObject 
-  var observerDelegate = PaymentObserverDelegate()
+  @State
+  private var isShowingPurchaseAlert = false
+  
+  @State
+  private var shouldDismiss: Bool = false
   
   // Timer used for resetting the restore action to prevent infinite loading
   @State private var iapRestoreTimer: Timer?
+  
+  var premiumUpgrageSuccessful: ((SubscriptionType) -> Void)?
 
   var body: some View {
     NavigationView {
@@ -55,9 +64,19 @@ struct AIChatPaywallView: View {
           .toolbar {
             ToolbarItemGroup(placement: .confirmationAction) {
               Button(action: {
-                observerDelegate.purchasedStatus = (.ongoing, nil)
-
-                subscriptionManager.restorePurchasesAction()
+                paymentStatus = .ongoing
+                
+                Task { @MainActor in
+                  if await storeSDK.restorePurchases() {
+                    iapRestoreTimer?.invalidate()
+                    paymentStatus = .success
+                    shouldDismiss.toggle()
+                  } else {
+                    iapRestoreTimer?.invalidate()
+                    paymentStatus = .failure
+                    isShowingPurchaseAlert.toggle()
+                  }
+                }
                 
                 if iapRestoreTimer != nil {
                   iapRestoreTimer?.invalidate()
@@ -65,16 +84,14 @@ struct AIChatPaywallView: View {
                 }
                 
                 // Adding 1 minute timer for restore
-                iapRestoreTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: false) { timer in
-                  // Create a custom error and return it
-                  let errorRestore = SKError(SKError.unknown, userInfo: ["detail": "time-out"])
-                  observerDelegate.purchasedStatus = (.failure, .transactionError(error: errorRestore))
+                iapRestoreTimer = Timer.scheduledTimer(withTimeInterval: 60.0, repeats: false) { timer in
+                  paymentStatus = .failure
 
                   // Show Alert for failure of restore
-                  observerDelegate.isShowingPurchaseAlert.toggle()
+                  isShowingPurchaseAlert.toggle()
                 }
               }) {
-                if observerDelegate.purchasedStatus.status == .ongoing {
+                if paymentStatus == .ongoing {
                   ProgressView()
                     .tint(Color.white)
                 } else {
@@ -82,7 +99,7 @@ struct AIChatPaywallView: View {
                 }
               }
               .foregroundColor(.white)
-              .disabled(observerDelegate.purchasedStatus.status == .ongoing)
+              .disabled(paymentStatus == .ongoing)
             }
             
             ToolbarItemGroup(placement: .cancellationAction) {
@@ -114,18 +131,14 @@ struct AIChatPaywallView: View {
           .edgesIgnoringSafeArea(.all)
           .overlay(Image("leo-product", bundle: .module),
                    alignment: .topTrailing))
-      .onAppear {
-        // Observe subscription manager events
-        subscriptionManager.purchaseObserver.delegate = observerDelegate
-      }
-      .alert(isPresented: $observerDelegate.isShowingPurchaseAlert) {
+      .alert(isPresented: $isShowingPurchaseAlert) {
         Alert(
           title: Text("Error"),
           message: Text("Unable to complete purchase. Please try again, or check your payment details on Apple and try again."),
           dismissButton: .default(Text("OK")))
       }
-      .onChange(of: observerDelegate.shouldDismiss) { shouldDismiss in
-        premiumUpgrageSuccessful?(subscriptionManager.activeType)
+      .onChange(of: shouldDismiss) { shouldDismiss in
+        premiumUpgrageSuccessful?(selectedTierType)
         
         if shouldDismiss {
           presentationMode.dismiss()
@@ -156,13 +169,14 @@ struct AIChatPaywallView: View {
             }
             Spacer()
             
-            if let yearlyProduct = productInfo.yearlySubProduct {
+            if let yearlyProduct = storeSDK.leoYearlyProduct {
               HStack(alignment: .center, spacing: 2) {
-                Text("\(yearlyProduct.priceLocale.currencyCode ?? "")\(yearlyProduct.priceLocale.currencySymbol ?? "")")
+                Text("\(yearlyProduct.priceFormatStyle.locale.currencyCode ?? "")\(yearlyProduct.priceFormatStyle.locale.currencySymbol ?? "")")
                   .font(.subheadline)
                   .foregroundColor(Color(braveSystemName: .primitivePrimary30))
                 
-                Text(yearlyProduct.price.frontSymbolCurrencyFormatted(with: yearlyProduct.priceLocale) ?? "$0")
+                Text(yearlyProduct.price.frontSymbolCurrencyFormatted(
+                  with: yearlyProduct.priceFormatStyle.locale, isSymbolIncluded: false) ?? "$0")
                   .font(.title)
                   .foregroundColor(.white)
                 
@@ -198,14 +212,14 @@ struct AIChatPaywallView: View {
             
             Spacer()
             
-            if let monthlyProduct = productInfo.monthlySubProduct {
+            if let monthlyProduct = storeSDK.leoMonthlyProduct {
               HStack(alignment: .center, spacing: 2.0) {
-                Text("\(monthlyProduct.priceLocale.currencySymbol ?? "")")
+                Text("\(monthlyProduct.priceFormatStyle.locale.currencySymbol ?? "")")
                   .font(.subheadline)
                   .foregroundColor(Color(braveSystemName: .primitivePrimary30))
                 
                 Text(monthlyProduct.price.frontSymbolCurrencyFormatted(
-                  with: monthlyProduct.priceLocale, isSymbolIncluded: false) ?? "$0")
+                  with: monthlyProduct.priceFormatStyle.locale, isSymbolIncluded: false) ?? "$0")
                   .font(.title)
                   .foregroundColor(.white)
                 
@@ -249,10 +263,29 @@ struct AIChatPaywallView: View {
       
       VStack {
         Button(action: {
-          subscriptionManager.startSubscriptionAction(with: selectedTierType)
-          observerDelegate.purchasedStatus = (.ongoing, nil)
+          paymentStatus = .ongoing
+          
+          Task {
+            do {
+              switch selectedTierType {
+              case .monthly:
+                try await storeSDK.purchase(product: BraveStoreProduct.leoMonthly)
+              case .yearly:
+                try await storeSDK.purchase(product: BraveStoreProduct.leoYearly)
+              }
+              
+              paymentStatus = .success
+              
+              Task.delayed(bySeconds: 2.0) { @MainActor in
+                shouldDismiss = true
+              }
+            } catch {
+              paymentStatus = .failure
+              isShowingPurchaseAlert.toggle()
+            }
+          }
         }) {
-          if observerDelegate.purchasedStatus.status == .ongoing {
+          if paymentStatus == .ongoing {
             ProgressView()
               .tint(Color.white)
           } else {
@@ -271,7 +304,7 @@ struct AIChatPaywallView: View {
                                    startPoint: .init(x: 0.0, y: 0.0),
                                    endPoint: .init(x: 0.0, y: 1.0)))
         .clipShape(RoundedRectangle(cornerRadius: 16.0, style: .continuous))
-        .disabled(observerDelegate.purchasedStatus.status == .ongoing)
+        .disabled(paymentStatus == .ongoing)
       }
       .padding([.horizontal], 16.0)
     }

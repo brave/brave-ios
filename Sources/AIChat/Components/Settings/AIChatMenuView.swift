@@ -184,7 +184,7 @@ struct AIChatMenuView: View {
   
   func generateMenuActionItems(menuOption: AIChatMenuOptionTypes) -> some View {
     Button {
-      if menuOption == .premium, !LeoProductInfo.shared.isComplete {
+      if menuOption == .premium, !BraveStoreSDK.shared.isLeoProductsLoaded {
         appStoreConnectionErrorPresented = true
       } else {
         presentationMode.wrappedValue.dismiss()

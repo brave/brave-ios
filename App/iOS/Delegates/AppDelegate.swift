@@ -123,10 +123,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       await BraveVPN.hideActiveStorePromotion()
     }
     
-    // AIChat Refresh order accordingly for the same orderID
-    Task { @MainActor in
-      await LeoSubscriptionManager.shared.checkExpirationAndRefreshOrder()
-    }
+    // Brave Store SDK - Initialization
+    BraveStoreSDK.shared.refreshAllSkusOrders()
     
     // Override point for customization after application launch.
     var shouldPerformAdditionalDelegateHandling = true
