@@ -5,9 +5,42 @@
 
 import SwiftUI
 import DesignSystem
+import BraveCore
 
 struct AIChatIntroMessageView: View {
-  let prompt: String
+  let model: AiChat.Model
+
+  private var modelDescription: String {
+    switch model.key {
+    case "chat-basic":
+      return Strings.AIChat.introMessageLlamaModelDescription
+      
+    case "chat-leo-expanded":
+      return Strings.AIChat.introMessageMixtralModelDescription
+      
+    case "chat-claude-instant":
+      return Strings.AIChat.introMessageClaudeInstantModelDescription
+      
+    default:
+      return model.displayName
+    }
+  }
+  
+  private var introMessage: String {
+    switch model.key {
+    case "chat-basic":
+      return Strings.AIChat.introMessageLlamaMessageDescription
+      
+    case "chat-leo-expanded":
+      return Strings.AIChat.introMessageMixtralMessageDescription
+      
+    case "chat-claude-instant":
+      return Strings.AIChat.introMessageClaudeInstantMessageDescription
+      
+    default:
+      return String(format: Strings.AIChat.introMessageGenericMessageDescription, model.displayName)
+    }
+  }
   
   var body: some View {
     HStack(alignment: .top, spacing: 0.0) {
@@ -37,7 +70,7 @@ struct AIChatIntroMessageView: View {
           .frame(maxWidth: .infinity, alignment: .leading)
           .fixedSize(horizontal: false, vertical: true)
         
-        Text("Mixtral by Mistral AI")
+        Text(modelDescription)
           .font(.footnote)
           .foregroundStyle(Color(braveSystemName: .textTertiary))
           .multilineTextAlignment(.leading)
@@ -45,7 +78,7 @@ struct AIChatIntroMessageView: View {
           .fixedSize(horizontal: false, vertical: true)
           .padding(.bottom)
         
-        Text(prompt)
+        Text(introMessage)
           .font(.subheadline)
           .foregroundStyle(Color(braveSystemName: .textPrimary))
           .multilineTextAlignment(.leading)
@@ -58,6 +91,9 @@ struct AIChatIntroMessageView: View {
 
 @available(iOS 17.0, *)
 #Preview(traits: .sizeThatFitsLayout) {
-  AIChatIntroMessageView(prompt: "Hi, I'm Leo. I'm a fully hosted AI assistant by Brave. I'm powered by Mixtral 8x7B, a model created by Mistral AI to handle advanced tasks.")
+  AIChatIntroMessageView(model: .init(key: "mixtral_8x7b", name: "Mixtral-8x7b", displayName: "Mixtral 8x7b",
+                                      displayMaker: "Powerful, fast and adaptive", engineType: .llamaRemote,
+                                      category: .chat, access: .basicAndPremium,
+                                      maxPageContentLength: 9000, longConversationWarningCharacterLimit: 20000))
     .previewLayout(.sizeThatFits)
 }

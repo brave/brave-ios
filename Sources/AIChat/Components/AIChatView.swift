@@ -138,7 +138,7 @@ public struct AIChatView: View {
                     )
                     .padding()
                   } else {
-                    AIChatIntroMessageView(prompt: "Hi, I'm Leo. I'm a fully hosted AI assistant by Brave. I'm powered by Mixtral 8x7B, a model created by Mistral AI to handle advanced tasks.")
+                    AIChatIntroMessageView(model: model.currentModel)
                       .padding()
                       .background(Color(braveSystemName: .containerBackground))
                     
