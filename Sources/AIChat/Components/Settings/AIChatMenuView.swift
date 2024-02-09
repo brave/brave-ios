@@ -157,7 +157,7 @@ struct AIChatMenuView: View {
         }, label: {
           AIChatMenuItemView(title: model.displayName, subtitle: model.displayMaker, isSelected: model.key == currentModel.key) {
             if model.access == .basicAndPremium {
-              Text("LIMITED")
+              Text(premiumStatus)
                 .font(.caption2)
                 .foregroundStyle(Color(braveSystemName: .blue50))
                 .padding(.horizontal, 4.0)
