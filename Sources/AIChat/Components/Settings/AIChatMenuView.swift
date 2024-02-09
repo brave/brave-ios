@@ -107,6 +107,29 @@ struct AIChatMenuView: View {
   
   @State 
   private var appStoreConnectionErrorPresented = false
+  
+  var premiumStatus: String
+ 
+  init(aiModel: AIChatViewModel, 
+       onModelChanged: @escaping (String) -> Void,
+       onOptionSelected: @escaping (AIChatMenuOptionTypes) -> Void) {
+    self.currentModel = aiModel.currentModel
+    self.modelOptions = aiModel.models
+    self.premiumStatus = aiModel.premiumStatus == .active ? "UNLIMITED" : "LIMITED"
+    self.onModelChanged = onModelChanged
+    self.onOptionSelected = onOptionSelected
+  }
+  
+  fileprivate init(currentModel: AiChat.Model,
+                   modelOptions: [AiChat.Model],
+                   onModelChanged: @escaping (String) -> Void,
+                   onOptionSelected: @escaping (AIChatMenuOptionTypes) -> Void) {
+    self.currentModel = currentModel
+    self.modelOptions = modelOptions
+    self.premiumStatus = "UNLIMITED"
+    self.onModelChanged = onModelChanged
+    self.onOptionSelected = onOptionSelected
+  }
 
   var body: some View {
     LazyVStack(spacing: 0.0) {
@@ -206,30 +229,32 @@ struct AIChatMenuView: View {
 }
 
 #Preview {
-  AIChatMenuView(currentModel:
+  AIChatMenuView(
+    currentModel:
       .init(key: "mixtral_8x7b", name: "Mixtral-8x7b", displayName: "Mixtral 8x7b",
             displayMaker: "Powerful, fast and adaptive", engineType: .llamaRemote,
             category: .chat, access: .basicAndPremium,
             maxPageContentLength: 9000, longConversationWarningCharacterLimit: 20000),
-                 modelOptions: [
-                  .init(key: "mixtral_8x7b", name: "Mixtral-8x7b", displayName: "Mixtral 8x7b",
-                        displayMaker: "Powerful, fast and adaptive", engineType: .llamaRemote,
-                        category: .chat, access: .basicAndPremium,
-                        maxPageContentLength: 9000, longConversationWarningCharacterLimit: 20000),
-                  .init(key: "claude_instant", name: "Claude-Instant", displayName: "Claude Instant",
-                        displayMaker: "Strength in creative tasks", engineType: .llamaRemote,
-                        category: .chat, access: .basicAndPremium,
-                        maxPageContentLength: 9000, longConversationWarningCharacterLimit: 20000),
-                  .init(key: "llaba_2x13b", name: "Llama-2x13b", displayName: "Llama2 13b",
-                        displayMaker: "General purpose chat", engineType: .llamaRemote,
-                        category: .chat, access: .basic,
-                        maxPageContentLength: 9000, longConversationWarningCharacterLimit: 20000),
-                  .init(key: "llaba_2x70b", name: "Llama-2x70b", displayName: "Llama2 70b",
-                        displayMaker: "Advanced and accurate chat", engineType: .llamaRemote,
-                        category: .chat, access: .premium,
-                        maxPageContentLength: 9000, longConversationWarningCharacterLimit: 20000),
-                 ],
-                 onModelChanged: {
-    print("Model Changed To: \($0)")
-  }, onOptionSelected: { _ in })
+    modelOptions: [
+      .init(key: "mixtral_8x7b", name: "Mixtral-8x7b", displayName: "Mixtral 8x7b",
+            displayMaker: "Powerful, fast and adaptive", engineType: .llamaRemote,
+            category: .chat, access: .basicAndPremium,
+            maxPageContentLength: 9000, longConversationWarningCharacterLimit: 20000),
+      .init(key: "claude_instant", name: "Claude-Instant", displayName: "Claude Instant",
+            displayMaker: "Strength in creative tasks", engineType: .llamaRemote,
+            category: .chat, access: .basicAndPremium,
+            maxPageContentLength: 9000, longConversationWarningCharacterLimit: 20000),
+      .init(key: "llaba_2x13b", name: "Llama-2x13b", displayName: "Llama2 13b",
+            displayMaker: "General purpose chat", engineType: .llamaRemote,
+            category: .chat, access: .basic,
+            maxPageContentLength: 9000, longConversationWarningCharacterLimit: 20000),
+      .init(key: "llaba_2x70b", name: "Llama-2x70b", displayName: "Llama2 70b",
+            displayMaker: "Advanced and accurate chat", engineType: .llamaRemote,
+            category: .chat, access: .premium,
+            maxPageContentLength: 9000, longConversationWarningCharacterLimit: 20000)
+    ],
+    onModelChanged: {
+      print("Model Changed To: \($0)")
+    }, 
+    onOptionSelected: { _ in })
 }

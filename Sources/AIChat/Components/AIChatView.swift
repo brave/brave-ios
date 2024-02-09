@@ -80,8 +80,7 @@ public struct AIChatView: View {
         }, menuContent: {
           ScrollView {
             AIChatMenuView(
-              currentModel: model.currentModel,
-              modelOptions: model.models,
+              aiModel: model,
               onModelChanged: { modelKey in
                 model.changeModel(modelKey: modelKey)
               }, onOptionSelected: { option in

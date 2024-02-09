@@ -19,6 +19,15 @@ struct AIChatDefaultModelView: View {
   private var isPresentingPaywallPremium: Bool = false
 
   let onModelChanged: (String) -> Void
+  
+  var premiumStatus: String {
+    switch aiModel.premiumStatus {
+    case .active:
+      return "UNLIMITED"
+    default:
+      return "LIMITED"
+    }
+  }
 
   var body: some View {
     modelView
@@ -57,7 +66,7 @@ struct AIChatDefaultModelView: View {
                   .padding(.horizontal, 4.0)
               } else {
                 if model.access == .basicAndPremium {
-                  Text("LIMITED")
+                  Text(premiumStatus)
                     .font(.caption2)
                     .foregroundStyle(Color(braveSystemName: .blue50))
                     .padding(.horizontal, 4.0)
