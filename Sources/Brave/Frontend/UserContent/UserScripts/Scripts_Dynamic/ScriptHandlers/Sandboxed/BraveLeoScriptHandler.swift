@@ -6,6 +6,7 @@
 import Foundation
 import WebKit
 import os.log
+import AIChat
 
 class BraveLeoScriptHandler: NSObject, TabContentScript {
   fileprivate weak var tab: Tab?
@@ -16,6 +17,7 @@ class BraveLeoScriptHandler: NSObject, TabContentScript {
   }
   
   static let getMainArticle = "getMainArticle\(uniqueID)"
+  static let getPDFDocument = "getPDFDocument\(uniqueID)"
 
   static let scriptName = "BraveLeoScript"
   static let scriptId = UUID().uuidString
@@ -27,7 +29,8 @@ class BraveLeoScriptHandler: NSObject, TabContentScript {
     }
     
     return WKUserScript(source: secureScript(handlerNamesMap: ["$<message_handler>": messageHandlerName,
-                                                               "$<getMainArticle>": getMainArticle],
+                                                               "$<getMainArticle>": getMainArticle,
+                                                               "$<getPDFDocument>": getPDFDocument],
                                              securityToken: scriptId,
                                              script: script),
                         injectionTime: .atDocumentEnd,
@@ -45,7 +48,13 @@ class BraveLeoScriptHandler: NSObject, TabContentScript {
   }
 }
 
-extension BraveLeoScriptHandler {
+extension BraveLeoScriptHandler: AIChatJavascript {
+  
+  @MainActor
+  static func getPageContentType(webView: WKWebView) async -> String? {
+    return try? await webView.evaluateSafeJavaScriptThrowing(functionName: "document.contentType", contentWorld: Self.scriptSandbox, escapeArgs: false, asFunction: false) as? String
+  }
+  
   @MainActor
   static func getMainArticle(webView: WKWebView) async -> String? {
     do {
@@ -58,5 +67,25 @@ extension BraveLeoScriptHandler {
       Logger.module.error("Error Retrieving Main Article From Page: \(error.localizedDescription)")
       return nil
     }
+  }
+  
+  @MainActor
+  static func getPDFDocument(webView: WKWebView) async -> String? {
+    return try? await webView.callAsyncJavaScript(
+    """
+    const buffer = await window.fetch(window.location.href, {
+      method: 'GET',
+      priority: 'high'
+    });
+
+    var array = new Uint8Array(await buffer.arrayBuffer());
+    var binaryString = new Array(array.length);
+
+    for(var i = 0; i < array.length; i++) {
+      binaryString[i] = String.fromCharCode(array[i]);
+    }
+
+    return window.btoa(binaryString.join(''));
+    """, contentWorld: Self.scriptSandbox) as? String
   }
 }

@@ -3377,8 +3377,8 @@ extension BrowserViewController {
     let model = AIChatViewModel(
       braveCore: braveCore,
       webView: webView,
-      querySubmited: query,
-      pageContentFetcher: BraveLeoScriptHandler.getMainArticle)
+      script: BraveLeoScriptHandler.self,
+      querySubmited: query)
     
     let chatController = UIHostingController(rootView: AIChatView(
       model: model,

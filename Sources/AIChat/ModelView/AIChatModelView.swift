@@ -12,7 +12,7 @@ import Shared
 public class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   private var api: AIChat!
   private let webView: WKWebView?
-  private let pageContentFetcher: (WKWebView) async -> String?
+  private let script: any AIChatJavascript.Type
   public var querySubmited: String?
   
   @Published var siteInfo: AiChat.SiteInfo?
@@ -44,7 +44,7 @@ public class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
       return premiumStatus == .inactive && api.canShowPremiumPrompt
     }
     
-    set {
+    set {  // swiftlint:disable:this unused_setter_value
       objectWillChange.send()
       api.dismissPremiumPrompt()
     }
@@ -79,11 +79,11 @@ public class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   
   public init(braveCore: BraveCoreMain,
               webView: WKWebView?,
-              querySubmited: String? = nil,
-              pageContentFetcher: @escaping (WKWebView) async -> String?) {
+              script: any AIChatJavascript.Type,
+              querySubmited: String? = nil) {
     self.webView = webView
+    self.script = script
     self.querySubmited = querySubmited
-    self.pageContentFetcher = pageContentFetcher
     
     super.init()
 
@@ -125,7 +125,7 @@ public class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
     }
     
     Task { @MainActor in
-      completion(await pageContentFetcher(webView), false)
+      completion(await script.getMainArticle(webView: webView), false)
     }
   }
   

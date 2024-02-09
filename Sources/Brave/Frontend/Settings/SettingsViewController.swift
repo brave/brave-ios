@@ -676,7 +676,7 @@ class SettingsViewController: TableViewController {
             aiModel: .init(
               braveCore: self.braveCore,
               webView: self.tabManager.selectedTab?.webView, 
-              pageContentFetcher: BraveLeoScriptHandler.getMainArticle),
+              script: BraveLeoScriptHandler.self),
             isModallyPresented: false,
             openURL: { [unowned self] url in
             self.settingsDelegate?.settingsOpenURLInNewTab(url)
