@@ -3372,7 +3372,7 @@ extension BrowserViewController {
   }
   
   func openBraveLeo(with query: String? = nil) {
-    let webView = (query == nil) ? nil : tabManager.selectedTab?.webView
+    let webView = (query == nil) ? tabManager.selectedTab?.webView : nil
     
     let model = AIChatViewModel(
       braveCore: braveCore,
