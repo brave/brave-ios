@@ -115,6 +115,7 @@ struct AIChatSuggestionsView: View {
           Text(suggestion)
             .font(.callout)
             .foregroundColor(Color(braveSystemName: .textInteractive))
+            .multilineTextAlignment(.leading)
         }
         .padding(12.0)
         .background(

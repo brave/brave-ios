@@ -20,7 +20,11 @@ public struct AIChatAdvancedSettingsView: View {
   @ObservedObject 
   var aiModel: AIChatViewModel
   
-  @State private var appStoreConnectionErrorPresented = false
+  @State 
+  private var appStoreConnectionErrorPresented = false
+
+  @State 
+  private var isPaywallPresented = false
 
   var isModallyPresented: Bool
   
@@ -126,21 +130,21 @@ public struct AIChatAdvancedSettingsView: View {
             premiumActionView
           }
         } else {
-          if LeoProductInfo.shared.isComplete {
-            NavigationLink(destination: AIChatPaywallView()) {
-              premiumActionView
-            }
-          } else {
-            Button(action: {
+          Button(action: {
+            if LeoProductInfo.shared.isComplete {
+              isPaywallPresented = true
+            } else {
               appStoreConnectionErrorPresented = true
-            }) {
-              premiumActionView
             }
+          }) {
+            premiumActionView
           }
         }
-
       } header: {
         Text("SUBSCRIPTION")
+      }
+      .sheet(isPresented: $isPaywallPresented) {
+        AIChatPaywallView()
       }
       .alert(isPresented: $appStoreConnectionErrorPresented) {
           Alert(title: Text("App Store Error"), 
