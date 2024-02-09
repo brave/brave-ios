@@ -176,7 +176,9 @@ public class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   }
   
   func retryLastRequest() {
-    api.retryAPIRequest()
+    if !conversationHistory.isEmpty {
+      api.retryAPIRequest()
+    }
   }
   
   func clearAndResetData() {
