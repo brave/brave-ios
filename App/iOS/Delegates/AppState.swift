@@ -45,10 +45,6 @@ public class AppState {
           assertionFailure("Cannot set launching state twice!")
         }
         
-        /*if !isActive {
-          _ = BraveStoreSDK.shared
-        }*/
-        
         if isActive && !didBecomeActive {
           // We have to wait until pre 1.12 migration is done until we proceed with database
           // initialization. This is because Database container may change. See bugs #3416, #3377.

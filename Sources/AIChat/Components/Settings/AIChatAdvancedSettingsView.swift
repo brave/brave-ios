@@ -9,13 +9,14 @@ import BraveCore
 import Strings
 import DesignSystem
 import Preferences
+import StoreKit
 
 public struct AIChatAdvancedSettingsView: View {
   @Environment(\.presentationMode)
   @Binding private var presentationMode
   
   @ObservedObject 
-  var subscriptionManager = LeoSubscriptionManager.shared
+  private var storeSDK = BraveStoreSDK.shared
 
   @ObservedObject 
   var aiModel: AIChatViewModel
@@ -60,6 +61,98 @@ public struct AIChatAdvancedSettingsView: View {
     }
   }
   
+  private var subscriptionMenuTitle: String {
+    guard let state = storeSDK.leoSubscriptionStatus?.state else {
+      return "Go Premium"
+    }
+    
+    switch state {
+    case .subscribed: return "Manage Subscription"
+    case .expired, .inBillingRetryPeriod, .inGracePeriod, .revoked: return "Go Premium"
+    default: return "Go Premium"
+    }
+  }
+  
+  private var subscriptionStatusTitle: String {
+    if storeSDK.leoMonthlyProduct != nil {
+      return "Monthly Subscription"
+    }
+    
+    if storeSDK.leoYearlyProduct != nil {
+      return "Yearly Subscription"
+    }
+    
+    return "Unknown"
+  }
+  
+  private var subscriptionTimeLeftTitle: String {
+    let formatSubscriptionPeriod = { (subscription: StoreKit.Product.SubscriptionPeriod) -> String? in
+      let plural = subscription.value != 1
+      switch subscription.unit {
+      case .day:
+        return plural ? "\(subscription.value) days" : "day"
+      case .week:
+        return plural ? "\(subscription.value) weeks" : "week"
+      case .month:
+        return plural ? "\(subscription.value) months" : "month"
+      case .year:
+        return plural ? "\(subscription.value) years" : "year"
+      @unknown default:
+        return nil
+      }
+    }
+    
+    if let leoMonthlySubscription = storeSDK.leoMonthlyProduct?.subscription?.subscriptionPeriod {
+      return formatSubscriptionPeriod(leoMonthlySubscription) ?? "N/A"
+    }
+
+    if let leoYearlySubscription = storeSDK.leoYearlyProduct?.subscription?.subscriptionPeriod {
+      return formatSubscriptionPeriod(leoYearlySubscription) ?? "N/A"
+    }
+    
+    return "N/A"
+  }
+  
+  private var expirationDateTitle: String {
+    let dateFormatter = DateFormatter().then {
+      $0.locale = Locale.current
+      $0.dateFormat = "MM/dd/yy"
+    }
+    
+    let periodToDate = { (subscription: StoreKit.Product.SubscriptionPeriod) -> Date? in
+      let now = Date.now
+      if subscription.value == 0 {
+        return now
+      }
+      
+      switch subscription.unit {
+      case .day:
+        return Calendar.current.date(byAdding: .day, value: subscription.value, to: now)
+      case .week:
+        return Calendar.current.date(byAdding: .weekOfYear, value: subscription.value, to: now)
+      case .month:
+        return Calendar.current.date(byAdding: .month, value: subscription.value, to: now)
+      case .year:
+        return Calendar.current.date(byAdding: .year, value: subscription.value, to: now)
+      @unknown default:
+        return nil
+      }
+    }
+    
+    if let leoMonthlySubscription = storeSDK.leoMonthlyProduct?.subscription?.subscriptionPeriod,
+       let date = periodToDate(leoMonthlySubscription) {
+      return dateFormatter.string(from: date)
+    }
+
+    if let leoYearlySubscription = storeSDK.leoYearlyProduct?.subscription?.subscriptionPeriod,
+       let date = periodToDate(leoYearlySubscription) {
+      return dateFormatter.string(from: date)
+    }
+    
+    return "N/A"
+  }
+  
+  @ViewBuilder
   private var settingsView: some View {
     List {
       Section {
@@ -86,12 +179,12 @@ public struct AIChatAdvancedSettingsView: View {
       }
       
       Section {
-        if subscriptionManager.subscriptionState == .purchased {
+        if storeSDK.leoSubscriptionStatus?.state == .subscribed {
           LabelDetailView(title: "Status",
-                          detail: subscriptionManager.activeType.title)
+                          detail: subscriptionStatusTitle)
           
           LabelDetailView(title: "Expires", 
-                          detail: subscriptionManager.expirationDateFormatted ?? "")
+                          detail: expirationDateTitle)
           
           Button(action: {
             openURL(.brave.braveLeoLinkReceiptProd)
@@ -102,7 +195,7 @@ public struct AIChatAdvancedSettingsView: View {
             )
           }
           
-          if subscriptionManager.isSandbox {
+          if storeSDK.enviroment != .production {
             Button(action: {
               openURL(.brave.braveLeoLinkReceiptStaging)
             }) {
@@ -168,9 +261,10 @@ public struct AIChatAdvancedSettingsView: View {
     .listStyle(.insetGrouped)
   }
 
+  @ViewBuilder
   var premiumActionView: some View {
     HStack {
-      LabelView(title: subscriptionManager.subscriptionState.actionTitle)
+      LabelView(title: subscriptionMenuTitle)
       Spacer()
       Image(braveSystemName: "leo.launch")
         .foregroundStyle(Color(braveSystemName: .iconDefault))
