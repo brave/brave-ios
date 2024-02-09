@@ -241,10 +241,6 @@ public struct AIChatView: View {
                   hideKeyboard()
                   scrollViewReader.scrollTo(lastMessageId, anchor: .bottom)
                 }
-                .onChange(of: model.conversationHistory.last?.text) { _ in
-                  hideKeyboard()
-                  scrollViewReader.scrollTo(lastMessageId, anchor: .bottom)
-                }
                 .onChange(of: customFeedbackIndex) { _ in
                   hideKeyboard()
                   withAnimation {
