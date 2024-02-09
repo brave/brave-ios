@@ -34,7 +34,7 @@ private struct AIChatIntroBubbleView<ImageOverlay: View>: View {
           Button {
             onSummarizePage()
           } label: {
-            Text("Summarize this page")
+            Text(Strings.AIChat.summarizePageActionTitle)
               .font(.callout)
               .foregroundColor(Color(braveSystemName: .textInteractive))
           }
@@ -70,7 +70,7 @@ struct AIChatIntroView: View {
   
   var body: some View {
     VStack(spacing: 0.0) {
-      Text("Hi, I'm Leo!")
+      Text(Strings.AIChat.chatIntroTitle)
         .font(.largeTitle.weight(.semibold))
         .foregroundStyle(Color(braveSystemName: .textPrimary))
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -78,7 +78,7 @@ struct AIChatIntroView: View {
         .padding(.horizontal, 24.0)
         .padding(.bottom, 8.0)
       
-      Text("An AI-powered intelligent assistant, built right into Brave.")
+      Text(Strings.AIChat.chatIntroSubTitle)
         .font(.title.weight(.semibold))
         .foregroundStyle(Color(braveSystemName: .textTertiary))
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -87,8 +87,10 @@ struct AIChatIntroView: View {
         .padding(.bottom, 36.0)
       
       AIChatIntroBubbleView(
-        title: "Need help with a website?",
-        subtitle: onSummarizePage != nil ? "I can help you summarizing articles, expanding on a site's content and much more. Not sure where to start? Try this:" : "I can help you summarizing articles, expanding on a site's content and much more.",
+        title: Strings.AIChat.chatIntroWebsiteHelpTitle,
+        subtitle: onSummarizePage != nil
+          ? Strings.AIChat.chatIntroWebsiteHelpSubtitlePageSummarize
+          : Strings.AIChat.chatIntroWebsiteHelpSubtitleArticleSummarize,
         image: Image("leo-intro-website-shape", bundle: .module)
           .renderingMode(.template)
           .foregroundStyle(Color(braveSystemName: .purple20)),
@@ -99,9 +101,8 @@ struct AIChatIntroView: View {
       .padding([.horizontal, .bottom], 12.0)
       
       AIChatIntroBubbleView(
-        title: "Just want to chat?",
-                            
-        subtitle: "Ask me anything! We can talk about any topic you want. I'm always learning and improving to provide better answers.",
+        title: Strings.AIChat.chatIntroJustTalkTitle,
+        subtitle: Strings.AIChat.chatIntroJustTalkSubTitle,
         image: Image("leo-intro-star-burst", bundle: .module)
           .renderingMode(.template)
           .foregroundStyle(Color(braveSystemName: .teal20)),

@@ -126,11 +126,22 @@ private struct AIChatDropdownMenu<Item>: View where Item: RawRepresentable, Item
 
 private struct AIChatDropdownView: View {
   enum Options: String, CaseIterable, Identifiable {
-    case notHelpful = "Answer is not helpful"
-    case notWorking = "Something doesn't work"
-    case other = "Other"
+    case notHelpful
+    case notWorking
+    case other
     
     var id: Self { self }
+
+    var rawValue: String {
+      switch self {
+      case .notHelpful:
+        return Strings.AIChat.feedbackOptionTitleNotHelpful
+      case .notWorking:
+        return Strings.AIChat.feedbackOptionTitleNotHelpful
+      case .other:
+        return Strings.AIChat.feedbackOptionTitleNotHelpful
+      }
+    }
   }
   
   @Binding
@@ -142,7 +153,7 @@ private struct AIChatDropdownView: View {
   var body: some View {
     VStack {
       HStack(spacing: 0.0) {
-        Text("What's your feedback about?")
+        Text(Strings.AIChat.feedbackOptionsViewTitle)
           .font(.caption)
           .fontWeight(.semibold)
           .foregroundStyle(Color(braveSystemName: .textPrimary))
@@ -199,7 +210,7 @@ private struct AIChatFeedbackInputView: View {
         
         if text.isEmpty {
           VStack {
-            Text("Provide feedback here")
+            Text(Strings.AIChat.feedbackInputViewTitle)
               .font(.subheadline)
               .foregroundColor(Color(braveSystemName: .textTertiary))
               .disabled(true)
@@ -298,7 +309,7 @@ struct AIChatFeedbackView: View {
   
   var body: some View {
     VStack {
-      Text("Provide Brave AI Feedback")
+      Text(Strings.AIChat.feedbackViewMainTitle)
         .font(.body)
         .fontWeight(.semibold)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -308,7 +319,7 @@ struct AIChatFeedbackView: View {
         .zIndex(999)
         .padding(.horizontal)
       
-      Text("Provide Feedback here")
+      Text(Strings.AIChat.feedbackInputViewTitle)
         .font(.caption)
         .fontWeight(.semibold)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -327,7 +338,7 @@ struct AIChatFeedbackView: View {
         Button {
           onCancel()
         } label: {
-          Text("Cancel")
+          Text(Strings.CancelString)
             .font(.callout)
             .fontWeight(.semibold)
             .foregroundStyle(Color(braveSystemName: .textSecondary))
@@ -337,7 +348,7 @@ struct AIChatFeedbackView: View {
         Button {
           onSubmit(AIChatDropdownView.Options.allCases[categoryIndex].rawValue, feedbackText)
         } label: {
-          Text("Submit")
+          Text(Strings.AIChat.feedbackSubmitActionTitle)
         }
         .buttonStyle(BraveFilledButtonStyle(size: .large))
       }

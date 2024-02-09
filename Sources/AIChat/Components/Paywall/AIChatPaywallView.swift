@@ -59,7 +59,7 @@ struct AIChatPaywallView: View {
             tierSelection
               .padding([.bottom, .horizontal], 8.0)
           }
-          .navigationTitle("Leo Premium")
+          .navigationTitle(Strings.AIChat.paywallViewTitle)
           .navigationBarTitleDisplayMode(.inline)
           .toolbar {
             ToolbarItemGroup(placement: .confirmationAction) {

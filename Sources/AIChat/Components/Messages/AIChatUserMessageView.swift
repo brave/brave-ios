@@ -37,6 +37,7 @@ struct AIChatUserMessageView: View {
 
 @available(iOS 17.0, *)
 #Preview(traits: .sizeThatFitsLayout) {
-  AIChatUserMessageView(prompt: "Does it work with Apple devices?")
+  AIChatUserMessageView(
+    prompt: "Does it work with Apple devices?")
     .previewLayout(.sizeThatFits)
 }

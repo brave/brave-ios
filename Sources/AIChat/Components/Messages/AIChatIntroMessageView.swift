@@ -30,7 +30,7 @@ struct AIChatIntroMessageView: View {
       .padding(.trailing, 16.0)
       
       VStack(spacing: 0.0) {
-        Text("Chat")
+        Text(Strings.AIChat.introMessageTitle)
           .font(.headline)
           .foregroundStyle(Color(braveSystemName: .textPrimary))
           .multilineTextAlignment(.leading)

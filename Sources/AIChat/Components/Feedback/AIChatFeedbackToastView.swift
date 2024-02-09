@@ -109,9 +109,11 @@ struct AIChatFeedbackToastView: View {
     case .error(let message):
       return message
     case .success(let isLiked, _):
-      return isLiked ? "Answer Liked" : "Answer Disliked"
+      return isLiked 
+      ? Strings.AIChat.feedbackSuccessAnswerLikedTitle
+      : Strings.AIChat.feedbackSuccessAnswerDisLikedTitle
     case .submitted:
-      return "Feedback sent successfully"
+      return Strings.AIChat.feedbackSubmittedTitle
     }
   }
   
@@ -133,7 +135,7 @@ struct AIChatFeedbackToastView: View {
           toastType = .none
           onAddFeedback?()
         } label: {
-          Text("Add Feedback")
+          Text(Strings.AIChat.addFeedbackActionTitle)
         }
       }
     case .error, .submitted:
