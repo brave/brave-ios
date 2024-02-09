@@ -16,7 +16,6 @@ enum AIChatPaymentStatus {
 }
 
 struct AIChatPaywallView: View {
-  
   @Environment(\.presentationMode) 
   @Binding private var presentationMode
   
@@ -39,7 +38,8 @@ struct AIChatPaywallView: View {
   private var shouldDismiss: Bool = false
   
   // Timer used for resetting the restore action to prevent infinite loading
-  @State private var iapRestoreTimer: Timer?
+  @State 
+  private var iapRestoreTimer: Timer?
   
   var premiumUpgrageSuccessful: ((SubscriptionType) -> Void)?
 

@@ -110,7 +110,6 @@ struct PremiumUpsellActionView: View {
 }
 
 struct PremiumUpsellTitleView: View {
-  
   let upsellType: AIChatPremiumUpsellView.UpsellType
   
   let isPaywallPresented: Bool
@@ -151,7 +150,6 @@ struct PremiumUpsellTitleView: View {
 }
 
 struct PremiumUpsellDetailView: View {
-  
   let isPaywallPresented: Bool
   
   var body: some View {

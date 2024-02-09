@@ -7,6 +7,8 @@ import SwiftUI
 import DesignSystem
 
 struct AIChatContextLimitErrorView: View {
+  var newChatStarted: (() -> Void)?
+
   var body: some View {
     HStack(alignment: .top, spacing: 0.0) {
       Image(braveSystemName: "leo.warning.circle-filled")
@@ -14,16 +16,16 @@ struct AIChatContextLimitErrorView: View {
         .padding([.bottom, .trailing])
       
       VStack(spacing: 0.0) {
-        Text("This conversation is too long and cannot continue.\nThere may be other models available with which Leo is capable of maintaining accuracy for longer conversations.")
+        Text(Strings.AIChat.contextLimitErrorTitle)
           .font(.callout)
           .foregroundColor(Color(braveSystemName: .textPrimary))
           .padding(.bottom)
         
         HStack {
           Button(action: {
-            
+            newChatStarted?()
           }) {
-            Text("New chat")
+            Text(Strings.AIChat.newChatActionTitle)
               .font(.body.weight(.semibold))
               .foregroundColor(Color(.white))
           }

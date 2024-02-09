@@ -26,7 +26,6 @@ private struct MenuScaleTransition: GeometryEffect {
 }
 
 private struct DropdownView<ActionView, MenuView>: View where ActionView: View, MenuView: View {
-  
   @Binding
   var showMenu: Bool
   

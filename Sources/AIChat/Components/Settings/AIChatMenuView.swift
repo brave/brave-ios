@@ -7,7 +7,6 @@ import SwiftUI
 import BraveCore
 
 private struct AIChatMenuHeaderView: View {
-  
   let icon: String
   let title: String
   
@@ -29,7 +28,6 @@ private struct AIChatMenuHeaderView: View {
 }
 
 private struct AIChatMenuItemView<RightAccessoryView: View>: View {
-  
   let title: String
   let subtitle: String
   let isSelected: Bool

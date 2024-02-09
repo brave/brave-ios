@@ -19,17 +19,6 @@ struct AIChatPromptInputView: View {
 
   var body: some View {
     HStack(spacing: 0.0) {
-//      Image(braveSystemName: "leo.slash")
-//        .foregroundStyle(Color(braveSystemName: .iconDefault))
-//        .padding(.horizontal, 4.0)
-//        .padding(.vertical, 4.0)
-//        .background(
-//          RoundedRectangle(cornerRadius: 4.0, style: .continuous)
-//            .strokeBorder(Color(braveSystemName: .dividerSubtle), lineWidth: 1.0)
-//        )
-//        .clipShape(RoundedRectangle(cornerRadius: 4.0, style: .continuous))
-//        .padding()
-      
       TextField(
         "",
         text: $prompt,

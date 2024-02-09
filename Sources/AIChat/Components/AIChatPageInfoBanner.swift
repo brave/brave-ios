@@ -36,6 +36,8 @@ struct AIChatPageInfoBanner: View {
 
 @available(iOS 17.0, *)
 #Preview(traits: .sizeThatFitsLayout) {
-  AIChatPageInfoBanner(url: nil, pageTitle: "Sonos Era 300 and Era 100...'s Editors’Choice Awards: The Best AIs and Services for 2023")
-    .previewLayout(.sizeThatFits)
+  AIChatPageInfoBanner(
+    url: nil,
+    pageTitle: "Sonos Era 300 and Era 100...'s Editors’Choice Awards: The Best AIs and Services for 2023")
+  .previewLayout(.sizeThatFits)
 }

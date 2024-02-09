@@ -172,9 +172,10 @@ public struct AIChatView: View {
                             ),
                             onSubmit: { category, feedback in
                               Task { @MainActor in
-                                await model.submitFeedback(category: category,
-                                                           feedback: feedback,
-                                                           ratingId: "\(index)")
+                                await model.submitFeedback(
+                                  category: category,
+                                  feedback: feedback,
+                                  ratingId: "\(index)")
                               }
                               
                               customFeedbackIndex = nil
@@ -348,36 +349,48 @@ public struct AIChatView: View {
   
   @ViewBuilder
   private func responseContextMenuItems(for turnIndex: Int, turn: AiChat.ConversationTurn) -> some View {
-    AIChatResponseMessageViewContextMenuButton(title: "Regenerate", icon: Image(braveSystemName: "leo.refresh"), onSelected: {
-      model.retryLastRequest()
-    })
+    AIChatResponseMessageViewContextMenuButton(
+      title: "Regenerate",
+      icon: Image(braveSystemName: "leo.refresh"),
+      onSelected: {
+        model.retryLastRequest()
+      })
     
-    AIChatResponseMessageViewContextMenuButton(title: "Copy", icon: Image(braveSystemName: "leo.copy"), onSelected: {
-      UIPasteboard.general.setValue(turn.text, forPasteboardType: "public.plain-text")
-    })
+    AIChatResponseMessageViewContextMenuButton(
+      title: "Copy",
+      icon: Image(braveSystemName: "leo.copy"),
+      onSelected: {
+        UIPasteboard.general.setValue(turn.text, forPasteboardType: "public.plain-text")
+      })
     
-    AIChatResponseMessageViewContextMenuButton(title: "Like Answer", icon: Image(braveSystemName: "leo.thumb.up"), onSelected: {
-      Task { @MainActor in
-        let ratingId = await model.rateConversation(isLiked: true, turnId: UInt(turnIndex))
-        if let ratingId = ratingId {
-          feedbackToast = .success(isLiked: true)
-        } else {
-          feedbackToast = .error(message: "Failed to update rating")
+    AIChatResponseMessageViewContextMenuButton(
+      title: "Like Answer",
+      icon: Image(braveSystemName: "leo.thumb.up"),
+      onSelected: {
+        Task { @MainActor in
+          let ratingId = await model.rateConversation(isLiked: true, turnId: UInt(turnIndex))
+          if ratingId != nil {
+            feedbackToast = .success(isLiked: true)
+          } else {
+            feedbackToast = .error(message: "Failed to update rating")
+          }
         }
-      }
-    })
+      })
     
-    AIChatResponseMessageViewContextMenuButton(title: "Dislike Answer", icon: Image(braveSystemName: "leo.thumb.down"), onSelected: {
-      Task { @MainActor in
-        let ratingId = await model.rateConversation(isLiked: false, turnId: UInt(turnIndex))
-        if let ratingId = ratingId {
-          feedbackToast = .success(isLiked: false, onAddFeedback: {
-            customFeedbackIndex = turnIndex
-          })
-        } else {
-          feedbackToast = .error(message: "Failed to update rating")
+    AIChatResponseMessageViewContextMenuButton(
+      title: "Dislike Answer",
+      icon: Image(braveSystemName: "leo.thumb.down"),
+      onSelected: {
+        Task { @MainActor in
+          let ratingId = await model.rateConversation(isLiked: false, turnId: UInt(turnIndex))
+          if ratingId != nil {
+            feedbackToast = .success(isLiked: false, onAddFeedback: {
+              customFeedbackIndex = turnIndex
+            })
+          } else {
+            feedbackToast = .error(message: "Failed to update rating")
+          }
         }
-      }
     })
   }
   
@@ -415,11 +428,14 @@ public struct AIChatView: View {
             .padding()
             .background(Color(braveSystemName: .pageBackground))
           
-          AIChatPageInfoBanner(url: nil, pageTitle: "Sonos Era 300 and Era 100...'s Editors’Choice Awards: The Best AIs and Services for 2023")
+          AIChatPageInfoBanner(
+            url: nil,
+            pageTitle: "Sonos Era 300 and Era 100...'s Editors’Choice Awards: The Best AIs and Services for 2023")
             .padding([.horizontal, .bottom])
             .background(Color(braveSystemName: .pageBackground))
         
-          AIChatResponseMessageView(prompt: "After months of leaks and some recent coordinated teases from the company itself, Sonos is finally officially announcing the Era 300 and Era 100 speakers. Both devices go up for preorder today — the Era 300 costs $449 and the Era 100 is $249 — and they’ll be available to purchase in stores beginning March 28th.\n\nAs its unique design makes clear, the Era 300 represents a completely new type of speaker for the company; it’s designed from the ground up to make the most of spatial audio music and challenge competitors like the HomePod and Echo Studio.")
+          AIChatResponseMessageView(
+            prompt: "After months of leaks and some recent coordinated teases from the company itself, Sonos is finally officially announcing the Era 300 and Era 100 speakers. Both devices go up for preorder today — the Era 300 costs $449 and the Era 100 is $249 — and they’ll be available to purchase in stores beginning March 28th.\n\nAs its unique design makes clear, the Era 300 represents a completely new type of speaker for the company; it’s designed from the ground up to make the most of spatial audio music and challenge competitors like the HomePod and Echo Studio.")
             .padding()
             .background(Color(braveSystemName: .containerBackground))
 
@@ -440,7 +456,9 @@ public struct AIChatView: View {
           )
           .padding()
           
-          AIChatSuggestionsView(geometry: geometry, suggestions: ["What Bluetooth version does it use?", "Summarize this page?", "What is Leo?", "What can the Leo assistant do for me?"])
+          AIChatSuggestionsView(
+            geometry: geometry,
+            suggestions: ["What Bluetooth version does it use?", "Summarize this page?", "What is Leo?", "What can the Leo assistant do for me?"])
             .padding()
         }
       }

@@ -16,7 +16,7 @@ struct AIChatNetworkErrorView: View {
         .padding([.bottom, .trailing])
       
       VStack(spacing: 0.0) {
-        Text("There was a network issue connecting to Leo, check your connection and try again.")
+        Text(Strings.AIChat.networkErrorViewTitle)
           .font(.callout)
           .foregroundColor(Color(braveSystemName: .textPrimary))
           .padding(.bottom)
@@ -25,7 +25,7 @@ struct AIChatNetworkErrorView: View {
           Button(action: {
             onRetryRequest()
           }) {
-            Text("Retry")
+            Text(Strings.AIChat.retryActionTitle)
               .font(.body.weight(.semibold))
               .foregroundColor(Color(.white))
           }
@@ -45,7 +45,5 @@ struct AIChatNetworkErrorView: View {
 }
 
 #Preview {
-  AIChatNetworkErrorView() {
-    print("Retrying Request")
-  }
+  AIChatNetworkErrorView() {}
 }

@@ -131,7 +131,9 @@ struct AIChatSuggestionsView: View {
 @available(iOS 17.0, *)
 #Preview(traits: .sizeThatFitsLayout) {
   GeometryReader { geometry in
-    AIChatSuggestionsView(geometry: geometry, suggestions: ["What Bluetooth version does it use?", "Summarize this page?", "What is Leo?", "What can the Leo assistant do for me?"])
-      .previewLayout(.sizeThatFits)
+    AIChatSuggestionsView(
+      geometry: geometry,
+      suggestions: ["What Bluetooth version does it use?", "Summarize this page?", "What is Leo?", "What can the Leo assistant do for me?"])
+    .previewLayout(.sizeThatFits)
   }
 }

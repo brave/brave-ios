@@ -60,9 +60,5 @@ public struct AIChatTermsAndConditionsView: View {
 }
 
 #Preview {
-  AIChatTermsAndConditionsView() {
-    print("Terms Accepted")
-  } onOpenURL: { url in
-    print("OPEN URL: \(url)")
-  }
+  AIChatTermsAndConditionsView() {} onOpenURL: { _ in }
 }
