@@ -125,11 +125,15 @@ public struct AIChatView: View {
                         
                       },
                       dismissAction: {
-                        if let basicModel = model.models.first(where: { $0.access == .basic }) {
-                          model.changeModel(modelKey: basicModel.key)
-                          model.retryLastRequest()
+                        if model.apiError == .rateLimitReached {
+                          if let basicModel = model.models.first(where: { $0.access == .basic }) {
+                            model.changeModel(modelKey: basicModel.key)
+                            model.retryLastRequest()
+                          } else {
+                            // TODO: LOG Error Switching Model
+                          }
                         } else {
-                          // TODO: LOG Error Switching Model
+                          model.shouldShowPremiumPrompt = false
                         }
                       }
                     )

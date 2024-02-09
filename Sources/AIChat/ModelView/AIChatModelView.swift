@@ -40,7 +40,14 @@ public class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   }
   
   public var shouldShowPremiumPrompt: Bool {
-    return premiumStatus == .inactive && api.canShowPremiumPrompt
+    get {
+      return premiumStatus == .inactive && api.canShowPremiumPrompt
+    }
+    
+    set {
+      objectWillChange.send()
+      api.dismissPremiumPrompt()
+    }
   }
   
   public var hasValidWebPage: Bool {
