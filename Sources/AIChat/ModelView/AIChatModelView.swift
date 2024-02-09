@@ -108,7 +108,22 @@ public class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
   public func getPageTitle() -> String? {
     if isPageConnected {
       if let webView = webView {
-        return webView.title
+        // Return the Page Title
+        if let title = webView.title, !title.isEmpty {
+          return title
+        }
+        
+        guard let url = webView.url else {
+          return nil
+        }
+        
+        // Return the URL domain/host
+        if url.pathExtension.isEmpty {
+          return URLFormatter.formatURLOrigin(forDisplayOmitSchemePathAndTrivialSubdomains: url.absoluteString)
+        }
+        
+        // Return the file name with extension
+        return url.lastPathComponent
       }
     }
     return "Leo"
@@ -125,6 +140,18 @@ public class AIChatViewModel: NSObject, AIChatDelegate, ObservableObject {
     }
     
     Task { @MainActor in
+      if await script.getPageContentType(webView: webView) == "application/pdf" {
+        if let base64EncodedPDF = await script.getPDFDocument(webView: webView) {
+          completion(await AIChatPDFRecognition.parse(pdfData: base64EncodedPDF), false)
+          return
+        }
+        
+        // Could not fetch PDF for parsing
+        completion(nil, false)
+        return
+      }
+      
+      // Fetch regular page content
       completion(await script.getMainArticle(webView: webView), false)
     }
   }

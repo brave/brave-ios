@@ -8,8 +8,14 @@ import WebKit
 import PDFKit
 
 class AIChatPDFRecognition {
-  static func parse(url: URL) async -> String? {
-    guard let pdf = PDFDocument(url: url) else { return nil }
+  static func parse(pdfData: String) async -> String? {
+    guard let data = Data(base64Encoded: pdfData) else {
+      return nil
+    }
+    
+    guard let pdf = PDFDocument(data: data) else {
+      return nil
+    }
     
     let pageCount = pdf.pageCount
     let documentContent = NSMutableAttributedString()
