@@ -182,8 +182,6 @@ public class BraveStoreSDK: AppStoreSDK {
     return didRestore
     #else
     do {
-      try await AppStoreReceipt.sync()
-      
       for product in BraveStoreProduct.allCases {
         try await self.updateSkusPurchaseState(for: product)
       }
@@ -201,8 +199,7 @@ public class BraveStoreSDK: AppStoreSDK {
         if transaction.productID == BraveStoreProduct.leoMonthly.rawValue ||
             transaction.productID == BraveStoreProduct.leoYearly.rawValue {
           // Preferences.AIChat.subscriptionExpirationDate.value = transaction.expirationDate
-          
-          try await AppStoreReceipt.sync()
+
           try await self.updateSkusPurchaseState(for: product)
         }
       }

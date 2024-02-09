@@ -41,6 +41,36 @@ public class AppStoreReceipt {
     }
   }
   
+  #if USE_SK_REFRESH_RECEIPT
+  private class AppStoreReceiptRestorer: NSObject, SKRequestDelegate {
+    private let request = SKReceiptRefreshRequest()
+    private var onRefreshComplete: ((Error?) -> Void)?
+    
+    override init() {
+      super.init()
+      self.request.delegate = self
+    }
+    
+    func restoreTransactions(with listener: @escaping (Error?) -> Void) {
+      if onRefreshComplete == nil {
+        self.onRefreshComplete = listener
+        self.request.start()
+      }
+    }
+    
+    func requestDidFinish(_ request: SKRequest) {
+      self.onRefreshComplete?(nil)
+      self.onRefreshComplete = nil
+      self.request.delegate = nil
+    }
+
+    func request(_ request: SKRequest, didFailWithError error: Error) {
+      self.onRefreshComplete?(error)
+      self.onRefreshComplete = nil
+      self.request.delegate = nil
+    }
+  }
+  #else
   private class AppStoreReceiptRestorer: NSObject, SKPaymentTransactionObserver {
     private let queue = SKPaymentQueue()
     private var onRefreshComplete: ((Error?) -> Void)?
@@ -113,11 +143,12 @@ public class AppStoreReceipt {
     }
     
     func paymentQueue(_ queue: SKPaymentQueue, restoreCompletedTransactionsFailedWithError error: Error) {
-      self.onRefreshComplete?(SKError(.storeProductNotAvailable))
+      self.onRefreshComplete?(error)
       self.onRefreshComplete = nil
       self.queue.remove(self)
     }
   }
+  #endif
 }
 
 public class AppStoreSDK: ObservableObject {
