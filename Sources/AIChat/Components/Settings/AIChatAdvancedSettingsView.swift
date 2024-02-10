@@ -329,7 +329,7 @@ public struct AIChatAdvancedSettingsView: View {
           }
         } else {
           Button(action: {
-            if LeoProductInfo.shared.isComplete {
+            if storeSDK.isLeoProductsLoaded {
               isPaywallPresented = true
             } else {
               appStoreConnectionErrorPresented = true

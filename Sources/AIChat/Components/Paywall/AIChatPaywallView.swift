@@ -15,15 +15,20 @@ enum AIChatPaymentStatus {
   case failure
 }
 
+enum AIChatSubscriptionTier {
+  case monthly
+  case yearly
+}
+
 struct AIChatPaywallView: View {
   @Environment(\.presentationMode) 
   @Binding private var presentationMode
   
   @State 
-  private var selectedTierType: SubscriptionType = .monthly
+  private var selectedTierType: AIChatSubscriptionTier = .monthly
   
   @State
-  private var availableTierTypes: [SubscriptionType] = [.monthly]
+  private var availableTierTypes: [AIChatSubscriptionTier] = [.monthly]
   
   @ObservedObject
   private(set) var storeSDK = BraveStoreSDK.shared
@@ -41,7 +46,7 @@ struct AIChatPaywallView: View {
   @State 
   private var iapRestoreTimer: Timer?
   
-  var premiumUpgrageSuccessful: ((SubscriptionType) -> Void)?
+  var premiumUpgrageSuccessful: ((AIChatSubscriptionTier) -> Void)?
 
   var body: some View {
     NavigationView {
