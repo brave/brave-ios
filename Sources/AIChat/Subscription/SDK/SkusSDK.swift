@@ -9,8 +9,8 @@ import BraveCore
 // https://github.com/brave/brave-core/blob/master/components/skus/browser/rs/lib/src/models.rs#L137
 
 /// Returned by credentialsSummary
-struct CredentialSummary: Codable {
-  let order: Order
+struct SkusCredentialSummary: Codable {
+  let order: SkusOrder
   let remainingCredentialCount: UInt   // 512
   let expiresAt: Date?                 // 2024-02-06T16:18:43
   let active: Bool                     // true
@@ -26,7 +26,7 @@ struct CredentialSummary: Codable {
 }
 
 /// Returned by refreshOrder
-struct Order: Codable {
+struct SkusOrder: Codable {
   let id: String              // UUID
   let createdAt: Date         // 2024-02-05T23:14:19.260973
   let currency: String        // USD
@@ -37,7 +37,7 @@ struct Order: Codable {
   let status: String          // paid
   let expiresAt: Date?        // 2024-02-05T23:14:19.260973
   let lastPaidAt: Date?       // 2024-02-05T23:14:19.260973
-  let items: [OrderItem]
+  let items: [SkusOrderItem]
   
   enum CodingKeys: String, CodingKey {
     case id
@@ -54,7 +54,7 @@ struct Order: Codable {
     case lastPaidAt = "last_paid_at"
   }
   
-  struct OrderItem: Codable {
+  struct SkusOrderItem: Codable {
     let id: String                         // UUID
     let orderId: String                    // UUID
     let sku: String                        // brave-leo-premium
@@ -66,7 +66,7 @@ struct Order: Codable {
     let subTotal: Double                   // 15.0
     let location: String                   // leo.bravesoftware.com
     let productDescription: String         // Premium access to Leo
-    let credentialType: CredentialType     // time-limited-v2
+    let credentialType: SkusCredentialType     // time-limited-v2
     
     enum CodingKeys: String, CodingKey {
       case id
@@ -83,7 +83,7 @@ struct Order: Codable {
       case credentialType = "credential_type"
     }
     
-    enum CredentialType: String, Codable {
+    enum SkusCredentialType: String, Codable {
       case singleUse = "single-use"
       case timeLimited = "time-limited"
       case timeLimitedv2 = "time-limited-v2"
@@ -234,7 +234,7 @@ class SkusSDK {
   /// Updates the local cached order via the given Order-ID
   @MainActor
   @discardableResult
-  func refreshOrder(orderId: String) async throws -> Order {
+  func refreshOrder(orderId: String) async throws -> SkusOrder {
     guard let skusService = skusService else {
       throw SkusError.skusServiceUnavailable
     }
@@ -247,12 +247,12 @@ class SkusSDK {
       return try self.jsonDecoder.decode(T.self, from: data)
     }
     
-    return try await decode(skusService.refreshOrder(product.skusDomain, orderId: orderId)) as Order
+    return try await decode(skusService.refreshOrder(product.skusDomain, orderId: orderId)) as SkusOrder
   }
   
   ///  Fetch and refresh order details of a subscription
   @MainActor
-  func fetchAndRefreshOrderDetails() async throws -> (orderId: String, orderDetails: Order) {
+  func fetchAndRefreshOrderDetails() async throws -> (orderId: String, orderDetails: SkusOrder) {
     do {
       let orderId = try await createOrder()
       let order = try await refreshOrder(orderId: orderId)
@@ -270,7 +270,7 @@ class SkusSDK {
   
   /// Fetches Credentials Summary.
   @MainActor
-  func credentialsSummary() async throws -> CredentialSummary {
+  func credentialsSummary() async throws -> SkusCredentialSummary {
     func decode<T: Decodable>(_ response: String) throws -> T {
       guard let data = response.data(using: .utf8) else {
         throw SkusError.decodingError
@@ -283,7 +283,7 @@ class SkusSDK {
       throw SkusError.skusServiceUnavailable
     }
     
-    return try await decode(skusService.credentialSummary(product.skusDomain)) as CredentialSummary
+    return try await decode(skusService.credentialSummary(product.skusDomain)) as SkusCredentialSummary
   }
   
   @MainActor

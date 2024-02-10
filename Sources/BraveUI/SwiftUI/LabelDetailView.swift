@@ -7,9 +7,9 @@ import SwiftUI
 
 public struct LabelDetailView: View {
   let title: String
-  var detail: String
+  var detail: String?
 
-  public init(title: String, detail: String) {
+  public init(title: String, detail: String?) {
     self.title = title
     self.detail = detail
   }
@@ -18,9 +18,14 @@ public struct LabelDetailView: View {
     HStack {
       LabelView(title: title)
       Spacer()
-      Text(detail)
-        .foregroundColor(Color(.braveLabel))
-        .font(.body)
+      
+      if let detail = detail {
+        Text(detail)
+          .foregroundColor(Color(.braveLabel))
+          .font(.body)
+      } else {
+        ProgressView()
+      }
     }
   }
 }

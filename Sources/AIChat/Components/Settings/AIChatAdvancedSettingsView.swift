@@ -11,6 +11,46 @@ import DesignSystem
 import Preferences
 import StoreKit
 
+private class SkusOrderInfo: ObservableObject {
+  @Published
+  private(set) var credentialSummary: SkusCredentialSummary?
+  
+  private var isLoading = true
+  
+  var orderStatus: OrderStatus {
+    if isLoading {
+      return .loading
+    }
+    
+    guard let order = credentialSummary?.order else {
+      return .inactive
+    }
+    
+    if let expiresAt = order.expiresAt {
+      return Date() > expiresAt ? .expired : .active
+    }
+    
+    return .inactive
+  }
+  
+  func fetchOrder() {
+    Task { @MainActor in
+      let credentialSummary = try? await SkusSDK(product: .leoMonthly).credentialsSummary()
+      
+      self.isLoading = false
+      
+      self.credentialSummary = credentialSummary
+    }
+  }
+  
+  enum OrderStatus {
+    case loading
+    case inactive
+    case expired
+    case active
+  }
+}
+
 public struct AIChatAdvancedSettingsView: View {
   @Environment(\.presentationMode)
   @Binding private var presentationMode
@@ -19,7 +59,10 @@ public struct AIChatAdvancedSettingsView: View {
   private var storeSDK = BraveStoreSDK.shared
 
   @ObservedObject 
-  var aiModel: AIChatViewModel
+  private var aiModel: AIChatViewModel
+  
+  @ObservedObject
+  private var orderInfo: SkusOrderInfo
   
   @State 
   private var appStoreConnectionErrorPresented = false
@@ -35,9 +78,10 @@ public struct AIChatAdvancedSettingsView: View {
     self.aiModel = aiModel
     self.isModallyPresented = isModallyPresented
     self.openURL = openURL
+    self.orderInfo = SkusOrderInfo()
     
-    Task { @MainActor in
-      await aiModel.getPremiumStatus()
+    if storeSDK.leoSubscriptionStatus == nil {
+      self.orderInfo.fetchOrder()
     }
   }
 
@@ -61,28 +105,62 @@ public struct AIChatAdvancedSettingsView: View {
     }
   }
   
+  private var purchasedLeoProduct: BraveStoreProduct? {
+    for product in storeSDK.purchasedProducts.all {
+      if product.id == BraveStoreProduct.leoMonthly.rawValue {
+        return .leoMonthly
+      }
+      
+      if product.id == BraveStoreProduct.leoYearly.rawValue {
+        return .leoYearly
+      }
+    }
+    return nil
+  }
+  
   private var subscriptionMenuTitle: String {
-    guard let state = storeSDK.leoSubscriptionStatus?.state else {
-      return "Go Premium"
+    // Display the info from the AppStore
+    if let state = storeSDK.leoSubscriptionStatus?.state {
+      switch state {
+      case .subscribed: 
+        return "Manage Subscription"
+      case .expired, .inBillingRetryPeriod, .inGracePeriod, .revoked:
+        return "Go Premium"
+      default: 
+        return "Go Premium"
+      }
     }
     
-    switch state {
-    case .subscribed: return "Manage Subscription"
-    case .expired, .inBillingRetryPeriod, .inGracePeriod, .revoked: return "Go Premium"
-    default: return "Go Premium"
+    // Display the info from SkusSDK
+    if orderInfo.orderStatus == .active {
+      return "Manage Subscription"
     }
+    
+    // No order found
+    return "Go Premium"
   }
   
   private var subscriptionStatusTitle: String {
-    if storeSDK.leoMonthlyProduct != nil {
-      return "Monthly Subscription"
+    // Display the info from the AppStore
+    if storeSDK.leoSubscriptionStatus != nil {
+      let purchasedProduct = self.purchasedLeoProduct
+      if purchasedProduct == .leoMonthly {
+        return "Monthly Subscription"
+      }
+      
+      if purchasedProduct == .leoYearly {
+        return "Yearly Subscription"
+      }
     }
     
-    if storeSDK.leoYearlyProduct != nil {
-      return "Yearly Subscription"
+    // Display the info from SkusSDK
+    // SkusSDK only returns `brave-leo-premium` as the sku for the Order Items
+    if orderInfo.orderStatus == .active {
+      return "Premium"
     }
     
-    return "Unknown"
+    // No order found
+    return "None"
   }
   
   private var subscriptionTimeLeftTitle: String {
@@ -102,12 +180,14 @@ public struct AIChatAdvancedSettingsView: View {
       }
     }
     
-    if let leoMonthlySubscription = storeSDK.leoMonthlyProduct?.subscription?.subscriptionPeriod {
-      return formatSubscriptionPeriod(leoMonthlySubscription) ?? "N/A"
-    }
-
-    if let leoYearlySubscription = storeSDK.leoYearlyProduct?.subscription?.subscriptionPeriod {
-      return formatSubscriptionPeriod(leoYearlySubscription) ?? "N/A"
+    if storeSDK.leoSubscriptionStatus != nil {
+      if let leoMonthlySubscription = storeSDK.leoMonthlyProduct?.subscription?.subscriptionPeriod {
+        return formatSubscriptionPeriod(leoMonthlySubscription) ?? "N/A"
+      }
+      
+      if let leoYearlySubscription = storeSDK.leoYearlyProduct?.subscription?.subscriptionPeriod {
+        return formatSubscriptionPeriod(leoYearlySubscription) ?? "N/A"
+      }
     }
     
     return "N/A"
@@ -139,14 +219,22 @@ public struct AIChatAdvancedSettingsView: View {
       }
     }
     
-    if let leoMonthlySubscription = storeSDK.leoMonthlyProduct?.subscription?.subscriptionPeriod,
-       let date = periodToDate(leoMonthlySubscription) {
-      return dateFormatter.string(from: date)
+    // Display the info from the AppStore
+    if storeSDK.leoSubscriptionStatus != nil {
+      if let leoMonthlySubscription = storeSDK.leoMonthlyProduct?.subscription?.subscriptionPeriod,
+         let date = periodToDate(leoMonthlySubscription) {
+        return dateFormatter.string(from: date)
+      }
+      
+      if let leoYearlySubscription = storeSDK.leoYearlyProduct?.subscription?.subscriptionPeriod,
+         let date = periodToDate(leoYearlySubscription) {
+        return dateFormatter.string(from: date)
+      }
     }
-
-    if let leoYearlySubscription = storeSDK.leoYearlyProduct?.subscription?.subscriptionPeriod,
-       let date = periodToDate(leoYearlySubscription) {
-      return dateFormatter.string(from: date)
+    
+    // Display the info from SkusSDK
+    if let order = orderInfo.credentialSummary?.order, let expiresAt = order.expiresAt {
+      return dateFormatter.string(from: expiresAt)
     }
     
     return "N/A"
@@ -179,48 +267,62 @@ public struct AIChatAdvancedSettingsView: View {
       }
       
       Section {
-        if storeSDK.leoSubscriptionStatus?.state == .subscribed {
-          LabelDetailView(title: "Status",
-                          detail: subscriptionStatusTitle)
+        if storeSDK.leoSubscriptionStatus?.state == .subscribed ||
+            orderInfo.orderStatus == .active ||
+            orderInfo.orderStatus == .loading {
           
-          LabelDetailView(title: "Expires", 
-                          detail: expirationDateTitle)
-          
-          Button(action: {
-            openURL(.brave.braveLeoLinkReceiptProd)
-          }) {
-            LabelView(
-              title: "Link purchase to your Brave account",
-              subtitle: "Link your Appstore purchase to your Brave account to use Leo on other devices."
-            )
+          if storeSDK.leoSubscriptionStatus?.state != nil || orderInfo.credentialSummary != nil {
+            LabelDetailView(title: "Status",
+                            detail: subscriptionStatusTitle)
+            
+            LabelDetailView(title: "Expires",
+                            detail: expirationDateTitle)
+          } else {
+            // Subscription information is loading
+            LabelDetailView(title: "Status",
+                            detail: nil)
+            
+            LabelDetailView(title: "Expires",
+                            detail: nil)
           }
           
-          if storeSDK.enviroment != .production {
+          if storeSDK.leoSubscriptionStatus?.state != nil || orderInfo.orderStatus != .loading {
             Button(action: {
-              openURL(.brave.braveLeoLinkReceiptStaging)
+              openURL(.brave.braveLeoLinkReceiptProd)
             }) {
               LabelView(
-                title: "[Staging] Link receipt"
+                title: "Link purchase to your Brave account",
+                subtitle: "Link your Appstore purchase to your Brave account to use Leo on other devices."
               )
             }
             
+            if storeSDK.enviroment != .production {
+              Button(action: {
+                openURL(.brave.braveLeoLinkReceiptStaging)
+              }) {
+                LabelView(
+                  title: "[Staging] Link receipt"
+                )
+              }
+              
+              Button(action: {
+                openURL(.brave.braveLeoLinkReceiptDev)
+              }) {
+                LabelView(
+                  title: "[Dev] Link receipt"
+                )
+              }
+            }
+            
             Button(action: {
-              openURL(.brave.braveLeoLinkReceiptDev)
+              guard let url = URL.apple.manageSubscriptions else { return }
+              if UIApplication.shared.canOpenURL(url) {
+                // Opens Apple's 'manage subscription' screen
+                UIApplication.shared.open(url, options: [:])
+              }
             }) {
-              LabelView(
-                title: "[Dev] Link receipt"
-              )
+              premiumActionView
             }
-          }
-          
-          Button(action: {
-            guard let url = URL.apple.manageSubscriptions else { return }
-            if UIApplication.shared.canOpenURL(url) {
-              // Opens Apple's 'manage subscription' screen
-              UIApplication.shared.open(url, options: [:])
-            }
-          }) {
-            premiumActionView
           }
         } else {
           Button(action: {

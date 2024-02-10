@@ -85,7 +85,7 @@ public class BraveStoreSDK: AppStoreSDK {
     
     // Fetch the AppStore receipt
     Task.detached {
-      try await AppStoreReceipt.sync()
+      try? await AppStoreReceipt.sync()
     }
     
     observers.append($allProducts.sink(receiveValue: onProductsUpdated(_:)))
@@ -138,11 +138,7 @@ public class BraveStoreSDK: AppStoreSDK {
   }
   
   public func refreshAllSkusOrders() {
-//    Task { @MainActor in
-//      if let orderId = Preferences.AIChat.subscriptionOrderId.value {
-//        try await SkusSDK(product: .leoMonthly).refreshOrder(orderId: orderId)
-//      }
-//    }
+    
   }
   
   public func restorePurchase(_ product: BraveStoreProduct) async -> Bool {
@@ -242,12 +238,6 @@ public class BraveStoreSDK: AppStoreSDK {
       // Statuses apply the entire group
       vpnSubscriptionStatus = try? await vpnSubscriptions.first?.status.first
       leoSubscriptionStatus = try? await leoSubscriptions.first?.status.first
-      
-      // Update SkusSDK
-      /*let storeProducts = products.compactMap({ BraveStoreProduct(rawValue: $0.id) })
-      for product in storeProducts {
-        try? await self.refreshOrder(for: product)
-      }*/
     }
   }
   
