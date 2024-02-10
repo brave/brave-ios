@@ -315,9 +315,12 @@ public struct AIChatAdvancedSettingsView: View {
             }
             
             Button(action: {
-              guard let url = URL.apple.manageSubscriptions else { return }
+              guard let url = URL.apple.manageSubscriptions else {
+                return
+              }
+              
+              // Opens Apple's 'manage subscription' screen
               if UIApplication.shared.canOpenURL(url) {
-                // Opens Apple's 'manage subscription' screen
                 UIApplication.shared.open(url, options: [:])
               }
             }) {

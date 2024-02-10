@@ -4,6 +4,7 @@
 // file, You can obtain one at https://mozilla.org/MPL/2.0/.
 
 import Foundation
+import os.log
 import BraveCore
 
 // https://github.com/brave/brave-core/blob/master/components/skus/browser/rs/lib/src/models.rs#L137
@@ -151,7 +152,7 @@ class SkusSDK {
       do {
         return try Data(contentsOf: receiptUrl).base64EncodedString
       } catch {
-        // Logger.module.error("Failed to retrieve AppStore Receipt: \(error.localizedDescription)")
+        Logger.module.error("Failed to retrieve AppStore Receipt: \(error.localizedDescription)")
         throw SkusError.invalidReceiptData
       }
     }
@@ -185,7 +186,7 @@ class SkusSDK {
       do {
         return (product: product, value: try JSONEncoder().encode(json).base64EncodedString)
       } catch {
-        // Logger.module.error("Failed to serialize AppStore Receipt for LocalStorage: \(error.localizedDescription)")
+        Logger.module.error("Failed to serialize AppStore Receipt for LocalStorage: \(error.localizedDescription)")
         throw SkusError.cannotEncodeReceipt
       }
     }

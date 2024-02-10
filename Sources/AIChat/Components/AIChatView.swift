@@ -10,6 +10,7 @@ import BraveCore
 import Shared
 import Preferences
 import BraveUI
+import os.log
 
 public struct AIChatView: View {
   @ObservedObject
@@ -95,10 +96,13 @@ public struct AIChatView: View {
                   isPremiumPaywallPresented.toggle()
                   
                 case .managePremium:
-                  if BraveStoreSDK.shared.enviroment == .production {
-                    openURL(URL(string: "https://account.brave.com")!)
-                  } else {
-                    openURL(URL(string: "https://account.bravesoftware.com")!)
+                  guard let url = URL.apple.manageSubscriptions else {
+                    return
+                  }
+                  
+                  // Opens Apple's 'manage subscription' screen
+                  if UIApplication.shared.canOpenURL(url) {
+                    UIApplication.shared.open(url, options: [:])
                   }
                   presentationMode.wrappedValue.dismiss()
                   
@@ -141,7 +145,7 @@ public struct AIChatView: View {
                             model.changeModel(modelKey: basicModel.key)
                             model.retryLastRequest()
                           } else {
-                            // TODO: LOG Error Switching Model
+                            Logger.module.error("No basic models available")
                           }
                         } else {
                           model.shouldShowPremiumPrompt = false
@@ -218,7 +222,6 @@ public struct AIChatView: View {
                       }
                         .padding()
                     } else if model.apiError == .rateLimitReached {
-                      // TODO: If the user is already premium, are they also rate-limited?
                       AIChatPremiumUpsellView(
                         upsellType: .rateLimit,
                         upgradeAction: {
@@ -229,7 +232,7 @@ public struct AIChatView: View {
                             model.changeModel(modelKey: basicModel.key)
                             model.retryLastRequest()
                           } else {
-                            // TODO: LOG Error Switching Model
+                            Logger.module.error("No basic models available")
                           }
                         }
                       )

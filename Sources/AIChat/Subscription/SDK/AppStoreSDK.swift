@@ -5,6 +5,7 @@
 
 import Foundation
 import StoreKit
+import os.log
 
 public protocol AppStoreProduct: RawRepresentable<String>, CaseIterable {
   var subscriptionGroup: String { get }
@@ -370,7 +371,7 @@ public class AppStoreSDK: ObservableObject {
           autoRenewable.append(product)
           
         default:
-          // TODO: Log Error - Unknown Product
+          Logger.module.error("Fetched Product of Unknown Type: \(product.type.rawValue)")
           break
         }
       }
