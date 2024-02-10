@@ -80,20 +80,32 @@ public struct AIChatView: View {
         }, menuContent: {
           ScrollView {
             AIChatMenuView(
-              aiModel: model,
+              premiumStatus: model.premiumStatus,
+              currentModel: model.currentModel,
+              modelOptions: model.models,
               onModelChanged: { modelKey in
                 model.changeModel(modelKey: modelKey)
-              }, onOptionSelected: { option in
+              },
+              onOptionSelected: { option in
                 switch option {
+                case .newChat:
+                  break
+                  
                 case .premium:
                   isPremiumPaywallPresented.toggle()
+                  
+                case .managePremium:
+                  if BraveStoreSDK.shared.enviroment == .production {
+                    openURL(URL(string: "https://account.brave.com")!)
+                  } else {
+                    openURL(URL(string: "https://account.bravesoftware.com")!)
+                  }
+                  presentationMode.wrappedValue.dismiss()
+                  
                 case .advancedSettings:
                   isAdvancedSettingsPresented.toggle()
-                default:
-                  break
                 }
-              }
-            )
+              })
             .frame(minWidth: 300)
             .osAvailabilityModifiers({ view in
               if #available(iOS 16.4, *) {

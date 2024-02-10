@@ -69,7 +69,10 @@ private struct AIChatMenuItemView<RightAccessoryView: View>: View {
 }
 
 enum AIChatMenuOptionTypes {
-  case newChat, premium, advancedSettings
+  case newChat
+  case premium
+  case managePremium
+  case advancedSettings
   
   var title: String {
     switch self {
@@ -77,6 +80,8 @@ enum AIChatMenuOptionTypes {
       return "New Chat"
     case .premium:
       return "Go Premium"
+    case .managePremium:
+      return "Manage Subscription"
     case .advancedSettings:
       return "Advanced Settings"
     }
@@ -88,6 +93,8 @@ enum AIChatMenuOptionTypes {
       return "leo.erase"
     case .premium:
       return "leo.lock.open"
+    case .managePremium:
+      return "leo.lock.open"
     case .advancedSettings:
       return "leo.settings"
     }
@@ -95,6 +102,7 @@ enum AIChatMenuOptionTypes {
 }
 
 struct AIChatMenuView: View {
+  let premiumStatus: AiChat.PremiumStatus
   let currentModel: AiChat.Model
   let modelOptions: [AiChat.Model]
   let onModelChanged: (String) -> Void
@@ -105,29 +113,6 @@ struct AIChatMenuView: View {
   
   @State 
   private var appStoreConnectionErrorPresented = false
-  
-  var premiumStatus: String
- 
-  init(aiModel: AIChatViewModel, 
-       onModelChanged: @escaping (String) -> Void,
-       onOptionSelected: @escaping (AIChatMenuOptionTypes) -> Void) {
-    self.currentModel = aiModel.currentModel
-    self.modelOptions = aiModel.models
-    self.premiumStatus = aiModel.premiumStatus == .active ? "UNLIMITED" : "LIMITED"
-    self.onModelChanged = onModelChanged
-    self.onOptionSelected = onOptionSelected
-  }
-  
-  fileprivate init(currentModel: AiChat.Model,
-                   modelOptions: [AiChat.Model],
-                   onModelChanged: @escaping (String) -> Void,
-                   onOptionSelected: @escaping (AIChatMenuOptionTypes) -> Void) {
-    self.currentModel = currentModel
-    self.modelOptions = modelOptions
-    self.premiumStatus = "UNLIMITED"
-    self.onModelChanged = onModelChanged
-    self.onOptionSelected = onOptionSelected
-  }
 
   var body: some View {
     LazyVStack(spacing: 0.0) {
@@ -155,7 +140,7 @@ struct AIChatMenuView: View {
         }, label: {
           AIChatMenuItemView(title: model.displayName, subtitle: model.displayMaker, isSelected: model.key == currentModel.key) {
             if model.access == .basicAndPremium {
-              Text(premiumStatus)
+              Text(premiumStatus == .active ? "UNLIMITED" : "LIMITED")
                 .font(.caption2)
                 .foregroundStyle(Color(braveSystemName: .blue50))
                 .padding(.horizontal, 4.0)
@@ -189,7 +174,7 @@ struct AIChatMenuView: View {
       Color(braveSystemName: .dividerSubtle)
         .frame(height: 1.0)
       
-      generateMenuActionItems(menuOption: .premium)
+      generateMenuActionItems(menuOption: premiumStatus == .active ? .managePremium : .premium)
       
       Color(braveSystemName: .dividerSubtle)
         .frame(height: 1.0)
@@ -228,6 +213,7 @@ struct AIChatMenuView: View {
 
 #Preview {
   AIChatMenuView(
+    premiumStatus: .inactive,
     currentModel:
       .init(key: "mixtral_8x7b", name: "Mixtral-8x7b", displayName: "Mixtral 8x7b",
             displayMaker: "Powerful, fast and adaptive", engineType: .llamaRemote,
