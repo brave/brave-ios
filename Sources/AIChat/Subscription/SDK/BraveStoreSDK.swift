@@ -7,20 +7,35 @@ import Foundation
 import StoreKit
 import Combine
 import Preferences
+import os.log
 
+/// The Store Environment for use with Debugging APIs
 public enum BraveStoreEnvironment: String {
+  /// The production environment
   case production
+  
+  /// The sandbox environment
   case sandbox
+  
+  /// Xcode environment - A debugger is attached
   case xcode
 }
 
+/// A structure representing a Product offered by Brave's Store
 public enum BraveStoreProduct: String, AppStoreProduct, CaseIterable {
+  /// VPN Monthly AppStore SKU
   case vpnMonthly = "bravevpn.monthly"
+  
+  /// VPN Yearly AppStore SKU
   case vpnYearly = "bravevpn.yearly"
   
+  /// Leo Monthly AppStore SKU
   case leoMonthly = "braveleo.monthly"
+  
+  /// Leo Yearly AppStore SKU
   case leoYearly = "braveleo.yearly"
   
+  /// The Title of the SKU Group
   public var subscriptionGroup: String {
     switch self {
     case .vpnMonthly, .vpnYearly: return "Brave VPN"
@@ -28,8 +43,10 @@ public enum BraveStoreProduct: String, AppStoreProduct, CaseIterable {
     }
   }
   
-  public var itemSku: String {
+  /// The Brave Store's SKU
+  public var itemSKU: String {
     // These are from the `Order.items.sku` and are NOT the same as the AppStore Skus
+    // These are Brave's Skus
     switch self {
     case .vpnMonthly: return "brave-firewall-vpn-premium"
     case .vpnYearly: return "brave-firewall-vpn-premium-year"
@@ -38,6 +55,7 @@ public enum BraveStoreProduct: String, AppStoreProduct, CaseIterable {
     }
   }
   
+  /// The SKU's associated environment domain
   public var skusDomain: String {
     #if DEBUG
     switch self {
@@ -53,34 +71,42 @@ public enum BraveStoreProduct: String, AppStoreProduct, CaseIterable {
   }
 }
 
+/// A structure for handling Brave Store transactions, products, and purchases
 public class BraveStoreSDK: AppStoreSDK {
   
   public static let shared = BraveStoreSDK()
   
   // MARK: - VPN
   
+  /// The AppStore Vpn Monthly Product offering
   @Published
   private(set) var vpnMonthlyProduct: Product?
   
+  /// The AppStore Vpn Yearly Product offering
   @Published
   private(set) var vpnYearlyProduct: Product?
   
+  /// The AppStore Vpn customer purchase Subscription Status
   @Published
   private(set) var vpnSubscriptionStatus: Product.SubscriptionInfo.Status?
   
   // MARK: - LEO
   
+  /// The AppStore Leo Monthly Product offering
   @Published
   private(set) var leoMonthlyProduct: Product?
   
+  /// The AppStore Leo Monthly Product offering
   @Published
   private(set) var leoYearlyProduct: Product?
   
+  /// The AppStore Leo customer purchase Subscription Status
   @Published
   private(set) var leoSubscriptionStatus: Product.SubscriptionInfo.Status?
   
   // MARK: - Private
   
+  /// All observers this uses
   private var observers = [AnyCancellable]()
   
   private override init() {
@@ -91,22 +117,30 @@ public class BraveStoreSDK: AppStoreSDK {
       try? await AppStoreReceipt.sync()
     }*/
     
+    // Observe Product Updates
     observers.append($allProducts.sink(receiveValue: onProductsUpdated(_:)))
+    
+    // Observe Customer Purchase Updates
     observers.append($purchasedProducts.sink(receiveValue: onPurchasesUpdated(_:)))
   }
   
   // MARK: - Public
   
+  /// A list of all products the Brave Store offers
   public override var allAppStoreProducts: [any AppStoreProduct] {
     return BraveStoreProduct.allCases
   }
   
+  /// The current store environment
   public var enviroment: BraveStoreEnvironment {
+    // Retrieve the subscription renewal information
     guard let renewalInfo = [vpnSubscriptionStatus, leoSubscriptionStatus].compactMap({ $0 }).first?.renewalInfo else {
+      // There is currently no subscription so check if there was a restored receipt
       if Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt" {
         return .sandbox
       }
       
+      // If the application has a Parent Process-ID then it is being debugged
       if getppid() != 1 {
         return .xcode
       }
@@ -114,6 +148,7 @@ public class BraveStoreSDK: AppStoreSDK {
       return .production
     }
     
+    // Retrieve the current environment from StoreKit's Renewal Information
     switch renewalInfo {
     case .verified(let renewalInfo), .unverified(let renewalInfo, _):
       if #available(iOS 16.0, *) {
@@ -124,6 +159,7 @@ public class BraveStoreSDK: AppStoreSDK {
     }
   }
   
+  /// A boolean indicating whether or not all the VPN product offerings has been loaded
   public var isVpnProductsLoaded: Bool {
     if vpnMonthlyProduct != nil || vpnYearlyProduct != nil {
       return true
@@ -132,6 +168,7 @@ public class BraveStoreSDK: AppStoreSDK {
     return false
   }
   
+  /// A boolean indicating whether or not all the Leo product offerings has been loaded
   public var isLeoProductsLoaded: Bool {
     if leoMonthlyProduct != nil || leoYearlyProduct != nil {
       return true
@@ -140,10 +177,14 @@ public class BraveStoreSDK: AppStoreSDK {
     return false
   }
   
+  /// Refreshes all the Skus SDK orders
   public func refreshAllSkusOrders() {
     
   }
   
+  /// Restores a single purchased product
+  /// - Parameter product: The product whose purchase receipt to restore
+  /// - Returns: Returns true if receipt restoration was successful. False otherwise
   public func restorePurchase(_ product: BraveStoreProduct) async -> Bool {
     // SKPaymentQueue.default().restoreCompletedTransactions()
     if await currentTransaction(for: product) != nil {
@@ -154,6 +195,8 @@ public class BraveStoreSDK: AppStoreSDK {
     return false
   }
   
+  /// Restores all purchased products
+  /// - Returns: Returns true if receipt restoration was successful. False otherwise
   @MainActor
   public func restorePurchases() async -> Bool {
     #if STOREKIT2
@@ -161,6 +204,7 @@ public class BraveStoreSDK: AppStoreSDK {
     for await result in Transaction.currentEntitlements {
       if case .verified(let transaction) = result {
         if let product = BraveStoreProduct(rawValue: transaction.productID) {
+          // Update subscription status for the product
           switch product {
           case .vpnMonthly, .vpnYearly:
             vpnSubscriptionStatus = await transaction.subscriptionStatus
@@ -173,7 +217,7 @@ public class BraveStoreSDK: AppStoreSDK {
             try await self.updateSkusPurchaseState(for: product)
             didRestore = true
           } catch {
-            // TODO: Log Error
+            Logger.module.error("[BraveStoreSDK] - Failed to restore purchased product receipt: \(error)")
           }
         }
       }
@@ -186,19 +230,24 @@ public class BraveStoreSDK: AppStoreSDK {
       }
       return true
     } catch {
+      Logger.module.error("[BraveStoreSDK] - Failed to restore purchased product receipt: \(error)")
       return false
     }
     #endif
   }
   
+  /// Purchases the specified product using In-App purchases
+  /// - Parameter product: The product the customer wishes to purchase
+  /// - Throws: An exception if purchasing fails for any reason.
+  ///           Purchase may be successful with the AppStore, but fail with SkusSDK.
   @MainActor
   public func purchase(product: BraveStoreProduct) async throws {
     if let subscription = await subscription(for: product) {
       if let transaction = try await super.purchase(subscription) {
         if transaction.productID == BraveStoreProduct.leoMonthly.rawValue ||
             transaction.productID == BraveStoreProduct.leoYearly.rawValue {
-          // Preferences.AIChat.subscriptionExpirationDate.value = transaction.expirationDate
-
+          
+          // Update Skus SDK Purchase
           try await self.updateSkusPurchaseState(for: product)
         }
       }
@@ -207,10 +256,12 @@ public class BraveStoreSDK: AppStoreSDK {
   
   // MARK: - Internal
   
+  /// Observer function called when AppStore products have been fetched or updated
   private func onProductsUpdated(_ products: Products) {
     // Process only subscriptions at this time as Brave has no other products
     let products = products.all.filter({ $0.type == .autoRenewable })
     
+    // No products to process
     if products.isEmpty {
       return
     }
@@ -224,10 +275,12 @@ public class BraveStoreSDK: AppStoreSDK {
     leoYearlyProduct = products.first(where: { $0.id == BraveStoreProduct.leoYearly.rawValue })
   }
   
+  /// Observer function called when AppStore customer purchased products have been fetched or updated
   private func onPurchasesUpdated(_ products: Products) {
     // Process only subscriptions at this time as Brave has no other products
     let products = products.all.filter({ $0.type == .autoRenewable }).filter({ $0.subscription != nil })
     
+    // No products to process
     if products.isEmpty {
       return
     }
@@ -235,6 +288,7 @@ public class BraveStoreSDK: AppStoreSDK {
     Task { @MainActor [weak self] in
       guard let self = self else { return }
       
+      // Retrieve subscription statuses
       let vpnSubscriptions = products.filter({ $0.id == BraveStoreProduct.vpnMonthly.rawValue || $0.id == BraveStoreProduct.vpnYearly.rawValue }).compactMap({ $0.subscription })
       let leoSubscriptions = products.filter({ $0.id == BraveStoreProduct.leoMonthly.rawValue || $0.id == BraveStoreProduct.leoYearly.rawValue }).compactMap({ $0.subscription })
       
@@ -244,6 +298,8 @@ public class BraveStoreSDK: AppStoreSDK {
     }
   }
   
+  /// Refreshes a Skus-SDK product order
+  /// - Throws: An exception if refreshing the order information fails
   @MainActor
   private func refreshOrder(for product: BraveStoreProduct) async throws {
     // This SDK currently only supports Leo
@@ -253,13 +309,16 @@ public class BraveStoreSDK: AppStoreSDK {
     case .leoMonthly, .leoYearly: break
     }
     
+    // Attempt to update the Application Bundle's receipt, if necessary
     if (try? AppStoreReceipt.receipt) == nil {
       try await AppStoreReceipt.sync()
     }
     
+    // Create a Skus-SDK for the specified product
     let skusSDK = BraveSkusSDK(product: product)
     
-    // Retrieve the cached Order-ID or create a new order
+    // Create an order for the AppStore receipt
+    // If an order already exists, refreshes the order information
     if let orderId = Preferences.AIChat.subscriptionOrderId.value {
       try await skusSDK.refreshOrder(orderId: orderId)
       return
@@ -268,6 +327,9 @@ public class BraveStoreSDK: AppStoreSDK {
     throw BraveSkusSDK.SkusError.cannotCreateOrder
   }
   
+  /// Updates the Skus-SDK credentials and order information
+  /// - Parameter product: The product whose information to update
+  /// - Throws: An exception if updating the purchase information fails
   @MainActor
   private func updateSkusPurchaseState(for product: BraveStoreProduct) async throws {
     // This SDK currently only supports Leo
@@ -277,13 +339,16 @@ public class BraveStoreSDK: AppStoreSDK {
     case .leoMonthly, .leoYearly: break
     }
     
+    // Attempt to update the Application Bundle's receipt, if necessary
     if (try? AppStoreReceipt.receipt) == nil {
       try await AppStoreReceipt.sync()
     }
     
+    // Create a Skus-SDK for the specified product
     let skusSDK = BraveSkusSDK(product: product)
     
-    // Retrieve the cached Order-ID or create a new order
+    // Create an order for the AppStore receipt
+    // If an order already exists, refreshes the order information
     var orderId = Preferences.AIChat.subscriptionOrderId.value
     if orderId == nil {
       orderId = try await skusSDK.createOrder()
@@ -294,7 +359,7 @@ public class BraveStoreSDK: AppStoreSDK {
       throw BraveSkusSDK.SkusError.cannotCreateOrder
     }
 
-    // There's an existing order refresh it if it's expired
+    // There's an existing with no expiry date, refresh it
     var expiryDate = Preferences.AIChat.subscriptionExpirationDate.value
     if expiryDate == nil {
       let order = try await skusSDK.refreshOrder(orderId: orderId)
@@ -316,12 +381,8 @@ public class BraveStoreSDK: AppStoreSDK {
     // There is an order, and an expiry date, but no credentials
     // Fetch the credentials
     if !Preferences.AIChat.subscriptionHasCredentials.value {
-      let errorCode = try await skusSDK.fetchCredentials(orderId: orderId)
-      Preferences.AIChat.subscriptionHasCredentials.value = errorCode.isEmpty
-      
-      if !errorCode.isEmpty {
-        throw BraveSkusSDK.SkusError.invalidReceiptData
-      }
+      try await skusSDK.fetchCredentials(orderId: orderId)
+      Preferences.AIChat.subscriptionHasCredentials.value = true
     }
   }
 }
