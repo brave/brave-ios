@@ -104,7 +104,7 @@ window.__firefox__.includeOnce('BraveLeoScript', function($) {
         return null;
       }
       
-      const buffer = await window.fetch(window.location.href, {
+      var buffer = await window.fetch(window.location.href, {
         method: 'GET',
         priority: 'high'
       });
