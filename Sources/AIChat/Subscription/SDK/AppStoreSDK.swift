@@ -14,15 +14,18 @@ public protocol AppStoreProduct: RawRepresentable<String>, CaseIterable {
 public class AppStoreReceipt {
   private init() {}
   
-  static var receipt: String? {
-    guard let receiptUrl = Bundle.main.appStoreReceiptURL else {
-      return nil
-    }
-    
-    do {
-      return try Data(contentsOf: receiptUrl).base64EncodedString
-    } catch {
-      return nil
+  public static var receipt: String {
+    get throws {
+      guard let receiptUrl = Bundle.main.appStoreReceiptURL else {
+        throw AppStoreReceiptError.invalidReceiptURL
+      }
+      
+      do {
+        return try Data(contentsOf: receiptUrl).base64EncodedString
+      } catch {
+        Logger.module.error("Failed to retrieve AppStore Receipt: \(error.localizedDescription)")
+        throw AppStoreReceiptError.invalidReceiptData
+      }
     }
   }
 
@@ -40,6 +43,11 @@ public class AppStoreReceipt {
         }
       }
     }
+  }
+  
+  enum AppStoreReceiptError: Error {
+    case invalidReceiptURL
+    case invalidReceiptData
   }
   
   #if USE_SK_REFRESH_RECEIPT

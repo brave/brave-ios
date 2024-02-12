@@ -35,7 +35,7 @@ private class SkusOrderInfo: ObservableObject {
   
   func fetchOrder() {
     Task { @MainActor in
-      let credentialSummary = try? await SkusSDK(product: .leoMonthly).credentialsSummary()
+      let credentialSummary = try? await BraveSkusSDK(product: .leoMonthly).credentialsSummary()
       
       self.isLoading = false
       
@@ -156,7 +156,15 @@ public struct AIChatAdvancedSettingsView: View {
     // Display the info from SkusSDK
     // SkusSDK only returns `brave-leo-premium` as the sku for the Order Items
     if orderInfo.orderStatus == .active {
-      return "Premium"
+      if orderInfo.credentialSummary?.order.items.first?.sku == "brave-leo-premium" {
+        return "Monthly Subscription"
+      }
+      
+      if orderInfo.credentialSummary?.order.items.first?.sku == "brave-leo-premium-year" {
+        return "Yearly Subscription"
+      }
+      
+      return "Premium Subscription"
     }
     
     // No order found

@@ -28,10 +28,13 @@ public enum BraveStoreProduct: String, AppStoreProduct, CaseIterable {
     }
   }
   
-  public var skusWebSessionStorageKey: String {
+  public var itemSku: String {
+    // These are from the `Order.items.sku` and are NOT the same as the AppStore Skus
     switch self {
-    case .vpnMonthly, .vpnYearly: return "braveVpn.receipt"
-    case .leoMonthly, .leoYearly: return "braveLeo.receipt"
+    case .vpnMonthly: return "brave-firewall-vpn-premium"
+    case .vpnYearly: return "brave-firewall-vpn-premium-year"
+    case .leoMonthly: return "brave-leo-premium"
+    case .leoYearly: return "brave-leo-premium-year"
     }
   }
   
@@ -84,9 +87,9 @@ public class BraveStoreSDK: AppStoreSDK {
     super.init()
     
     // Fetch the AppStore receipt
-    Task.detached {
+    /*Task.detached {
       try? await AppStoreReceipt.sync()
-    }
+    }*/
     
     observers.append($allProducts.sink(receiveValue: onProductsUpdated(_:)))
     observers.append($purchasedProducts.sink(receiveValue: onPurchasesUpdated(_:)))
@@ -250,11 +253,11 @@ public class BraveStoreSDK: AppStoreSDK {
     case .leoMonthly, .leoYearly: break
     }
     
-    if AppStoreReceipt.receipt == nil {
+    if (try? AppStoreReceipt.receipt) == nil {
       try await AppStoreReceipt.sync()
     }
     
-    let skusSDK = SkusSDK(product: product)
+    let skusSDK = BraveSkusSDK(product: product)
     
     // Retrieve the cached Order-ID or create a new order
     if let orderId = Preferences.AIChat.subscriptionOrderId.value {
@@ -262,7 +265,7 @@ public class BraveStoreSDK: AppStoreSDK {
       return
     }
     
-    throw SkusSDK.SkusError.cannotCreateOrder
+    throw BraveSkusSDK.SkusError.cannotCreateOrder
   }
   
   @MainActor
@@ -274,11 +277,11 @@ public class BraveStoreSDK: AppStoreSDK {
     case .leoMonthly, .leoYearly: break
     }
     
-    if AppStoreReceipt.receipt == nil {
+    if (try? AppStoreReceipt.receipt) == nil {
       try await AppStoreReceipt.sync()
     }
     
-    let skusSDK = SkusSDK(product: product)
+    let skusSDK = BraveSkusSDK(product: product)
     
     // Retrieve the cached Order-ID or create a new order
     var orderId = Preferences.AIChat.subscriptionOrderId.value
@@ -288,7 +291,7 @@ public class BraveStoreSDK: AppStoreSDK {
     }
     
     guard let orderId = orderId else {
-      throw SkusSDK.SkusError.cannotCreateOrder
+      throw BraveSkusSDK.SkusError.cannotCreateOrder
     }
 
     // There's an existing order refresh it if it's expired
@@ -300,7 +303,7 @@ public class BraveStoreSDK: AppStoreSDK {
     }
     
     guard let expiryDate = expiryDate else {
-      throw SkusSDK.SkusError.cannotCreateOrder
+      throw BraveSkusSDK.SkusError.cannotCreateOrder
     }
     
     // If the order is expired, refresh it
@@ -317,7 +320,7 @@ public class BraveStoreSDK: AppStoreSDK {
       Preferences.AIChat.subscriptionHasCredentials.value = errorCode.isEmpty
       
       if !errorCode.isEmpty {
-        throw SkusSDK.SkusError.invalidReceiptData
+        throw BraveSkusSDK.SkusError.invalidReceiptData
       }
     }
   }

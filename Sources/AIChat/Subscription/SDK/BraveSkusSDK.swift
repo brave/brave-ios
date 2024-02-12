@@ -10,7 +10,7 @@ import BraveCore
 // https://github.com/brave/brave-core/blob/master/components/skus/browser/rs/lib/src/models.rs#L137
 
 /// Returned by credentialsSummary
-struct SkusCredentialSummary: Codable {
+public struct SkusCredentialSummary: Codable {
   let order: SkusOrder
   let remainingCredentialCount: UInt   // 512
   let expiresAt: Date?                 // 2024-02-06T16:18:43
@@ -27,7 +27,7 @@ struct SkusCredentialSummary: Codable {
 }
 
 /// Returned by refreshOrder
-struct SkusOrder: Codable {
+public struct SkusOrder: Codable {
   let id: String              // UUID
   let createdAt: Date         // 2024-02-05T23:14:19.260973
   let currency: String        // USD
@@ -55,7 +55,7 @@ struct SkusOrder: Codable {
     case lastPaidAt = "last_paid_at"
   }
   
-  struct SkusOrderItem: Codable {
+  public struct SkusOrderItem: Codable {
     let id: String                         // UUID
     let orderId: String                    // UUID
     let sku: String                        // brave-leo-premium
@@ -93,16 +93,16 @@ struct SkusOrder: Codable {
 }
 
 /// Class for handling Skus SDK via SkusService
-class SkusSDK {
+public class BraveSkusSDK {
   
-  init(product: BraveStoreProduct) {
+  public init(product: BraveStoreProduct) {
     self.product = product
     self.skusService = Skus.SkusServiceFactory.get(privateMode: false)
   }
   
   // MARK: - Structures
   
-  enum SkusError: Error {
+  public enum SkusError: Error {
     case skusServiceUnavailable
     case invalidBundleId
     case invalidReceiptURL
@@ -143,52 +143,36 @@ class SkusSDK {
     return decoder
   }()
   
-  private var receipt: String {
-    get throws {
-      guard let receiptUrl = Bundle.main.appStoreReceiptURL else {
-        throw SkusError.invalidReceiptURL
-      }
+  /// Encodes a receipt for use with SkusSDK and Brave's Account Linking page
+  public static func receipt(for product: BraveStoreProduct) throws -> String {
+    struct Receipt: Codable {
+      let type: String
+      let rawReceipt: String
+      let package: String
+      let subscriptionId: String
       
-      do {
-        return try Data(contentsOf: receiptUrl).base64EncodedString
-      } catch {
-        Logger.module.error("Failed to retrieve AppStore Receipt: \(error.localizedDescription)")
-        throw SkusError.invalidReceiptData
+      enum CodingKeys: String, CodingKey {
+        case type, package
+        case rawReceipt = "raw_receipt"
+        case subscriptionId = "subscription_id"
       }
     }
-  }
-  
-  private var encodedReceipt: (product: any AppStoreProduct, value: String) {
-    get throws {
-      struct Receipt: Codable {
-        let type: String
-        let rawReceipt: String
-        let package: String
-        let subscriptionId: String
-        
-        enum CodingKeys: String, CodingKey {
-          case type, package
-          case rawReceipt = "raw_receipt"
-          case subscriptionId = "subscription_id"
-        }
-      }
-      
-      let receipt = try receipt
-      guard let bundleId = Bundle.main.bundleIdentifier else {
-        throw SkusError.invalidBundleId
-      }
-      
-      let json = Receipt(type: "ios",
-                         rawReceipt: receipt,
-                         package: bundleId,
-                         subscriptionId: product.rawValue)
-      
-      do {
-        return (product: product, value: try JSONEncoder().encode(json).base64EncodedString)
-      } catch {
-        Logger.module.error("Failed to serialize AppStore Receipt for LocalStorage: \(error.localizedDescription)")
-        throw SkusError.cannotEncodeReceipt
-      }
+    
+    let receipt = try AppStoreReceipt.receipt
+    guard let bundleId = Bundle.main.bundleIdentifier else {
+      throw SkusError.invalidBundleId
+    }
+    
+    let json = Receipt(type: "ios",
+                       rawReceipt: receipt,
+                       package: bundleId,
+                       subscriptionId: product.rawValue)
+    
+    do {
+      return try JSONEncoder().encode(json).base64EncodedString
+    } catch {
+      Logger.module.error("Failed to serialize AppStore Receipt for LocalStorage: \(error.localizedDescription)")
+      throw SkusError.cannotEncodeReceipt
     }
   }
   
@@ -198,14 +182,14 @@ class SkusSDK {
   /// Returns existing Order-ID if one is already created
   /// Returns Order-ID
   @MainActor
-  func createOrder() async throws -> String {
+  public func createOrder() async throws -> String {
     guard let skusService = skusService else {
       throw SkusError.skusServiceUnavailable
     }
     
-    let receipt = try encodedReceipt
+    let receipt = try BraveSkusSDK.receipt(for: product)
     return try await withCheckedThrowingContinuation { @MainActor continuation in
-      skusService.createOrder(fromReceipt: product.skusDomain, receipt: receipt.value) { orderId in
+      skusService.createOrder(fromReceipt: product.skusDomain, receipt: receipt) { orderId in
         if orderId.isEmpty {
           continuation.resume(throwing: SkusError.cannotCreateOrder)
           return
@@ -219,14 +203,14 @@ class SkusSDK {
   /// Links an existing order to an AppStore Receipt
   /// Returns Order-ID
   @MainActor
-  func submitReceipt(orderId: String) async throws -> String {
+  public func submitReceipt(orderId: String) async throws -> String {
     guard let skusService = skusService else {
       throw SkusError.skusServiceUnavailable
     }
     
-    let receipt = try encodedReceipt
+    let receipt = try BraveSkusSDK.receipt(for: product)
     return try await withCheckedThrowingContinuation { @MainActor continuation in
-      skusService.submitReceipt(product.skusDomain, orderId: orderId, receipt: receipt.value) { response in
+      skusService.submitReceipt(product.skusDomain, orderId: orderId, receipt: receipt) { response in
         continuation.resume(returning: response)
       }
     }
@@ -235,7 +219,7 @@ class SkusSDK {
   /// Updates the local cached order via the given Order-ID
   @MainActor
   @discardableResult
-  func refreshOrder(orderId: String) async throws -> SkusOrder {
+  public func refreshOrder(orderId: String) async throws -> SkusOrder {
     guard let skusService = skusService else {
       throw SkusError.skusServiceUnavailable
     }
@@ -253,7 +237,7 @@ class SkusSDK {
   
   ///  Fetch and refresh order details of a subscription
   @MainActor
-  func fetchAndRefreshOrderDetails() async throws -> (orderId: String, orderDetails: SkusOrder) {
+  public func fetchAndRefreshOrderDetails() async throws -> (orderId: String, orderDetails: SkusOrder) {
     do {
       let orderId = try await createOrder()
       let order = try await refreshOrder(orderId: orderId)
@@ -271,7 +255,7 @@ class SkusSDK {
   
   /// Fetches Credentials Summary.
   @MainActor
-  func credentialsSummary() async throws -> SkusCredentialSummary {
+  public func credentialsSummary() async throws -> SkusCredentialSummary {
     func decode<T: Decodable>(_ response: String) throws -> T {
       guard let data = response.data(using: .utf8) else {
         throw SkusError.decodingError
@@ -288,7 +272,7 @@ class SkusSDK {
   }
   
   @MainActor
-  func fetchCredentials(orderId: String) async throws -> String {
+  public func fetchCredentials(orderId: String) async throws -> String {
     guard let skusService = skusService else {
       throw SkusError.skusServiceUnavailable
     }
@@ -297,7 +281,7 @@ class SkusSDK {
   }
   
   @MainActor
-  func prepareCredentials(path: String = "*") async throws -> String {
+  public func prepareCredentials(path: String = "*") async throws -> String {
     guard let skusService = skusService else {
       throw SkusError.skusServiceUnavailable
     }
@@ -309,7 +293,7 @@ class SkusSDK {
   }
   
   @MainActor
-  func testSkus() async throws {
+  public func testSkus() async throws {
     let orderId = try await createOrder()
     let order = try await refreshOrder(orderId: orderId)
     assert(orderId == order.id, "Skus Order-Id Mismatch")
