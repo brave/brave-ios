@@ -13,16 +13,16 @@ struct AIChatPremiumUpsellView: View {
     var title: String {
       switch self {
       case .premium:
-        return "Unleash Leo's Full Powers With Premium:"
+        return Strings.AIChat.paywallPremiumUpsellTitle
       case .rateLimit:
-        return "Response Rate Limit Reached"
+        return Strings.AIChat.paywallRateLimitTitle
       }
     }
     
     var subtitle: String? {
       switch self {
       case .rateLimit:
-        return "Unlock a higher response rate by subscribing to Premium, or try again later."
+        return Strings.AIChat.paywallRateLimitSubTitle
       default:
         return nil
       }
@@ -31,16 +31,16 @@ struct AIChatPremiumUpsellView: View {
     var primaryActionTitle: String {
       switch self {
       case .premium, .rateLimit:
-        return "Upgrade"
+        return Strings.AIChat.paywallPremiumUpsellPrimaryAction
       }
     }
     
     var dismissActionTitle: String {
       switch self {
       case .premium:
-        return "Maybe Later"
+        return Strings.AIChat.paywallPremiumUpsellDismissAction
       case .rateLimit:
-        return "Continue with Basic Model"
+        return Strings.AIChat.paywallRateLimitDismissActionTitle
       }
     }
   }
@@ -250,26 +250,26 @@ private struct PremiumUpsellTopicView: View {
     var title: String {
       switch self {
       case .modelType:
-        return "Explore different AI models"
+        return Strings.AIChat.paywallUpsellModelTypeTopicTitle
       case .creativity:
-        return "Unlock your creativity"
+        return Strings.AIChat.paywallUpsellCreativityTopicTitle
       case .accuracy:
-        return "Stay on topic"
+        return Strings.AIChat.paywallUpsellAccuracyTopicTitle
       case .chatLength:
-        return "Chat for longer"
+        return Strings.AIChat.paywallUpsellChatLengthTopicTitle
       }
     }
     
     var subTitle: String {
       switch self {
       case .modelType:
-        return "Priority access to powerful models with different skills"
+        return Strings.AIChat.paywallUpsellModelTypeTopicSubTitle
       case .creativity:
-        return "Access models better suited for creative tasks and content generation."
+        return Strings.AIChat.paywallUpsellCreativityTopicSubTitle
       case .accuracy:
-        return "Get more accurate answers for more nuanced conversations."
+        return Strings.AIChat.paywallUpsellAccuracyTopicSubTitle
       case .chatLength:
-        return "Get higher rate limits for longer conversations."
+        return Strings.AIChat.paywallUpsellChatLengthTopicSubTitle
       }
     }
   }

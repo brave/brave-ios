@@ -257,15 +257,141 @@ extension Strings {
       "aichat.paywallYearlySubscriptionDescription",
       tableName: "BraveLeo",
       bundle: .module,
-      value: "One Year",
+      value: "SAVE UP TO 25%",
       comment: "The description indicating yearly subscription that show how much user is saving percentage"
     )
     public static let paywallYearlyPriceDividend = NSLocalizedString(
       "aichat.paywallYearlyPriceDividend",
       tableName: "BraveLeo",
       bundle: .module,
-      value: "One Year",
-      comment: "The description indicating yearly subscription that show how much user is saving percentage"
+      value: "year",
+      comment: "The text which will be used to indicate period of payments like 150 / year"
+    )
+    public static let paywallMontlySubscriptionTitle = NSLocalizedString(
+      "aichat.paywallMontlySubscriptionTitle",
+      tableName: "BraveLeo",
+      bundle: .module,
+      value: "Monthly",
+      comment: "Title indicating monthly subscription"
+    )
+    public static let paywallMonthlyPriceDividend = NSLocalizedString(
+      "aichat.paywallMonthlyPriceDividend",
+      tableName: "BraveLeo",
+      bundle: .module,
+      value: "month",
+      comment: "The text which will be used to indicate period of payments like 10 / month"
+    )
+    public static let paywallPurchaseDeepNote = NSLocalizedString(
+      "aichat.paywallPurchaseDeepNote",
+      tableName: "BraveLeo",
+      bundle: .module,
+      value: "All subscriptions are auto-renewed but can be cancelled at any time before renewal.",
+      comment: "The text displayed on the bottom of paywall screen which indicates subscriptions are auto renewable."
+    )
+    public static let paywallPurchaseActionTitle = NSLocalizedString(
+      "aichat.paywallPurchaseActionTitle",
+      tableName: "BraveLeo",
+      bundle: .module,
+      value: "Upgrade Now",
+      comment: "The title of the button for action triggering purchase"
+    )
+    public static let paywallPremiumUpsellTitle = NSLocalizedString(
+      "aichat.paywallPremiumUpsellTitle",
+      tableName: "BraveLeo",
+      bundle: .module,
+      value: "Unleash Leo's Full Powers With Premium:",
+      comment: "The title for premium upsell when paywall is triggered"
+    )
+    public static let paywallRateLimitTitle = NSLocalizedString(
+      "aichat.paywallRateLimitTitle",
+      tableName: "BraveLeo",
+      bundle: .module,
+      value: "Response Rate Limit Reached",
+      comment: "The title for premium upseel when rate limit is shown after sending a message"
+    )
+    public static let paywallRateLimitSubTitle = NSLocalizedString(
+      "aichat.paywallRateLimitSubTitle",
+      tableName: "BraveLeo",
+      bundle: .module,
+      value: "Unlock a higher response rate by subscribing to Premium, or try again later.",
+      comment: "The subtitle for premium upseel when rate limit is shown after sending a message"
+    )
+    public static let paywallPremiumUpsellPrimaryAction = NSLocalizedString(
+      "aichat.paywallPremiumUpsellPrimaryAction",
+      tableName: "BraveLeo",
+      bundle: .module,
+      value: "Upgrade",
+      comment: "The title for button when premium upsell when paywall is triggered"
+    )
+    public static let paywallPremiumUpsellDismissAction = NSLocalizedString(
+      "aichat.paywallPremiumUpsellDismissAction",
+      tableName: "BraveLeo",
+      bundle: .module,
+      value: "Maybe Later",
+      comment: "The title for dismiss button when premium upsell when paywall is triggered"
+    )
+    public static let paywallRateLimitDismissActionTitle = NSLocalizedString(
+      "aichat.paywallRateLimitDismissActionTitle",
+      tableName: "BraveLeo",
+      bundle: .module,
+      value: "Continue with Basic Model",
+      comment: "The title for dismiss button when rate limit is shown after sending a message"
+    )
+    public static let paywallUpsellModelTypeTopicTitle = NSLocalizedString(
+      "aichat.paywallUpsellModelTypeTopicTitle",
+      tableName: "BraveLeo",
+      bundle: .module,
+      value: "Explore different AI models",
+      comment: "The title model type entry in paywall upsell screen"
+    )
+    public static let paywallUpsellCreativityTopicTitle = NSLocalizedString(
+      "aichat.paywallUpsellCreativityTopicTitle",
+      tableName: "BraveLeo",
+      bundle: .module,
+      value: "Unlock your creativity",
+      comment: "The title creativity entry in paywall upsell screen"
+    )
+    public static let paywallUpsellAccuracyTopicTitle = NSLocalizedString(
+      "aichat.paywallUpsellAccuracyTopicTitle",
+      tableName: "BraveLeo",
+      bundle: .module,
+      value: "Stay on topic",
+      comment: "The title accuracy entry in paywall upsell screen"
+    )
+    public static let paywallUpsellChatLengthTopicTitle = NSLocalizedString(
+      "aichat.paywallUpsellChatLengthTopicTitle",
+      tableName: "BraveLeo",
+      bundle: .module,
+      value: "Chat for longer",
+      comment: "The title chat length entry in paywall upsell screen"
+    )
+    public static let paywallUpsellModelTypeTopicSubTitle = NSLocalizedString(
+      "aichat.paywallUpsellModelTypeTopicSubTitle",
+      tableName: "BraveLeo",
+      bundle: .module,
+      value: "Priority access to powerful models with different skills",
+      comment: "The subtitle model type entry in paywall upsell screen"
+    )
+    public static let paywallUpsellCreativityTopicSubTitle = NSLocalizedString(
+      "aichat.paywallUpsellCreativityTopicSubTitle",
+      tableName: "BraveLeo",
+      bundle: .module,
+      value: "Access models better suited for creative tasks and content generation.",
+      comment: "The subtitle creativity entry in paywall upsell screen"
+    )
+    public static let paywallUpsellAccuracyTopicSubTitle = NSLocalizedString(
+      "aichat.paywallUpsellAccuracyTopicSubTitle",
+      tableName: "BraveLeo",
+      bundle: .module,
+      value: "Get more accurate answers for more nuanced conversations.",
+      comment: "The subtitle accuracy entry in paywall upsell screen"
+    )
+    public static let paywallUpsellChatLengthTopicSubTitle = NSLocalizedString(
+      "aichat.paywallUpsellChatLengthTopicSubTitle",
+      tableName: "BraveLeo",
+      bundle: .module,
+      value: "Get higher rate limits for longer conversations.",
+      comment: "The subtitle chat length entry in paywall upsell screen"
     )
   }
 }

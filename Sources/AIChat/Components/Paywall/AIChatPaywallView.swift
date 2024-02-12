@@ -186,7 +186,7 @@ struct AIChatPaywallView: View {
                   .font(.title)
                   .foregroundColor(.white)
                 
-                Text(" / year")
+                Text(" / " + Strings.AIChat.paywallYearlyPriceDividend)
                   .font(.subheadline)
                   .foregroundColor(Color(braveSystemName: .primitivePrimary30))
               }
@@ -212,7 +212,7 @@ struct AIChatPaywallView: View {
           selectedTierType = .monthly
         }) {
           HStack {
-            Text("Monthly")
+            Text(Strings.AIChat.paywallMontlySubscriptionTitle)
               .font(.title2.weight(.semibold))
               .foregroundColor(Color(.white))
             
@@ -229,7 +229,7 @@ struct AIChatPaywallView: View {
                   .font(.title)
                   .foregroundColor(.white)
                 
-                Text(" / month")
+                Text(" / " + Strings.AIChat.paywallMonthlyPriceDividend)
                   .font(.subheadline)
                   .foregroundColor(Color(braveSystemName: .primitivePrimary30))
               }
@@ -250,7 +250,7 @@ struct AIChatPaywallView: View {
         .clipShape(RoundedRectangle(cornerRadius: 8.0, style: .continuous))
       }
       
-      Text("All subscriptions are auto-renewed but can be cancelled at any time before renewal.")
+      Text(Strings.AIChat.paywallPurchaseDeepNote)
         .multilineTextAlignment(.center)
         .font(.footnote)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -295,7 +295,7 @@ struct AIChatPaywallView: View {
             ProgressView()
               .tint(Color.white)
           } else {
-            Text("Upgrade Now")
+            Text(Strings.AIChat.paywallPurchaseActionTitle)
               .font(.body.weight(.semibold))
               .foregroundColor(Color(.white))
           }
