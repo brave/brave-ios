@@ -286,45 +286,49 @@ public struct AIChatAdvancedSettingsView: View {
                             detail: nil)
           }
           
-          if storeSDK.leoSubscriptionStatus?.state != nil || orderInfo.orderStatus != .loading {
-            Button(action: {
-              openURL(.brave.braveLeoLinkReceiptProd)
-            }) {
-              LabelView(
-                title: "Link purchase to your Brave account",
-                subtitle: "Link your Appstore purchase to your Brave account to use Leo on other devices."
-              )
-            }
-            
-            if storeSDK.enviroment != .production {
+          // Check subscription is activated with in-app purchase
+          if storeSDK.leoSubscriptionStatus?.state != nil {
+            // Order status is active no need to link purchase
+            if orderInfo.orderStatus != .loading, orderInfo.orderStatus != .active {
               Button(action: {
-                openURL(.brave.braveLeoLinkReceiptStaging)
+                openURL(.brave.braveLeoLinkReceiptProd)
               }) {
                 LabelView(
-                  title: "[Staging] Link receipt"
+                  title: "Link purchase to your Brave account",
+                  subtitle: "Link your Appstore purchase to your Brave account to use Leo on other devices."
                 )
               }
               
-              Button(action: {
-                openURL(.brave.braveLeoLinkReceiptDev)
-              }) {
-                LabelView(
-                  title: "[Dev] Link receipt"
-                )
-              }
-            }
-            
-            Button(action: {
-              guard let url = URL.apple.manageSubscriptions else {
-                return
+              if storeSDK.enviroment != .production {
+                Button(action: {
+                  openURL(.brave.braveLeoLinkReceiptStaging)
+                }) {
+                  LabelView(
+                    title: "[Staging] Link receipt"
+                  )
+                }
+                
+                Button(action: {
+                  openURL(.brave.braveLeoLinkReceiptDev)
+                }) {
+                  LabelView(
+                    title: "[Dev] Link receipt"
+                  )
+                }
               }
               
-              // Opens Apple's 'manage subscription' screen
-              if UIApplication.shared.canOpenURL(url) {
-                UIApplication.shared.open(url, options: [:])
+              Button(action: {
+                guard let url = URL.apple.manageSubscriptions else {
+                  return
+                }
+                
+                // Opens Apple's 'manage subscription' screen
+                if UIApplication.shared.canOpenURL(url) {
+                  UIApplication.shared.open(url, options: [:])
+                }
+              }) {
+                premiumActionView
               }
-            }) {
-              premiumActionView
             }
           }
         } else {

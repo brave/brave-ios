@@ -8,6 +8,7 @@ import BraveUI
 import DesignSystem
 import Then
 import StoreKit
+import BraveStrings
 
 enum AIChatPaymentStatus {
   case ongoing
@@ -100,7 +101,7 @@ struct AIChatPaywallView: View {
                   ProgressView()
                     .tint(Color.white)
                 } else {
-                  Text("Restore")
+                  Text(Strings.AIChat.restorePaywallButtonTitle)
                 }
               }
               .foregroundColor(.white)
@@ -108,7 +109,7 @@ struct AIChatPaywallView: View {
             }
             
             ToolbarItemGroup(placement: .cancellationAction) {
-              Button("Close") {
+              Button(Strings.CancelString) {
                 presentationMode.dismiss()
               }
               .foregroundColor(.white)
@@ -138,9 +139,9 @@ struct AIChatPaywallView: View {
                    alignment: .topTrailing))
       .alert(isPresented: $isShowingPurchaseAlert) {
         Alert(
-          title: Text("Error"),
-          message: Text("Unable to complete purchase. Please try again, or check your payment details on Apple and try again."),
-          dismissButton: .default(Text("OK")))
+          title: Text(Strings.genericErrorTitle),
+          message: Text(Strings.AIChat.paywallPurchaseErrorDescription),
+          dismissButton: .default(Text(Strings.OKString)))
       }
       .onChange(of: shouldDismiss) { shouldDismiss in
         premiumUpgrageSuccessful?(selectedTierType)
@@ -161,11 +162,11 @@ struct AIChatPaywallView: View {
         }) {
           HStack {
             VStack(alignment: .leading, spacing: 8.0) {
-              Text("One Year")
+              Text(Strings.AIChat.paywallYearlySubscriptionTitle)
                 .font(.title2.weight(.semibold))
                 .foregroundColor(Color(.white))
               
-              Text("SAVE UP TO 25%")
+              Text(Strings.AIChat.paywallYearlySubscriptionDescription)
                 .font(.caption2.weight(.semibold))
                 .foregroundColor(Color(braveSystemName: .green50))
                 .padding(4.0)

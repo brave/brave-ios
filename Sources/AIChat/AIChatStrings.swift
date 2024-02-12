@@ -232,5 +232,40 @@ extension Strings {
       value: "Leo Premium",
       comment: "The title for paywall view"
     )
+    public static let restorePaywallButtonTitle = NSLocalizedString(
+      "aichat.restorePaywallButtonTitle",
+      tableName: "BraveLeo",
+      bundle: .module,
+      value: "Restore",
+      comment: "The button title for restoring ai-app purchse for Leo."
+    )
+    public static let paywallPurchaseErrorDescription = NSLocalizedString(
+      "aichat.paywallPurchaseErrorDescription",
+      tableName: "BraveLeo",
+      bundle: .module,
+      value: "Unable to complete purchase. Please try again, or check your payment details on Apple and try again.",
+      comment: "The error description when in app purcahse is erroneous."
+    )
+    public static let paywallYearlySubscriptionTitle = NSLocalizedString(
+      "aichat.paywallYearlySubscriptionTitle",
+      tableName: "BraveLeo",
+      bundle: .module,
+      value: "One Year",
+      comment: "Title indicating yearly subscription"
+    )
+    public static let paywallYearlySubscriptionDescription = NSLocalizedString(
+      "aichat.paywallYearlySubscriptionDescription",
+      tableName: "BraveLeo",
+      bundle: .module,
+      value: "One Year",
+      comment: "The description indicating yearly subscription that show how much user is saving percentage"
+    )
+    public static let paywallYearlyPriceDividend = NSLocalizedString(
+      "aichat.paywallYearlyPriceDividend",
+      tableName: "BraveLeo",
+      bundle: .module,
+      value: "One Year",
+      comment: "The description indicating yearly subscription that show how much user is saving percentage"
+    )
   }
 }
