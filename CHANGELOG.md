@@ -6,10 +6,10 @@
 
 - Implemented new UI for the “Transaction Details” page. ([#8379](https://github.com/brave/brave-ios/issues/8379))
 - Implemented new UI for the “Activity” tab in Brave Wallet. ([#8349](https://github.com/brave/brave-ios/issues/8349))
-- Updated UI and functionality for the "NFT" details page. ([#8064](https://github.com/brave/brave-ios/issues/8064))
-- Updated UI and functionality for “NFT” tab under “Portfolio.” ([#8063](https://github.com/brave/brave-ios/issues/8063))
+- Updated NFT details to new layout. ([#8064](https://github.com/brave/brave-ios/issues/8064))
+- Updated NFT tab UI to new layout. ([#8063](https://github.com/brave/brave-ios/issues/8063))
 - Updated SNS interstitial page copy for new provider. ([#8515](https://github.com/brave/brave-ios/issues/8515))
-- Fixed NFT auto-discover and remove modals to be dismissed when Brave Wallet gets auto-locked. ([#8412](https://github.com/brave/brave-ios/issues/8412))
+- Fixed NFT auto-discover popup not being dismissed when Brave Wallet gets auto-locked. ([#8412](https://github.com/brave/brave-ios/issues/8412))
 
 ### General 
 
