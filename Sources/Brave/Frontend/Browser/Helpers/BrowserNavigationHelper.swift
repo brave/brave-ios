@@ -110,10 +110,6 @@ class BrowserNavigationHelper {
       }
     }
   }
-
-  func openPlaylist() {
-    bvc?.openPlaylist(tab: nil, item: nil)
-  }
   
   func openWallet() {
     bvc?.presentWallet()

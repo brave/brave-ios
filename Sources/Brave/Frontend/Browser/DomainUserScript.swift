@@ -14,10 +14,10 @@ enum DomainUserScript: CaseIterable {
   case braveTalkHelper
 #endif
   case braveSkus
-  case bravePlaylistFolderSharingHelper
 
   /// Initialize this script with a URL
   init?(for url: URL) {
+    return nil
     // First we look for an exact domain match
     if let host = url.host, let found = Self.allCases.first(where: { $0.associatedDomains.contains(host) }) {
       self = found
@@ -47,8 +47,6 @@ enum DomainUserScript: CaseIterable {
                   "talk.bravesoftware.com",
                   "talk.brave.software"])
 #endif
-    case .bravePlaylistFolderSharingHelper:
-      return Set(["playlist.bravesoftware.com", "playlist.brave.com"])
     case .braveSkus:
       return Set(["account.brave.com",
                    "account.bravesoftware.com",
@@ -60,7 +58,7 @@ enum DomainUserScript: CaseIterable {
   /// Returns nil if the domain's user script can't be turned off via a shield toggle. (i.e. it's always enabled)
   var requiredShield: BraveShield? {
     switch self {
-    case .braveSearchHelper, .bravePlaylistFolderSharingHelper, .braveSkus:
+    case .braveSearchHelper, .braveSkus:
       return nil
 #if canImport(BraveTalk)
     case .braveTalkHelper:

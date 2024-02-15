@@ -16,9 +16,6 @@ public class BasicAuthCredentialsManager: NSObject, URLSessionDataDelegate {
     "search.brave.software", "search.bravesoftware.com",
     "safesearch.brave.software", "safesearch.bravesoftware.com",
     "search-dev-local.brave.com",
-    
-    // Playlist
-    "playlist.bravesoftware.com"
   ]
   
   public static func setCredential(origin: String, credential: URLCredential?) {

@@ -191,8 +191,6 @@ public class BrowserViewController: UIViewController {
 
   var pendingToast: Toast?  // A toast that might be waiting for BVC to appear before displaying
   var downloadToast: DownloadToast?  // A toast that is showing the combined download progress
-  var addToPlayListActivityItem: (enabled: Bool, item: PlaylistInfo?)?  // A boolean to determine If AddToListActivity should be added
-  var openInPlaylistActivityItem: (enabled: Bool, item: PlaylistInfo?)?  // A boolean to determine if OpenInPlaylistActivity should be shown
   var shouldDownloadNavigationResponse: Bool = false
   var pendingDownloads = [WKDownload: PendingDownload]()
 
@@ -465,9 +463,6 @@ public class BrowserViewController: UIViewController {
     Preferences.Privacy.blockAllCookies.observe(from: self)
     Preferences.Rewards.hideRewardsIcon.observe(from: self)
     Preferences.Rewards.rewardsToggledOnce.observe(from: self)
-    Preferences.Playlist.enablePlaylistMenuBadge.observe(from: self)
-    Preferences.Playlist.enablePlaylistURLBarButton.observe(from: self)
-    Preferences.Playlist.syncSharedFoldersAutomatically.observe(from: self)
     Preferences.NewTabPage.backgroundSponsoredImages.observe(from: self)
     ShieldPreferences.blockAdsAndTrackingLevelRaw.observe(from: self)
     Preferences.Privacy.screenTimeEnabled.observe(from: self)
@@ -487,7 +482,7 @@ public class BrowserViewController: UIViewController {
       self.setupAdsNotificationHandler()
       self.recordAdsUsageType()
     }
-    Preferences.Playlist.webMediaSourceCompatibility.observe(from: self)
+    
     Preferences.PrivacyReports.captureShieldsData.observe(from: self)
     Preferences.PrivacyReports.captureVPNAlerts.observe(from: self)
     Preferences.Wallet.defaultEthWallet.observe(from: self)
@@ -573,7 +568,6 @@ public class BrowserViewController: UIViewController {
     recordAccessibilityDocumentsDirectorySizeP3A()
     recordTimeBasedNumberReaderModeUsedP3A(activated: false)
     recordGeneralBottomBarLocationP3A()
-    PlaylistP3A.recordHistogram()
     recordAdsUsageType()
     recordDefaultBrowserLikelyhoodP3A()
     
@@ -862,29 +856,29 @@ public class BrowserViewController: UIViewController {
     header.isHidden = false
     footer.isHidden = false
     
-    NotificationCenter.default.do {
-      $0.addObserver(
-        self, selector: #selector(sceneWillResignActiveNotification(_:)),
-        name: UIScene.willDeactivateNotification, object: nil)
-      $0.addObserver(
-        self, selector: #selector(sceneDidBecomeActiveNotification(_:)),
-        name: UIScene.didActivateNotification, object: nil)
-      $0.addObserver(
-        self, selector: #selector(sceneDidEnterBackgroundNotification),
-        name: UIScene.didEnterBackgroundNotification, object: nil)
-      $0.addObserver(
-        self, selector: #selector(appWillTerminateNotification),
-        name: UIApplication.willTerminateNotification, object: nil)
-      $0.addObserver(
-        self, selector: #selector(resetNTPNotification),
-        name: .adsOrRewardsToggledInSettings, object: nil)
-      $0.addObserver(
-        self, selector: #selector(vpnConfigChanged),
-        name: .NEVPNConfigurationChange, object: nil)
-      $0.addObserver(
-        self, selector: #selector(updateShieldNotifications),
-        name: NSNotification.Name(rawValue: BraveGlobalShieldStats.didUpdateNotification), object: nil)
-    }
+//    NotificationCenter.default.do {
+//      $0.addObserver(
+//        self, selector: #selector(sceneWillResignActiveNotification(_:)),
+//        name: UIScene.willDeactivateNotification, object: nil)
+//      $0.addObserver(
+//        self, selector: #selector(sceneDidBecomeActiveNotification(_:)),
+//        name: UIScene.didActivateNotification, object: nil)
+//      $0.addObserver(
+//        self, selector: #selector(sceneDidEnterBackgroundNotification),
+//        name: UIScene.didEnterBackgroundNotification, object: nil)
+//      $0.addObserver(
+//        self, selector: #selector(appWillTerminateNotification),
+//        name: UIApplication.willTerminateNotification, object: nil)
+//      $0.addObserver(
+//        self, selector: #selector(resetNTPNotification),
+//        name: .adsOrRewardsToggledInSettings, object: nil)
+//      $0.addObserver(
+//        self, selector: #selector(vpnConfigChanged),
+//        name: .NEVPNConfigurationChange, object: nil)
+//      $0.addObserver(
+//        self, selector: #selector(updateShieldNotifications),
+//        name: NSNotification.Name(rawValue: BraveGlobalShieldStats.didUpdateNotification), object: nil)
+//    }
     
     BraveGlobalShieldStats.shared.$adblock
       .scan((BraveGlobalShieldStats.shared.adblock, BraveGlobalShieldStats.shared.adblock), { ($0.1, $1) })
@@ -897,7 +891,7 @@ public class BrowserViewController: UIViewController {
       .store(in: &cancellables)
     
     KeyboardHelper.defaultHelper.addDelegate(self)
-    UNUserNotificationCenter.current().delegate = self
+    //UNUserNotificationCenter.current().delegate = self
     
     // Add interactions
     topTouchArea.addTarget(self, action: #selector(tappedTopArea), for: .touchUpInside)
@@ -962,8 +956,6 @@ public class BrowserViewController: UIViewController {
       .sink(receiveValue: { [weak self] featureLinkageType in
         guard let self = self else { return }
         switch featureLinkageType {
-        case .playlist:
-          self.presentPlaylistController()
         case .vpn:
           self.navigationHelper.openVPNBuyScreen(iapObserver: self.iapObserver)
         default:
@@ -980,7 +972,6 @@ public class BrowserViewController: UIViewController {
       }
       .store(in: &cancellables)
     
-    syncPlaylistFolders()
     checkCrashRestorationOrSetupTabs()
   }
 
@@ -1157,7 +1148,6 @@ public class BrowserViewController: UIViewController {
       // Have to defer this to the next cycle to avoid an iOS bug which lays out the toolbars without any
       // bottom safe area, resulting in a layout bug.
       DispatchQueue.main.async {
-        // On iOS 17 rotating the device with a full screen modal presented (e.g. Playlist, Tab Tray)
         // to landscape then back to portrait does not trigger `traitCollectionDidChange`/`willTransition`/etc
         // calls and so the toolbar remains in the wrong state.
         self.updateToolbarStateForTraitCollection(self.traitCollection)
@@ -1235,9 +1225,6 @@ public class BrowserViewController: UIViewController {
       UIApplication.shared.requestSceneSessionRefresh(session)
     }
   }
-
-  /// Whether or not to show the playlist onboarding callout this session
-  var shouldShowPlaylistOnboardingThisSession = true
 
   public func showQueuedAlertIfAvailable() {
     if let queuedAlertInfo = tabManager.selectedTab?.dequeueJavascriptAlertPrompt() {
@@ -1499,7 +1486,6 @@ public class BrowserViewController: UIViewController {
           readerMode.state == .active,
           isReaderModeURL {
           self.showReaderModeBar(animated: false)
-          self.updatePlaylistURLBar(tab: tab, state: tab.playlistItemState, item: tab.playlistItem)
         }
       })
   }
@@ -1994,7 +1980,6 @@ public class BrowserViewController: UIViewController {
 
       updateInContentHomePanel(url as URL)
       updateScreenTimeUrl(url)
-      updatePlaylistURLBar(tab: tab, state: tab.playlistItemState, item: tab.playlistItem)
     }
   }
 
@@ -2003,18 +1988,6 @@ public class BrowserViewController: UIViewController {
     guard let tab = tabManager.selectedTab else { return }
 
     updateRewardsButtonState()
-
-    DispatchQueue.main.async {
-      if let item = tab.playlistItem {
-        if PlaylistItem.itemExists(uuid: item.tagId) || PlaylistItem.itemExists(pageSrc: item.pageSrc) {
-          self.updatePlaylistURLBar(tab: tab, state: .existingItem, item: item)
-        } else {
-          self.updatePlaylistURLBar(tab: tab, state: .newItem, item: item)
-        }
-      } else {
-        self.updatePlaylistURLBar(tab: tab, state: .none, item: nil)
-      }
-    }
 
     updateToolbarCurrentURL(tab.url?.displayURL)
     if tabManager.selectedTab === tab {
@@ -2517,8 +2490,6 @@ extension BrowserViewController: TabDelegate {
       ResourceDownloadScriptHandler(tab: tab),
       DownloadContentScriptHandler(browserController: self, tab: tab),
       WindowRenderScriptHandler(tab: tab),
-      PlaylistScriptHandler(tab: tab),
-      PlaylistFolderSharingScriptHandler(tab: tab),
       RewardsReportingScriptHandler(rewards: rewards, tab: tab),
       AdsMediaReportingScriptHandler(rewards: rewards, tab: tab),
       ReadyStateScriptHandler(tab: tab),
@@ -2571,8 +2542,6 @@ extension BrowserViewController: TabDelegate {
     if #unavailable(iOS 16.0) {
       (tab.getContentScript(name: FindInPageScriptHandler.scriptName) as? FindInPageScriptHandler)?.delegate = self
     }
-    (tab.getContentScript(name: PlaylistScriptHandler.scriptName) as? PlaylistScriptHandler)?.delegate = self
-    (tab.getContentScript(name: PlaylistFolderSharingScriptHandler.scriptName) as? PlaylistFolderSharingScriptHandler)?.delegate = self
     (tab.getContentScript(name: Web3NameServiceScriptHandler.scriptName) as? Web3NameServiceScriptHandler)?.delegate = self
     (tab.getContentScript(name: Web3IPFSScriptHandler.scriptName) as? Web3IPFSScriptHandler)?.delegate = self
   }
@@ -2685,9 +2654,7 @@ extension BrowserViewController: TabDelegate {
   }
 
   func stopMediaPlayback(_ tab: Tab) {
-    tabManager.allTabs.forEach({
-      PlaylistScriptHandler.stopPlayback(tab: $0)
-    })
+    
   }
   
   func showWalletNotification(_ tab: Tab, origin: URLOrigin) {
@@ -3074,11 +3041,7 @@ extension BrowserViewController: PreferencesObserver {
     case Preferences.Rewards.hideRewardsIcon.key,
       Preferences.Rewards.rewardsToggledOnce.key:
       updateRewardsButtonState()
-    case Preferences.Playlist.webMediaSourceCompatibility.key:
-      tabManager.allTabs.forEach {
-        $0.setScript(script: .playlistMediaSource, enabled: Preferences.Playlist.webMediaSourceCompatibility.value)
-        $0.webView?.reload()
-      }
+    
     case Preferences.General.mediaAutoBackgrounding.key:
       tabManager.allTabs.forEach {
         $0.setScript(script: .mediaBackgroundPlay, enabled: Preferences.General.mediaAutoBackgrounding.value)
@@ -3088,13 +3051,6 @@ extension BrowserViewController: PreferencesObserver {
       tabManager.allTabs.forEach {
         YoutubeQualityScriptHandler.setEnabled(option: Preferences.General.youtubeHighQuality, for: $0)
       }
-    case Preferences.Playlist.enablePlaylistMenuBadge.key,
-      Preferences.Playlist.enablePlaylistURLBarButton.key:
-      let selectedTab = tabManager.selectedTab
-      updatePlaylistURLBar(
-        tab: selectedTab,
-        state: selectedTab?.playlistItemState ?? .none,
-        item: selectedTab?.playlistItem)
     case Preferences.PrivacyReports.captureShieldsData.key:
       PrivacyReportsManager.scheduleProcessingBlockedRequests(isPrivateBrowsing: privateBrowsingManager.isPrivateBrowsing)
       PrivacyReportsManager.scheduleNotification(debugMode: !AppConstants.buildChannel.isPublic)
@@ -3122,8 +3078,6 @@ extension BrowserViewController: PreferencesObserver {
         cryptoStore.rejectAllPendingWebpageRequests()
       }
       updateURLBarWalletButton()
-    case Preferences.Playlist.syncSharedFoldersAutomatically.key:
-      syncPlaylistFolders()
     case Preferences.NewTabPage.backgroundSponsoredImages.key:
       recordAdsUsageType()
     case Preferences.Privacy.screenTimeEnabled.key:

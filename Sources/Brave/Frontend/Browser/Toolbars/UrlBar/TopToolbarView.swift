@@ -15,8 +15,6 @@ import BraveCore
 protocol TopToolbarDelegate: AnyObject {
   func topToolbarDidPressTabs(_ topToolbar: TopToolbarView)
   func topToolbarDidPressReaderMode(_ topToolbar: TopToolbarView)
-  func topToolbarDidPressPlaylistButton(_ urlBar: TopToolbarView)
-  func topToolbarDidPressPlaylistMenuAction(_ urlBar: TopToolbarView, action: PlaylistURLBarButton.MenuAction)
   func topToolbarDidEnterOverlayMode(_ topToolbar: TopToolbarView)
   func topToolbarDidLeaveOverlayMode(_ topToolbar: TopToolbarView)
   func topToolbarDidPressScrollToTop(_ topToolbar: TopToolbarView)
@@ -51,7 +49,6 @@ class TopToolbarView: UIView, ToolbarProtocol {
   
   enum URLBarButton {
     case wallet
-    case playlist
   }
   
   // MARK: Internal
@@ -196,7 +193,6 @@ class TopToolbarView: UIView, ToolbarProtocol {
   private(set) var currentURLBarButton: URLBarButton? {
     didSet {
       locationView.walletButton.isHidden = currentURLBarButton != .wallet
-      locationView.playlistButton.isHidden = currentURLBarButton != .playlist
     }
   }
   
@@ -554,25 +550,14 @@ class TopToolbarView: UIView, ToolbarProtocol {
     updateURLBarButtonsVisibility()
   }
   
-  func updatePlaylistButtonState(_ state: PlaylistURLBarButton.State) {
-    locationView.playlistButton.buttonState = state
-    updateURLBarButtonsVisibility()
-  }
-  
   func updateWalletButtonState(_ state: WalletURLBarButton.ButtonState) {
     locationView.walletButton.buttonState = state
     updateURLBarButtonsVisibility()
   }
   
-  /// Updates the `currentURLBarButton` based on priority: 1) Wallet 2) Playlist 3) ReaderMode.
+  /// Updates the `currentURLBarButton` based on priority: 1) Wallet 2)  3) ReaderMode.
   private func updateURLBarButtonsVisibility() {
-    if locationView.walletButton.buttonState != .inactive {
-      currentURLBarButton = .wallet
-    } else if locationView.playlistButton.buttonState != .none {
-      currentURLBarButton = .playlist
-    } else {
-      currentURLBarButton = nil
-    }
+    
   }
   
   func setAutocompleteSuggestion(_ suggestion: String?) {
@@ -810,14 +795,6 @@ extension TopToolbarView: TabLocationViewDelegate {
 
   func tabLocationViewDidTapReaderMode(_ tabLocationView: TabLocationView) {
     delegate?.topToolbarDidPressReaderMode(self)
-  }
-
-  func tabLocationViewDidTapPlaylist(_ tabLocationView: TabLocationView) {
-    delegate?.topToolbarDidPressPlaylistButton(self)
-  }
-  
-  func tabLocationViewDidTapPlaylistMenuAction(_ tabLocationView: TabLocationView, action: PlaylistURLBarButton.MenuAction) {
-    delegate?.topToolbarDidPressPlaylistMenuAction(self, action: action)
   }
 
   func tabLocationViewDidBeginDragInteraction(_ tabLocationView: TabLocationView) {

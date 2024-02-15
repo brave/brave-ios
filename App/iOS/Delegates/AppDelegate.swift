@@ -29,7 +29,6 @@ import BraveWallet
 import Preferences
 import BraveShields
 import PrivateCDN
-import Playlist
 import UserAgent
 
 @main
@@ -243,13 +242,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       )
     }
     
-    // Setup Playlist
-    // This restores the playlist incomplete downloads. So if a download was started
-    // and interrupted on application death, we restart it on next launch.
-    Task(priority: .low) { @MainActor in
-      PlaylistManager.shared.setupPlaylistFolder()
-      PlaylistManager.shared.restoreSession()
-    }
+    
     
     return shouldPerformAdditionalDelegateHandling
   }

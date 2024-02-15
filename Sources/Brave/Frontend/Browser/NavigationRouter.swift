@@ -134,8 +134,6 @@ public enum NavigationPath: Equatable {
           bvc.displayOpenDownloadsError()
         }
       }
-    case .playlist:
-      bvc.navigationHelper.openPlaylist()
     case .wallet:
       bvc.navigationHelper.openWallet()
     case .scanQRCode:

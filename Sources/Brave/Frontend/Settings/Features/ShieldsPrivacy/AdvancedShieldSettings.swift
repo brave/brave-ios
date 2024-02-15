@@ -16,7 +16,7 @@ import os
 @MainActor class AdvancedShieldsSettings: ObservableObject {
   struct ClearableSetting: Identifiable {
     enum ClearableType: String {
-      case history, cache, cookiesAndCache, passwords, downloads, braveNews, playlistCache, playlistData, recentSearches
+      case history, cache, cookiesAndCache, passwords, downloads, braveNews, recentSearches
     }
     
     var id: ClearableType
@@ -87,8 +87,6 @@ import os
       ClearableSetting(id: .passwords, clearable: PasswordsClearable(profile: profile), isEnabled: true),
       ClearableSetting(id: .downloads, clearable: DownloadsClearable(), isEnabled: true),
       ClearableSetting(id: .braveNews, clearable: BraveNewsClearable(feedDataSource: feedDataSource), isEnabled: true),
-      ClearableSetting(id: .playlistCache, clearable: PlayListCacheClearable(), isEnabled: false),
-      ClearableSetting(id: .playlistData, clearable: PlayListDataClearable(), isEnabled: false),
       ClearableSetting(id: .recentSearches, clearable: RecentSearchClearable(), isEnabled: true)
     ]
     

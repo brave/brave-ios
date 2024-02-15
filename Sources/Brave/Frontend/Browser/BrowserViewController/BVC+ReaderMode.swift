@@ -129,26 +129,7 @@ extension BrowserViewController {
 
     recordTimeBasedNumberReaderModeUsedP3A(activated: true)
     
-    if backList.count > 1 && backList.last?.url == readerModeURL {
-      let playlistItem = tab.playlistItem
-      webView.go(to: backList.last!)
-      PlaylistScriptHandler.updatePlaylistTab(tab: tab, item: playlistItem)
-    } else if !forwardList.isEmpty && forwardList.first?.url == readerModeURL {
-      let playlistItem = tab.playlistItem
-      webView.go(to: forwardList.first!)
-      PlaylistScriptHandler.updatePlaylistTab(tab: tab, item: playlistItem)
-    } else {
-      // Store the readability result in the cache and load it. This will later move to the ReadabilityHelper.
-      webView.evaluateSafeJavaScript(functionName: "\(ReaderModeNamespace).readerize", contentWorld: ReaderModeScriptHandler.scriptSandbox) { (object, error) -> Void in
-        if let readabilityResult = ReadabilityResult(object: object as AnyObject?) {
-          let playlistItem = tab.playlistItem
-          try? self.readerModeCache.put(currentURL, readabilityResult)
-          if webView.load(PrivilegedRequest(url: readerModeURL) as URLRequest) != nil {
-            PlaylistScriptHandler.updatePlaylistTab(tab: tab, item: playlistItem)
-          }
-        }
-      }
-    }
+    
   }
 
   /// Disabling reader mode can mean two things. In the simplest case we were opened from the reading list, which
@@ -157,30 +138,7 @@ extension BrowserViewController {
   /// of the page is either to the left or right in the BackForwardList. If that is the case, we navigate there.
 
   func disableReaderMode() {
-    if let tab = tabManager.selectedTab,
-      let webView = tab.webView {
-      let backList = webView.backForwardList.backList
-      let forwardList = webView.backForwardList.forwardList
-
-      if let currentURL = webView.backForwardList.currentItem?.url {
-        if let originalURL = currentURL.decodeReaderModeURL {
-          if backList.count > 1 && backList.last?.url == originalURL {
-            let playlistItem = tab.playlistItem
-            webView.go(to: backList.last!)
-            PlaylistScriptHandler.updatePlaylistTab(tab: tab, item: playlistItem)
-          } else if !forwardList.isEmpty && forwardList.first?.url == originalURL {
-            let playlistItem = tab.playlistItem
-            webView.go(to: forwardList.first!)
-            PlaylistScriptHandler.updatePlaylistTab(tab: tab, item: playlistItem)
-          } else {
-            let playlistItem = tab.playlistItem
-            if webView.load(URLRequest(url: originalURL)) != nil {
-              PlaylistScriptHandler.updatePlaylistTab(tab: tab, item: playlistItem)
-            }
-          }
-        }
-      }
-    }
+    
   }
 
   @objc func dynamicFontChanged(_ notification: Notification) {

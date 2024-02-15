@@ -78,7 +78,6 @@ extension BrowserViewController: DownloadQueueDelegate {
       title: Strings.genericErrorTitle,
       message: Strings.openDownloadsFolderErrorDescription,
       preferredStyle: .alert)
-    alert.addAction(UIAlertAction(title: Strings.PlayList.okayButtonTitle, style: .default, handler: nil))
 
     present(alert, animated: true, completion: nil)
   }

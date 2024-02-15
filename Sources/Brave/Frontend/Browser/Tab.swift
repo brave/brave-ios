@@ -232,8 +232,6 @@ class Tab: NSObject {
   var mimeType: String?
   var isEditing: Bool = false
   var shouldClassifyLoadsForAds = true
-  var playlistItem: PlaylistInfo?
-  var playlistItemState: PlaylistItemAddedState = .none
 
   /// The tabs new tab page controller.
   ///
@@ -411,7 +409,6 @@ class Tab: NSObject {
         .mediaBackgroundPlay: Preferences.General.mediaAutoBackgrounding.value,
         .nightMode: Preferences.General.nightModeEnabled.value,
         .deAmp: Preferences.Shields.autoRedirectAMPPages.value,
-        .playlistMediaSource: Preferences.Playlist.webMediaSourceCompatibility.value,
       ]
       
       userScripts = Set(scriptPreferences.filter({ $0.value }).map({ $0.key }))

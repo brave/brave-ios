@@ -135,22 +135,6 @@ extension BrowserViewController: TabManagerDelegate {
     navigationToolbar.updateBackStatus(selected?.canGoBack ?? false)
     navigationToolbar.updateForwardStatus(selected?.canGoForward ?? false)
 
-    let shouldShowPlaylistURLBarButton = selected?.url?.isPlaylistSupportedSiteURL == true
-
-    if let readerMode = selected?.getContentScript(name: ReaderModeScriptHandler.scriptName) as? ReaderModeScriptHandler,
-      !shouldShowPlaylistURLBarButton {
-      topToolbar.updateReaderModeState(readerMode.state)
-      if readerMode.state == .active {
-        showReaderModeBar(animated: false)
-      } else {
-        hideReaderModeBar(animated: false)
-      }
-
-      updatePlaylistURLBar(tab: selected, state: selected?.playlistItemState ?? .none, item: selected?.playlistItem)
-    } else {
-      topToolbar.updateReaderModeState(ReaderModeState.unavailable)
-    }
-
     updateScreenTimeUrl(tabManager.selectedTab?.url)
     updateInContentHomePanel(selected?.url as URL?)
 

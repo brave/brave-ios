@@ -86,11 +86,6 @@ extension BrowserViewController {
       
       Divider()
 
-      MenuItemFactory.button(for: .playlist(subtitle: Strings.OptionsMenu.bravePlaylistItemDescription)) { [weak self] in
-        guard let self = self else { return }
-        self.presentPlaylistController()
-      }
-
       // Add Brave Talk and News options only in normal browsing
       if !privateBrowsingManager.isPrivateBrowsing {
         // Show Brave News if it is first launch and after first launch If the new is enabled
@@ -151,10 +146,6 @@ extension BrowserViewController {
         MenuItemFactory.button(for: .wallet()) {[weak self] in
           self?.presentWallet()
         }
-        MenuItemFactory.button(for: .playlist()) { [weak self] in
-          guard let self = self else { return }
-          self.presentPlaylistController()
-        }
       }
       MenuItemFactory.button(for: .settings) { [unowned self, unowned menuController] in
         let isPrivateMode = privateBrowsingManager.isPrivateBrowsing
@@ -208,80 +199,15 @@ extension BrowserViewController {
     }
   }
 
-  public func presentPlaylistController() {
-    if PlaylistCarplayManager.shared.isPlaylistControllerPresented {
-      let alert = UIAlertController(title: Strings.PlayList.playlistAlreadyShowingTitle,
-                                    message: Strings.PlayList.playlistAlreadyShowingBody,
-                                    preferredStyle: .alert)
-      alert.addAction(UIAlertAction(title: Strings.OKString, style: .default))
-      dismiss(animated: true) {
-        self.present(alert, animated: true)
-      }
-      return
-    }
-    
-    // Present existing playlist controller
-    if let playlistController = PlaylistCarplayManager.shared.playlistController {
-      PlaylistP3A.recordUsage()
-      
-      dismiss(animated: true) {
-        PlaylistCarplayManager.shared.isPlaylistControllerPresented = true
-        self.present(playlistController, animated: true)
-      }
-    } else {
-      // Retrieve the item and offset-time from the current tab's webview.
-      let tab = self.tabManager.selectedTab
-      PlaylistCarplayManager.shared.getPlaylistController(tab: tab) { [weak self] playlistController in
-        guard let self = self else { return }
-
-        playlistController.modalPresentationStyle = .fullScreen
-        PlaylistP3A.recordUsage()
-        
-        self.dismiss(animated: true) {
-          PlaylistCarplayManager.shared.isPlaylistControllerPresented = true
-          self.present(playlistController, animated: true)
-        }
-      }
-    }
-  }
-
   struct PageActionsMenuSection: View {
     var browserViewController: BrowserViewController
     var tabURL: URL
     var activities: [UIActivity]
 
-    @State private var playlistItemAdded: Bool = false
-
-    private var playlistActivity: (enabled: Bool, item: PlaylistInfo?)? {
-      browserViewController.addToPlayListActivityItem ?? browserViewController.openInPlaylistActivityItem
-    }
-
-    private var isPlaylistItemAdded: Bool {
-      browserViewController.openInPlaylistActivityItem != nil
-    }
-
     var body: some View {
       VStack(alignment: .leading, spacing: 0) {
         MenuTabDetailsView(tab: browserViewController.tabManager.selectedTab, url: tabURL)
         VStack(spacing: 0) {
-          if let activity = playlistActivity, activity.enabled, let item = activity.item {
-            PlaylistMenuButton(isAdded: isPlaylistItemAdded) {
-              if !isPlaylistItemAdded {
-                // Add to playlist
-                browserViewController.addToPlaylist(item: item) { didAddItem in
-                  Logger.module.debug("Playlist Item Added")
-                  if didAddItem {
-                    playlistItemAdded = true
-                  }
-                }
-              } else {
-                browserViewController.dismiss(animated: true) {
-                  browserViewController.openPlaylist(tab: browserViewController.tabManager.selectedTab, item: item)
-                }
-              }
-            }
-            .animation(.default, value: playlistItemAdded)
-          }
           MenuItemButton(icon: Image(braveSystemName: "leo.share.macos"), title: Strings.shareWithMenuItem) {
             browserViewController.dismiss(animated: true)
             browserViewController.tabToolbarDidPressShare()

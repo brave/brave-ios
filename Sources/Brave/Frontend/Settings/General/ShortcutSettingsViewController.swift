@@ -118,18 +118,6 @@ class ShortcutSettingsViewController: TableViewController {
       Section(
         rows: [
           Row(
-            text: Strings.Shortcuts.shortcutSettingsOpenPlaylistTitle,
-            selection: { [unowned self] in
-              manageShortcutActivity(for: .openPlayList)
-            }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self)
-        ],
-        footer: .title(Strings.Shortcuts.shortcutSettingsOpenPlaylistDescription))
-    )
-
-    dataSource.sections.append(
-      Section(
-        rows: [
-          Row(
             text: Strings.Shortcuts.shortcutSettingsOpenSyncedTabsTitle,
             selection: { [unowned self] in
               manageShortcutActivity(for: .openSyncedTabs)

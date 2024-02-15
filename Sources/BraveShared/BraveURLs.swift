@@ -11,7 +11,6 @@ extension URL {
     public static let braveNews = URL(string: "https://brave.com/brave-news/")!
     public static let braveNewsPrivacy = URL(string: "https://brave.com/privacy/#brave-news")!
     public static let braveOffers = URL(string: "https://offers.brave.com/")!
-    public static let playlist = URL(string: "https://brave.com/playlist")!
     public static let rewardsOniOS = URL(string: "https://brave.com/rewards-ios/")!
     public static let rewardsUnverifiedPublisherLearnMoreURL = URL(string: "https://brave.com/faq-rewards/#unclaimed-funds")!
     public static let termsOfUse = URL(string: "https://www.brave.com/terms_of_use")!

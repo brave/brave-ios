@@ -103,9 +103,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // as it is only possible to have a single car-play instance.
     // Once we move to iOS 14+, this is easy to fix as we just pass car-play a `MediaStreamer`
     // instance instead of a `BrowserViewController`.
-    PlaylistCarplayManager.shared.do {
-      $0.browserController = browserViewController
-    }
+    
     
     self.present(
       browserViewController: browserViewController,
@@ -361,11 +359,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       }
 
       return
-    case ActivityType.openPlayList.identifier:
-      if let browserViewController = scene.browserViewController {
-        ActivityShortcutManager.shared.performShortcutActivity(
-          type: .openPlayList, using: browserViewController)
-      }
 
     case ActivityType.openSyncedTabs.identifier:
       if let browserViewController = scene.browserViewController {

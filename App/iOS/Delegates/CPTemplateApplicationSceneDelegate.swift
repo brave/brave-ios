@@ -49,9 +49,7 @@ extension CarplayTemplateApplicationSceneDelegate: CPTemplateApplicationSceneDel
   func templateApplicationScene(_ templateApplicationScene: CPTemplateApplicationScene, didConnect interfaceController: CPInterfaceController) {
     log.debug("Template application scene did connect.")
 
-    DispatchQueue.main.async {
-      PlaylistCarplayManager.shared.connect(interfaceController: interfaceController)
-    }
+   
   }
 
   func templateApplicationScene(
@@ -60,8 +58,6 @@ extension CarplayTemplateApplicationSceneDelegate: CPTemplateApplicationSceneDel
   ) {
     log.debug("Template application scene did disconnect.")
 
-    DispatchQueue.main.async {
-      PlaylistCarplayManager.shared.disconnect(interfaceController: interfaceController)
-    }
+   
   }
 }

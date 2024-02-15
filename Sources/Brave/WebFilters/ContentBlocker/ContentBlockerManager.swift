@@ -174,6 +174,7 @@ actor ContentBlockerManager {
   
   /// Compile the rule list found in the given local URL using the specified modes
   func compileRuleList(at localFileURL: URL, for type: BlocklistType, modes: [BlockingMode]) async throws {
+    return
     let result: ContentBlockingRulesResult
     let signpostID = Self.signpost.makeSignpostID()
     let state = Self.signpost.beginInterval("convertRules", id: signpostID, "\(type.debugDescription)")
@@ -192,6 +193,7 @@ actor ContentBlockerManager {
   
   /// Compile the given resource and store it in cache for the given blocklist type and specified modes
   func compile(encodedContentRuleList: String, for type: BlocklistType, modes: [BlockingMode]) async throws {
+    return
     guard !modes.isEmpty else { return }
     var foundError: Error?
     
@@ -218,6 +220,7 @@ actor ContentBlockerManager {
   }
   
   private func modify(encodedContentRuleList: String, for mode: BlockingMode) throws -> String? {
+    return nil
     switch mode {
     case .aggressive, .general:
       // Aggressive mode and general mode has no modification to the rules
@@ -247,7 +250,9 @@ actor ContentBlockerManager {
   }
   
   /// Compile the given resource and store it in cache for the given blocklist type
-  private func compile(encodedContentRuleList: String, for type: BlocklistType, mode: BlockingMode) async throws -> WKContentRuleList {
+  private func compile(encodedContentRuleList: String, for type: BlocklistType, mode: BlockingMode) async throws ->
+  WKContentRuleList {
+    
     let identifier = type.makeIdentifier(for: mode)
     let signpostID = Self.signpost.makeSignpostID()
     let state = Self.signpost.beginInterval("compileRuleList", id: signpostID, "\(identifier)")
@@ -305,6 +310,7 @@ actor ContentBlockerManager {
   
   /// Load a rule list from the rule store and return it. Will not use cached results
   private func loadRuleList(for type: BlocklistType, mode: BlockingMode) async throws -> WKContentRuleList? {
+    return nil
     let identifier = type.makeIdentifier(for: mode)
     
     do {
@@ -323,6 +329,7 @@ actor ContentBlockerManager {
   /// - Warning: This may replace any downloaded versions with the bundled ones in the rulestore
   /// for example, the `adBlock` rule type may replace the `adBlockRules` downloaded version.
   func compileBundledRuleList(for genericType: GenericBlocklistType) async throws {
+    return
     let type = BlocklistType.generic(genericType)
     try await compileBundledRuleList(for: genericType, modes: type.allowedModes)
   }
@@ -331,6 +338,7 @@ actor ContentBlockerManager {
   /// - Warning: This may replace any downloaded versions with the bundled ones in the rulestore
   /// for example, the `adBlock` rule type may replace the `genericContentBlockingBehaviors` downloaded version.
   func compileBundledRuleList(for genericType: GenericBlocklistType, modes: [BlockingMode]) async throws {
+    return
     guard !modes.isEmpty else { return }
     guard let fileURL = Bundle.module.url(forResource: genericType.bundledFileName, withExtension: "json") else {
       assertionFailure("A bundled file shouldn't fail to load")

@@ -62,23 +62,23 @@ class SiteStateListenerScriptHandler: TabContentScript {
         return
       }
       
-      if let pageData = tab.currentPageData {
-        Task { @MainActor in
-          let domain = pageData.domain(persistent: !tab.isPrivate)
-          guard domain.isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true) else { return }
-          
-          let models = await AdBlockStats.shared.cosmeticFilterModels(forFrameURL: frameURL, domain: domain)
-          let setup = try self.makeSetup(from: models, isAggressive: domain.blockAdsAndTrackingLevel.isAggressive)
-          let script = try ScriptFactory.shared.makeScript(for: .selectorsPoller(setup))
-          
-          try await webView.evaluateSafeJavaScriptThrowing(
-            functionName: script.source,
-            frame: message.frameInfo,
-            contentWorld: CosmeticFiltersScriptHandler.scriptSandbox,
-            asFunction: false
-          )
-        }
-      }
+//      if let pageData = tab.currentPageData {
+//        Task { @MainActor in
+//          let domain = pageData.domain(persistent: !tab.isPrivate)
+//          guard domain.isShieldExpected(.AdblockAndTp, considerAllShieldsOption: true) else { return }
+//          
+//          let models = await AdBlockStats.shared.cosmeticFilterModels(forFrameURL: frameURL, domain: domain)
+//          let setup = try self.makeSetup(from: models, isAggressive: domain.blockAdsAndTrackingLevel.isAggressive)
+//          let script = try ScriptFactory.shared.makeScript(for: .selectorsPoller(setup))
+//          
+//          try await webView.evaluateSafeJavaScriptThrowing(
+//            functionName: script.source,
+//            frame: message.frameInfo,
+//            contentWorld: CosmeticFiltersScriptHandler.scriptSandbox,
+//            asFunction: false
+//          )
+//        }
+//      }
     } catch {
       assertionFailure("Invalid type of message. Fix the `SiteStateListenerScript.js` script")
       Logger.module.error("\(error.localizedDescription)")

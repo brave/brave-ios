@@ -21,11 +21,6 @@ class MenuButton: ToolbarButton {
     static func == (lhs: Self, rhs: Self) -> Bool {
       return lhs.icon == rhs.icon
     }
-
-    static let playlist: Self = .init(
-      gradientView: { .gradient02 },
-      icon: UIImage(named: "playlist-menu-badge", in: .module, compatibleWith: nil)?.withTintColor(.white)
-    )
   }
 
   private(set) var badges: [Badge: UIView] = [:]

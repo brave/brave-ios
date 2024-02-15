@@ -17,7 +17,6 @@ import BraveWallet
 import Preferences
 import CertificateUtilities
 import AVFoundation
-import Playlist
 
 // MARK: - TopToolbarDelegate
 
@@ -128,53 +127,6 @@ extension BrowserViewController: TopToolbarDelegate {
 
   func topToolbarDidPressReaderMode(_ topToolbar: TopToolbarView) {
     toggleReaderMode()
-  }
-
-  func topToolbarDidPressPlaylistButton(_ urlBar: TopToolbarView) {
-    guard let tab = tabManager.selectedTab, let playlistItem = tab.playlistItem else { return }
-    let state = urlBar.locationView.playlistButton.buttonState
-    switch state {
-    case .addToPlaylist:
-      addToPlaylist(item: playlistItem) { [weak self] didAddItem in
-        guard let self else { return }
-        
-        if didAddItem {
-          self.updatePlaylistURLBar(tab: tab, state: .existingItem, item: playlistItem)
-          
-          DispatchQueue.main.async { [self] in
-            let popover = self.createPlaylistPopover(item: playlistItem, tab: tab)
-            popover.present(from: self.topToolbar.locationView.playlistButton, on: self)
-          }
-        }
-      }
-    case .addedToPlaylist:
-      // Shows its own menu
-      break
-    case .none:
-      break
-    }
-  }
-  
-  func topToolbarDidPressPlaylistMenuAction(_ urlBar: TopToolbarView, action: PlaylistURLBarButton.MenuAction) {
-    guard let tab = tabManager.selectedTab, let info = tab.playlistItem else { return }
-    switch action {
-    case .changeFolders:
-      guard let item = PlaylistItem.getItem(uuid: info.tagId) else { return }
-      let controller = PlaylistChangeFoldersViewController(item: item)
-      self.present(controller, animated: true)
-    case .openInPlaylist:
-      DispatchQueue.main.async {
-        self.openPlaylist(tab: tab, item: info)
-      }
-    case .remove:
-      DispatchQueue.main.async {
-        if PlaylistManager.shared.delete(item: info) {
-          self.updatePlaylistURLBar(tab: tab, state: .newItem, item: info)
-        }
-      }
-    case .undoRemove(let originalFolderUUID):
-      addToPlaylist(item: info, folderUUID: originalFolderUUID)
-    }
   }
 
   func topToolbarDisplayTextForURL(_ topToolbar: URL?) -> (String?, Bool) {
@@ -528,17 +480,7 @@ extension BrowserViewController: TopToolbarDelegate {
     
     func openVoiceSearch(speechRecognizer: SpeechRecognizer) {
       // Pause active playing in PiP when Audio Search is enabled
-      if let pipMediaPlayer = PlaylistCarplayManager.shared.mediaPlayer?.pictureInPictureController?.playerLayer.player {
-        pipMediaPlayer.pause()
-      }
       
-      voiceSearchViewController = PopupViewController(rootView: VoiceSearchInputView(speechModel: speechRecognizer))
-      
-      if let voiceSearchController = voiceSearchViewController {
-        voiceSearchController.modalTransitionStyle = .crossDissolve
-        voiceSearchController.modalPresentationStyle = .overFullScreen
-        present(voiceSearchController, animated: true)
-      }
     }
     
     func showNoMicrophoneWarning() {

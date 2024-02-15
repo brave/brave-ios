@@ -14,7 +14,6 @@ class MenuItemFactory {
     case downloads
     case history
     case news
-    case playlist(subtitle: String? = nil)
     case settings
     case talk
     case wallet(subtitle: String? = nil)
@@ -29,8 +28,6 @@ class MenuItemFactory {
           return Image(braveSystemName: "leo.history")
         case .news:
           return Image(braveSystemName: "leo.product.brave-news")
-        case .playlist:
-          return Image(braveSystemName: "leo.product.playlist")
         case .settings:
           return Image(braveSystemName: "leo.settings")
         case .talk:
@@ -50,8 +47,6 @@ class MenuItemFactory {
         return Strings.historyMenuItem
       case .news:
         return Strings.OptionsMenu.braveNewsItemTitle
-      case .playlist:
-        return Strings.OptionsMenu.bravePlaylistItemTitle
       case .settings:
         return Strings.settingsMenuItem
       case .talk:
@@ -65,8 +60,6 @@ class MenuItemFactory {
       switch self {
       case .news:
         return Strings.OptionsMenu.braveNewsItemDescription
-      case let .playlist(subtitle):
-        return subtitle
       case .talk:
         return Strings.OptionsMenu.braveTalkItemDescription
       case let .wallet(subtitle):

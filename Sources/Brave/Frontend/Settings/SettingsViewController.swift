@@ -329,15 +329,6 @@ class SettingsViewController: TableViewController {
       section.rows.append(vpnRow)
     }
 
-    section.rows.append(
-      Row(
-        text: Strings.PlayList.playListTitle,
-        selection: { [unowned self] in
-          let playlistSettings = PlaylistSettingsViewController()
-          self.navigationController?.pushViewController(playlistSettings, animated: true)
-        }, image: UIImage(braveSystemNamed: "leo.product.playlist"), accessory: .disclosureIndicator)
-    )
-
     return section
   }
 

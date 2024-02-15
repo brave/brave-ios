@@ -21,7 +21,6 @@ class UserScriptManager {
   private let alwaysEnabledScripts: [ScriptType] = [
     .faviconFetcher,
     .rewardsReporting,
-    .playlist,
     .resourceDownloader,
     .windowRenderHelper,
     .readyStateHelper,
@@ -34,54 +33,10 @@ class UserScriptManager {
   }()
   
   /// Scripts that are web-packed and should be loaded after `baseScripts` but before `dynamicScripts`
-  private let staticScripts: [WKUserScript] = {
-    return [
-      (WKUserScriptInjectionTime.atDocumentStart, mainFrameOnly: false, sandboxed: false),
-      (WKUserScriptInjectionTime.atDocumentEnd, mainFrameOnly: false, sandboxed: false),
-      (WKUserScriptInjectionTime.atDocumentStart, mainFrameOnly: false, sandboxed: true),
-      (WKUserScriptInjectionTime.atDocumentEnd, mainFrameOnly: false, sandboxed: true),
-      (WKUserScriptInjectionTime.atDocumentStart, mainFrameOnly: true, sandboxed: false),
-      (WKUserScriptInjectionTime.atDocumentEnd, mainFrameOnly: true, sandboxed: false),
-      (WKUserScriptInjectionTime.atDocumentStart, mainFrameOnly: true, sandboxed: true),
-      (WKUserScriptInjectionTime.atDocumentEnd, mainFrameOnly: true, sandboxed: true),
-    ].compactMap { (injectionTime, mainFrameOnly, sandboxed) in
-      
-      let name = (mainFrameOnly ? "MainFrame" : "AllFrames") + "AtDocument" + (injectionTime == .atDocumentStart ? "Start" : "End") + (sandboxed ? "Sandboxed" : "")
-      
-      if let source = ScriptLoader.loadUserScript(named: name) {
-        let wrappedSource = "(function() { const SECURITY_TOKEN = '\(UserScriptManager.securityToken)'; \(source) })()"
-
-        return WKUserScript(
-          source: wrappedSource,
-          injectionTime: injectionTime,
-          forMainFrameOnly: mainFrameOnly,
-          in: sandboxed ? .defaultClient : .page)
-      }
-      
-      return nil
-    }
-  }()
+  private let staticScripts: [WKUserScript] = []
   
   /// Scripts injected before all other scripts.
-  private let baseScripts: [WKUserScript] = {
-    [
-      (WKUserScriptInjectionTime.atDocumentStart, mainFrameOnly: false, sandboxed: false),
-      (WKUserScriptInjectionTime.atDocumentEnd, mainFrameOnly: false, sandboxed: false),
-      (WKUserScriptInjectionTime.atDocumentStart, mainFrameOnly: false, sandboxed: true),
-      (WKUserScriptInjectionTime.atDocumentEnd, mainFrameOnly: false, sandboxed: true),
-    ].compactMap { (injectionTime, mainFrameOnly, sandboxed) in
-      
-      if let source = ScriptLoader.loadUserScript(named: "__firefox__") {
-        return WKUserScript(
-          source: source,
-          injectionTime: injectionTime,
-          forMainFrameOnly: mainFrameOnly,
-          in: sandboxed ? .defaultClient : .page)
-      }
-      
-      return nil
-    }
-  }()
+  private let baseScripts: [WKUserScript] = []
   
   private var walletEthProviderScript: WKUserScript?
   private var walletSolProviderScript: WKUserScript?
@@ -93,8 +48,6 @@ class UserScriptManager {
     case cookieBlocking
     case rewardsReporting
     case mediaBackgroundPlay
-    case playlistMediaSource
-    case playlist
     case nightMode
     case deAmp
     case requestBlocking
@@ -111,7 +64,6 @@ class UserScriptManager {
         // Conditionally enabled scripts
       case .cookieBlocking: return loadScript(named: "CookieControlScript")
       case .mediaBackgroundPlay: return loadScript(named: "MediaBackgroundingScript")
-      case .playlistMediaSource: return loadScript(named: "PlaylistSwizzlerScript")
       case .nightMode: return NightModeScriptHandler.userScript
       case .deAmp: return DeAmpScriptHandler.userScript
       case .requestBlocking: return RequestBlockingContentScriptHandler.userScript
@@ -122,7 +74,6 @@ class UserScriptManager {
       // Always enabled scripts
       case .faviconFetcher: return FaviconScriptHandler.userScript
       case .rewardsReporting: return RewardsReportingScriptHandler.userScript
-      case .playlist: return PlaylistScriptHandler.userScript
       case .resourceDownloader: return ResourceDownloadScriptHandler.userScript
       case .windowRenderHelper: return WindowRenderScriptHandler.userScript
       case .readyStateHelper: return ReadyStateScriptHandler.userScript
@@ -141,6 +92,7 @@ class UserScriptManager {
   }
   
   func fetchWalletScripts(from braveWalletAPI: BraveWalletAPI) {
+    return ()
     if let ethJS = braveWalletAPI.providerScripts(for: .eth)[.ethereum] {
       let providerJS = """
           window.__firefox__.execute(function($, $Object) {
@@ -228,6 +180,7 @@ class UserScriptManager {
   }
   
   public func loadScripts(into webView: WKWebView, scripts: Set<ScriptType>) {
+    return
     var scripts = scripts
     
     webView.configuration.userContentController.do { scriptController in
@@ -275,6 +228,7 @@ class UserScriptManager {
     userScripts: Set<ScriptType>,
     customScripts: Set<UserScriptType>
   ) {
+    return
     guard let webView = tab.webView else {
       Logger.module.info("Injecting Scripts into a Tab that has no WebView")
       return
@@ -333,15 +287,7 @@ class UserScriptManager {
       
       // TODO: Refactor this and get rid of the `UserScriptType`
       // Inject Custom scripts
-      for userScriptType in customScripts.sorted(by: { $0.order < $1.order }) {
-        do {
-          let script = try ScriptFactory.shared.makeScript(for: userScriptType)
-          scriptController.addUserScript(script)
-        } catch {
-          assertionFailure("Should never happen. The scripts are packed in the project and loading/modifying should always be possible.")
-          Logger.module.error("\(error.localizedDescription)")
-        }
-      }
+      
     }
   }
 }

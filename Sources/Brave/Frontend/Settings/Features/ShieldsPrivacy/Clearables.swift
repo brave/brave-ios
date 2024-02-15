@@ -11,7 +11,6 @@ import BraveCore
 import BraveNews
 import Favicon
 import os.log
-import Playlist
 
 // A base protocol for something that can be cleared.
 protocol Clearable {
@@ -177,52 +176,6 @@ class BraveNewsClearable: Clearable {
 
   func clear() async throws {
     feedDataSource.clearCachedFiles()
-  }
-}
-
-class PlayListCacheClearable: Clearable {
-
-  init() {}
-
-  var label: String {
-    return Strings.PlayList.playlistOfflineDataToggleOption
-  }
-
-  func clear() async throws {
-    PlaylistCarplayManager.shared.destroyPiP()
-    PlaylistManager.shared.deleteAllItems(cacheOnly: true)
-    
-    // Backup in case there is folder corruption, so we delete the cache anyway
-    if let playlistDirectory = PlaylistDownloadManager.playlistDirectory {
-      do {
-        try FileManager.default.removeItem(at: playlistDirectory)
-      } catch {
-        Logger.module.error("Error Deleting Playlist directory: \(error.localizedDescription)")
-      }
-    }
-  }
-}
-
-class PlayListDataClearable: Clearable {
-
-  init() {}
-
-  var label: String {
-    return Strings.PlayList.playlistMediaAndOfflineDataToggleOption
-  }
-
-  func clear() async throws {
-    PlaylistCarplayManager.shared.destroyPiP()
-    PlaylistManager.shared.deleteAllItems(cacheOnly: false)
-    
-    // Backup in case there is folder corruption, so we delete the cache anyway
-    if let playlistDirectory = PlaylistDownloadManager.playlistDirectory {
-      do {
-        try FileManager.default.removeItem(at: playlistDirectory)
-      } catch {
-        Logger.module.error("Error Deleting Playlist directory: \(error.localizedDescription)")
-      }
-    }
   }
 }
 

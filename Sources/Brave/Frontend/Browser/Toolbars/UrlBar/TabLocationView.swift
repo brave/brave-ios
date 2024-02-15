@@ -17,8 +17,6 @@ protocol TabLocationViewDelegate {
   func tabLocationViewDidTapLocation(_ tabLocationView: TabLocationView)
   func tabLocationViewDidTapReaderMode(_ tabLocationView: TabLocationView)
   func tabLocationViewDidBeginDragInteraction(_ tabLocationView: TabLocationView)
-  func tabLocationViewDidTapPlaylist(_ tabLocationView: TabLocationView)
-  func tabLocationViewDidTapPlaylistMenuAction(_ tabLocationView: TabLocationView, action: PlaylistURLBarButton.MenuAction)
   func tabLocationViewDidTapReload(_ tabLocationView: TabLocationView)
   func tabLocationViewDidTapStop(_ tabLocationView: TabLocationView)
   func tabLocationViewDidTapVoiceSearch(_ tabLocationView: TabLocationView)
@@ -183,14 +181,6 @@ class TabLocationView: UIView {
     readerModeButton.accessibilityIdentifier = "TabLocationView.readerModeButton"
     return readerModeButton
   }()
-
-  private(set) lazy var playlistButton = PlaylistURLBarButton(frame: .zero).then {
-    $0.accessibilityIdentifier = "TabToolbar.playlistButton"
-    $0.isAccessibilityElement = true
-    $0.buttonState = .none
-    $0.tintColor = .white
-    $0.addTarget(self, action: #selector(didTapPlaylistButton), for: .touchUpInside)
-  }
   
   private(set) lazy var walletButton = WalletURLBarButton(frame: .zero).then {
     $0.accessibilityIdentifier = "TabToolbar.walletButton"
@@ -275,7 +265,7 @@ class TabLocationView: UIView {
       $0.setContentHuggingPriority(.defaultHigh, for: .horizontal)
     }
     
-    var trailingOptionSubviews: [UIView] = [walletButton, playlistButton]
+    var trailingOptionSubviews: [UIView] = [walletButton]
     if isVoiceSearchAvailable {
       trailingOptionSubviews.append(voiceSearchButton)
     }
@@ -344,10 +334,6 @@ class TabLocationView: UIView {
         self?.updateColors()
       })
     
-    playlistButton.menuActionHandler = { [unowned self] action in
-      self.delegate?.tabLocationViewDidTapPlaylistMenuAction(self, action: action)
-    }
-    
     updateForTraitCollection()
     updateColors()
   }
@@ -364,7 +350,7 @@ class TabLocationView: UIView {
   
   override var accessibilityElements: [Any]? {
     get {
-      return [urlDisplayLabel, placeholderLabel, readerModeButton, playlistButton, reloadButton].filter { !$0.isHidden }
+      return [urlDisplayLabel, placeholderLabel, readerModeButton, reloadButton].filter { !$0.isHidden }
     }
     set {
       super.accessibilityElements = newValue
@@ -445,10 +431,6 @@ class TabLocationView: UIView {
 
   @objc func didTapReaderModeButton() {
     delegate?.tabLocationViewDidTapReaderMode(self)
-  }
-  
-  @objc func didTapPlaylistButton() {
-    delegate?.tabLocationViewDidTapPlaylist(self)
   }
 
   @objc func didTapStopReloadButton() {
