@@ -68,22 +68,7 @@ class TabManagerNavDelegate: NSObject, WKNavigationDelegate {
   }
 
   private func defaultAllowPolicy(for navigationAction: WKNavigationAction) -> WKNavigationActionPolicy {
-    let isPrivateBrowsing = tabManager?.privateBrowsingManager.isPrivateBrowsing == true
-    func isYouTubeLoad() -> Bool {
-      guard let domain = navigationAction.request.mainDocumentURL?.baseDomain else {
-        return false
-      }
-      let domainsWithUniversalLinks: Set<String> = ["youtube.com", "youtu.be"]
-      return domainsWithUniversalLinks.contains(domain)
-    }
-    if isPrivateBrowsing || !Preferences.General.followUniversalLinks.value ||
-        (Preferences.General.keepYouTubeInBrave.value && isYouTubeLoad()) {
-      // Stop Brave from opening universal links by using the private enum value
-      // `_WKNavigationActionPolicyAllowWithoutTryingAppLink` which is defined here:
-      // https://github.com/WebKit/WebKit/blob/main/Source/WebKit/UIProcess/API/Cocoa/WKNavigationDelegatePrivate.h#L62
-      let allowDecision = WKNavigationActionPolicy(rawValue: WKNavigationActionPolicy.allow.rawValue + 2) ?? .allow
-      return allowDecision
-    }
+    
     return .allow
   }
   

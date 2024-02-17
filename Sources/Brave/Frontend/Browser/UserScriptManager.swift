@@ -60,6 +60,8 @@ class UserScriptManager {
     case youtubeQuality
     
     fileprivate var script: WKUserScript? {
+      return nil
+      
       switch self {
         // Conditionally enabled scripts
       case .cookieBlocking: return loadScript(named: "CookieControlScript")
