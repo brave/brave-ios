@@ -58,12 +58,6 @@ public class BrowserViewController: UIViewController {
     topToolbar.locationView.addInteraction(toolBarInteraction)
     return topToolbar
   }()
-  
-  private(set) lazy var tabsBar: TabsBarViewController = {
-    let tabsBar = TabsBarViewController(tabManager: tabManager)
-    tabsBar.delegate = self
-    return tabsBar
-  }()
 
   // These views wrap the top and bottom toolbars to provide background effects on them
   private(set) lazy var header = HeaderContainerView(privateBrowsingManager: privateBrowsingManager)
@@ -822,8 +816,8 @@ public class BrowserViewController: UIViewController {
     header.expandedBarStackView.addArrangedSubview(topToolbar)
     header.collapsedBarContainerView.addSubview(collapsedURLBarView)
     
-    addChild(tabsBar)
-    tabsBar.didMove(toParent: self)
+//    addChild(tabsBar)
+//    tabsBar.didMove(toParent: self)
 
     view.addSubview(alertStackView)
     view.addSubview(bottomTouchArea)
@@ -1077,9 +1071,9 @@ public class BrowserViewController: UIViewController {
       $0.edges.equalToSuperview()
     }
 
-    tabsBar.view.snp.makeConstraints { make in
-      make.height.equalTo(UX.TabsBar.height)
-    }
+//    tabsBar.view.snp.makeConstraints { make in
+//      make.height.equalTo(UX.TabsBar.height)
+//    }
 
     webViewContainerBackdrop.snp.makeConstraints { make in
       make.edges.equalTo(webViewContainer)
@@ -1118,7 +1112,7 @@ public class BrowserViewController: UIViewController {
     searchController?.additionalSafeAreaInsets = additionalInsets
     favoritesController?.additionalSafeAreaInsets = additionalInsets
     
-    tabsBar.reloadDataAndRestoreSelectedTab(isAnimated: false)
+    //tabsBar.reloadDataAndRestoreSelectedTab(isAnimated: false)
   }
 
   override public var canBecomeFirstResponder: Bool {
@@ -1542,15 +1536,10 @@ public class BrowserViewController: UIViewController {
       toolbar?.line.isHidden = isUsingBottomBar
     }
     
-    tabsBar.view.removeFromSuperview()
-    if isUsingBottomBar {
-      header.expandedBarStackView.insertArrangedSubview(tabsBar.view, at: 0)
-    } else {
-      header.expandedBarStackView.addArrangedSubview(tabsBar.view)
-    }
+    
 
     if tabManager.selectedTab == nil {
-      tabsBar.view.isHidden = true
+      //tabsBar.view.isHidden = true
       return
     }
 
@@ -1574,15 +1563,15 @@ public class BrowserViewController: UIViewController {
       }
     }
 
-    let isShowing = tabsBar.view.isHidden == false
+    let isShowing = false
     let shouldShow = shouldShowTabBar()
 
     if isShowing != shouldShow && presentedViewController == nil {
-      UIView.animate(withDuration: 0.1) {
-        self.tabsBar.view.isHidden = !shouldShow
-      }
+//      UIView.animate(withDuration: 0.1) {
+//        self.tabsBar.view.isHidden = !shouldShow
+//      }
     } else {
-      tabsBar.view.isHidden = !shouldShow
+      //tabsBar.view.isHidden = !shouldShow
     }
   }
 
@@ -1793,7 +1782,7 @@ public class BrowserViewController: UIViewController {
       guard let title = (webView.title?.isEmpty == true ? webView.url?.absoluteString : webView.title) else { break }
       if !title.isEmpty && title != tab.lastTitle {
         navigateInTab(tab: tab)
-        tabsBar.updateSelectedTabTitle()
+        //tabsBar.updateSelectedTabTitle()
       }
     case .canGoBack:
       guard tab === tabManager.selectedTab, let canGoBack = change?[.newKey] as? Bool else {
@@ -2337,7 +2326,7 @@ public class BrowserViewController: UIViewController {
           topToolbar.locationContainer.alpha = 1
           topToolbar.actionButtons.forEach { $0.alpha = topToolbar.locationContainer.alpha }
           header.collapsedBarContainerView.alpha = 1 - topToolbar.locationContainer.alpha
-          tabsBar.view.alpha = topToolbar.locationContainer.alpha
+          //tabsBar.view.alpha = topToolbar.locationContainer.alpha
           toolbar?.actionButtons.forEach { $0.alpha = topToolbar.locationContainer.alpha }
         }
         animator.startAnimation()
@@ -2360,7 +2349,7 @@ public class BrowserViewController: UIViewController {
         toolbarBottomConstraint?.update(offset: min(footerHeight, max(0, footerHeight * (1 - progress))))
       }
       topToolbar.actionButtons.forEach { $0.alpha = topToolbar.locationContainer.alpha }
-      tabsBar.view.alpha = topToolbar.locationContainer.alpha
+      //tabsBar.view.alpha = topToolbar.locationContainer.alpha
       header.collapsedBarContainerView.alpha = 1 - topToolbar.locationContainer.alpha
       toolbar?.actionButtons.forEach { $0.alpha = topToolbar.locationContainer.alpha }
       return
@@ -2375,7 +2364,7 @@ public class BrowserViewController: UIViewController {
       topToolbar.locationContainer.alpha = 0
       toolbarBottomConstraint?.update(offset: footerHeight)
     }
-    tabsBar.view.alpha = topToolbar.locationContainer.alpha
+    //tabsBar.view.alpha = topToolbar.locationContainer.alpha
     topToolbar.actionButtons.forEach { $0.alpha = topToolbar.locationContainer.alpha }
     header.collapsedBarContainerView.alpha = 1 - topToolbar.locationContainer.alpha
     toolbar?.actionButtons.forEach { $0.alpha = topToolbar.locationContainer.alpha }
@@ -2774,7 +2763,7 @@ extension BrowserViewController: SessionRestoreScriptHandlerDelegate {
 
 extension BrowserViewController: TabTrayDelegate {
   func tabOrderChanged() {
-    tabsBar.updateData()
+    //tabsBar.updateData()
   }
 }
 

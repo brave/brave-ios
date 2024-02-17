@@ -623,6 +623,7 @@ class Tab: NSObject {
   }
   
   func fetchDisplayTitle(using url: URL?, title: String?) -> String? {
+    return nil
     if let tabTitle = title, !tabTitle.isEmpty {
       var displayTitle = tabTitle
       
@@ -715,29 +716,29 @@ class Tab: NSObject {
   }
 
   func updateUserAgent(_ webView: WKWebView, newURL: URL) {
-    guard let baseDomain = newURL.baseDomain else { return }
-    
-    let screenWidth = webView.currentScene?.screen.bounds.width ?? webView.bounds.size.width
-    if webView.traitCollection.horizontalSizeClass == .compact && (webView.bounds.size.width < screenWidth / 2.0) {
-      let desktopMode = userAgentOverrides[baseDomain] == true
-      webView.customUserAgent = desktopMode ? UserAgent.desktop : UserAgent.mobile
-      return
-    }
-
-    let desktopMode = userAgentOverrides[baseDomain] ?? UserAgent.shouldUseDesktopMode
-    webView.customUserAgent = desktopMode ? UserAgent.desktop : UserAgent.mobile
+//    guard let baseDomain = newURL.baseDomain else { return }
+//    
+//    let screenWidth = webView.currentScene?.screen.bounds.width ?? webView.bounds.size.width
+//    if webView.traitCollection.horizontalSizeClass == .compact && (webView.bounds.size.width < screenWidth / 2.0) {
+//      let desktopMode = userAgentOverrides[baseDomain] == true
+//      webView.customUserAgent = desktopMode ? UserAgent.desktop : UserAgent.mobile
+//      return
+//    }
+//
+//    let desktopMode = userAgentOverrides[baseDomain] ?? UserAgent.shouldUseDesktopMode
+//    webView.customUserAgent = desktopMode ? UserAgent.desktop : UserAgent.mobile
   }
 
   func addContentScript(_ helper: TabContentScript, name: String, contentWorld: WKContentWorld) {
-    contentScriptManager.addContentScript(helper, name: name, forTab: self, contentWorld: contentWorld)
+    //contentScriptManager.addContentScript(helper, name: name, forTab: self, contentWorld: contentWorld)
   }
   
   func removeContentScript(name: String, forTab tab: Tab, contentWorld: WKContentWorld) {
-    contentScriptManager.removeContentScript(name: name, forTab: tab, contentWorld: contentWorld)
+    //contentScriptManager.removeContentScript(name: name, forTab: tab, contentWorld: contentWorld)
   }
   
   func replaceContentScript(_ helper: TabContentScript, name: String, forTab tab: Tab) {
-    contentScriptManager.replaceContentScript(helper, name: name, forTab: tab)
+    //contentScriptManager.replaceContentScript(helper, name: name, forTab: tab)
   }
 
   func getContentScript(name: String) -> TabContentScript? {

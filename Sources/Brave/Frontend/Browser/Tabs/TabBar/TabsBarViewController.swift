@@ -394,6 +394,7 @@ extension TabsBarViewController: UICollectionViewDataSource {
     guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TabCell", for: indexPath) as? TabBarCell
     else { return UICollectionViewCell() }
     guard let tab = tabList[indexPath.row] else { return cell }
+    return cell
 
     cell.tabManager = tabManager
     cell.tab = tab

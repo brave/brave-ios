@@ -245,21 +245,21 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   }
 
   func sceneWillResignActive(_ scene: UIScene) {
-    Preferences.AppState.backgroundedCleanly.value = true
-    scene.userActivity?.resignCurrent()
-    AppState.shared.uptimeMonitor.pauseMonitoring()
+//    Preferences.AppState.backgroundedCleanly.value = true
+//    scene.userActivity?.resignCurrent()
+//    AppState.shared.uptimeMonitor.pauseMonitoring()
   }
 
   func sceneWillEnterForeground(_ scene: UIScene) {
     if let scene = scene as? UIWindowScene {
-      scene.browserViewController?.windowProtection = windowProtection
+      scene.browserViewController?.view.setNeedsLayout()
     }
   }
 
   func sceneDidEnterBackground(_ scene: UIScene) {
-    AppState.shared.profile.shutdown()
-    BraveVPN.sendVPNWorksInBackgroundNotification()
-    Preferences.AppState.isOnboardingActive.value = false
+//    AppState.shared.profile.shutdown()
+//    BraveVPN.sendVPNWorksInBackgroundNotification()
+//    Preferences.AppState.isOnboardingActive.value = false
   }
 
   func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {

@@ -233,10 +233,7 @@ extension BrowserViewController: TabManagerDelegate {
           }
         })
 
-      if (UIDevice.current.userInterfaceIdiom == .pad && tabsBar.view.isHidden == true) || (UIDevice.current.userInterfaceIdiom == .phone && toolbar == nil) {
-        newTabMenuChildren.append(openNewPrivateTab)
-      }
-
+      
       addTabMenuChildren.append(openNewPrivateTab)
     }
 
@@ -247,9 +244,7 @@ extension BrowserViewController: TabManagerDelegate {
         self.openBlankNewTab(attemptLocationFieldFocus: false, isPrivate: privateBrowsingManager.isPrivateBrowsing)
       })
 
-    if (UIDevice.current.userInterfaceIdiom == .pad && tabsBar.view.isHidden) || (UIDevice.current.userInterfaceIdiom == .phone && toolbar == nil) {
-      newTabMenuChildren.append(openNewTab)
-    }
+    
     addTabMenuChildren.append(openNewTab)
 
     var bookmarkMenuChildren: [UIAction] = []
