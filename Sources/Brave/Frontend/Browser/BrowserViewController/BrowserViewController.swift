@@ -2476,35 +2476,7 @@ extension BrowserViewController: TabDelegate {
     KVOs.forEach { webView.addObserver(self, forKeyPath: $0.keyPath, options: .new, context: nil) }
     webView.uiDelegate = self
     
-    var injectedScripts: [TabContentScript] = [
-      ReaderModeScriptHandler(tab: tab),
-      ErrorPageHelper(certStore: profile.certStore),
-      SessionRestoreScriptHandler(tab: tab),
-      BlockedDomainScriptHandler(tab: tab),
-      PrintScriptHandler(browserController: self, tab: tab),
-      CustomSearchScriptHandler(tab: tab),
-      NightModeScriptHandler(tab: tab),
-      FocusScriptHandler(tab: tab),
-      BraveGetUA(tab: tab),
-      BraveSearchScriptHandler(tab: tab, profile: profile, rewards: rewards),
-      ResourceDownloadScriptHandler(tab: tab),
-      DownloadContentScriptHandler(browserController: self, tab: tab),
-      WindowRenderScriptHandler(tab: tab),
-      RewardsReportingScriptHandler(rewards: rewards, tab: tab),
-      AdsMediaReportingScriptHandler(rewards: rewards, tab: tab),
-      ReadyStateScriptHandler(tab: tab),
-      DeAmpScriptHandler(tab: tab),
-      SiteStateListenerScriptHandler(tab: tab),
-      CosmeticFiltersScriptHandler(tab: tab),
-      URLPartinessScriptHandler(tab: tab),
-      FaviconScriptHandler(tab: tab),
-      Web3NameServiceScriptHandler(tab: tab),
-      Web3IPFSScriptHandler(tab: tab),
-      YoutubeQualityScriptHandler(tab: tab),
-      
-      tab.contentBlocker,
-      tab.requestBlockingContentHelper,
-    ]
+    var injectedScripts: [TabContentScript] = []
     
     if #unavailable(iOS 16.0) {
       injectedScripts.append(FindInPageScriptHandler(tab: tab))

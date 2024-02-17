@@ -46,7 +46,7 @@ public extension WKWebView {
 
   func evaluateSafeJavaScript(functionName: String, args: [Any] = [], frame: WKFrameInfo? = nil, contentWorld: WKContentWorld, escapeArgs: Bool = true, asFunction: Bool = true, completion: ((Any?, Error?) -> Void)? = nil) {
     var javascript = functionName
-
+    return ()
     if asFunction {
       let js = generateJSFunctionString(functionName: functionName, args: args, escapeArgs: escapeArgs)
       if js.error != nil {
