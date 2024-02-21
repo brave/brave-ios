@@ -107,6 +107,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     SystemUtils.onFirstRun()
+    
+    // Clean Logger for Secure content state
+    DebugLogger.cleanLogger(for: .secureState)
+
     return true
   }
 
