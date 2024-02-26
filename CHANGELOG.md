@@ -2,7 +2,7 @@
 
 ## [1.61.1](https://github.com/brave/brave-ios/releases/tag/v1.61.1)
 
-- Fixed Ad notification click event not triggering on iOS. ([#8619](https://github.com/brave/brave-ios/issues/8619))
+- Fixed Brave Ad notification click event not being triggered. ([#8619](https://github.com/brave/brave-ios/issues/8619))
 
 ## [1.61](https://github.com/brave/brave-ios/releases/tag/v1.61)
 
