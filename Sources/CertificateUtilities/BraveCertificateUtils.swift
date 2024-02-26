@@ -211,7 +211,8 @@ public extension BraveCertificateUtils {
     }
     return serverTrust!
   }
-  
+
+  /// Verifies ServerTrust using Apple's APIs which validates also the X509 Certificate against the System Trusts
   static func evaluateTrust(_ trust: SecTrust, for host: String?) async throws {
     try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
       BraveCertificateUtils.evaluationQueue.async {
@@ -230,6 +231,7 @@ public extension BraveCertificateUtils {
     }
   }
   
+  /// Verifies ServerTrust using Brave-Core which verifies only SSL Pinning Status
   static func verifyTrust(_ trust: SecTrust, host: String, port: Int) async -> Int {
     return Int(BraveCertificateUtility.verifyTrust(trust, host: host, port: port))
   }
