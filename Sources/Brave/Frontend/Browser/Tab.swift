@@ -57,14 +57,14 @@ protocol URLChangeDelegate {
   func tab(_ tab: Tab, urlDidChangeTo url: URL)
 }
 
-enum TabSecureContentState {
-  case unknown
-  case localhost
-  case secure
-  case invalidCert
-  case missingSSL
-  case mixedContent
-  
+enum TabSecureContentState: String {
+  case unknown = "Unknown"
+  case localhost = "Localhost"
+  case secure = "Secure"
+  case invalidCert = "InvalidCertificate"
+  case missingSSL = "SSL Certificate Missing"
+  case mixedContent = "Mixed Content"
+
   var shouldDisplayWarning: Bool {
     switch self {
     case .unknown, .invalidCert, .missingSSL, .mixedContent:
@@ -95,7 +95,6 @@ class Tab: NSObject {
 
   var secureContentState: TabSecureContentState = .unknown
   var sslPinningError: Error?
-  var sslPinningTrust: SecTrust?
 
   private let _syncTab: BraveSyncTab?
   private let _faviconDriver: FaviconDriver?

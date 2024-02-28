@@ -107,6 +107,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     SystemUtils.onFirstRun()
+    
+    // Clean Logger for Secure content state
+    DebugLogger.cleanLogger(for: .secureState)
+
     return true
   }
 
@@ -215,7 +219,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       SceneDelegate.shouldHandleUrpLookup = true
     } else {
       log.error("Failed to initialize user referral program")
-      UrpLog.log("Failed to initialize user referral program")
+      DebugLogger.log(for: .urp, text: "Failed to initialize user referral program")
     }
 
     if Preferences.URP.installAttributionLookupOutstanding.value == nil {

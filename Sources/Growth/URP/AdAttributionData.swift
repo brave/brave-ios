@@ -4,6 +4,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os.log
+import BraveShared
 
 public struct AdAttributionData {
   // A value of true returns if a user clicks an Apple Search Ads impression up to 30 days before your app download.
@@ -43,14 +44,14 @@ extension AdAttributionData {
     // They will indicate if the Apple Searhs Ads is clicked and for which campaign
     guard let attribution = json["attribution"] as? Bool else {
       Logger.module.error("Failed to unwrap json to Ad Attribution property.")
-      UrpLog.log("Failed to unwrap json to Ad Attribution property. \(json)")
+      DebugLogger.log(for: .urp, text: "Failed to unwrap json to Ad Attribution property. \(json)")
       
       throw SerializationError.missing("Attribution Context")
     }
     
     guard let campaignId = json["campaignId"] as? Int else {
       Logger.module.error("Failed to unwrap json to Campaign Id property.")
-      UrpLog.log("Failed to unwrap json to Campaign Id property. \(json)")
+      DebugLogger.log(for: .urp, text: "Failed to unwrap json to Campaign Id property. \(json)")
       
       throw SerializationError.missing("Campaign Id")
     }
