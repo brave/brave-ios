@@ -1994,7 +1994,7 @@ public class BrowserViewController: UIViewController {
   func logSecureContentState(tab: Tab, path: KVOConstants? = nil, details: String? = nil) {
     var text = """
     Tab URL: \(tab.url?.absoluteString ?? "Empty Tab URL")
-     Tab VebView URL: \(tab.webView?.url?.absoluteString ?? "Empty Webview URL")
+     Tab WebView URL: \(tab.webView?.url?.absoluteString ?? "Empty Webview URL")
      Secure State: \(tab.secureContentState.rawValue)
     """
     
