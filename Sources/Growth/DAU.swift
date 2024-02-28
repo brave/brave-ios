@@ -90,7 +90,7 @@ public class DAU {
     return true
   }
 
-  @objc public func sendPingToServerInternal() {
+  @objc private func sendPingToServerInternal() {
     guard let paramsAndPrefs = paramsAndPrefsSetup(for: Date()) else {
       Logger.module.debug("dau, no changes detected, no server ping")
       DebugLogger.log(for: .urp, text: "dau, no changes detected, no server ping")
