@@ -727,11 +727,6 @@ class SettingsViewController: TableViewController {
       header: .title(Strings.about),
       rows: [
         Row(
-          text: "Secure Content State Debug",
-          selection: { [unowned self] in
-            self.navigationController?.pushViewController(DebugLogViewController(type: .secureState), animated: true)
-          }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self),
-        Row(
           text: version,
           selection: { [unowned self] in
             let device = UIDevice.current
@@ -815,6 +810,11 @@ class SettingsViewController: TableViewController {
           selection: { [unowned self] in
             let vc = AdblockDebugMenuTableViewController(style: .grouped)
             self.navigationController?.pushViewController(vc, animated: true)
+          }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self),
+        Row(
+          text: "Secure Content State Debug",
+          selection: { [unowned self] in
+            self.navigationController?.pushViewController(DebugLogViewController(type: .secureState), animated: true)
           }, accessory: .disclosureIndicator, cellClass: MultilineValue1Cell.self),
         Row(
           text: "View URP Logs",
