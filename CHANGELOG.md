@@ -1,5 +1,52 @@
 # Changelog
 
+## [1.62](https://github.com/brave/brave-ios/releases/tag/v1.62)
+
+### Web 3
+
+- Added support for fetching unknown tokens from non-main-net transactions. [(#8529)](https://github.com/brave/brave-ios/issues/8529)
+- Added support for SVG Blockies v2. [(#8375)](https://github.com/brave/brave-ios/issues/8375)
+- Added “Creating Wallet” step to Wallet Onboarding. [(#8345)](https://github.com/brave/brave-ios/issues/8345)
+- Added “Accounts” and “Transactions” tab to the asset detail view. [(#8137)](https://github.com/brave/brave-ios/issues/8137)
+- Added line chart v2 support for Wallet portfolio and asset details.  [(#8136)](https://github.com/brave/brave-ios/issues/8136)
+- Added support for safer signing for swaps on https://swap.cow.fi/ [(#8114)](https://github.com/brave/brave-ios/issues/8114)
+- Migrated Solana Swaps to use Jupiter Swap API v6. [(#8603)](https://github.com/brave/brave-ios/issues/8603)
+- Fixed the approve screen not showing the confirmation when approve limit is lower than transaction value for - https://swap.cow.fi/  [(#8721)](https://github.com/brave/brave-ios/issues/8721)
+- Fixed portfolio filter from opening intermittently when scrolling up and down the portfolio asset list. [(#8709)](https://github.com/brave/brave-ios/issues/8709)
+- Fixed UI issues in Brave Wallet resulting from NFT GIFs failing to load. [(#8560)](https://github.com/brave/brave-ios/issues/8560)
+- Fixed Wallet onboarding flow to get stuck in one of the views when using Split View on iPad. [(#8425)](https://github.com/brave/brave-ios/issues/8425)
+
+### General
+
+- Added Global Privacy Control toggle under “Brave Shields & Privacy.” [(#8556)](https://github.com/brave/brave-ios/issues/8556)
+- Added “View all version info” to the version context menu under “About” in Settings. [(#8705)](https://github.com/brave/brave-ios/issues/8705)
+- Added auto-upgrading for mixed content that contains media using a content blocker. [(#8664)](https://github.com/brave/brave-ios/issues/8664)
+- Added authentication for the user when disabling “Browser Lock” from Settings. [(#8608)](https://github.com/brave/brave-ios/issues/8608)
+- Added option in “Search” settings to disable bookmarks and history suggestions. [(#2336)](https://github.com/brave/brave-ios/issues/2336)
+- Updated SSL Certificate display logic to be more in line with Chromium.  [(#8703)](https://github.com/brave/brave-ios/issues/8703)
+- Updated Tracking Protection Stats script to prevent DOS. [(#8562)](https://github.com/brave/brave-ios/issues/8562)
+- Updated Privacy Hub on NTP to show dialog confirmation when using hide action. [(#8493)](https://github.com/brave/brave-ios/issues/8493)
+- Fixed tabs from being lost in certain cases. [(#8694)](https://github.com/brave/brave-ios/issues/8694)
+- Fixed background tab navigation exploit as reported on HackerOne by nishimunea. [(#8606)](https://github.com/brave/brave-ios/issues/8606)
+- Fixed “Security Certificate” to be shown in menu in certain cases when no certificate is found. [(#8688)](https://github.com/brave/brave-ios/issues/8688)
+- Fixed URLs not loading if already loaded in a tab using another browsing mode. [(#8665)](https://github.com/brave/brave-ios/issues/8665)
+- Fixed hyperlinks from not redirecting when value for target is “_blank.” [(#8661)](https://github.com/brave/brave-ios/issues/8661)
+- Fixed SSL status on interstitial pages to show correctly for offline and HTTP pages. [(#8650)](https://github.com/brave/brave-ios/issues/8650)
+- Fixed intermittent insecure state when loading URLs in certain cases. [(#8635)](https://github.com/brave/brave-ios/issues/8635)
+- Fixed a crash when loading invalid URLs using “Open In New Tab” via long-press. [(#8647)](https://github.com/brave/brave-ios/issues/8647)
+- Fixed an issue with videos not being auto-downloaded in Playlist. [(#8614)](https://github.com/brave/brave-ios/issues/8614)
+- Fixed “noscript” html tags from being rendered properly when JavaScript is disabled. [(#8585)](https://github.com/brave/brave-ios/issues/8585)
+- Fixed being able to bypass Screen Time by opening a new tab from a locked tab. [(#8579)](https://github.com/brave/brave-ios/issues/8579)
+- Fixed closed tabs not being restore using Cmd + Shift + T command when connected to hardware keyboard.  [(#8552)](https://github.com/brave/brave-ios/issues/8552)
+- Fixed VPN icon not being resized correctly in main menu for current accessibility font size. [(#8497)](https://github.com/brave/brave-ios/issues/8497)
+- Fixed cursor being misplaced for a selected URL when that URL doesn’t fit the screen. [(#8374)](https://github.com/brave/brave-ios/issues/8374)
+- Fixed Brave Rewards (BAT) icon from being grayed out after enabling rewards. [(#8371)](https://github.com/brave/brave-ios/issues/8371)
+- Fixed Playlist from playing next video when using picture-in-picture mode. [(#8151)](https://github.com/brave/brave-ios/issues/8151)
+- Fixed “Managing your Playlist data” dialog being presented for saving Shared Playlists even when “Auto-Save for Offline” is off in settings. [(#8012)](https://github.com/brave/brave-ios/issues/8012)
+- Fixed issue with adding pass/ticket to iOS Wallet. [(#8057)](https://github.com/brave/brave-ios/issues/8057)
+- Fixed videos intermittently being paused when opening in Playlist. [(#7485)](https://github.com/brave/brave-ios/issues/7485)
+- Fixed play/pause button state not being updated correctly when reopening Brave. [(#7459)](https://github.com/brave/brave-ios/issues/7459)
+
 ## [1.61.1](https://github.com/brave/brave-ios/releases/tag/v1.61.1)
 
 - Fixed Brave Ad notification click event not being triggered. ([#8619](https://github.com/brave/brave-ios/issues/8619))
