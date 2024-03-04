@@ -4,17 +4,17 @@
 
 ### Web3
 
+- Implemented Safe Sign for CoW Swaps. [(#8114)](https://github.com/brave/brave-ios/issues/8114)
 - Added support for fetching unknown tokens from non-mainnet transactions. [(#8529)](https://github.com/brave/brave-ios/issues/8529)
-- Added support for SVG blockies v2. [(#8375)](https://github.com/brave/brave-ios/issues/8375)
-- Added “Creating Wallet” step to Wallet Onboarding. [(#8345)](https://github.com/brave/brave-ios/issues/8345)
+- Added “Creating Wallet” step to Wallet onboarding. [(#8345)](https://github.com/brave/brave-ios/issues/8345)
 - Added “Accounts” and “Transactions” tab to the asset detail view. [(#8137)](https://github.com/brave/brave-ios/issues/8137)
-- Added line chart v2 support for Wallet portfolio and asset details.  [(#8136)](https://github.com/brave/brave-ios/issues/8136)
-- Added support for safer signing for swaps on https://swap.cow.fi/ [(#8114)](https://github.com/brave/brave-ios/issues/8114)
+- Updated Line chart color to match the new Brave Wallet design on Portfolio and Asset details screen. [(#8136)](https://github.com/brave/brave-ios/issues/8136)
+- Updated account blockies to be square similar to desktop. [(#8375)](https://github.com/brave/brave-ios/issues/8375)
 - Migrated Solana Swaps to use Jupiter Swap API v6. [(#8603)](https://github.com/brave/brave-ios/issues/8603)
-- Fixed the approve screen not showing the confirmation when approve limit is lower than transaction value for https://swap.cow.fi/  [(#8721)](https://github.com/brave/brave-ios/issues/8721)
+- Fixed the approve screen not showing the confirmation when approve limit is lower than transaction value. [(#8721)](https://github.com/brave/brave-ios/issues/8721)
 - Fixed portfolio filter from opening intermittently when scrolling up and down the portfolio asset list. [(#8709)](https://github.com/brave/brave-ios/issues/8709)
 - Fixed UI issues in Brave Wallet resulting from NFT GIFs failing to load. [(#8560)](https://github.com/brave/brave-ios/issues/8560)
-- Fixed Wallet onboarding flow to get stuck in one of the views when using Split View on iPad. [(#8425)](https://github.com/brave/brave-ios/issues/8425)
+- Fixed Wallet onboarding flow when initiated on two windows in split view on iPad. [(#8425)](https://github.com/brave/brave-ios/issues/8425)
 
 ### General
 
