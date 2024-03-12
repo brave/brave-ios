@@ -23,7 +23,7 @@
 - Added auto-upgrading for mixed content that contains media using a content blocker. [(#8664)](https://github.com/brave/brave-ios/issues/8664)
 - Added authentication when disabling “Browser Lock” from settings. [(#8608)](https://github.com/brave/brave-ios/issues/8608)
 - Added option in “Search” settings to disable bookmarks and history suggestions. [(#2336)](https://github.com/brave/brave-ios/issues/2336)
-- Updated SSL Certificate display logic to be more in line with Chromium.  [(#8703)](https://github.com/brave/brave-ios/issues/8703)
+- Updated SSL Certificate display logic to be more in line with Chromium. [(#8703)](https://github.com/brave/brave-ios/issues/8703)
 - Updated Tracking Protection Stats script to prevent Denial of Service (DoS). [(#8562)](https://github.com/brave/brave-ios/issues/8562)
 - Updated Privacy Hub on NTP to show dialog confirmation when using hide action. [(#8493)](https://github.com/brave/brave-ios/issues/8493)
 - Fixed tabs from being lost when launching Brave in certain cases. [(#8694)](https://github.com/brave/brave-ios/issues/8694)
