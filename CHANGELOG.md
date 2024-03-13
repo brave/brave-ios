@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.62.1](https://github.com/brave/brave-ios/releases/tag/v1.62.1)
+
+### Web3
+
+- Fixed Buy/Send/Swap action buttons not working from Asset details page. [(#8776)](https://github.com/brave/brave-ios/issues/8776)
+
+### General
+
+- Updated JitsiSDK to version 8.6.3. [(#8777)](https://github.com/brave/brave-ios/issues/8777)
+- Fixed insecure state being shown in address bar falsely for some websites. [(#8778)](https://github.com/brave/brave-ios/issues/8778)
+
 ## [1.62](https://github.com/brave/brave-ios/releases/tag/v1.62)
 
 ### Web3
