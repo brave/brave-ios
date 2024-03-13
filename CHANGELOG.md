@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.62.2](https://github.com/brave/brave-ios/releases/tag/v1.62.2)
+
+- Fixed error interstitial pages not being loaded. ([#8789](https://github.com/brave/brave-ios/issues/8789))
+
 ## [1.62.1](https://github.com/brave/brave-ios/releases/tag/v1.62.1)
 
 ### Web3
