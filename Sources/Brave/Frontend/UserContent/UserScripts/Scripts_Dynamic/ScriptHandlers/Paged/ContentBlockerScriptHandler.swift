@@ -47,17 +47,15 @@ extension ContentBlockerHelper: TabContentScript {
     blockedRequests.removeAll()
   }
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
-    defer { replyHandler(nil, nil) }
-    
-    guard let currentTabURL = tab?.webView?.url else {
+  func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) async -> (Any?, String?) {
+    guard let currentTabURL = await tab?.webView?.url else {
       assertionFailure("Missing tab or webView")
-      return
+      return (nil, nil)
     }
     
     if !verifyMessage(message: message, securityToken: UserScriptManager.securityToken) {
       assertionFailure("Missing required security token.")
-      return
+      return (nil, nil)
     }
     
     do {
@@ -134,5 +132,7 @@ extension ContentBlockerHelper: TabContentScript {
     } catch {
       Logger.module.error("\(error.localizedDescription)")
     }
+    
+    return (nil, nil)
   }
 }

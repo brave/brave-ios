@@ -28,16 +28,14 @@ class FindInPageScriptHandler: TabContentScript {
   static let scriptSandbox: WKContentWorld = .defaultClient
   static let userScript: WKUserScript? = nil
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
-    defer { replyHandler(nil, nil) }
-    
+  func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) async -> (Any?, String?) {
     if !verifyMessage(message: message, securityToken: UserScriptManager.securityToken) {
       assertionFailure("Missing required security token.")
-      return
+      return (nil, nil)
     }
     
     guard let body = message.body as? [String: AnyObject] else {
-      return
+      return (nil, nil)
     }
 
     guard let data = body["data"] as? [String: Int] else {
@@ -45,7 +43,7 @@ class FindInPageScriptHandler: TabContentScript {
         Logger.module.error("Could not find a message body or the data did not meet expectations: \(body))")
       }
       
-      return
+      return (nil, nil)
     }
 
     if let currentResult = data["currentResult"] {
@@ -55,5 +53,7 @@ class FindInPageScriptHandler: TabContentScript {
     if let totalResults = data["totalResults"] {
       delegate?.findInPageHelper(self, didUpdateTotalResults: totalResults)
     }
+    
+    return (nil, nil)
   }
 }

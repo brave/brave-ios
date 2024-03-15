@@ -23,6 +23,7 @@ class FaviconHandler {
     unregister(tabObservers)
   }
 
+  @MainActor
   func loadFaviconURL(
     _ url: URL,
     forTab tab: Tab
@@ -34,6 +35,7 @@ class FaviconHandler {
 }
 
 extension FaviconHandler: TabEventHandler {
+  @MainActor
   func tab(_ tab: Tab, didLoadPageMetadata metadata: PageMetadata) {
     if let currentURL = tab.url {
       if let favicon = FaviconFetcher.getIconFromCache(for: currentURL) {

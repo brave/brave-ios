@@ -13,6 +13,7 @@ private let browsingActivityType: String = "com.brave.ios.browsing"
 
 private let searchableIndex = CSSearchableIndex(name: "firefox")
 
+@MainActor
 class UserActivityHandler {
   private var tabObservers: TabObservers!
 

@@ -74,6 +74,7 @@ class BrowserNavigationHelper {
     open(vc, doneButton: DoneButton(style: .done, position: .left))
   }
 
+  @MainActor
   func openShareSheet() {
     guard let bvc = bvc else { return }
     dismissView()

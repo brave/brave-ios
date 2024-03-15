@@ -243,7 +243,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
       AppState.shared.dau.sendPingToServer()
     }
     
-    BraveSkusManager.refreshSKUCredential(isPrivate: scene.browserViewController?.privateBrowsingManager.isPrivateBrowsing == true)
+    Task { @MainActor in
+      await BraveSkusManager.refreshSKUCredential(isPrivate: scene.browserViewController?.privateBrowsingManager.isPrivateBrowsing == true)
+    }
   }
 
   func sceneWillResignActive(_ scene: UIScene) {

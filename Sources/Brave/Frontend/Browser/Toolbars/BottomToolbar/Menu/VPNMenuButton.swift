@@ -35,6 +35,7 @@ struct VPNMenuButton: View {
   
   @ScaledMetric private var iconSize: CGFloat = 32.0
 
+  @MainActor
   private var isVPNEnabledBinding: Binding<Bool> {
     Binding(
       get: { isVPNEnabled },
@@ -42,6 +43,7 @@ struct VPNMenuButton: View {
     )
   }
 
+  @MainActor
   private func toggleVPN(_ enabled: Bool) {
     if BraveSkusManager.keepShowingSessionExpiredState {
       let alert = BraveSkusManager.sessionExpiredStateAlert(loginCallback: { _ in
@@ -80,6 +82,7 @@ struct VPNMenuButton: View {
     }
   }
 
+  @MainActor
   private var vpnToggle: some View {
     Toggle("Brave VPN", isOn: isVPNEnabledBinding)
       .toggleStyle(SwitchToggleStyle(tint: retryStateActive ? Color(.braveErrorBorder) : .accentColor))

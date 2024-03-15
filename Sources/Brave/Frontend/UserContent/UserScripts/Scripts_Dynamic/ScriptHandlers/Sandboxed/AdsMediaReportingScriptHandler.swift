@@ -23,25 +23,27 @@ class AdsMediaReportingScriptHandler: TabContentScript {
   static let scriptSandbox: WKContentWorld = .defaultClient
   static let userScript: WKUserScript? = nil
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
-    defer { replyHandler(nil, nil) }
-    
+  func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) async -> (Any?, String?) {
     if !verifyMessage(message: message, securityToken: UserScriptManager.securityToken) {
       assertionFailure("Missing required security token.")
-      return
+      return (nil, nil)
     }
     
     guard let body = message.body as? [String: AnyObject] else {
-      return
+      return (nil, nil)
     }
 
-    if let isPlaying = body["data"] as? Bool, rewards.isEnabled {
+    await MainActor.run {
       guard let tab = tab else { return }
-      if isPlaying {
-        rewards.reportMediaStarted(tabId: Int(tab.rewardsId))
-      } else {
-        rewards.reportMediaStopped(tabId: Int(tab.rewardsId))
+      
+      if let isPlaying = body["data"] as? Bool, rewards.isEnabled {
+        if isPlaying {
+          rewards.reportMediaStarted(tabId: Int(tab.rewardsId))
+        } else {
+          rewards.reportMediaStopped(tabId: Int(tab.rewardsId))
+        }
       }
     }
+    return (nil, nil)
   }
 }

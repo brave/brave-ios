@@ -176,6 +176,7 @@ public class BraveRewards: NSObject {
   // MARK: - Reporting
 
   /// Report that a tab with a given id was updated
+  @MainActor
   func reportTabUpdated(
     tab: Tab,
     url: URL,

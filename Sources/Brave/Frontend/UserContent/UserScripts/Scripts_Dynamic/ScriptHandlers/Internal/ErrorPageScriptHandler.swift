@@ -17,12 +17,10 @@ extension ErrorPageHelper: TabContentScript {
   static let scriptSandbox: WKContentWorld = .page
   static let userScript: WKUserScript? = nil
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
-    defer { replyHandler(nil, nil) }
-    
+  func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) async -> (Any?, String?) {
     if !verifyMessage(message: message) {
       assertionFailure("Missing required security token.")
-      return
+      return (nil, nil)
     }
     
     guard let errorURL = message.frameInfo.request.url,
@@ -31,21 +29,24 @@ extension ErrorPageHelper: TabContentScript {
       let originalURL = internalUrl.originalURLFromErrorPage,
       let res = message.body as? [String: String],
       let type = res["type"]
-    else { return }
+    else {
+      return (nil, nil)
+    }
 
     switch type {
     case MessageOpenInSafari:
-      UIApplication.shared.open(originalURL, options: [:])
+      await UIApplication.shared.open(originalURL, options: [:])
     case MessageCertVisitOnce:
       if let cert = CertificateErrorPageHandler.certsFromErrorURL(errorURL)?.first,
         let host = originalURL.host {
         let origin = "\(host):\(originalURL.port ?? 443)"
         addCertificate(cert, forOrigin: origin)
-        message.webView?.replaceLocation(with: originalURL)
+        await message.webView?.replaceLocation(with: originalURL)
         // webview.reload will not change the error URL back to the original URL
       }
     default:
       assertionFailure("Unknown error message")
     }
+    return (nil, nil)
   }
 }

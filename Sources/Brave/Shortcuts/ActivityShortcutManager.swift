@@ -147,6 +147,7 @@ public class ActivityShortcutManager: NSObject {
     }
   }
 
+  @MainActor
   private func handleActivityDetails(type: ActivityType, using bvc: BrowserViewController) {
     switch type {
     case .newTab:

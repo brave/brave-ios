@@ -10,6 +10,7 @@ import BraveCore
 import BraveVPN
 import os.log
 
+@MainActor
 public class BraveSkusManager {
   private let sku: SkusSkusService
   
@@ -22,7 +23,7 @@ public class BraveSkusManager {
     self.sku = skusService
   }
   
-  public static func refreshSKUCredential(isPrivate: Bool) {
+  public static func refreshSKUCredential(isPrivate: Bool) async {
     guard let _ = Preferences.VPN.skusCredential.value,
           let domain = Preferences.VPN.skusCredentialDomain.value,
           let expirationDate = Preferences.VPN.expirationDate.value else {
@@ -39,98 +40,93 @@ public class BraveSkusManager {
       return
     }
     
-    manager.credentialSummary(for: domain) { completion in
-      Logger.module.debug("credentialSummary response")
-    }
+    _ = await manager.credentialSummary(for: domain)
+    Logger.module.debug("credentialSummary response")
   }
   
   // MARK: - Handling SKU methods.
   
-  func refreshOrder(for orderId: String, domain: String, resultJSON: @escaping (Any?) -> Void) {
-    sku.refreshOrder(domain, orderId: orderId) { completion in
-      do {
-        guard let data = completion.data(using: .utf8) else { return }
-        let json = try JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed)
-        Logger.module.debug("refreshOrder json parsed successfully")
-        resultJSON(json)
-      } catch {
-        resultJSON(nil)
-        Logger.module.error("refrshOrder: Failed to decode json: \(error.localizedDescription)")
-      }
+  func refreshOrder(for orderId: String, domain: String) async -> Any? {
+    let response = await sku.refreshOrder(domain, orderId: orderId)
+    
+    do {
+      guard let data = response.data(using: .utf8) else { return nil }
+      let json = try JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed)
+      Logger.module.debug("refreshOrder json parsed successfully")
+      return json
+    } catch {
+      Logger.module.error("refrshOrder: Failed to decode json: \(error.localizedDescription)")
+      return nil
     }
   }
   
-  func fetchOrderCredentials(for orderId: String, domain: String, resultCredential: @escaping (String) -> Void) {
-    sku.fetchOrderCredentials(domain, orderId: orderId) { completion in
-      Logger.module.debug("skus fetchOrderCredentials")
-      resultCredential(completion)
-    }
+  func fetchOrderCredentials(for orderId: String, domain: String) async -> String {
+    let credential = await sku.fetchOrderCredentials(domain, orderId: orderId)
+    Logger.module.debug("skus fetchOrderCredentials")
+    return credential
   }
   
-  func prepareCredentialsPresentation(for domain: String, path: String,
-                                      resultCredential: ((String) -> Void)?) {
+  func prepareCredentialsPresentation(for domain: String, path: String) async -> String {
     Logger.module.debug("skus prepareCredentialsPresentation")
-    sku.prepareCredentialsPresentation(domain, path: path) { credential in
-      if !credential.isEmpty {
-        if let vpnCredential = BraveSkusWebHelper.fetchVPNCredential(credential, domain: domain) {
-          Preferences.VPN.skusCredential.value = credential
-          Preferences.VPN.skusCredentialDomain.value = domain
-          Preferences.VPN.expirationDate.value = vpnCredential.expirationDate
-          
-          BraveVPN.setCustomVPNCredential(vpnCredential)
-        }
-      } else {
-        Logger.module.debug("skus empty credential from prepareCredentialsPresentation call")
+    
+    let credential = await sku.prepareCredentialsPresentation(domain, path: path)
+    
+    if !credential.isEmpty {
+      if let vpnCredential = BraveSkusWebHelper.fetchVPNCredential(credential, domain: domain) {
+        Preferences.VPN.skusCredential.value = credential
+        Preferences.VPN.skusCredentialDomain.value = domain
+        Preferences.VPN.expirationDate.value = vpnCredential.expirationDate
+        
+        BraveVPN.setCustomVPNCredential(vpnCredential)
+      }
+    } else {
+      Logger.module.debug("skus empty credential from prepareCredentialsPresentation call")
+    }
+    
+    return credential
+  }
+  
+  func credentialSummary(for domain: String) async -> Any? {
+    let credential = await sku.credentialSummary(domain)
+    
+    do {
+      Logger.module.debug("skus credentialSummary")
+      
+      guard let data = credential.data(using: .utf8) else {
+        return nil
       }
       
-      resultCredential?(credential)
-    }
-  }
-  
-  func credentialSummary(for domain: String, resultJSON: @escaping (Any?) -> Void) {
-    sku.credentialSummary(domain) { [self] completion in
-      do {
-        Logger.module.debug("skus credentialSummary")
-        
-        guard let data = completion.data(using: .utf8) else {
-          resultJSON(nil)
-          return
+      let json = try JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed)
+      
+      let jsonDecoder = JSONDecoder()
+      jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
+      let credentialSummaryJson = try jsonDecoder.decode(CredentialSummary.self, from: data)
+      
+      switch credentialSummaryJson.state {
+      case .valid:
+        if Preferences.VPN.skusCredential.value == nil {
+          Logger.module.debug("The credential does NOT exists, calling prepareCredentialsPresentation")
+          _ = await prepareCredentialsPresentation(for: domain, path: "*")
+        } else {
+          Logger.module.debug("The credential exists, NOT calling prepareCredentialsPresentation")
         }
-        let json = try JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed)
-        
-        let jsonDecoder = JSONDecoder()
-        jsonDecoder.keyDecodingStrategy = .convertFromSnakeCase
-        let credentialSummaryJson = try jsonDecoder.decode(CredentialSummary.self, from: data)
-        
-        switch credentialSummaryJson.state {
-        case .valid:
-          if Preferences.VPN.skusCredential.value == nil {
-            Logger.module.debug("The credential does NOT exists, calling prepareCredentialsPresentation")
-            self.prepareCredentialsPresentation(for: domain, path: "*") { _ in
-              // Keep the skus manager alive until preparing credential presentation finishes.
-              _ = self
-            }
-          } else {
-            Logger.module.debug("The credential exists, NOT calling prepareCredentialsPresentation")
-          }
-        case .sessionExpired:
-          Logger.module.debug("This credential session has expired")
-          Self.keepShowingSessionExpiredState = true
-        case .invalid:
-          if !credentialSummaryJson.active {
-            Logger.module.debug("The credential summary is not active")
-          }
-          
-          if credentialSummaryJson.remainingCredentialCount <= 0 {
-            Logger.module.debug("The credential summary does not have any remaining credentials")
-          }
+      case .sessionExpired:
+        Logger.module.debug("This credential session has expired")
+        Self.keepShowingSessionExpiredState = true
+      case .invalid:
+        if !credentialSummaryJson.active {
+          Logger.module.debug("The credential summary is not active")
         }
         
-        resultJSON(json)
-      } catch {
-        resultJSON(nil)
-        Logger.module.error("refrshOrder: Failed to decode json: \(error.localizedDescription)")
+        if credentialSummaryJson.remainingCredentialCount <= 0 {
+          Logger.module.debug("The credential summary does not have any remaining credentials")
+        }
       }
+      
+      return json
+    } catch {
+      Logger.module.error("refrshOrder: Failed to decode json: \(error.localizedDescription)")
+      return nil
     }
   }
   

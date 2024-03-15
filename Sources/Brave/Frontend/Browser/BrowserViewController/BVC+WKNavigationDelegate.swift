@@ -1167,6 +1167,7 @@ extension BrowserViewController: WKUIDelegate {
     webView.evaluateSafeJavaScript(functionName: script, contentWorld: .defaultClient, asFunction: false)
   }
 
+  @MainActor
   func handleAlert<T: JSAlertInfo>(webView: WKWebView, alert: inout T, completionHandler: @escaping () -> Void) {
     guard let promptingTab = tabManager[webView], !promptingTab.blockAllAlerts else {
       suppressJSAlerts(webView: webView)
@@ -1175,9 +1176,10 @@ extension BrowserViewController: WKUIDelegate {
       return
     }
     promptingTab.alertShownCount += 1
+    
     let suppressBlock: JSAlertInfo.SuppressHandler = { [unowned self] suppress in
       if suppress {
-        func suppressDialogues(_: UIAlertAction) {
+        @MainActor func suppressDialogues(_: UIAlertAction) {
           self.suppressJSAlerts(webView: webView)
           promptingTab.blockAllAlerts = true
           self.tabManager[webView]?.cancelQueuedAlerts()

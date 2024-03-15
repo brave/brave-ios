@@ -31,11 +31,14 @@ class WindowRenderScriptHandler: TabContentScript {
                         in: scriptSandbox)
   }()
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
+  func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) async -> (Any?, String?) {
     // Do nothing with the messages received.
     // For now.. It's useful for debugging though.
+    
+    return (nil, nil)
   }
 
+  @MainActor
   static func executeScript(for tab: Tab) {
     tab.webView?.evaluateSafeJavaScript(functionName: "window.__firefox__.\(resizeWindowFunction).resizeWindow", contentWorld: scriptSandbox)
   }

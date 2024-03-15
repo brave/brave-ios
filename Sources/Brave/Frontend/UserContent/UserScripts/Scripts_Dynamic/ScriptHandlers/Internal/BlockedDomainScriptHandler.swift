@@ -20,17 +20,16 @@ class BlockedDomainScriptHandler: TabContentScript {
   static let scriptSandbox: WKContentWorld = .page
   static let userScript: WKUserScript? = nil
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
-    defer { replyHandler(nil, nil) }
-    
+  @MainActor
+  func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) async -> (Any?, String?) {
     if !verifyMessage(message: message, securityToken: UserScriptManager.securityToken) {
       assertionFailure("Missing required security token.")
-      return
+      return (nil, nil)
     }
 
     guard let params = message.body as? [String: AnyObject], let action = params["action"] as? String else {
       assertionFailure("Missing required params.")
-      return
+      return (nil, nil)
     }
     
     switch action {
@@ -41,8 +40,11 @@ class BlockedDomainScriptHandler: TabContentScript {
     default:
       assertionFailure("Unhandled action `\(action)`")
     }
+    
+    return (nil, nil)
   }
   
+  @MainActor
   private func blockedDomainDidProceed() {
     guard let url = tab?.url?.stippedInternalURL, let etldP1 = url.baseDomain else {
       assertionFailure("There should be no way this method can be triggered if the tab is not on an internal url")
@@ -54,6 +56,7 @@ class BlockedDomainScriptHandler: TabContentScript {
     tab?.loadRequest(request)
   }
   
+  @MainActor
   private func blockedDomainDidGoBack() {
     guard let url = tab?.url?.stippedInternalURL else {
       assertionFailure("There should be no way this method can be triggered if the tab is not on an internal url")

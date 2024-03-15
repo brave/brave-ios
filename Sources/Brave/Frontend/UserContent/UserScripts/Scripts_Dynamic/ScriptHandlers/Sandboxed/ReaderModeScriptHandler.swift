@@ -281,16 +281,14 @@ class ReaderModeScriptHandler: TabContentScript {
     delegate?.readerMode(self, didParseReadabilityResult: readabilityResult, forTab: tab)
   }
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
-    defer { replyHandler(nil, nil) }
-    
+  func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) async -> (Any?, String?) {
     if !verifyMessage(message: message, securityToken: UserScriptManager.securityToken) {
       assertionFailure("Missing required security token.")
-      return
+      return (nil, nil)
     }
     
     guard let body = message.body as? [String: AnyObject] else {
-      return
+      return (nil, nil)
     }
 
     if let msg = body["data"] as? Dictionary<String, Any> {
@@ -313,8 +311,11 @@ class ReaderModeScriptHandler: TabContentScript {
         }
       }
     }
+    
+    return (nil, nil)
   }
 
+  @MainActor
   var style: ReaderModeStyle = DefaultReaderModeStyle {
     didSet {
       if state == ReaderModeState.active {
@@ -325,6 +326,7 @@ class ReaderModeScriptHandler: TabContentScript {
     }
   }
 
+  @MainActor
   static func cache(for tab: Tab?) -> ReaderModeCache {
     switch TabType.of(tab) {
     case .regular:

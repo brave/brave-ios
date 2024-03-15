@@ -75,6 +75,7 @@ class FrequencyQuery {
     }
   }
     
+  @MainActor
   private func fetchSitesFromTabs(_ tabs: [Tab]) -> [Site] {
     var tabList = [Site]()
         

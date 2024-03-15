@@ -35,11 +35,10 @@ class URLPartinessScriptHandler: TabContentScript {
     self.tab = tab
   }
   
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: @escaping (Any?, String?) -> Void) {
+  func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) async -> (Any?, String?) {
     if !verifyMessage(message: message) {
       assertionFailure("Invalid security token. Fix the `SelectorsPollerScript.js` script")
-      replyHandler(nil, nil)
-      return
+      return (nil, nil)
     }
 
     do {
@@ -54,8 +53,7 @@ class URLPartinessScriptHandler: TabContentScript {
           results[urlString] = false
         }
         
-        replyHandler(results, nil)
-        return
+        return (results, nil)
       }
       
       let frameETLD1 = frameURL.baseDomain
@@ -71,10 +69,10 @@ class URLPartinessScriptHandler: TabContentScript {
         results[urlString] = frameETLD1 == etld1
       }
       
-      replyHandler(results, nil)
+      return (results, nil)
     } catch {
       assertionFailure("Invalid type of message. Fix the `RequestBlocking.js` script")
-      replyHandler(nil, nil)
+      return (nil, nil)
     }
   }
 }

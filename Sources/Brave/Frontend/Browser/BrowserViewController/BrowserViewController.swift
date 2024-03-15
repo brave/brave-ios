@@ -1713,6 +1713,7 @@ public class BrowserViewController: UIViewController {
   // to report internal page load to Rewards lib
   var rewardsXHRLoadURL: URL?
 
+  @MainActor
   override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
 
     guard let webView = object as? WKWebView else {
@@ -1966,8 +1967,10 @@ public class BrowserViewController: UIViewController {
       
       Task { @MainActor in
         do {
-          let result = await BraveCertificateUtils.verifyTrust(serverTrust, host: host, port: port)
-          
+          let result = BraveCertificateUtility.verifyTrust(serverTrust,
+                                                           host: host,
+                                                           port: port)
+
           // Cert is valid!
           if result == 0 {
             tab.secureContentState = .secure
@@ -2378,14 +2381,15 @@ public class BrowserViewController: UIViewController {
     }
   }
   
-  func toggleReaderMode() {
+  @MainActor
+  func toggleReaderMode() async {
     guard let tab = tabManager.selectedTab else { return }
     if let readerMode = tab.getContentScript(name: ReaderModeScriptHandler.scriptName) as? ReaderModeScriptHandler {
       switch readerMode.state {
       case .available:
-        enableReaderMode()
+        await enableReaderMode()
       case .active:
-        disableReaderMode()
+        await disableReaderMode()
       case .unavailable:
         break
       }

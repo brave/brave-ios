@@ -34,6 +34,7 @@ class PlaylistScriptHandler: NSObject, TabContentScript {
   private var asset: AVURLAsset?
   private static let queue = DispatchQueue(label: "com.playlisthelper.queue", qos: .userInitiated)
 
+  @MainActor
   init(tab: Tab) {
     self.tab = tab
     self.url = tab.url
@@ -90,38 +91,39 @@ class PlaylistScriptHandler: NSObject, TabContentScript {
                         in: scriptSandbox)
   }()
 
-  func userContentController(_ userContentController: WKUserContentController, didReceiveScriptMessage message: WKScriptMessage, replyHandler: (Any?, String?) -> Void) {
-    defer { replyHandler(nil, nil) }
-    
+  func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) async -> (Any?, String?) {
     if !verifyMessage(message: message) {
       assertionFailure("Missing required security token.")
-      return
+      return (nil, nil)
     }
     
     // If this URL is blocked from Playlist support, do nothing
     if url?.isPlaylistBlockedSiteURL == true {
-      return
+      return (nil, nil)
     }
     
     if ReadyState.from(message: message) != nil {
-      return
+      return (nil, nil)
     }
     
-    Self.processPlaylistInfo(
+    await Self.processPlaylistInfo(
       handler: self,
       item: PlaylistInfo.from(message: message))
+    
+    return (nil, nil)
   }
 
-  private class func processPlaylistInfo(handler: PlaylistScriptHandler, item: PlaylistInfo?) {
+  @MainActor
+  private class func processPlaylistInfo(handler: PlaylistScriptHandler, item: PlaylistInfo?) async {
     guard var item = item, !item.src.isEmpty else {
-      DispatchQueue.main.async {
+      await MainActor.run {
         handler.delegate?.updatePlaylistURLBar(tab: handler.tab, state: .none, item: nil)
       }
       return
     }
     
     if handler.url?.baseDomain != "soundcloud.com", item.isInvisible {
-      DispatchQueue.main.async {
+      await MainActor.run {
         handler.delegate?.updatePlaylistURLBar(tab: handler.tab, state: .none, item: nil)
       }
       return
@@ -213,6 +215,7 @@ class PlaylistScriptHandler: NSObject, TabContentScript {
 
 extension PlaylistScriptHandler: UIGestureRecognizerDelegate {
   @objc
+  @MainActor
   func onLongPressedWebView(_ gestureRecognizer: UILongPressGestureRecognizer) {
     if gestureRecognizer.state == .began,
       let webView = tab?.webView,
@@ -275,6 +278,7 @@ extension PlaylistScriptHandler {
     }
   }
 
+  @MainActor
   static func stopPlayback(tab: Tab?) {
     guard let tab = tab else { return }
 
@@ -290,9 +294,10 @@ extension PlaylistScriptHandler {
 }
 
 extension PlaylistScriptHandler {
-  static func updatePlaylistTab(tab: Tab, item: PlaylistInfo?) {
+  @MainActor
+  static func updatePlaylistTab(tab: Tab, item: PlaylistInfo?) async {
     if let handler = tab.getContentScript(name: Self.scriptName) as? PlaylistScriptHandler {
-      Self.processPlaylistInfo(handler: handler, item: item)
+      await Self.processPlaylistInfo(handler: handler, item: item)
     }
   }
 }

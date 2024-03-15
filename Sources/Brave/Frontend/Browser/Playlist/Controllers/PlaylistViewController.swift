@@ -99,11 +99,11 @@ class PlaylistViewController: UIViewController {
     if let item = PlaylistCarplayManager.shared.currentPlaylistItem {
       updateLastPlayedItem(item: item)
     }
-
+    
     // Stop picture in picture
     player.pictureInPictureController?.delegate = nil
     player.pictureInPictureController?.stopPictureInPicture()
-
+    
     // Simulator cannot "detect" if Car-Play is enabled, therefore we need to STOP playback
     // When this controller deallocates. The user can still manually resume playback in CarPlay.
     if !PlaylistCarplayManager.shared.isCarPlayAvailable {
@@ -111,16 +111,19 @@ class PlaylistViewController: UIViewController {
       stop(playerView)
       PlaylistCarplayManager.shared.currentPlaylistItem = nil
       PlaylistCarplayManager.shared.currentlyPlayingItemIndex = -1
-
+      
       // Destroy folder observers
       folderObserver = nil
       PlaylistManager.shared.currentFolder = nil
     }
-
+    
     // Cancel all loading.
     listController.stopLoadingSharedPlaylist()
     PlaylistManager.shared.playbackTask = nil
-    PlaylistCarplayManager.shared.playlistController = nil
+    
+    Task { @MainActor in
+      PlaylistCarplayManager.shared.playlistController = nil
+    }
   }
 
   override func viewDidLoad() {
